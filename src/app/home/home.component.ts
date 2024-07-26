@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavBarComponent } from "../nav-bar/nav-bar.component";
 import { CommonModule } from '@angular/common';
+import { WeatherComponent } from '../weather/weather.component';
+import { FooterComponent } from '../footer/footer.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterOutlet, NavBarComponent, CommonModule],
+  imports: [RouterOutlet, NavBarComponent, CommonModule, WeatherComponent, FooterComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

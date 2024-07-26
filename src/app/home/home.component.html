@@ -1,8 +1,9 @@
 <app-nav-bar></app-nav-bar>
 <main>
+
   <div id="top-container">
     <div id="video">
-      <video src="/assets/google-deepmind1.mp4"  loop></video>
+      <video src="/assets/google-deepmind1.mp4" autoplay loop></video>
     </div>
     <div id="about">
       <div id="me">
@@ -49,5 +50,101 @@
     </div>
 
   </div>
+
+  <div id="languages-container">
+    <div class="language">
+      <div class="single-language">
+        <img src="/assets/icon/adobe.svg" alt="">
+        <h4>Adobe Suite</h4>
+      </div>
+    </div>
+    <div class="language">
+      <div class="single-language2">
+        <img src="/assets/icon/angular.svg" alt="">
+        <h4>Angular</h4>
+      </div>
+    </div>
+    <div class="language">
+      <div class="single-language">
+        <img src="/assets/icon/nodeJS.svg" alt="">
+        <h4>NodeJS</h4>
+      </div>
+    </div>
+    <div class="language">
+      <div class="single-language2">
+        <img src="/assets/icon/mySQL.svg" alt="">
+        <h4>MySQL</h4>
+      </div>
+    </div>
+  </div>
+
+  <div id="services-container">
+    <div class="service">
+      <div class="service-text">
+        <div class="service-title">
+          <p>È la prima volta che ti affacci al</p>
+          <h2>Branding Online</h2>
+        </div>
+        <div class="service-cta">
+          <img src="/assets/icon/arrow.svg" alt="">
+        </div>
+      </div>
+      <div class="service-image" id="service-branding"></div>
+    </div>
+    <div class="service">
+      <div class="service-text">
+        <div class="service-title">
+          <p>Sei già più esperto e vuoi un</p>
+          <h2>Servizio avanzato</h2>
+        </div>
+        <div class="service-cta">
+          <img src="/assets/icon/arrow.svg" alt="">
+        </div>
+      </div>
+      <div class="service-image" id="service-advance"></div>
+    </div>
+    <div class="service">
+      <div class="service-text">
+        <div class="service-title">
+          <p>Vuoi differenziarti con un</p>
+          <h2>Design unico</h2>
+        </div>
+        <div class="service-cta">
+          <img src="/assets/icon/arrow.svg" alt="">
+        </div>
+      </div>
+      <div class="service-image" id="service-design"></div>
+    </div>
+  </div>
+
+  <div id="cta-container">
+    <div id="cta1">
+      <app-weather></app-weather>
+      <div id="game">
+        <h3>Prova uno dei miei giochi</h3>
+        <div id="game2">
+          <div id="carta-alta" class="single-game">
+            <h5>Carta alta</h5>
+            <div class="game-cta">
+              <img src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+          <div id="morra-cinese" class="single-game">
+            <h5>Morra Cinese</h5>
+            <div class="game-cta">
+              <img src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="cta2">
+      <img src="/assets/icon/calendar.svg" alt="">
+      <h4>Hai un progetto in mente?</h4>
+      <h3>Organizziamo un'ora di chiacchierata gratuita</h3>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
 
 </main>

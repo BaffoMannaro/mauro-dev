@@ -14,12 +14,13 @@
   top: 0;
   left: 50%;
   translate: -50% 0;
+  background-color: #1b1b1b;
 }
 .content #logo {
   height: 38px;
   filter: invert(100%);
 }
-.content #menu {
+.content ul#menu {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -27,10 +28,11 @@
   flex-direction: row;
   gap: 30px;
 }
-.content #menu li {
+.content ul#menu li {
   padding: 10px 30px;
   border: 1px solid #d9d9d9;
   border-radius: 25px;
+  cursor: pointer;
 }
 .content #mail {
   background-color: #ffffff;
@@ -38,4 +40,5 @@
   padding: 10px;
   display: flex;
   align-items: center;
+  cursor: pointer;
 }/*# sourceMappingURL=nav-bar.component.css.map */

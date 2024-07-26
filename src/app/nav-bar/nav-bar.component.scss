@@ -16,13 +16,14 @@
   top: 0;
   left: 50%;
   translate: -50% 0;
+  background-color: $c-dark;
 
     #logo{
       height: 38px;
       filter: invert(100%);
     }
 
-    #menu{
+    ul#menu{
       list-style: none;
       padding: 0;
       margin: 0;
@@ -34,6 +35,7 @@
         padding: 10px 30px;
         border: $normal-border;
         border-radius: 25px;
+        cursor: pointer;
       }
     }
 
@@ -43,5 +45,6 @@
       padding: 10px;
       display: flex;
       align-items: center;
+      cursor: pointer;
     }
 }

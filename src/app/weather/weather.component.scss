@@ -1,0 +1,8 @@
+@import '../../variables';
+
+:host{
+  height: 40%;
+  width: 100%;
+  border: $normal-border;
+  border-radius: 25px;
+}

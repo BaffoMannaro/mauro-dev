@@ -1,0 +1,140 @@
+@import '../../variables';
+
+:host{
+  max-width: 1320px;
+}
+
+main{
+  height: 100%;
+  margin: 100px 0;
+
+  #top-container{
+    width: 100%;
+    height: 700px;
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+
+    #video{
+      width: 50%;
+      height: 100%;
+
+      video{
+        width: 100%;
+        height: 100%;
+        border-radius: 25px;
+        object-fit: cover;
+      }
+    }
+
+    #about{
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+
+      #me{
+        height: 30%;
+        border: $normal-border;
+        border-radius: 25px;
+        display: flex;
+        flex-direction: row;
+        gap: 30px;
+        padding: 30px;
+
+        >img{
+          background-color: $c-light-grey;
+          border-radius: 25px;
+        }
+
+        #me-name{
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+
+          h1{
+            margin: 0;
+            padding: 0;
+            font-size: 32px;
+            font-weight: 400;
+          }
+
+          ul#skill{
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+
+            li{
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              gap: 10px;
+              color: $c-dark;
+              background-color: $c-light;
+              border-radius: 25px;
+              padding: 5px 20px 5px 15px;
+
+              img{
+                width: 18px;
+                height: 18px;
+              }
+
+              h3{
+                font-size: 12px;
+                font-weight: 700;
+                margin: 0;
+              }
+            }
+          }
+        }
+      }
+
+      #mission{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 30px;
+        border: $normal-border;
+        border-radius: 25px;
+
+        p{
+          margin: 0;
+          font-weight: 400;
+          font-size: 32px;
+
+          .minus{
+            font-weight: 300;
+            color: #ffffff80;
+          }
+        }
+
+        @keyframes marquee {
+          0%    { transform: translateX(0%) }
+          100%  { transform: translateX(-100%) }
+        }
+        #marquee-container{
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+          color: $c-dark;
+          background-color: $c-light;
+          padding: 15px 30px;
+          border-radius: 25px;
+        }
+        #marquee-content{
+          display: inline-block;
+          padding-left: 100%;
+          animation: marquee 40s linear infinite;
+        }
+      }
+    }
+    
+  }
+
+  
+}

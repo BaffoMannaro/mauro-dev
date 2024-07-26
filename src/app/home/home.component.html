@@ -1,1 +1,53 @@
-<p>home works!</p>
+<app-nav-bar></app-nav-bar>
+<main>
+  <div id="top-container">
+    <div id="video">
+      <video src="/assets/google-deepmind1.mp4"  loop></video>
+    </div>
+    <div id="about">
+      <div id="me">
+        <img src="/assets/mauro.png" alt="">
+        <div id="me-name">
+          <h1>Mauro Altamura</h1>
+          <ul id="skill">
+            <li>
+              <img src="/assets/icon/web-designer.svg" alt="">
+              <h3>Web Designer</h3>
+            </li>
+            <li>
+              <img src="/assets/icon/frontend.svg" alt="">
+              <h3>Frontend Developer</h3>
+            </li>
+            <li>
+              <img src="/assets/icon/graphic.svg" alt="">
+              <h3>Graphic Designer</h3>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div id="mission">
+        <p>Come Senior Graphic Designer e Web Developer, sono specializzato nella creazione di identità visive strategiche per i prodotti digitali. <span class="minus">Credo che un design straordinario inizi con valori comuni, una comunicazione aperta e il rispetto per il pubblico.</span></p>
+
+        <div id="marquee-container">
+          <div id="marquee-content">
+            <span *ngFor="let word of words">
+              {{ word }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span *ngFor="let word of words">
+              {{ word }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span *ngFor="let word of words">
+              {{ word }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            <span *ngFor="let word of words">
+              {{ word }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</main>

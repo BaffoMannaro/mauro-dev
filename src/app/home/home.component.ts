@@ -1,12 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { NavBarComponent } from "../nav-bar/nav-bar.component";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [],
+  imports: [RouterOutlet, NavBarComponent, CommonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit{
+
+  words: string[] = [
+    'Branding',
+    'User Interface',
+    'Web-App',
+    'E-Commerce',
+    'Blog',
+    'Wire Framing',
+    'User Experience',
+    'SEO'
+  ];
+
+  constructor() {}
+
+  ngOnInit(): void {}
 
 }

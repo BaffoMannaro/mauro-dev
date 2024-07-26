@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+* {
+  font-family: "Archivo", sans-serif;
+  box-sizing: border-box;
+}
+* body {
+  background-color: #1b1b1b;
+  color: #ffffff;
+  max-width: 1320px;
+  margin: 0 auto;
+}/*# sourceMappingURL=styles.css.map */

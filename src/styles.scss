@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'variables';
+
+*{
+  font-family: "Archivo", sans-serif;
+  box-sizing: border-box;
+
+    body{
+      background-color: $c-dark;
+      color: $c-light;
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+  }

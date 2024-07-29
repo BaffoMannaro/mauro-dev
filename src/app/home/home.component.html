@@ -79,41 +79,109 @@
   </div>
 
   <div id="services-container">
-    <div class="service">
+
+    <div class="service" [ngClass]="{'selected': selectedService1}">
       <div class="service-text">
         <div class="service-title">
           <p>È la prima volta che ti affacci al</p>
           <h2>Branding Online</h2>
         </div>
-        <div class="service-cta">
+        <div class="service-cta" (click)="onServiceClick(1)">
           <img src="/assets/icon/arrow.svg" alt="">
         </div>
       </div>
-      <div class="service-image" id="service-branding"></div>
+      <div class="service-image">
+        <img class="service-image-cta" src="/assets/service-branding.webp" alt="">
+
+        <div class="service-page-container">
+          <div class="service-page-cta">
+            <h3>Voglio essere tra i primi risultati su GOOGLE</h3>
+            <div  class="page-cta">
+              <img routerLink="/services/seo" src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+
+          <div class="service-page-cta">
+            <h3>Ho bisogno di un SITO WEB per la mia attività</h3>
+            <div class="page-cta">
+              <img routerLink="/services/web" src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+
+          <div class="service-page-cta">
+            <h3>Ho bisogno di una LANDING PAGE per promuovere il mio prodotto o servizio</h3>
+            <div class="page-cta">
+              <img routerLink="/services/landing-page" src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
-    <div class="service">
+
+    <div class="service" [ngClass]="{'selected': selectedService2}">
       <div class="service-text">
         <div class="service-title">
           <p>Sei già più esperto e vuoi un</p>
           <h2>Servizio avanzato</h2>
         </div>
-        <div class="service-cta">
+        <div class="service-cta" (click)="onServiceClick(2)">
           <img src="/assets/icon/arrow.svg" alt="">
         </div>
       </div>
-      <div class="service-image" id="service-advance"></div>
-    </div>
-    <div class="service">
+      <div class="service-image">
+        <img class="service-image-cta" src="/assets/service-advance.webp" alt="">
+
+        <div class="service-page-container">
+          <div class="service-page-cta">
+            <h3>Ho bisogno di un BLOG per raccontare la mia storia</h3>
+            <div  class="page-cta">
+              <img routerLink="/services/blog" src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+
+          <div class="service-page-cta">
+            <h3>Ho bisogno di un E-COMMERCE per vendere i miei prodotti on-line</h3>
+            <div class="page-cta">
+              <img routerLink="/services/e-commerce" src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+
+          <div class="service-page-cta">
+            <h3>Ho bisogno di una WEB APP personalizzata per la mia attività</h3>
+            <div class="page-cta">
+              <img routerLink="/services/web-app" src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+
+      </div>
+      </div>
+     </div>
+
+    <div class="service" [ngClass]="{'selected': selectedService3}">
       <div class="service-text">
         <div class="service-title">
           <p>Vuoi differenziarti con un</p>
           <h2>Design unico</h2>
         </div>
-        <div class="service-cta">
+        <div class="service-cta" (click)="onServiceClick(3)">
           <img src="/assets/icon/arrow.svg" alt="">
         </div>
       </div>
-      <div class="service-image" id="service-design"></div>
+      <div class="service-image" id="service-design">
+        <img class="service-image-cta" src="/assets/service-design.webp" alt="">
+
+        <div class="service-page-container">
+          <div class="service-page-cta">
+            <h3>Ho bisogno del DESIGN / REDESIGN dell’ interfaccia del mio software / sito web</h3>
+            <div  class="page-cta">
+              <img routerLink="/services/design" src="/assets/icon/arrow.svg" alt="">
+            </div>
+          </div>
+
+      </div>
+    </div>
+
     </div>
   </div>
 

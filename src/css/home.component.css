@@ -209,10 +209,6 @@ main #services-container .service {
   flex-direction: column;
   gap: 30px;
 }
-main #services-container .service:hover {
-  border: 1px solid #C72086;
-  cursor: pointer;
-}
 main #services-container .service .service-text {
   display: flex;
   flex-direction: row;
@@ -256,18 +252,88 @@ main #services-container .service .service-image {
   border-radius: 18px;
   height: 390px;
   width: 100%;
+  background-color: #1b1b1b;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  overflow: hidden;
 }
-main #services-container .service #service-branding {
-  background-image: url("/assets/service-branding.webp");
+main #services-container .service .service-image .service-page-cta h3 {
+  margin: 0;
 }
-main #services-container .service #service-advance {
-  background-image: url("/assets/service-advance.webp");
+main #services-container .service .service-image .service-image-cta {
+  border-radius: 25px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
 }
-main #services-container .service #service-design {
-  background-image: url("/assets/service-design.webp");
+main #services-container .service .service-image .service-image-cta:hover {
+  cursor: pointer;
+  transform: scale(1.2);
+}
+main #services-container .service.selected {
+  background-color: #ffffff;
+  color: #1b1b1b;
+}
+main #services-container .service.selected .service-text .service-cta {
+  background-color: #ffffff;
+  border: 1px solid #1b1b1b;
+  transition: rotate 0.5 ease;
+}
+main #services-container .service.selected .service-text .service-cta > img {
+  filter: invert(100%);
+  rotate: 180deg;
+}
+main #services-container .service.selected .service-text .service-cta:hover {
+  background-color: #1b1b1b;
+}
+main #services-container .service.selected .service-text .service-cta:hover > img {
+  filter: invert(0);
+}
+main #services-container .service.selected .service-image img {
+  display: none;
+}
+main #services-container .service.selected .service-image .service-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 40px 20px;
+  color: #ffffff;
+}
+main #services-container .service.selected .service-image .service-page-container .service-page-cta {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding: 0 5px;
+}
+main #services-container .service.selected .service-image .service-page-container .service-page-cta h3 {
+  width: 80%;
+  margin: 0;
+  font-weight: 100;
+  font-size: 18px;
+}
+main #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
+  background-color: #1b1b1b;
+  border: 1px solid #ffffff;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 37px;
+  height: 37px;
+  cursor: pointer;
+}
+main #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover {
+  background-color: #C72086;
+  border: none;
+}
+main #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
+  display: block;
+  height: 12px;
+  width: 12px;
 }
 main #cta-container {
   display: flex;
@@ -329,10 +395,14 @@ main #cta-container #cta1 #game #game2 .single-game .game-cta {
   align-items: center;
   justify-content: center;
   background-color: #1b1b1b;
+  cursor: pointer;
+}
+main #cta-container #cta1 #game #game2 .single-game .game-cta:hover {
+  background-color: #C72086;
+  border: none;
 }
 main #cta-container #cta1 #game #game2 #carta-alta {
   background-image: url("/assets/carta.webp");
-  filter: saturate(0%);
 }
 main #cta-container #cta1 #game #game2 #morra-cinese {
   background-image: url("/assets/morra.webp");

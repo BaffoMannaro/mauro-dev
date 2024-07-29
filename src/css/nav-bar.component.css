@@ -19,6 +19,7 @@
 .content #logo {
   height: 38px;
   filter: invert(100%);
+  cursor: pointer;
 }
 .content ul#menu {
   list-style: none;
@@ -34,6 +35,10 @@
   border-radius: 25px;
   cursor: pointer;
 }
+.content ul#menu li:hover {
+  background-color: #ffffff;
+  color: #1b1b1b;
+}
 .content #mail {
   background-color: #ffffff;
   border-radius: 25px;
@@ -41,4 +46,10 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+.content #mail:hover {
+  background-color: #C72086;
+}
+.content #mail:hover img {
+  filter: invert(100%);
 }/*# sourceMappingURL=nav-bar.component.css.map */

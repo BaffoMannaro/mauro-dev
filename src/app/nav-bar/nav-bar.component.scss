@@ -21,6 +21,7 @@
     #logo{
       height: 38px;
       filter: invert(100%);
+      cursor: pointer;
     }
 
     ul#menu{
@@ -36,6 +37,11 @@
         border: $normal-border;
         border-radius: 25px;
         cursor: pointer;
+
+        &:hover{
+          background-color: $c-light;
+          color: $c-dark;
+        }
       }
     }
 
@@ -46,5 +52,13 @@
       display: flex;
       align-items: center;
       cursor: pointer;
+
+      &:hover{
+        background-color: $c-accent;
+
+        img{
+          filter: invert(100%);
+        }
+      }
     }
 }

@@ -157,4 +157,9 @@ main .cta-parliamone h3 {
   padding: 20px 30px;
   font-weight: 500;
   font-size: 25px;
+  cursor: pointer;
+}
+main .cta-parliamone h3:hover {
+  background-color: #C72086;
+  color: #ffffff;
 }/*# sourceMappingURL=seo.component.css.map */

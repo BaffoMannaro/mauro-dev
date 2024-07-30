@@ -185,6 +185,12 @@ main{
       padding: 20px 30px;
       font-weight: 500;
       font-size: 25px;
+      cursor: pointer;
+
+      &:hover{
+        background-color: $c-accent;
+        color: $c-light;
+      }
     }
   }
 

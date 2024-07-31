@@ -50,6 +50,7 @@ main .title {
   gap: 30px;
   align-items: center;
   justify-content: flex-start;
+  text-wrap: balance;
 }
 main .title h1, main .title h2 {
   margin: 0;
@@ -136,8 +137,38 @@ main .box-main .box-container {
   justify-content: space-between;
   gap: 4%;
 }
-main .box-main .box-container .end {
-  margin-bottom: 0 !important;
+main .box-main .box-container .face-title {
+  width: 100%;
+}
+main .box-main .box-container .face-title h2 {
+  margin: 0;
+  margin-bottom: 30px;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 24px;
+}
+main .box-main .box-container .help-title h2 {
+  text-align: center;
+}
+main .box-main .box-container .help-title p {
+  margin: 0;
+  margin-bottom: 30px;
+  padding: 20px 30px;
+  background-color: #ffffff;
+  color: #1b1b1b;
+  border-radius: 25px;
+  text-align: center;
+}
+main .box-main .box-container .box-image {
+  overflow: hidden;
+  padding: 0 !important;
+  border: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center !important;
+}
+main .box-main .box-container .box-image > img {
+  width: 100%;
 }
 main .box-main .box-container .box {
   height: 250px;
@@ -185,22 +216,35 @@ main .box-main .box-container .conclusion .box-icon {
   background-color: #1b1b1b !important;
 }
 main .cta-parliamone {
-  border: 1px solid #d9d9d9;
-  border-radius: 25px;
   width: 100%;
-  padding: 30px;
   display: flex;
   flex-direction: row;
   gap: 30px;
-  align-items: center;
+}
+main .cta-parliamone .cta-box {
+  width: 33%;
+  border: 1px solid #d9d9d9;
+  border-radius: 25px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+main .cta-parliamone .cta-box:first-child {
+  background-color: #ffffff;
+  color: #1b1b1b;
+}
+main .cta-parliamone .cta-box:last-child {
   justify-content: center;
 }
-main .cta-parliamone h2 {
+main .cta-parliamone .cta-box p {
   margin: 0;
-  font-weight: 200;
-  font-size: 25px;
+  padding: 0;
+  font-weight: 100;
+  font-size: 16px;
+  line-height: 19px;
 }
-main .cta-parliamone h3 {
+main .cta-parliamone .cta-box h3 {
   color: #1b1b1b;
   background-color: #ffffff;
   border-radius: 25px;
@@ -209,7 +253,7 @@ main .cta-parliamone h3 {
   font-size: 25px;
   cursor: pointer;
 }
-main .cta-parliamone h3:hover {
+main .cta-parliamone .cta-box h3:hover {
   background-color: #C72086;
   color: #ffffff;
 }/*# sourceMappingURL=e-commerce.component.css.map */

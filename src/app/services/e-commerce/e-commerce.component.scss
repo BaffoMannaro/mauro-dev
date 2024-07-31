@@ -58,6 +58,7 @@ main{
     gap: 30px;
     align-items: center;
     justify-content: flex-start;
+    text-wrap: balance;
 
     h1,h2{
       margin: 0;
@@ -158,8 +159,45 @@ main{
       justify-content: space-between;
       gap: 4%;
 
-      .end{
-        margin-bottom: 0 !important;
+      .face-title{
+        width: 100%;
+
+        h2{
+          margin: 0;
+          margin-bottom: 30px;
+          font-weight: 500;
+          text-transform: uppercase;
+          font-size: 24px;
+        }
+      }
+
+      .help-title{
+        h2{
+          text-align: center;
+        }
+
+        p{
+          margin: 0;
+          margin-bottom: 30px;
+          padding: 20px 30px;
+          background-color: $c-light;
+          color: $c-dark;
+          border-radius: 25px;
+          text-align: center;
+        }
+      }
+
+      .box-image{
+        overflow: hidden;
+        padding: 0 !important;
+        border: 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center !important;
+
+        >img{
+          width: 100%;
+        }
       }
 
       .box{
@@ -220,35 +258,52 @@ main{
   }
 
   .cta-parliamone{
-    border: $normal-border;
-    border-radius: 25px;
     width: 100%;
-    padding: 30px;
     display: flex;
     flex-direction: row;
     gap: 30px;
-    align-items: center;
-    justify-content: center;
 
-    h2{
-      margin: 0;
-      font-weight: 200;
-      font-size: 25px;
-    }
-
-    h3{
-      color: $c-dark;
-      background-color: $c-light;
+    .cta-box{
+      width: 33%;
+      border: $normal-border;
       border-radius: 25px;
-      padding: 20px 30px;
-      font-weight: 500;
-      font-size: 25px;
-      cursor: pointer;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
 
-      &:hover{
-        background-color: $c-accent;
-        color: $c-light;
+      &:first-child{
+        background-color: $c-light;
+        color: $c-dark;
       }
+
+      &:last-child{
+        justify-content: center;
+      }
+
+      p{
+        margin: 0;
+        padding: 0;
+        font-weight: 100;
+        font-size: 16px;
+        line-height: 19px;
+      }
+  
+      h3{
+        color: $c-dark;
+        background-color: $c-light;
+        border-radius: 25px;
+        padding: 20px 30px;
+        font-weight: 500;
+        font-size: 25px;
+        cursor: pointer;
+  
+        &:hover{
+          background-color: $c-accent;
+          color: $c-light;
+        }
+      }
+
     }
   }
 

@@ -105,6 +105,10 @@ main{
       justify-content: space-between;
       gap: 4%;
 
+      .end{
+        margin-bottom: 0 !important;
+      }
+
       .box{
         height: 250px;
         width: 48%;
@@ -125,8 +129,9 @@ main{
 
           h3{
             margin: 0;
-            font-weight: 400;
+            font-weight: 300;
             font-size: 24px;
+            width: 80%;
           }
 
           .box-icon{

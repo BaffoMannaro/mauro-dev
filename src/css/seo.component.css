@@ -90,6 +90,9 @@ main .box-main .box-container {
   justify-content: space-between;
   gap: 4%;
 }
+main .box-main .box-container .end {
+  margin-bottom: 0 !important;
+}
 main .box-main .box-container .box {
   height: 250px;
   width: 48%;
@@ -110,8 +113,9 @@ main .box-main .box-container .box .box-title {
 }
 main .box-main .box-container .box .box-title h3 {
   margin: 0;
-  font-weight: 400;
+  font-weight: 300;
   font-size: 24px;
+  width: 80%;
 }
 main .box-main .box-container .box .box-title .box-icon {
   background-color: #ffffff;

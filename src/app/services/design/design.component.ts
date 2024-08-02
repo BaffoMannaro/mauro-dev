@@ -1,12 +1,22 @@
 import { Component } from '@angular/core';
+import { NavBarComponent } from '../../nav-bar/nav-bar.component';
+import { FooterComponent } from '../../footer/footer.component';
+import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-design',
   standalone: true,
-  imports: [],
+  imports: [NavBarComponent, FooterComponent,RouterLink, CommonModule],
   templateUrl: './design.component.html',
   styleUrl: './design.component.scss'
 })
 export class DesignComponent {
+
+  selectedSlide:string = 'analisi';
+  
+  selectSlide(n:string): string{
+    return this.selectedSlide = n;
+  }
 
 }

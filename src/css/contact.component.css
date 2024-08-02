@@ -1,1 +1,90 @@
-/*# sourceMappingURL=contact.component.css.map */
+:host {
+  max-width: 1320px;
+}
+
+main {
+  height: 100%;
+  margin: 100px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 50px;
+}
+main .title-container {
+  max-width: 860px;
+  width: 100%;
+  margin: 100px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  align-items: center;
+}
+main .title-container .title {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  justify-content: flex-start;
+}
+main .title-container .title h1, main .title-container .title h2 {
+  margin: 0;
+  text-align: center;
+  font-weight: 400;
+  font-size: 36px;
+}
+main .title-container .title h1 {
+  text-wrap: balance;
+}
+main .title-container .title h3, main .title-container .title p {
+  margin: 0;
+  padding: 0;
+  font-weight: 500;
+  font-size: 24px;
+}
+main .title-container .title h3 {
+  text-align: center;
+}
+main .title-container .title h6 {
+  margin: 0;
+  padding: 0;
+  font-weight: 200;
+  font-size: 16px;
+}
+main .title-container .title p {
+  text-align: left;
+  font-weight: 100;
+  font-size: 20px;
+  line-height: 25px;
+  padding: 0 20px;
+}
+main .cta-parliamone {
+  max-width: 860px;
+  border: 1px solid #d9d9d9;
+  border-radius: 25px;
+  width: 100%;
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+}
+main .cta-parliamone h2 {
+  margin: 0;
+  font-weight: 200;
+  font-size: 25px;
+}
+main .cta-parliamone a {
+  text-decoration: none;
+  color: #1b1b1b;
+  background-color: #ffffff;
+  border-radius: 25px;
+  padding: 20px 30px;
+  font-weight: 500;
+  font-size: 25px;
+  cursor: pointer;
+}
+main .cta-parliamone a:hover {
+  background-color: #C72086;
+  color: #ffffff;
+}/*# sourceMappingURL=contact.component.css.map */

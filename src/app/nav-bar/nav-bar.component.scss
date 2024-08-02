@@ -38,12 +38,52 @@
         border: $normal-border;
         border-radius: 25px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-items: center;
 
         &:hover{
           background-color: $c-light;
           color: $c-dark;
         }
+
+        p{
+          margin: 0;
+          padding: 0;
+          font-size: 16px;
+        }
       }
+
+      .theme-container{
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 20px;
+        padding: 10px;
+
+        .theme{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 25px;
+          width: 20px;
+          height: 20px;
+
+          img{
+            width: 80%;
+          }
+        }
+
+        .dark{
+          background-color: $c-light;
+        }
+
+        .light{
+          background-color: $c-dark;
+        }
+
+      }
+
     }
 
     #mail{

@@ -1,1 +1,3 @@
-<router-outlet></router-outlet>
+<div [ngClass]="{'light-mode': DarkLightModeService.mode === true, 'dark-mode': DarkLightModeService.mode === false}">
+  <router-outlet></router-outlet>
+</div>

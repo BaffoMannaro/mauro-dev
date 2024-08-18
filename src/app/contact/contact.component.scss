@@ -1,107 +1,125 @@
-@import '../../variables';
+.light-mode{
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode{
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
 
 :host{
   max-width: 1320px;
 }
 
 main{
-  height: 100%;
-  margin: 100px 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 50px;
+  justify-content: center;
 
-  .title-container{
-    max-width: 860px;
-    width: 100%;
-    margin: 100px 0 0 0;
+  .main-content{
+    max-width: 1320px;
+    height: 100%;
+    padding: 120px 0;
     display: flex;
     flex-direction: column;
     gap: 50px;
-    align-items: center;
 
-    .title{
+    .title-container{
+      max-width: 860px;
+      width: 100%;
+      margin: 100px 0 0 0;
       display: flex;
       flex-direction: column;
+      gap: 50px;
+      align-items: center;
+
+      .title{
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        align-items: center;
+        justify-content: flex-start;
+    
+        h1,h2{
+          margin: 0;
+          text-align: center;
+          font-weight: 400;
+          font-size: 36px;
+        }
+    
+        h1{
+          text-wrap: balance;
+        }
+    
+        h3,p{
+          margin: 0;
+          padding: 0;
+          font-weight: 500;
+          font-size: 24px;
+        }
+    
+        h3{
+          text-align: center;
+        }
+    
+        h6{
+          margin: 0;
+          padding: 0;
+          font-weight: 200;
+          font-size: 16px;
+        }
+    
+        p{
+          text-align: left;
+          font-weight: 100;
+          font-size: 20px;
+          line-height: 25px;
+          padding: 0 20px;
+        }
+    
+      }
+
+    }
+
+    .cta-parliamone{
+      max-width: 860px;
+      border: 1px solid var(--c-grey);
+      border-radius: 25px;
+      width: 100%;
+      padding: 30px;
+      display: flex;
+      flex-direction: row;
       gap: 30px;
       align-items: center;
-      justify-content: flex-start;
-  
-      h1,h2{
+      justify-content: center;
+
+      h2{
         margin: 0;
-        text-align: center;
-        font-weight: 400;
-        font-size: 36px;
-      }
-  
-      h1{
-        text-wrap: balance;
-      }
-  
-      h3,p{
-        margin: 0;
-        padding: 0;
-        font-weight: 500;
-        font-size: 24px;
-      }
-  
-      h3{
-        text-align: center;
-      }
-  
-      h6{
-        margin: 0;
-        padding: 0;
         font-weight: 200;
-        font-size: 16px;
+        font-size: 25px;
       }
-  
-      p{
-        text-align: left;
-        font-weight: 100;
-        font-size: 20px;
-        line-height: 25px;
-        padding: 0 20px;
+
+      a{
+        text-decoration: none;
+        color: var(--c-dark);
+        background-color: var(--c-light);
+        border-radius: 25px;
+        padding: 20px 30px;
+        font-weight: 500;
+        font-size: 25px;
+        cursor: pointer;
+
+        &:hover{
+          background-color: var(--c-accent);
+          color: var(--c-light);
+        }
       }
-  
     }
 
   }
-
-  .cta-parliamone{
-    max-width: 860px;
-    border: $normal-border;
-    border-radius: 25px;
-    width: 100%;
-    padding: 30px;
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-    align-items: center;
-    justify-content: center;
-
-    h2{
-      margin: 0;
-      font-weight: 200;
-      font-size: 25px;
-    }
-
-    a{
-      text-decoration: none;
-      color: $c-dark;
-      background-color: $c-light;
-      border-radius: 25px;
-      padding: 20px 30px;
-      font-weight: 500;
-      font-size: 25px;
-      cursor: pointer;
-
-      &:hover{
-        background-color: $c-accent;
-        color: $c-light;
-      }
-    }
-  }
-
 }

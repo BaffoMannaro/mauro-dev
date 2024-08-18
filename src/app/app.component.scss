@@ -1,0 +1,23 @@
+.light-mode{
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode{
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+div{
+  width: 99vw;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--c-dark);
+  color: var(--c-light);
+}
+

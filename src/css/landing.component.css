@@ -1,3 +1,17 @@
+.light-mode {
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode {
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
 :host {
   display: flex;
   flex-direction: column;
@@ -35,11 +49,11 @@ main .title-container .tag {
   gap: 0;
 }
 main .title-container .tag h3 {
-  color: #1b1b1b;
+  color: var(--c-dark);
   margin: 0;
   padding: 10px 20px;
   border-radius: 25px;
-  background-color: #ffffff;
+  background-color: var(--c-light);
   text-transform: uppercase;
   font-weight: 400;
   font-size: 16px;
@@ -96,8 +110,8 @@ main .box-type .box-type-container .type {
   width: 100%;
   height: 350px;
   padding: 20px;
-  background-color: #ffffff;
-  color: #1b1b1b;
+  background-color: var(--c-light);
+  color: var(--c-dark);
   border-radius: 25px;
 }
 main .box-type .box-type-container .type p {
@@ -106,8 +120,8 @@ main .box-type .box-type-container .type p {
   font-weight: 100;
   font-size: 16px;
   line-height: 20px;
-  background-color: #1b1b1b;
-  color: #ffffff;
+  background-color: var(--c-dark);
+  color: var(--c-light);
   border-radius: 18px;
 }
 main .box-type .box-type-container .type .type-title {
@@ -144,7 +158,7 @@ main .box-main .box-container .box {
   width: 48%;
   margin-bottom: 4%;
   flex-wrap: nowrap;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
   padding: 20px 30px;
   display: flex;
@@ -164,7 +178,7 @@ main .box-main .box-container .box .box-title h3 {
   width: 80%;
 }
 main .box-main .box-container .box .box-title .box-icon {
-  background-color: #ffffff;
+  background-color: var(--c-light);
   border-radius: 10px;
   width: 37px;
   height: 37px;
@@ -178,14 +192,14 @@ main .box-main .box-container .box .box-content p {
   line-height: 19px;
 }
 main .box-main .box-container .conclusion {
-  background-color: #ffffff;
-  color: #1b1b1b;
+  background-color: var(--c-light);
+  color: var(--c-dark);
 }
 main .box-main .box-container .conclusion .box-icon {
-  background-color: #1b1b1b !important;
+  background-color: var(--c-dark) !important;
 }
 main .cta-parliamone {
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
   width: 100%;
   padding: 30px;
@@ -201,8 +215,8 @@ main .cta-parliamone h2 {
   font-size: 25px;
 }
 main .cta-parliamone h3 {
-  color: #1b1b1b;
-  background-color: #ffffff;
+  color: var(--c-dark);
+  background-color: var(--c-light);
   border-radius: 25px;
   padding: 20px 30px;
   font-weight: 500;
@@ -210,6 +224,6 @@ main .cta-parliamone h3 {
   cursor: pointer;
 }
 main .cta-parliamone h3:hover {
-  background-color: #C72086;
-  color: #ffffff;
+  background-color: var(--c-accent);
+  color: var(--c-light);
 }/*# sourceMappingURL=landing.component.css.map */

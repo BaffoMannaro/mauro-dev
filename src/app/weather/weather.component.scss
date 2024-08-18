@@ -1,8 +1,20 @@
-@import '../../variables';
+.light-mode{
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode{
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
 
 :host{
   height: 40%;
   width: 100%;
-  border: $normal-border;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
 }

@@ -3,6 +3,7 @@ import { NavBarComponent } from '../../nav-bar/nav-bar.component';
 import { FooterComponent } from '../../footer/footer.component';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { DarkLightModeService } from '../../app-service/dark-light-mode.service';
 
 @Component({
   selector: 'app-design',
@@ -14,6 +15,8 @@ import { CommonModule } from '@angular/common';
 export class DesignComponent {
 
   selectedSlide:string = 'analisi';
+
+  constructor( public DarkLightModeService: DarkLightModeService){}
   
   selectSlide(n:string): string{
     return this.selectedSlide = n;

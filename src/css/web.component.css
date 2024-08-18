@@ -1,3 +1,17 @@
+.light-mode {
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode {
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
 :host {
   display: flex;
   flex-direction: column;
@@ -35,14 +49,21 @@ main .title-container .tag {
   gap: 0;
 }
 main .title-container .tag h3 {
-  color: #1b1b1b;
+  color: var(--c-dark);
   margin: 0;
   padding: 10px 20px;
   border-radius: 25px;
-  background-color: #ffffff;
+  background-color: var(--c-light);
   text-transform: uppercase;
   font-weight: 400;
   font-size: 16px;
+}
+main .title-container .tag h3:first-child {
+  cursor: pointer;
+}
+main .title-container .tag h3:first-child:hover {
+  background-color: var(--c-accent);
+  color: var(--c-light);
 }
 main .title {
   display: flex;
@@ -56,6 +77,7 @@ main .title h1, main .title h2 {
   text-align: center;
   font-weight: 400;
   font-size: 36px;
+  text-wrap: balance;
 }
 main .title h3, main .title p {
   margin: 0;
@@ -65,6 +87,7 @@ main .title h3, main .title p {
 }
 main .title h3 {
   text-align: center;
+  text-wrap: balance;
 }
 main .title h6 {
   margin: 0;
@@ -77,6 +100,7 @@ main .title p {
   font-weight: 100;
   font-size: 20px;
   line-height: 25px;
+  padding: 0 20px;
 }
 main .box-main {
   display: flex;
@@ -95,7 +119,7 @@ main .box-main .box-container .box {
   width: 48%;
   margin-bottom: 4%;
   flex-wrap: nowrap;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
   padding: 20px 30px;
   display: flex;
@@ -103,7 +127,7 @@ main .box-main .box-container .box {
   justify-content: space-between;
 }
 main .box-main .box-container .box:hover {
-  border: 1px solid #C72086;
+  border: 1px solid var(--c-accent);
 }
 main .box-main .box-container .box .box-title {
   display: flex;
@@ -118,7 +142,7 @@ main .box-main .box-container .box .box-title h3 {
   width: 80%;
 }
 main .box-main .box-container .box .box-title .box-icon {
-  background-color: #ffffff;
+  background-color: var(--c-light);
   border-radius: 10px;
   width: 37px;
   height: 37px;
@@ -133,7 +157,7 @@ main .box-main .box-container .box .box-content p {
 }
 main .box-main .box-container .quote {
   padding-left: 30px;
-  border-left: 3px solid #ffffff;
+  border-left: 3px solid var(--c-light);
   margin: 20px 0;
   margin-bottom: 50px;
   display: flex;
@@ -153,11 +177,11 @@ main .box-main .box-container .quote p {
   line-height: 25px;
 }
 main .box-main .box-container .conclusion {
-  background-color: #ffffff;
-  color: #1b1b1b;
+  background-color: var(--c-light);
+  color: var(--c-dark);
 }
 main .box-main .box-container .conclusion .box-icon {
-  background-color: #1b1b1b !important;
+  background-color: var(--c-dark) !important;
 }
 main .box-main .box-container .conclusion-cta h4 {
   margin: 0;
@@ -169,20 +193,20 @@ main .box-main .box-container .conclusion-cta h3 {
   margin: 0 auto;
   font-weight: 500;
   font-size: 24px;
-  background-color: #1b1b1b;
-  color: #ffffff;
+  background-color: var(--c-dark);
+  color: var(--c-light);
   padding: 20px 30px;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
   cursor: pointer;
 }
 main .box-main .box-container .conclusion-cta h3:hover {
-  background-color: #C72086;
-  color: #ffffff;
+  background-color: var(--c-accent);
+  color: var(--c-light);
   border: none;
 }
 main .cta-parliamone {
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
   width: 100%;
   padding: 30px;
@@ -198,8 +222,8 @@ main .cta-parliamone h2 {
   font-size: 25px;
 }
 main .cta-parliamone h3 {
-  color: #1b1b1b;
-  background-color: #ffffff;
+  color: var(--c-dark);
+  background-color: var(--c-light);
   border-radius: 25px;
   padding: 20px 30px;
   font-weight: 500;
@@ -207,6 +231,6 @@ main .cta-parliamone h3 {
   cursor: pointer;
 }
 main .cta-parliamone h3:hover {
-  background-color: #C72086;
-  color: #ffffff;
+  background-color: var(--c-accent);
+  color: var(--c-light);
 }/*# sourceMappingURL=web.component.css.map */

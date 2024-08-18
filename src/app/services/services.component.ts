@@ -3,11 +3,12 @@ import { NavBarComponent } from '../nav-bar/nav-bar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { DarkLightModeService } from '../app-service/dark-light-mode.service';
 
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [NavBarComponent, FooterComponent, RouterLink,CommonModule],
+  imports: [NavBarComponent, FooterComponent, RouterLink, CommonModule],
   templateUrl: './services.component.html',
   styleUrl: './services.component.scss'
 })
@@ -16,6 +17,8 @@ export class ServicesComponent {
   selectedService1: boolean = false;
   selectedService2: boolean = false;
   selectedService3: boolean = false;
+
+  constructor( public DarkLightModeService: DarkLightModeService){}
 
   onServiceClick(i:number): void{
     if(i === 1){

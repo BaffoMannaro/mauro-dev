@@ -4,6 +4,7 @@ import { NavBarComponent } from "../nav-bar/nav-bar.component";
 import { CommonModule } from '@angular/common';
 import { WeatherComponent } from '../weather/weather.component';
 import { FooterComponent } from '../footer/footer.component';
+import { DarkLightModeService } from '../app-service/dark-light-mode.service';
 
 @Component({
   selector: 'app-home',
@@ -29,7 +30,7 @@ export class HomeComponent implements OnInit{
   selectedService2: boolean = false;
   selectedService3: boolean = false;
 
-  constructor() {}
+  constructor( public DarkLightModeService: DarkLightModeService){}
 
   ngOnInit(): void {}
 

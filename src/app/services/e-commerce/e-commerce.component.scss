@@ -1,4 +1,16 @@
-@import '../../../variables';
+.light-mode{
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode{
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
 
 :host{
   display: flex;
@@ -40,11 +52,11 @@ main{
       gap: 0;
 
       h3{
-        color: $c-dark;
+        color: var(--c-dark);
         margin: 0;
         padding: 10px 20px;
         border-radius: 25px;
-        background-color: $c-light;
+        background-color: var(--c-light);
         text-transform: uppercase;
         font-weight: 400;
         font-size: 16px;
@@ -112,8 +124,8 @@ main{
         width: 100%;
         height: 350px;
         padding: 20px;
-        background-color: $c-light;
-        color: $c-dark;
+        background-color: var(--c-light);
+        color: var(--c-dark);
         border-radius: 25px;
 
         p{
@@ -122,8 +134,8 @@ main{
           font-weight: 100;
           font-size: 16px;
           line-height: 20px;
-          background-color: $c-dark;
-          color: $c-light;
+          background-color: var(--c-dark);
+          color: var(--c-light);
           border-radius: 18px;
         }
 
@@ -180,8 +192,8 @@ main{
           margin: 0;
           margin-bottom: 30px;
           padding: 20px 30px;
-          background-color: $c-light;
-          color: $c-dark;
+          background-color: var(--c-light);
+          color: var(--c-dark);
           border-radius: 25px;
           text-align: center;
         }
@@ -205,7 +217,7 @@ main{
         width: 48%;
         margin-bottom: 4%;
         flex-wrap: nowrap;
-        border: $normal-border;
+        border: 1px solid var(--c-grey);
         border-radius: 25px;
         padding: 20px 30px;
         display: flex;
@@ -226,7 +238,7 @@ main{
           }
 
           .box-icon{
-            background-color: $c-light;
+            background-color: var(--c-light);
             border-radius: 10px;
             width: 37px;
             height: 37px;
@@ -250,11 +262,11 @@ main{
       }
 
       .conclusion{
-        background-color: $c-light;
-        color: $c-dark;
+        background-color: var(--c-light);
+        color: var(--c-dark);
 
         .box-icon{
-          background-color: $c-dark !important;
+          background-color: var(--c-dark) !important;
         }
       }
     }
@@ -269,7 +281,7 @@ main{
 
     .cta-box{
       width: 33%;
-      border: $normal-border;
+      border: 1px solid var(--c-grey);
       border-radius: 25px;
       padding: 30px;
       display: flex;
@@ -277,8 +289,8 @@ main{
       justify-content: flex-start;
 
       &:first-child{
-        background-color: $c-light;
-        color: $c-dark;
+        background-color: var(--c-light);
+        color: var(--c-dark);
       }
 
       &:last-child{
@@ -294,8 +306,8 @@ main{
       }
   
       h3{
-        color: $c-dark;
-        background-color: $c-light;
+        color: var(--c-dark);
+        background-color: var(--c-light);
         border-radius: 25px;
         padding: 20px 30px;
         font-weight: 500;
@@ -303,8 +315,8 @@ main{
         cursor: pointer;
   
         &:hover{
-          background-color: $c-accent;
-          color: $c-light;
+          background-color: var(--c-accent);
+          color: var(--c-light);
         }
       }
 

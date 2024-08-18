@@ -1,4 +1,16 @@
-@import '../../../variables';
+.light-mode{
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode{
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
 
 :host{
   display: flex;
@@ -40,14 +52,24 @@ main{
       gap: 0;
 
       h3{
-        color: $c-dark;
+        color: var(--c-dark);
         margin: 0;
         padding: 10px 20px;
         border-radius: 25px;
-        background-color: $c-light;
+        background-color: var(--c-light);
         text-transform: uppercase;
         font-weight: 400;
         font-size: 16px;
+        
+        &:first-child{
+          cursor: pointer;
+
+          &:hover{
+            background-color: var(--c-accent);
+            color: var(--c-light);
+          }
+        }
+
       }
     }
   }
@@ -64,6 +86,7 @@ main{
       text-align: center;
       font-weight: 400;
       font-size: 36px;
+      text-wrap: balance;
     }
 
     h3,p{
@@ -75,6 +98,7 @@ main{
 
     h3{
       text-align: center;
+      text-wrap: balance;
     }
 
     h6{
@@ -89,6 +113,7 @@ main{
       font-weight: 100;
       font-size: 20px;
       line-height: 25px;
+      padding: 0 20px;
     }
 
   }
@@ -110,7 +135,7 @@ main{
         width: 48%;
         margin-bottom: 4%;
         flex-wrap: nowrap;
-        border: $normal-border;
+        border: 1px solid var(--c-grey);
         border-radius: 25px;
         padding: 20px 30px;
         display: flex;
@@ -118,7 +143,7 @@ main{
         justify-content: space-between;
 
         &:hover{
-          border: 1px solid $c-accent;
+          border: 1px solid var(--c-accent);
         }
 
         .box-title{
@@ -135,7 +160,7 @@ main{
           }
 
           .box-icon{
-            background-color: $c-light;
+            background-color: var(--c-light);
             border-radius: 10px;
             width: 37px;
             height: 37px;
@@ -156,7 +181,7 @@ main{
 
       .quote{
         padding-left: 30px;
-        border-left: 3px solid $c-light;
+        border-left: 3px solid var(--c-light);
         margin: 20px 0;
         margin-bottom: 50px;
         display: flex;
@@ -179,11 +204,11 @@ main{
       }
 
       .conclusion{
-        background-color: $c-light;
-        color: $c-dark;
+        background-color: var(--c-light);
+        color: var(--c-dark);
 
         .box-icon{
-          background-color: $c-dark !important;
+          background-color: var(--c-dark) !important;
         }
 
 
@@ -201,16 +226,16 @@ main{
           margin: 0 auto;
           font-weight: 500;
           font-size: 24px;
-          background-color: $c-dark;
-          color: $c-light;
+          background-color: var(--c-dark);
+          color: var(--c-light);
           padding: 20px 30px;
-          border: $normal-border;
+          border: 1px solid var(--c-grey);
           border-radius: 25px;
           cursor: pointer;
 
           &:hover{
-            background-color: $c-accent;
-            color: $c-light;
+            background-color: var(--c-accent);
+            color: var(--c-light);
             border: none;
           }
         }
@@ -221,7 +246,7 @@ main{
   }
 
   .cta-parliamone{
-    border: $normal-border;
+    border: 1px solid var(--c-grey);
     border-radius: 25px;
     width: 100%;
     padding: 30px;
@@ -238,8 +263,8 @@ main{
     }
 
     h3{
-      color: $c-dark;
-      background-color: $c-light;
+      color: var(--c-dark);
+      background-color: var(--c-light);
       border-radius: 25px;
       padding: 20px 30px;
       font-weight: 500;
@@ -247,8 +272,8 @@ main{
       cursor: pointer;
 
       &:hover{
-        background-color: $c-accent;
-        color: $c-light;
+        background-color: var(--c-accent);
+        color: var(--c-light);
       }
     }
   }

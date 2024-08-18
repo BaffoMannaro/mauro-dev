@@ -1,5 +1,5 @@
 <app-nav-bar></app-nav-bar>
-<main>
+<main [ngClass]="{'light-mode': DarkLightModeService.mode === true, 'dark-mode': DarkLightModeService.mode === false}">
 
   <div class="title-container">
     <div class="tag">

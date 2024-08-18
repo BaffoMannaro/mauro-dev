@@ -1,9 +1,9 @@
 <app-nav-bar></app-nav-bar>
-<main>
+<main [ngClass]="{'light-mode': DarkLightModeService.mode === true, 'dark-mode': DarkLightModeService.mode === false}">
 
   <div class="title-container">
     <div class="tag">
-      <h3>service</h3>
+      <h3 routerLink="/services">service</h3>
       <h3>web-site</h3>
     </div>
     <div class="title">

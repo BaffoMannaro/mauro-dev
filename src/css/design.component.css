@@ -1,3 +1,17 @@
+.light-mode {
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
+.dark-mode {
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
 :host {
   display: flex;
   flex-direction: column;
@@ -35,11 +49,11 @@ main .title-container .tag {
   gap: 0;
 }
 main .title-container .tag h3 {
-  color: #1b1b1b;
+  color: var(--c-dark);
   margin: 0;
   padding: 10px 20px;
   border-radius: 25px;
-  background-color: #ffffff;
+  background-color: var(--c-light);
   text-transform: uppercase;
   font-weight: 400;
   font-size: 16px;
@@ -101,8 +115,8 @@ main .box-type .box-type-container .type {
   height: 350px;
   padding: 20px;
   margin-bottom: 4%;
-  background-color: #ffffff;
-  color: #1b1b1b;
+  background-color: var(--c-light);
+  color: var(--c-dark);
   border-radius: 25px;
 }
 main .box-type .box-type-container .type p {
@@ -111,8 +125,8 @@ main .box-type .box-type-container .type p {
   font-weight: 100;
   font-size: 16px;
   line-height: 20px;
-  background-color: #1b1b1b;
-  color: #ffffff;
+  background-color: var(--c-dark);
+  color: var(--c-light);
   border-radius: 18px;
 }
 main .box-type .box-type-container .type .type-title {
@@ -146,7 +160,7 @@ main .box-type2 .box-type2-container .type2 {
   justify-content: space-between;
   width: 100%;
   margin-bottom: 4%;
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
 }
 main .box-type2 .box-type2-container .type2 p {
@@ -155,7 +169,7 @@ main .box-type2 .box-type2-container .type2 p {
   font-weight: 100;
   font-size: 16px;
   line-height: 20px;
-  color: #ffffff;
+  color: var(--c-light);
   border-radius: 18px;
 }
 main .box-type2 .box-type2-container .type2 .type2-title {
@@ -164,8 +178,8 @@ main .box-type2 .box-type2-container .type2 .type2-title {
   gap: 15px;
   padding: 20px;
   border-radius: 25px;
-  background-color: #ffffff;
-  color: #1b1b1b;
+  background-color: var(--c-light);
+  color: var(--c-dark);
 }
 main .box-type2 .box-type2-container .type2 .type2-title span {
   font-weight: 100;
@@ -198,8 +212,8 @@ main .box-main .box-container .box {
   justify-content: space-between;
   align-items: center;
   gap: 30px;
-  background-color: #ffffff;
-  color: #1b1b1b;
+  background-color: var(--c-light);
+  color: var(--c-dark);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -232,8 +246,8 @@ main .box-main .box-container .box .slider-title h3 {
   display: none;
 }
 main .box-main .box-container .box .slider-title .slider-button {
-  background-color: #ffffff;
-  color: #1b1b1b;
+  background-color: var(--c-light);
+  color: var(--c-dark);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -243,8 +257,8 @@ main .box-main .box-container .box .slider-title .slider-button {
   cursor: pointer;
 }
 main .box-main .box-container .box .slider-title .slider-button:hover {
-  background-color: #1b1b1b;
-  color: #ffffff;
+  background-color: var(--c-dark);
+  color: var(--c-light);
 }
 main .box-main .box-container .box .slider-title .slider-button span {
   font-size: 24px;
@@ -281,8 +295,8 @@ main .box-main .box-container .selectedSlide .slider-title h3 {
   display: block;
 }
 main .box-main .box-container .selectedSlide .slider-title .slider-button {
-  background-color: #1b1b1b;
-  color: #ffffff;
+  background-color: var(--c-dark);
+  color: var(--c-light);
 }
 main .box-main .box-container .selectedSlide .slider-image {
   display: flex;
@@ -291,7 +305,7 @@ main .box-main .box-container .selectedSlide .slider-text {
   display: block;
 }
 main .cta-parliamone {
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--c-grey);
   border-radius: 25px;
   width: 100%;
   padding: 30px;
@@ -309,8 +323,8 @@ main .cta-parliamone p {
   line-height: 20px;
 }
 main .cta-parliamone h3 {
-  color: #1b1b1b;
-  background-color: #ffffff;
+  color: var(--c-dark);
+  background-color: var(--c-light);
   border-radius: 25px;
   padding: 20px 30px;
   font-weight: 500;
@@ -318,6 +332,6 @@ main .cta-parliamone h3 {
   cursor: pointer;
 }
 main .cta-parliamone h3:hover {
-  background-color: #C72086;
-  color: #ffffff;
+  background-color: var(--c-accent);
+  color: var(--c-light);
 }/*# sourceMappingURL=design.component.css.map */

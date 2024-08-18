@@ -1,234 +1,238 @@
 <app-nav-bar></app-nav-bar>
-<main>
+<main [ngClass]="{'light-mode': DarkLightModeService.mode === true, 'dark-mode': DarkLightModeService.mode === false}">
 
-  <div id="me">
-    <div class="me-image">
-      <img src="/assets/about-photo.png" alt="">
-    </div>
-
-    <div class="me-name">
-      <h1>Ciao sono Mauro Altamura</h1>
-
-      <div class="me-skill">
-        <div class="skill">
-          <img src="/assets/icon/web-designer.svg" alt="">
-          <h3>Web Designer</h3>
-        </div>
-
-        <div class="skill">
-          <img src="/assets/icon/frontend.svg" alt="">
-          <h3>FrontEnd Developer</h3>
-        </div>
-
-        <div class="skill">
-          <img src="/assets/icon/graphic.svg" alt="">
-          <h3>Graphic Designer</h3>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="me-description">
-      <p>Sono un Senior Graphic Designer con oltre 5 anni di esperienza nel settore della creatività visiva. Negli ultimi anni, ho ampliato le mie competenze diventando anche un web designer, web developer e junior full stack developer. Questo mix di competenze mi permette di offrire soluzioni complete e innovative per le esigenze digitali dei miei clienti.</p>
-    </div>
-
-  </div>
-
-  <div id="exp-container">
-    <div class="exp">
-      <h2>Experience</h2>
-
-      <div class="exp-content">
-        <p class="year">2021-2024</p>
-        <p class="job">Web Designer</p>
-        <p class="company">Morsillo Direzione Commerciale, Bari, Italia</p>
+  <section class="main-content">
+    
+    <div id="me">
+      <div class="me-image">
+        <img src="/assets/about-photo.png" alt="">
       </div>
 
-      <div class="exp-content">
-        <p class="year">2018-2024</p>
-        <p class="job">Senior Graphic Designer</p>
-        <p class="company">Morsillo Direzione Commerciale, Bari, Italia</p>
-      </div>
+      <div class="me-name">
+        <h1>Ciao sono Mauro Altamura</h1>
 
-    </div>
-
-    <div class="exp">
-      <h2>Education</h2>
-
-      <div class="exp-content">
-        <p class="year">2015</p>
-        <p class="job">Treinnale Grafica d'arte</p>
-        <p class="company">Accademia di Belle Arti, Bari</p>
-      </div>
-
-      <div class="exp-content">
-        <p class="year">2008-2013</p>
-        <p class="job">Diploma</p>
-        <p class="company">Liceo Scientifico "Albert Einstein", Molfetta</p>
-      </div>
-
-    </div>
-
-  </div>
-
-  <div id="award-container">
-    <div class="award-side">
-      <p>6</p>
-      <p>Anni di esperienza</p>
-    </div>
-
-    <div class="award-content">
-      <h2>Certificationi</h2>
-
-      <div class="award-box">
-        <div class="award">
-          <p>Full Stack Developer</p>
-          <div></div>
-          <p>LabForTraining</p>
-        </div>
-
-        <div class="award">
-          <p>Responsive Web Design</p>
-          <div></div>
-          <p>FreeCodeCamp</p>
-        </div>
-
-        <div class="award">
-          <p>ISE II (B2)</p>
-          <div></div>
-          <p>Trinity College London</p>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="award-side">
-      <p>+50</p>
-      <p>Clienti in tutto il mondo</p>
-    </div>
-
-  </div>
-
-  <div id="services-container">
-    <div class="serv-list">
-      <h2>Experience</h2>
-
-      <div class="serv-list-content">
-        <div class="serv-content">
-          <div class="serv" routerLink="/services/seo">
-            <div class="serv-img">
-              <img src="/assets/icon/2-3.svg" alt="">
-            </div>
-            <p>SEO service</p>
+        <div class="me-skill">
+          <div class="skill">
+            <img src="/assets/icon/web-designer.svg" alt="">
+            <h3>Web Designer</h3>
           </div>
-          <div class="serv" routerLink="/services/web">
-            <div class="serv-img">
-              <img src="/assets/icon/2-3.svg" alt="">
-            </div>
-            <p>Sito Web</p>
-          </div>
-          <div class="serv" routerLink="/services/landing-page">
-            <div class="serv-img">
-              <img src="/assets/icon/2-3.svg" alt="">
-            </div>
-            <p>Landing Page</p>
-          </div>
-        </div>
 
-        <div class="serv-content">
-          <div class="serv" routerLink="/services/blog">
-            <div class="serv-img">
-              <img src="/assets/icon/2-3.svg" alt="">
-            </div>
-            <p>Blog</p>
+          <div class="skill">
+            <img src="/assets/icon/frontend.svg" alt="">
+            <h3>FrontEnd Developer</h3>
           </div>
-          <div class="serv" routerLink="/services/e-commerce">
-            <div class="serv-img">
-              <img src="/assets/icon/2-3.svg" alt="">
-            </div>
-            <p>E-Commerce</p>
-          </div>
-          <div class="serv" routerLink="/services/web-app">
-            <div class="serv-img">
-              <img src="/assets/icon/2-3.svg" alt="">
-            </div>
-            <p>Web-App</p>
-          </div>
-        </div>
 
-        <div class="serv-content">
-          <div class="serv" routerLink="/services/design">
-            <div class="serv-img">
-              <img src="/assets/icon/2-3.svg" alt="">
-            </div>
-            <p>Design & Redesign</p>
+          <div class="skill">
+            <img src="/assets/icon/graphic.svg" alt="">
+            <h3>Graphic Designer</h3>
           </div>
-        </div>
 
+        </div>
       </div>
 
-      <div class="serv-cta">
-        <div class="serv-cta-img" routerLink="/services">
-          <img src="/assets/icon/arrow.svg" alt="">
-        </div>
+      <div class="me-description">
+        <p>Sono un Senior Graphic Designer con oltre 5 anni di esperienza nel settore della creatività visiva. Negli ultimi anni, ho ampliato le mie competenze diventando anche un web designer, web developer e junior full stack developer. Questo mix di competenze mi permette di offrire soluzioni complete e innovative per le esigenze digitali dei miei clienti.</p>
       </div>
 
     </div>
 
-    <div class="serv-list">
-      <h2>Skill</h2>
+    <div id="exp-container">
+      <div class="exp">
+        <h2>Experience</h2>
 
-      <div class="skill-container">
-        <div class="skill">
-          <p>HTML / CSS / Sass</p>
-          <p>100%</p>
+        <div class="exp-content">
+          <p class="year">2021-2024</p>
+          <p class="job">Web Designer</p>
+          <p class="company">Morsillo Direzione Commerciale, Bari, Italia</p>
         </div>
 
-        <div class="skill">
-          <p>Javascript</p>
-          <p>85%</p>
+        <div class="exp-content">
+          <p class="year">2018-2024</p>
+          <p class="job">Senior Graphic Designer</p>
+          <p class="company">Morsillo Direzione Commerciale, Bari, Italia</p>
         </div>
 
-        <div class="skill">
-          <p>Angular</p>
-          <p>80%</p>
+      </div>
+
+      <div class="exp">
+        <h2>Education</h2>
+
+        <div class="exp-content">
+          <p class="year">2015</p>
+          <p class="job">Treinnale Grafica d'arte</p>
+          <p class="company">Accademia di Belle Arti, Bari</p>
         </div>
 
-        <div class="skill">
-          <p>Version Control System (Git)</p>
-          <p>65%</p>
+        <div class="exp-content">
+          <p class="year">2008-2013</p>
+          <p class="job">Diploma</p>
+          <p class="company">Liceo Scientifico "Albert Einstein", Molfetta</p>
         </div>
 
-        <div class="skill">
-          <p>Graphic Design</p>
-          <p>100%</p>
-        </div>
-
-        <div class="skill">
-          <p>User Experience / User Interface</p>
-          <p>90%</p>
-        </div>
-
-        <div class="skill">
-          <p>SEO (Search Engine Optimization)</p>
-          <p>75%</p>
-        </div>
-
-        <div class="skill">
-          <p>Content Management Systems (CMS)</p>
-          <p>95%</p>
-        </div>
       </div>
 
     </div>
 
-  </div>
+    <div id="award-container">
+      <div class="award-side">
+        <p>6</p>
+        <p>Anni di esperienza</p>
+      </div>
 
-  <div class="cta-parliamone">
-    <h2>Hai un'idea interessante e vuoi una mano per realizzarla?</h2>
-    <h3 routerLink="/contacts">Parliamone!</h3>
-  </div>
+      <div class="award-content">
+        <h2>Certificationi</h2>
 
-  <app-footer></app-footer>
+        <div class="award-box">
+          <div class="award">
+            <p>Full Stack Developer</p>
+            <div></div>
+            <p>LabForTraining</p>
+          </div>
+
+          <div class="award">
+            <p>Responsive Web Design</p>
+            <div></div>
+            <p>FreeCodeCamp</p>
+          </div>
+
+          <div class="award">
+            <p>ISE II (B2)</p>
+            <div></div>
+            <p>Trinity College London</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="award-side">
+        <p>+50</p>
+        <p>Clienti in tutto il mondo</p>
+      </div>
+
+    </div>
+
+    <div id="services-container">
+      <div class="serv-list">
+        <h2>Experience</h2>
+
+        <div class="serv-list-content">
+          <div class="serv-content">
+            <div class="serv" routerLink="/services/seo">
+              <div class="serv-img">
+                <img src="/assets/icon/2-3.svg" alt="">
+              </div>
+              <p>SEO service</p>
+            </div>
+            <div class="serv" routerLink="/services/web">
+              <div class="serv-img">
+                <img src="/assets/icon/2-3.svg" alt="">
+              </div>
+              <p>Sito Web</p>
+            </div>
+            <div class="serv" routerLink="/services/landing-page">
+              <div class="serv-img">
+                <img src="/assets/icon/2-3.svg" alt="">
+              </div>
+              <p>Landing Page</p>
+            </div>
+          </div>
+
+          <div class="serv-content">
+            <div class="serv" routerLink="/services/blog">
+              <div class="serv-img">
+                <img src="/assets/icon/2-3.svg" alt="">
+              </div>
+              <p>Blog</p>
+            </div>
+            <div class="serv" routerLink="/services/e-commerce">
+              <div class="serv-img">
+                <img src="/assets/icon/2-3.svg" alt="">
+              </div>
+              <p>E-Commerce</p>
+            </div>
+            <div class="serv" routerLink="/services/web-app">
+              <div class="serv-img">
+                <img src="/assets/icon/2-3.svg" alt="">
+              </div>
+              <p>Web-App</p>
+            </div>
+          </div>
+
+          <div class="serv-content">
+            <div class="serv" routerLink="/services/design">
+              <div class="serv-img">
+                <img src="/assets/icon/2-3.svg" alt="">
+              </div>
+              <p>Design & Redesign</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="serv-cta">
+          <div class="serv-cta-img" routerLink="/services">
+            <img src="/assets/icon/arrow.svg" alt="">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="serv-list">
+        <h2>Skill</h2>
+
+        <div class="skill-container">
+          <div class="skill">
+            <p>HTML / CSS / Sass</p>
+            <p>100%</p>
+          </div>
+
+          <div class="skill">
+            <p>Javascript</p>
+            <p>85%</p>
+          </div>
+
+          <div class="skill">
+            <p>Angular</p>
+            <p>80%</p>
+          </div>
+
+          <div class="skill">
+            <p>Version Control System (Git)</p>
+            <p>65%</p>
+          </div>
+
+          <div class="skill">
+            <p>Graphic Design</p>
+            <p>100%</p>
+          </div>
+
+          <div class="skill">
+            <p>User Experience / User Interface</p>
+            <p>90%</p>
+          </div>
+
+          <div class="skill">
+            <p>SEO (Search Engine Optimization)</p>
+            <p>75%</p>
+          </div>
+
+          <div class="skill">
+            <p>Content Management Systems (CMS)</p>
+            <p>95%</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="cta-parliamone">
+      <h2>Hai un'idea interessante e vuoi una mano per realizzarla?</h2>
+      <h3 routerLink="/contacts">Parliamone!</h3>
+    </div>
+
+    <app-footer></app-footer>
+
+  </section>
 
 </main>

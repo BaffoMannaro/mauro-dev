@@ -3,9 +3,10 @@
   font-family: "Archivo", sans-serif;
   box-sizing: border-box;
 }
-* body {
+
+body {
+  margin: 0;
+  padding: 0;
   background-color: #1b1b1b;
-  color: #ffffff;
-  max-width: 1320px;
-  margin: 0 auto;
+  position: relative;
 }/*# sourceMappingURL=styles.css.map */

@@ -7,6 +7,25 @@
   #logo{
     filter: invert(0) !important;
   }
+
+  .theme-container{
+    .dark{
+      background-color: var(--c-dark) !important;
+
+      >img{
+        filter: invert(.1) !important;
+      }
+    }
+
+    .light{
+      background-color: var(--c-light) !important;
+
+      >img{
+        filter: invert(.1) !important;
+      }
+    }
+
+  }
 }
 
 .dark-mode{
@@ -18,7 +37,6 @@
 
 :host{
   position: relative;
-
 }
 
 .container{

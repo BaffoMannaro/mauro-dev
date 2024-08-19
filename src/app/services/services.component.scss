@@ -3,6 +3,79 @@
   --c-light: #1b1b1b;
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
+
+  .service{
+    .service-text{
+      .service-cta{
+        background-color: var(--c-accent);
+
+        &:hover{
+          background-color: var(--c-dark);
+
+          >img{
+            filter: invert(1) !important;
+          }
+        }
+      }
+    }
+
+    &.selected{
+      .service-text{
+        .service-cta{    
+          >img{
+            filter: invert(0) !important;
+          }
+
+          &:hover{
+            >img{
+              filter: invert(1) !important;
+            }
+          }
+        }          
+      }
+
+      .service-image{
+        img{
+          display: none;
+        }
+
+        .service-page-container{
+          .service-page-cta{
+            .page-cta{
+              >img{
+                filter: invert(0) !important;
+              }
+
+              &:hover{
+                >img{
+                  filter: invert(1) !important;
+                }
+              }
+            }
+          }
+        }
+      }
+
+    }
+
+  }
+
+  #languages-container{
+    div.language{
+      div.single-language{
+        img{
+          filter: invert(.9) !important;
+        }
+      }
+
+      div.single-language2{
+        img{
+          filter: invert(.9) !important;
+        }
+      }
+    }
+  }
+
 }
 
 .dark-mode{
@@ -175,6 +248,7 @@ main{
         padding: 20px;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         gap: 30px;
 
         .service-text{
@@ -203,8 +277,8 @@ main{
           }
 
           .service-cta{
-            background-color: var(--c-dark);
-            border: 2px solid var(--c-accent);
+            background-color: var(--c-accent);
+            border: none;
             border-radius: 25px;
             display: flex;
             align-items: center;
@@ -218,7 +292,8 @@ main{
             }
 
             &:hover{
-              background-color: var(--c-accent);
+              background-color: var(--c-dark);
+              border: 1px solid var(--c-light);
             }
           }
         }
@@ -308,8 +383,8 @@ main{
                 }
 
                 .page-cta{
-                  background-color: var(--c-dark);
-                  border: 1px solid var(--c-light);
+                  background-color: var(--c-accent);
+                  border: none;
                   border-radius: 25px;
                   display: flex;
                   align-items: center;
@@ -319,8 +394,8 @@ main{
                   cursor: pointer;
 
                   &:hover{
-                    background-color: var(--c-accent);
-                    border: none;
+                    background-color: var(--c-dark);
+                    border: 1px solid var(--c-light);
                   }
 
                   >img{

@@ -4,6 +4,36 @@
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
 }
+.light-mode .service .service-text .service-cta {
+  background-color: var(--c-accent);
+}
+.light-mode .service .service-text .service-cta:hover {
+  background-color: var(--c-dark);
+}
+.light-mode .service .service-text .service-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .service.selected .service-text .service-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .service.selected .service-text .service-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .service.selected .service-image img {
+  display: none;
+}
+.light-mode .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode #languages-container div.language div.single-language img {
+  filter: invert(0.9) !important;
+}
+.light-mode #languages-container div.language div.single-language2 img {
+  filter: invert(0.9) !important;
+}
 
 .dark-mode {
   --c-dark: #1b1b1b;
@@ -156,6 +186,7 @@ main .main-content #services-container .service {
   padding: 20px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 30px;
 }
 main .main-content #services-container .service .service-text {
@@ -181,8 +212,8 @@ main .main-content #services-container .service .service-text .service-title h2 
   font-size: 32px;
 }
 main .main-content #services-container .service .service-text .service-cta {
-  background-color: var(--c-dark);
-  border: 2px solid var(--c-accent);
+  background-color: var(--c-accent);
+  border: none;
   border-radius: 25px;
   display: flex;
   align-items: center;
@@ -195,7 +226,8 @@ main .main-content #services-container .service .service-text .service-cta > img
   height: 12px;
 }
 main .main-content #services-container .service .service-text .service-cta:hover {
-  background-color: var(--c-accent);
+  background-color: var(--c-dark);
+  border: 1px solid var(--c-light);
 }
 main .main-content #services-container .service .service-image {
   border-radius: 18px;
@@ -265,8 +297,8 @@ main .main-content #services-container .service.selected .service-image .service
   font-size: 18px;
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
-  background-color: var(--c-dark);
-  border: 1px solid var(--c-light);
+  background-color: var(--c-accent);
+  border: none;
   border-radius: 25px;
   display: flex;
   align-items: center;
@@ -276,8 +308,8 @@ main .main-content #services-container .service.selected .service-image .service
   cursor: pointer;
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover {
-  background-color: var(--c-accent);
-  border: none;
+  background-color: var(--c-dark);
+  border: 1px solid var(--c-light);
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
   display: block;

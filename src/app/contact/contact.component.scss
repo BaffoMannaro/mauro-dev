@@ -3,6 +3,18 @@
   --c-light: #1b1b1b;
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
+
+  .cta-parliamone{
+
+    a{
+      color: var(--c-dark) !important;
+
+      &:hover{
+        background-color: var(--c-light) !important;
+        color: var(--c-dark) !important;
+      }
+    }
+  }
 }
 
 .dark-mode{
@@ -106,8 +118,8 @@ main{
 
       a{
         text-decoration: none;
-        color: var(--c-dark);
-        background-color: var(--c-light);
+        color: var(--c-light);
+        background-color: var(--c-accent);
         border-radius: 25px;
         padding: 20px 30px;
         font-weight: 500;
@@ -115,8 +127,8 @@ main{
         cursor: pointer;
 
         &:hover{
-          background-color: var(--c-accent);
-          color: var(--c-light);
+          background-color: var(--c-light);
+          color: var(--c-dark);
         }
       }
     }

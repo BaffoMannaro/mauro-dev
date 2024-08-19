@@ -1,17 +1,3 @@
-.light-mode {
-  --c-dark: #ffffff;
-  --c-light: #1b1b1b;
-  --c-grey: #d9d9d9;
-  --c-accent: #C72086;
-}
-
-.dark-mode {
-  --c-dark: #1b1b1b;
-  --c-light: #ffffff;
-  --c-grey: #d9d9d9;
-  --c-accent: #C72086;
-}
-
 main {
   display: flex;
   align-items: center;
@@ -250,8 +236,8 @@ main .main-content #services-container .service .service-text .service-title h2 
   font-size: 32px;
 }
 main .main-content #services-container .service .service-text .service-cta {
-  background-color: var(--c-dark);
-  border: 2px solid var(--c-accent);
+  background-color: var(--c-accent);
+  border: none;
   border-radius: 25px;
   display: flex;
   align-items: center;
@@ -264,7 +250,8 @@ main .main-content #services-container .service .service-text .service-cta > img
   height: 12px;
 }
 main .main-content #services-container .service .service-text .service-cta:hover {
-  background-color: var(--c-accent);
+  background-color: var(--c-dark);
+  border: 1px solid var(--c-light);
 }
 main .main-content #services-container .service .service-image {
   border-radius: 18px;
@@ -334,8 +321,8 @@ main .main-content #services-container .service.selected .service-image .service
   font-size: 18px;
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
-  background-color: var(--c-dark);
-  border: 1px solid var(--c-light);
+  background-color: var(--c-accent);
+  border: none;
   border-radius: 25px;
   display: flex;
   align-items: center;
@@ -345,8 +332,8 @@ main .main-content #services-container .service.selected .service-image .service
   cursor: pointer;
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover {
-  background-color: var(--c-accent);
-  border: none;
+  background-color: var(--c-dark);
+  border: 1px solid var(--c-light);
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
   display: block;
@@ -415,7 +402,11 @@ main .main-content #cta-container #cta1 #game #game2 .single-game .game-cta {
   background-color: var(--c-dark);
   cursor: pointer;
 }
-main .main-content #cta-container #cta1 #game #game2 .single-game .game-cta:hover {
+main .main-content #cta-container #cta1 #game #game2 .single-game:hover {
+  cursor: pointer;
+  background-size: 120%;
+}
+main .main-content #cta-container #cta1 #game #game2 .single-game:hover .game-cta {
   background-color: var(--c-accent);
   border: none;
 }
@@ -451,13 +442,125 @@ main .main-content #cta-container #cta2 h4 {
 }
 main .main-content #cta-container #cta2 h3 {
   font-weight: 500;
-  color: var(--c-dark);
-  background-color: var(--c-light);
+  color: var(--c-light);
+  background-color: var(--c-accent);
   border-radius: 25px;
   padding: 20px 30px;
   cursor: pointer;
 }
 main .main-content #cta-container #cta2 h3:hover {
+  background-color: var(--c-light);
+  color: var(--c-dark);
+}
+
+.light-mode {
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+.light-mode .main-content #top-container #about #me #me-name #skill li > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #top-container #about #mission {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px;
+  border: 1px solid var(--c-grey);
+  border-radius: 25px;
+}
+.light-mode .main-content #top-container #about #mission p {
+  margin: 0;
+  font-weight: 400;
+  font-size: 32px;
+}
+.light-mode .main-content #top-container #about #mission p .minus {
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5019607843);
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+.light-mode .main-content #top-container #about #mission #marquee-container {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--c-dark);
+  background-color: var(--c-light);
+  padding: 15px 30px;
+  border-radius: 25px;
+}
+.light-mode .main-content #top-container #about #mission #marquee-content {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 40s linear infinite;
+}
+.light-mode .main-content #languages-container div.language div.single-language img {
+  filter: invert(0.9) !important;
+}
+.light-mode .main-content #languages-container div.language div.single-language2 img {
+  filter: invert(0.9) !important;
+}
+.light-mode .main-content #services-container .service .service-text .service-cta {
   background-color: var(--c-accent);
-  color: var(--c-light);
+}
+.light-mode .main-content #services-container .service .service-text .service-cta:hover {
+  background-color: var(--c-dark);
+}
+.light-mode .main-content #services-container .service .service-text .service-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-text .service-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-text .service-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-image img {
+  display: none;
+}
+.light-mode .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game h5 {
+  color: var(--c-dark);
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game .game-cta {
+  border: none;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game .game-cta > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game:hover .game-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 #carta-alta {
+  background-image: url("/assets/carta.webp");
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 #morra-cinese {
+  background-image: url("/assets/morra.webp");
+  background-position: bottom;
+}
+.light-mode .main-content #cta-container #cta2 h3 {
+  color: var(--c-dark);
+}
+.light-mode .main-content #cta-container #cta2 > img {
+  filter: invert(1) !important;
+}
+
+.dark-mode {
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
 }/*# sourceMappingURL=home.component.css.map */

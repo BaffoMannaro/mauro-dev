@@ -3,6 +3,93 @@
   --c-light: #1b1b1b;
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
+
+  #me{
+    .me-name{
+      .me-skill{  
+        .skill{  
+          img{
+            filter: invert(0) !important;
+          }
+        }
+      }
+    }
+  }
+
+  .cta-parliamone{
+    h3{
+      color: var(--c-dark) !important;
+    }
+  }
+
+  #services-container{
+
+    .serv-list{
+
+      .serv-list-content{
+        .serv-content{
+          .serv{
+            
+            .serv-img{
+              img{
+                filter: invert(1) !important;
+              }
+            }
+            &:hover{
+              .serv-img{
+                background-color: var(--c-accent);
+              }
+
+            }
+  
+            .serv-img{
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 30px;
+              height: 30px;
+              border-radius: 10px;
+              background-color: var(--c-light);
+            }
+  
+            p{
+              margin: 0;
+              padding: 0;
+              font-weight: 100;
+              font-size: 15px;
+            }
+          }
+        }
+      }
+
+      .serv-cta{
+        .serv-cta-img{
+          &:hover{
+            background-color: var(--c-dark);
+
+            >img{
+              filter: invert(1) !important;
+            }
+          }
+        }
+      }
+
+      .skill-container{
+        .skill{
+          &:nth-child(1){ width: 100%; opacity: .9 !important }
+          &:nth-child(2){ width: 85%; opacity: .6 !important }
+          &:nth-child(3){ width: 80%; opacity: .9 !important }
+          &:nth-child(4){ width: 70%; opacity: .6 !important }
+          &:nth-child(5){ width: 100%; opacity: .9 !important }
+          &:nth-child(6){ width: 90%; opacity: .6 !important }
+          &:nth-child(7){ width: 75%; opacity: .9 !important }
+          &:nth-child(8){ width: 95%; opacity: .6 !important }
+        }
+      }
+  
+    } 
+
+  }
 }
 
 .dark-mode{
@@ -290,7 +377,7 @@ main{
                 margin: 0;
                 padding: 0;
                 font-weight: 100;
-                font-size: 18px;
+                font-size: 15px;
               }
             }
           }
@@ -306,28 +393,25 @@ main{
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--c-light);
+            background-color: var(--c-accent);
             border-radius: 25px;
             width: 37px;
             height: 37px;
             cursor: pointer;
 
-            &:hover{
-              background-color: var(--c-accent);
-
-              img{
-                filter: invert(0);
-              }
+            img{
+              filter: invert(0);
             }
 
-            img{
-              filter: invert(1);
+            &:hover{
+              background-color: var(--c-dark);
+              border: 1px solid var(--c-light);
             }
           }
         }
 
         .skill-container{
-          margin: 0 50px;
+          margin: 0 30px;
           margin-bottom: 30px;
           display: flex;
           flex-direction: column;
@@ -345,7 +429,7 @@ main{
             &:nth-child(1){ width: 100% }
             &:nth-child(2){ width: 85%; opacity: .7; }
             &:nth-child(3){ width: 80% }
-            &:nth-child(4){ width: 65%; opacity: .7; }
+            &:nth-child(4){ width: 70%; opacity: .7; }
             &:nth-child(5){ width: 100% }
             &:nth-child(6){ width: 90%; opacity: .7; }
             &:nth-child(7){ width: 75% }
@@ -355,7 +439,7 @@ main{
               margin: 0;
               padding: 0;
               font-weight: 200;
-              font-size: 15px;
+              font-size: 12px;
               text-wrap: nowrap;
               color: var(--c-dark);
             }
@@ -384,8 +468,8 @@ main{
       }
 
       h3{
-        color: var(--c-dark);
-        background-color: var(--c-light);
+        color: var(--c-light);
+        background-color: var(--c-accent);
         border-radius: 25px;
         padding: 20px 30px;
         font-weight: 500;
@@ -393,8 +477,8 @@ main{
         cursor: pointer;
 
         &:hover{
-          background-color: var(--c-accent);
-          color: var(--c-light);
+          background-color: var(--c-light);
+          color: var(--c-dark);
         }
       }
     }

@@ -7,6 +7,18 @@
 .light-mode #logo {
   filter: invert(0) !important;
 }
+.light-mode .theme-container .dark {
+  background-color: var(--c-dark) !important;
+}
+.light-mode .theme-container .dark > img {
+  filter: invert(0.1) !important;
+}
+.light-mode .theme-container .light {
+  background-color: var(--c-light) !important;
+}
+.light-mode .theme-container .light > img {
+  filter: invert(0.1) !important;
+}
 
 .dark-mode {
   --c-dark: #1b1b1b;

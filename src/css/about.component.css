@@ -4,6 +4,71 @@
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
 }
+.light-mode #me .me-name .me-skill .skill img {
+  filter: invert(0) !important;
+}
+.light-mode .cta-parliamone h3 {
+  color: var(--c-dark) !important;
+}
+.light-mode #services-container .serv-list .serv-list-content .serv-content .serv .serv-img img {
+  filter: invert(1) !important;
+}
+.light-mode #services-container .serv-list .serv-list-content .serv-content .serv:hover .serv-img {
+  background-color: var(--c-accent);
+}
+.light-mode #services-container .serv-list .serv-list-content .serv-content .serv .serv-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background-color: var(--c-light);
+}
+.light-mode #services-container .serv-list .serv-list-content .serv-content .serv p {
+  margin: 0;
+  padding: 0;
+  font-weight: 100;
+  font-size: 15px;
+}
+.light-mode #services-container .serv-list .serv-cta .serv-cta-img:hover {
+  background-color: var(--c-dark);
+}
+.light-mode #services-container .serv-list .serv-cta .serv-cta-img:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(1) {
+  width: 100%;
+  opacity: 0.9 !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(2) {
+  width: 85%;
+  opacity: 0.6 !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(3) {
+  width: 80%;
+  opacity: 0.9 !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(4) {
+  width: 70%;
+  opacity: 0.6 !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(5) {
+  width: 100%;
+  opacity: 0.9 !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(6) {
+  width: 90%;
+  opacity: 0.6 !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(7) {
+  width: 75%;
+  opacity: 0.9 !important;
+}
+.light-mode #services-container .serv-list .skill-container .skill:nth-child(8) {
+  width: 95%;
+  opacity: 0.6 !important;
+}
 
 .dark-mode {
   --c-dark: #1b1b1b;
@@ -253,7 +318,7 @@ main .main-content #services-container .serv-list .serv-list-content .serv-conte
   margin: 0;
   padding: 0;
   font-weight: 100;
-  font-size: 18px;
+  font-size: 15px;
 }
 main .main-content #services-container .serv-list .serv-cta {
   height: 100%;
@@ -265,23 +330,21 @@ main .main-content #services-container .serv-list .serv-cta .serv-cta-img {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--c-light);
+  background-color: var(--c-accent);
   border-radius: 25px;
   width: 37px;
   height: 37px;
   cursor: pointer;
 }
-main .main-content #services-container .serv-list .serv-cta .serv-cta-img:hover {
-  background-color: var(--c-accent);
-}
-main .main-content #services-container .serv-list .serv-cta .serv-cta-img:hover img {
+main .main-content #services-container .serv-list .serv-cta .serv-cta-img img {
   filter: invert(0);
 }
-main .main-content #services-container .serv-list .serv-cta .serv-cta-img img {
-  filter: invert(1);
+main .main-content #services-container .serv-list .serv-cta .serv-cta-img:hover {
+  background-color: var(--c-dark);
+  border: 1px solid var(--c-light);
 }
 main .main-content #services-container .serv-list .skill-container {
-  margin: 0 50px;
+  margin: 0 30px;
   margin-bottom: 30px;
   display: flex;
   flex-direction: column;
@@ -307,7 +370,7 @@ main .main-content #services-container .serv-list .skill-container .skill:nth-ch
   width: 80%;
 }
 main .main-content #services-container .serv-list .skill-container .skill:nth-child(4) {
-  width: 65%;
+  width: 70%;
   opacity: 0.7;
 }
 main .main-content #services-container .serv-list .skill-container .skill:nth-child(5) {
@@ -328,7 +391,7 @@ main .main-content #services-container .serv-list .skill-container .skill p {
   margin: 0;
   padding: 0;
   font-weight: 200;
-  font-size: 15px;
+  font-size: 12px;
   text-wrap: nowrap;
   color: var(--c-dark);
 }
@@ -349,8 +412,8 @@ main .main-content .cta-parliamone h2 {
   font-size: 25px;
 }
 main .main-content .cta-parliamone h3 {
-  color: var(--c-dark);
-  background-color: var(--c-light);
+  color: var(--c-light);
+  background-color: var(--c-accent);
   border-radius: 25px;
   padding: 20px 30px;
   font-weight: 500;
@@ -358,6 +421,6 @@ main .main-content .cta-parliamone h3 {
   cursor: pointer;
 }
 main .main-content .cta-parliamone h3:hover {
-  background-color: var(--c-accent);
-  color: var(--c-light);
+  background-color: var(--c-light);
+  color: var(--c-dark);
 }/*# sourceMappingURL=about.component.css.map */

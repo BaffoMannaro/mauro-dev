@@ -1,4 +1,38 @@
 <div class="container"
 [ngClass]="{'light-mode': DarkLightModeService.mode === true, 'dark-mode': DarkLightModeService.mode === false}">
-  <p>weather works!</p>
+  
+  <div class="weather-icon">
+    <img src="../../assets/weather/{{weather_icon}}.svg" alt="">
+  </div>
+
+  <div class="weather-location">
+    <div class="time">
+      <p>{{today | date :'dd MMMM'}}</p>
+    </div>
+    <div class="city">
+      <h3>{{weather_city}}</h3>
+    </div>
+  </div>
+
+  <div class="weather-info">
+    <div class="temperature">
+      <h2>{{temperature}}<span>°C</span></h2>
+      <h3>{{weather_description}}</h3>
+      <p>Percepiti: {{feels_like}}°C</p>
+    </div>
+
+    <div class="other-info">
+      <img src="../../assets/icon/wind_info.svg" alt="">
+      <h3>Vento</h3>
+      <p>{{wind_speed}} m/s</p>
+    </div>
+
+    <div class="other-info">
+      <img src="../../assets/icon/humidity_info.svg" alt="">
+      <h3>Umidità</h3>
+      <p>{{humidity}}%</p>
+    </div>
+  </div>
+
+
 </div>

@@ -1,4 +1,4 @@
-import { Component, NgModule } from '@angular/core';
+import { booleanAttribute, Component, NgModule } from '@angular/core';
 import { DarkLightModeService } from '../app-service/dark-light-mode.service';
 import { CommonModule } from '@angular/common';
 import { WeatherService } from '../app-service/weather.service';
@@ -18,8 +18,6 @@ import { BlobOptions } from 'buffer';
 export class WeatherComponent{
   private weather: any = [];
   private weatherObservable: Observable<any[]>;
-  private cityList: any = [];
-  public cityList_names: any = [];
 
   // gestione info sul meteo
   public weather_city: string = '';
@@ -35,6 +33,9 @@ export class WeatherComponent{
 
   // gestione lista città nell'input
   public selectedCity: string = 'Monopoli';
+  private city_check: any = [];
+  public city_flag: boolean = false;
+
 
   // costruttore
   constructor(
@@ -67,17 +68,29 @@ export class WeatherComponent{
   inputCity(): void {
 
     this.cityListService.get_city_list(this.selectedCity).subscribe((city:any) => {
-      if (city.postalCodes.placeName){
-        console.log("EURECA");
+      this.city_check = city.postalCodes[0].placeName;
+      
+      if (this.city_check.toLowerCase() != this.selectedCity.toLowerCase()){
+        this.city_flag = true;
+        return
       }
+
+      this.weatherService.get_weather(this.city_check).subscribe((data:any[]) => {
+        this.weather = data;
+        this.formatWeather(this.weather);
+        this.city_flag = false;
+      });
+
     });
 
 
-    this.weatherService.get_weather(this.selectedCity).subscribe((data:any[]) => {
+  }
 
-      this.weather = data;
-      this.formatWeather(this.weather);
-    })
+  onKeyup(event: KeyboardEvent): void{
+
+    if (event.key === 'Backspace') {
+      this.city_flag = false;
+    }
 
   }
 

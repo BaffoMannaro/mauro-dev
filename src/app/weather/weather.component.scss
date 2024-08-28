@@ -3,6 +3,28 @@
   --c-light: #1b1b1b;
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
+
+  .weather-location{
+    .city{
+      >div{
+        border-top: 1px solid var(--c-light) !important;
+        color: var(--c-light) !important;
+  
+        &:hover{
+          border-top: 1px solid var(--c-accent) !important;
+        }
+      }
+    }
+  }
+  
+  .weather-info{
+    .other-info{  
+      img{
+        filter: invert(1) !important;
+      }
+    }
+  }
+
 }
 
 .dark-mode{
@@ -48,7 +70,7 @@ p,h3,h2{
   .weather-location{
     display: flex;
     flex-direction: column;
-    width: 25%;
+    width: 30%;
     gap: 5px;
 
     .time{
@@ -84,6 +106,10 @@ p,h3,h2{
           opacity: 1;
           border-top: 1px solid var(--c-accent);
         }
+      }
+
+      .wrong-city{
+        color: red;
       }
     }
 

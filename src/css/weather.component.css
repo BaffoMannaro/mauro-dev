@@ -4,6 +4,16 @@
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
 }
+.light-mode .weather-location .city > div {
+  border-top: 1px solid var(--c-light) !important;
+  color: var(--c-light) !important;
+}
+.light-mode .weather-location .city > div:hover {
+  border-top: 1px solid var(--c-accent) !important;
+}
+.light-mode .weather-info .other-info img {
+  filter: invert(1) !important;
+}
 
 .dark-mode {
   --c-dark: #1b1b1b;
@@ -46,7 +56,7 @@ p, h3, h2 {
 .container .weather-location {
   display: flex;
   flex-direction: column;
-  width: 25%;
+  width: 30%;
   gap: 5px;
 }
 .container .weather-location .time {
@@ -80,6 +90,9 @@ p, h3, h2 {
 .container .weather-location .city > div:hover {
   opacity: 1;
   border-top: 1px solid var(--c-accent);
+}
+.container .weather-location .city .wrong-city {
+  color: red;
 }
 .container .weather-info {
   width: 60%;

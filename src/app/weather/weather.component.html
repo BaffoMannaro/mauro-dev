@@ -17,6 +17,8 @@
         autocomplete="off"
         [(ngModel)]="selectedCity"
         (keyup.enter)="inputCity()"
+        (keyup)="onKeyup($event)"
+        [ngClass]="{'wrong-city': city_flag}"
       >
       <div (click)="inputCity()">Invia</div>
     </div>

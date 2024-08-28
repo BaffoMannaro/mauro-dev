@@ -20,7 +20,6 @@ export class WeatherComponent{
   private weatherObservable: Observable<any[]>;
   private cityList: any = [];
   public cityList_names: any = [];
-  private cityListObservable: Observable<any>;
 
   // gestione info sul meteo
   public weather_city: string = '';
@@ -52,13 +51,6 @@ export class WeatherComponent{
       this.formatWeather(this.weather);
     })
 
-    // CITTA'
-    this.cityListObservable = this.cityListService.get_city_list(this.selectedCity);
-    cityListService.get_city_list(this.selectedCity).subscribe((res:any[]) => {
-      this.cityList = res;
-      this.cityList_names = this.cityList.postalCodes.map((postalCode: { placeName: any; }) => postalCode.placeName);
-    });
-
   }
   //fine costruttore
 
@@ -73,8 +65,17 @@ export class WeatherComponent{
   }
 
   inputCity(): void {
-    this.weatherService.get_weather(this.selectedCity).subscribe((res:any[]) => {
-      this.weather = res;
+
+    this.cityListService.get_city_list(this.selectedCity).subscribe((city:any) => {
+      if (city.postalCodes.placeName){
+        console.log("EURECA");
+      }
+    });
+
+
+    this.weatherService.get_weather(this.selectedCity).subscribe((data:any[]) => {
+
+      this.weather = data;
       this.formatWeather(this.weather);
     })
 

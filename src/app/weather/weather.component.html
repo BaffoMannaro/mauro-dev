@@ -16,6 +16,7 @@
         placeholder="{{weather_city}}"
         autocomplete="off"
         [(ngModel)]="selectedCity"
+        (keyup.enter)="inputCity()"
       >
       <div (click)="inputCity()">Invia</div>
     </div>

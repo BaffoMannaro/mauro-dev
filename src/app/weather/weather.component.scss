@@ -67,6 +67,7 @@ p,h3,h2{
         padding: 5px;
         font-size: 24px;
         color: var(--c-light);
+        text-transform: capitalize;
         
         &:focus-visible{ outline: none }
       }
@@ -98,6 +99,7 @@ p,h3,h2{
     gap: 1%;
 
     .temperature{
+      width: 55%;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -115,10 +117,13 @@ p,h3,h2{
       h3{
         text-transform: capitalize;
         margin: 2px 0;
+        text-wrap: balance;
+        text-align: center;
       }
     }
 
     .other-info{
+      width: 20%;
       display: flex;
       flex-direction: column;
       align-items: center;

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { DarkLightModeService } from '../app-service/dark-light-mode.service';
 import { CommonModule } from '@angular/common';
 import { WeatherService } from '../app-service/weather.service';
+import { CityListService } from '../app-service/city-list.service';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -14,6 +15,9 @@ import { Observable } from 'rxjs';
 export class WeatherComponent{
   private weather: any = [];
   private weatherObservable: Observable<any[]>;
+  private cityList: any = [];
+  public cityList_names: any = [];
+  private cityListObservable: Observable<any>;
 
   // gestione info sul meteo
   public weather_city: string = '';
@@ -27,12 +31,19 @@ export class WeatherComponent{
   // gestione della data di oggi
   public today : number = Date.now();
 
+  // gestione lista città nell'input
+  public cities: any[] = [];
+  public filteredCities: any[] = [];
+  public selectedCity: string = '';
+
   // costruttore
   constructor(
     public DarkLightModeService: DarkLightModeService,
     public weatherService: WeatherService,
+    public cityListService: CityListService 
   ){
-
+    
+    // METEO
     this.weatherObservable = this.weatherService.get_weather();
 
     this.weatherService.get_weather().subscribe((res:any[]) => {
@@ -48,8 +59,22 @@ export class WeatherComponent{
 
     })
 
+    // CITTA'
+    this.cityListObservable = this.cityListService.get_city_list();
+    cityListService.get_city_list().subscribe((res:any[]) => {
+      this.cityList = res;
+
+/*       for(let i = 0; i < 4; i++){
+        this.cityList_names = this.cityList.postalCodes[i].placeName;
+      }
+ */
+
+      this.cityList_names = this.cityList.postalCodes.map((postalCode: { placeName: any; }) => postalCode.placeName);
+
+      console.log(this.cityList_names);
+
+    });
+
   }
-
-
 
 }

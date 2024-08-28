@@ -10,11 +10,9 @@ export class CityListService {
   private API_URL_START: string = 'http://api.geonames.org/postalCodeSearchJSON?placename=';
   private API_URL_END: string = '&maxRows=2&username=BaffoMannaro';
 
-  public cityName: string = 'Mono';
-
   constructor(private httpClient: HttpClient) {}
 
-  get_city_list(): Observable<any>{
-    return this.httpClient.get(`${this.API_URL_START}${this.cityName}${this.API_URL_END}`);
+  get_city_list(cityName: string): Observable<any>{
+    return this.httpClient.get(`${this.API_URL_START}${cityName}${this.API_URL_END}`);
   }
 }

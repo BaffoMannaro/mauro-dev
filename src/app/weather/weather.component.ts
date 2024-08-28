@@ -1,14 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { DarkLightModeService } from '../app-service/dark-light-mode.service';
 import { CommonModule } from '@angular/common';
 import { WeatherService } from '../app-service/weather.service';
 import { CityListService } from '../app-service/city-list.service';
 import { Observable } from 'rxjs';
 
+import { FormsModule } from '@angular/forms';
+import { BlobOptions } from 'buffer';
+
 @Component({
   selector: 'app-weather',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './weather.component.html',
   styleUrl: './weather.component.scss'
 })
@@ -32,9 +35,7 @@ export class WeatherComponent{
   public today : number = Date.now();
 
   // gestione lista città nell'input
-  public cities: any[] = [];
-  public filteredCities: any[] = [];
-  public selectedCity: string = '';
+  public selectedCity: string = 'Monopoli';
 
   // costruttore
   constructor(
@@ -44,36 +45,38 @@ export class WeatherComponent{
   ){
     
     // METEO
-    this.weatherObservable = this.weatherService.get_weather();
+    this.weatherObservable = this.weatherService.get_weather(this.selectedCity);
 
-    this.weatherService.get_weather().subscribe((res:any[]) => {
+    this.weatherService.get_weather(this.selectedCity).subscribe((res:any[]) => {
       this.weather = res;
-
-      this.weather_city = this.weather.name.replace('Comune di ', '');
-      this.temperature = parseInt(this.weather.main.temp);
-      this.weather_description = this.weather.weather[0].description;
-      this.feels_like = parseInt(this.weather.main.feels_like);
-      this.wind_speed = this.weather.wind.speed;
-      this.humidity = this.weather.main.humidity;
-      this.weather_icon = this.weather.weather[0].icon;
-
+      this.formatWeather(this.weather);
     })
 
     // CITTA'
-    this.cityListObservable = this.cityListService.get_city_list();
-    cityListService.get_city_list().subscribe((res:any[]) => {
+    this.cityListObservable = this.cityListService.get_city_list(this.selectedCity);
+    cityListService.get_city_list(this.selectedCity).subscribe((res:any[]) => {
       this.cityList = res;
-
-/*       for(let i = 0; i < 4; i++){
-        this.cityList_names = this.cityList.postalCodes[i].placeName;
-      }
- */
-
       this.cityList_names = this.cityList.postalCodes.map((postalCode: { placeName: any; }) => postalCode.placeName);
-
-      console.log(this.cityList_names);
-
     });
+
+  }
+  //fine costruttore
+
+  formatWeather(weather: any){
+    this.weather_city = weather.name.replace('Comune di ', '');
+    this.temperature = parseInt(weather.main.temp);
+    this.weather_description = weather.weather[0].description;
+    this.feels_like = parseInt(weather.main.feels_like);
+    this.wind_speed = weather.wind.speed;
+    this.humidity = weather.main.humidity;
+    this.weather_icon = weather.weather[0].icon;
+  }
+
+  inputCity(): void {
+    this.weatherService.get_weather(this.selectedCity).subscribe((res:any[]) => {
+      this.weather = res;
+      this.formatWeather(this.weather);
+    })
 
   }
 

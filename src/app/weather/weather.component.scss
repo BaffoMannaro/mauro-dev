@@ -13,7 +13,7 @@
 }
 
 :host{
-  height: 40%;
+  min-height: 180px;
   width: 100%;
   border: 1px solid var(--c-grey);
   border-radius: 25px;
@@ -25,6 +25,7 @@ p,h3,h2{
 }
 
 .container{
+  height: 100%;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -33,6 +34,8 @@ p,h3,h2{
   padding: 20px;
 
   .weather-icon{
+    display: flex;
+    align-items: center;
     width: 20%;
     height: 100%;
     padding: 10px;
@@ -53,18 +56,32 @@ p,h3,h2{
     }
 
     .city{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
       input{
         width: 100%;
         background: none;
         border: none;
-        border-bottom: 1px solid var(--c-grey);
         padding: 5px;
         font-size: 24px;
         color: var(--c-light);
         
-        &:focus-visible{
-          outline: none;
-          border-bottom: 1.5px solid var(--c-accent);
+        &:focus-visible{ outline: none }
+      }
+
+      >div{
+        padding: 5px 6px;
+        border-top: 1px solid var(--c-grey);
+        width: 100%;
+        color: var(--c-grey);
+        opacity: .5;
+        cursor: pointer;
+
+        &:hover{
+          opacity: 1;
+          border-top: 1px solid var(--c-accent);
         }
       }
     }

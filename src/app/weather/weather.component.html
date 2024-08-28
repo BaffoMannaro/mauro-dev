@@ -10,10 +10,14 @@
       <p>{{today | date :'dd MMMM'}}</p>
     </div>
     <div class="city">
-        <input
-          type="text"
-          placeholder="{{weather_city}}"
-        >
+      <input
+        type="text"
+        name="selectedCity"
+        placeholder="{{weather_city}}"
+        autocomplete="off"
+        [(ngModel)]="selectedCity"
+      >
+      <div (click)="inputCity()">Invia</div>
     </div>
   </div>
 

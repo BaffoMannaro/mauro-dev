@@ -1,3 +1,115 @@
+.light-mode {
+  --c-dark: #ffffff;
+  --c-light: #1b1b1b;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+.light-mode .main-content #top-container #about #me #me-name #skill li > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #top-container #about #mission {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px;
+  border: 1px solid var(--c-grey);
+  border-radius: 25px;
+}
+.light-mode .main-content #top-container #about #mission p {
+  margin: 0;
+  font-weight: 400;
+  font-size: 32px;
+}
+.light-mode .main-content #top-container #about #mission p .minus {
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5019607843);
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+.light-mode .main-content #top-container #about #mission #marquee-container {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--c-dark);
+  background-color: var(--c-light);
+  padding: 15px 30px;
+  border-radius: 25px;
+}
+.light-mode .main-content #top-container #about #mission #marquee-content {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 40s linear infinite;
+}
+.light-mode .main-content #languages-container div.language div.single-language img {
+  filter: invert(0.9) !important;
+}
+.light-mode .main-content #languages-container div.language div.single-language2 img {
+  filter: invert(0.9) !important;
+}
+.light-mode .main-content #services-container .service .service-text .service-cta {
+  background-color: var(--c-accent);
+}
+.light-mode .main-content #services-container .service .service-text .service-cta:hover {
+  background-color: var(--c-dark);
+}
+.light-mode .main-content #services-container .service .service-text .service-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-text .service-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-text .service-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-image img {
+  display: none;
+}
+.light-mode .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game h5 {
+  color: var(--c-dark);
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game .game-cta {
+  border: none;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game .game-cta > img {
+  filter: invert(1) !important;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 .single-game:hover .game-cta > img {
+  filter: invert(0) !important;
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 #carta-alta {
+  background-image: url("/assets/carta.webp");
+}
+.light-mode .main-content #cta-container #cta1 #game #game2 #morra-cinese {
+  background-image: url("/assets/morra.webp");
+  background-position: bottom;
+}
+.light-mode .main-content #cta-container #cta2 h3 {
+  color: var(--c-dark);
+}
+.light-mode .main-content #cta-container #cta2 > img {
+  filter: invert(1) !important;
+}
+
+.dark-mode {
+  --c-dark: #1b1b1b;
+  --c-light: #ffffff;
+  --c-grey: #d9d9d9;
+  --c-accent: #C72086;
+}
+
 main {
   display: flex;
   align-items: center;
@@ -5,6 +117,7 @@ main {
 }
 main .main-content {
   max-width: 1320px;
+  width: 90vw;
   height: 100%;
   padding: 120px 0;
   display: flex;
@@ -41,7 +154,7 @@ main .main-content #top-container #about #me {
   display: flex;
   flex-direction: row;
   gap: 30px;
-  padding: 30px;
+  padding: clamp(10px, 3vw, 30px);
 }
 main .main-content #top-container #about #me > img {
   background-color: var(--c-grey);
@@ -55,7 +168,7 @@ main .main-content #top-container #about #me #me-name {
 main .main-content #top-container #about #me #me-name h1 {
   margin: 0;
   padding: 0;
-  font-size: 32px;
+  font-size: clamp(12px, 3vw, 32px);
   font-weight: 400;
 }
 main .main-content #top-container #about #me #me-name ul#skill {
@@ -228,6 +341,7 @@ main .main-content #services-container .service .service-text .service-title p {
   padding: 0;
   font-weight: 100;
   font-size: 16px;
+  text-wrap: balance;
 }
 main .main-content #services-container .service .service-text .service-title h2 {
   margin: 0;
@@ -453,114 +567,75 @@ main .main-content #cta-container #cta2 h3:hover {
   color: var(--c-dark);
 }
 
-.light-mode {
-  --c-dark: #ffffff;
-  --c-light: #1b1b1b;
-  --c-grey: #d9d9d9;
-  --c-accent: #C72086;
-}
-.light-mode .main-content #top-container #about #me #me-name #skill li > img {
-  filter: invert(1) !important;
-}
-.light-mode .main-content #top-container #about #mission {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 30px;
-  border: 1px solid var(--c-grey);
-  border-radius: 25px;
-}
-.light-mode .main-content #top-container #about #mission p {
-  margin: 0;
-  font-weight: 400;
-  font-size: 32px;
-}
-.light-mode .main-content #top-container #about #mission p .minus {
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.5019607843);
-}
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
+@media (min-width: 768px) and (max-width: 1023px) {
+  main .main-content #top-container {
+    flex-direction: column;
+    height: 100%;
   }
-  100% {
-    transform: translateX(-100%);
+  main .main-content #top-container #video {
+    width: 100%;
+    height: 50vh;
   }
-}
-.light-mode .main-content #top-container #about #mission #marquee-container {
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  color: var(--c-dark);
-  background-color: var(--c-light);
-  padding: 15px 30px;
-  border-radius: 25px;
-}
-.light-mode .main-content #top-container #about #mission #marquee-content {
-  display: inline-block;
-  padding-left: 100%;
-  animation: marquee 40s linear infinite;
-}
-.light-mode .main-content #languages-container div.language div.single-language img {
-  filter: invert(0.9) !important;
-}
-.light-mode .main-content #languages-container div.language div.single-language2 img {
-  filter: invert(0.9) !important;
-}
-.light-mode .main-content #services-container .service .service-text .service-cta {
-  background-color: var(--c-accent);
-}
-.light-mode .main-content #services-container .service .service-text .service-cta:hover {
-  background-color: var(--c-dark);
-}
-.light-mode .main-content #services-container .service .service-text .service-cta:hover > img {
-  filter: invert(1) !important;
-}
-.light-mode .main-content #services-container .service.selected .service-text .service-cta > img {
-  filter: invert(0) !important;
-}
-.light-mode .main-content #services-container .service.selected .service-text .service-cta:hover > img {
-  filter: invert(1) !important;
-}
-.light-mode .main-content #services-container .service.selected .service-image img {
-  display: none;
-}
-.light-mode .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
-  filter: invert(0) !important;
-}
-.light-mode .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover > img {
-  filter: invert(1) !important;
-}
-.light-mode .main-content #cta-container #cta1 #game #game2 .single-game h5 {
-  color: var(--c-dark);
-}
-.light-mode .main-content #cta-container #cta1 #game #game2 .single-game .game-cta {
-  border: none;
-}
-.light-mode .main-content #cta-container #cta1 #game #game2 .single-game .game-cta > img {
-  filter: invert(1) !important;
-}
-.light-mode .main-content #cta-container #cta1 #game #game2 .single-game:hover .game-cta > img {
-  filter: invert(0) !important;
-}
-.light-mode .main-content #cta-container #cta1 #game #game2 #carta-alta {
-  background-image: url("/assets/carta.webp");
-}
-.light-mode .main-content #cta-container #cta1 #game #game2 #morra-cinese {
-  background-image: url("/assets/morra.webp");
-  background-position: bottom;
-}
-.light-mode .main-content #cta-container #cta2 h3 {
-  color: var(--c-dark);
-}
-.light-mode .main-content #cta-container #cta2 > img {
-  filter: invert(1) !important;
-}
-
-.dark-mode {
-  --c-dark: #1b1b1b;
-  --c-light: #ffffff;
-  --c-grey: #d9d9d9;
-  --c-accent: #C72086;
+  main .main-content #top-container #about {
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+  }
+  main .main-content #top-container #about #me {
+    width: 40%;
+    height: auto;
+    flex-direction: column;
+    align-items: center;
+  }
+  main .main-content #top-container #about #me > img {
+    width: 60%;
+  }
+  main .main-content #top-container #about #me #me-name {
+    gap: 15px;
+  }
+  main .main-content #top-container #about #me #me-name ul#skill li {
+    width: 100%;
+  }
+  main .main-content #top-container #about #mission {
+    width: 60%;
+    height: auto;
+    gap: inherit;
+  }
+  main .main-content #top-container #about #mission p {
+    font-size: 28px;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 0 5px;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta h3 {
+    width: 80%;
+    margin: 0;
+    font-weight: 100;
+    font-size: 16px;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
+    background-color: var(--c-accent);
+    border: none;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover {
+    background-color: var(--c-dark);
+    border: 1px solid var(--c-light);
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
+    display: block;
+    height: 10px;
+    width: 10px;
+  }
 }/*# sourceMappingURL=home.component.css.map */

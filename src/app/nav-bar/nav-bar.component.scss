@@ -52,7 +52,7 @@
 
   .content{
     max-width: 1320px;
-    width: 100%;
+    width: 90vw;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -144,3 +144,20 @@
       }
   }
 }
+/* 
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .container{
+    .content{
+      max-width: 1200px;
+    }
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .container{
+    .content{
+      max-width: 1000px;
+    }
+  }
+}
+ */

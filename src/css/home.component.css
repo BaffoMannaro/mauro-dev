@@ -605,36 +605,76 @@ main .main-content #cta-container #cta2 h3:hover {
     font-size: 28px;
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
     gap: 20px;
     padding: 0 5px;
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta h3 {
-    width: 80%;
-    margin: 0;
-    font-weight: 100;
     font-size: 16px;
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
-    background-color: var(--c-accent);
-    border: none;
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 30px;
     height: 30px;
-    cursor: pointer;
-  }
-  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta:hover {
-    background-color: var(--c-dark);
-    border: 1px solid var(--c-light);
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
-    display: block;
+    height: 10px;
+    width: 10px;
+  }
+}
+@media (max-width: 767px) {
+  main .main-content {
+    width: 80vw;
+    gap: 30px;
+  }
+  main .main-content #top-container {
+    flex-direction: column;
+    height: 100%;
+    gap: 30px;
+  }
+  main .main-content #top-container #video {
+    width: 100%;
+    height: 50vh;
+  }
+  main .main-content #top-container #about {
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    gap: 30px;
+  }
+  main .main-content #top-container #about #me {
+    width: 40%;
+    height: auto;
+    flex-direction: column;
+    align-items: center;
+  }
+  main .main-content #top-container #about #me > img {
+    width: 60%;
+  }
+  main .main-content #top-container #about #me #me-name {
+    gap: 15px;
+  }
+  main .main-content #top-container #about #me #me-name ul#skill li {
+    width: 100%;
+  }
+  main .main-content #top-container #about #mission {
+    width: 60%;
+    height: auto;
+    gap: inherit;
+  }
+  main .main-content #top-container #about #mission p {
+    font-size: 28px;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta {
+    gap: 20px;
+    padding: 0 5px;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta h3 {
+    font-size: 16px;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
+    width: 30px;
+    height: 30px;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
     height: 10px;
     width: 10px;
   }

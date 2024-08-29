@@ -121,20 +121,11 @@
   filter: invert(100%);
 }
 
-/* 
-@media (min-width: 1280px) and (max-width: 1439px) {
-  .container{
-    .content{
-      max-width: 1200px;
-    }
+@media (max-width: 767px) {
+  .container {
+    width: 80vw;
   }
-}
-
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .container{
-    .content{
-      max-width: 1000px;
-    }
+  .container .content ul#menu {
+    display: none;
   }
-}
- *//*# sourceMappingURL=nav-bar.component.css.map */
+}/*# sourceMappingURL=nav-bar.component.css.map */

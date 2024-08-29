@@ -144,20 +144,15 @@
       }
   }
 }
-/* 
-@media (min-width: 1280px) and (max-width: 1439px) {
-  .container{
-    .content{
-      max-width: 1200px;
-    }
-  }
-}
 
-@media (min-width: 1024px) and (max-width: 1279px) {
+@media (max-width: 767px){
   .container{
+    width: 80vw;
     .content{
-      max-width: 1000px;
+      ul#menu{
+        display: none;
+      }
+
     }
   }
 }
- */

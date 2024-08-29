@@ -147,7 +147,8 @@
 
 @media (max-width: 767px){
   .container{
-    width: 80vw;
+    width: 100vw;
+    padding: 0 10vw;
     .content{
       ul#menu{
         display: none;

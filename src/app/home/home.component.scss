@@ -555,6 +555,7 @@ main{
               color: var(--c-light);
 
               .service-page-cta{
+                cursor: pointer;
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
@@ -567,6 +568,7 @@ main{
                   margin: 0;
                   font-weight:100;
                   font-size: 18px;
+                  text-wrap: balance;
                 }
 
                 .page-cta{
@@ -735,6 +737,7 @@ main{
 
 @media (min-width: 768px) and (max-width: 1023px) {
   main{
+    overflow-x: hidden;
     .main-content{
 
       #top-container{
@@ -758,7 +761,7 @@ main{
             align-items: center;
 
             >img{
-              width: 60%;
+              height: 50%;
             }
 
             #me-name{
@@ -790,17 +793,31 @@ main{
             .service-image{
               .service-page-container{  
                 .service-page-cta{
-                  gap: 20px;
+                  display: flex;
+                  width: 120%;
+                  gap: 0;
                   padding: 0 5px;
+
                   h3{
                     font-size: 16px;
+                    border-left: 2px solid var(--c-accent);
+                    padding-left: 10px;
                   }
                   .page-cta{
-                    width: 30px;
-                    height: 30px;
+                    display: none;
+                    width: 0;
+                    height: 0;
+  
                     >img{
-                      height: 10px;
-                      width: 10px;
+                      display: none;
+                      height: 0;
+                      width: 0;
+                    }
+                  }
+
+                  &:hover{
+                    h3{
+                      border-left: 5px solid var(--c-accent);
                     }
                   }
                 }
@@ -849,13 +866,14 @@ main{
             }
 
             #me-name{
+              width: 100%;
               gap: 15px;
 
-              h1{ font-size: 20px }
+              h1{ font-size: 2em }
               
               ul#skill{
                 li{
-                  h3{ font-size: 11px }
+                  h3{ font-size: 1em }
                   img{ display: none }
                 }
               }
@@ -978,6 +996,11 @@ main{
     
           #game{
             width: 100%;
+
+            h3{
+              text-wrap: balance;
+              text-align: center;
+            }
     
             #game2{
               height: 300px;
@@ -987,6 +1010,7 @@ main{
               .single-game{
                 height: 100%;
                 border-radius: 18px;
+                padding: 10px;
               }
             }
           }
@@ -1010,7 +1034,7 @@ main{
           h4,h3{
             margin: 0;
             padding: 0;
-            font-size: 25px;
+            font-size: 20px;
             text-align: center;
           }
     
@@ -1020,8 +1044,8 @@ main{
             font-weight: 500;
             color: var(--c-light);
             background-color: var(--c-accent);
-            border-radius: 25px;
-            padding: 20px 30px;
+            border-radius: 12px;
+            padding: 10px 20px;
             cursor: pointer;
     
             &:hover{
@@ -1030,6 +1054,46 @@ main{
             }
           }
     
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 540px) {
+  main{
+    .main-content{
+      #top-container{
+        #about{
+          #me{
+            #me-name{
+              h1{ font-size: 26px }
+              
+              ul#skill{
+                li{
+                  h3{ font-size: 11px }
+                  img{ display: none }
+                }
+              }
+            }
+          }
+
+          #mission{
+            width: 100%;
+            height: auto;
+            gap: inherit;
+
+            p{
+              font-size: 24px;
+              text-wrap: balance;
+            }
+
+            #marquee-container{
+              span{
+                font-size: 14px;
+              }
+            }
+          }
         }
       }
     }

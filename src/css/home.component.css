@@ -421,6 +421,7 @@ main .main-content #services-container .service.selected .service-image .service
   color: var(--c-light);
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta {
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -433,6 +434,7 @@ main .main-content #services-container .service.selected .service-image .service
   margin: 0;
   font-weight: 100;
   font-size: 18px;
+  text-wrap: balance;
 }
 main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
   background-color: var(--c-accent);
@@ -568,6 +570,9 @@ main .main-content #cta-container #cta2 h3:hover {
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
+  main {
+    overflow-x: hidden;
+  }
   main .main-content #top-container {
     flex-direction: column;
     height: 100%;
@@ -588,7 +593,7 @@ main .main-content #cta-container #cta2 h3:hover {
     align-items: center;
   }
   main .main-content #top-container #about #me > img {
-    width: 60%;
+    height: 50%;
   }
   main .main-content #top-container #about #me #me-name {
     gap: 15px;
@@ -605,19 +610,28 @@ main .main-content #cta-container #cta2 h3:hover {
     font-size: 28px;
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta {
-    gap: 20px;
+    display: flex;
+    width: 120%;
+    gap: 0;
     padding: 0 5px;
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta h3 {
     font-size: 16px;
+    border-left: 2px solid var(--c-accent);
+    padding-left: 10px;
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta {
-    width: 30px;
-    height: 30px;
+    display: none;
+    width: 0;
+    height: 0;
   }
   main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta .page-cta > img {
-    height: 10px;
-    width: 10px;
+    display: none;
+    height: 0;
+    width: 0;
+  }
+  main .main-content #services-container .service.selected .service-image .service-page-container .service-page-cta:hover h3 {
+    border-left: 5px solid var(--c-accent);
   }
 }
 @media (max-width: 767px) {
@@ -655,13 +669,14 @@ main .main-content #cta-container #cta2 h3:hover {
     width: 40%;
   }
   main .main-content #top-container #about #me #me-name {
+    width: 100%;
     gap: 15px;
   }
   main .main-content #top-container #about #me #me-name h1 {
-    font-size: 20px;
+    font-size: 2em;
   }
   main .main-content #top-container #about #me #me-name ul#skill li h3 {
-    font-size: 11px;
+    font-size: 1em;
   }
   main .main-content #top-container #about #me #me-name ul#skill li img {
     display: none;
@@ -766,6 +781,10 @@ main .main-content #cta-container #cta2 h3:hover {
   main .main-content #cta-container #cta1 #game {
     width: 100%;
   }
+  main .main-content #cta-container #cta1 #game h3 {
+    text-wrap: balance;
+    text-align: center;
+  }
   main .main-content #cta-container #cta1 #game #game2 {
     height: 300px;
     flex-direction: column;
@@ -774,6 +793,7 @@ main .main-content #cta-container #cta2 h3:hover {
   main .main-content #cta-container #cta1 #game #game2 .single-game {
     height: 100%;
     border-radius: 18px;
+    padding: 10px;
   }
   main .main-content #cta-container #cta2 {
     width: 100%;
@@ -792,7 +812,7 @@ main .main-content #cta-container #cta2 h3:hover {
   main .main-content #cta-container #cta2 h4, main .main-content #cta-container #cta2 h3 {
     margin: 0;
     padding: 0;
-    font-size: 25px;
+    font-size: 20px;
     text-align: center;
   }
   main .main-content #cta-container #cta2 h4 {
@@ -802,12 +822,35 @@ main .main-content #cta-container #cta2 h3:hover {
     font-weight: 500;
     color: var(--c-light);
     background-color: var(--c-accent);
-    border-radius: 25px;
-    padding: 20px 30px;
+    border-radius: 12px;
+    padding: 10px 20px;
     cursor: pointer;
   }
   main .main-content #cta-container #cta2 h3:hover {
     background-color: var(--c-light);
     color: var(--c-dark);
+  }
+}
+@media (max-width: 540px) {
+  main .main-content #top-container #about #me #me-name h1 {
+    font-size: 26px;
+  }
+  main .main-content #top-container #about #me #me-name ul#skill li h3 {
+    font-size: 11px;
+  }
+  main .main-content #top-container #about #me #me-name ul#skill li img {
+    display: none;
+  }
+  main .main-content #top-container #about #mission {
+    width: 100%;
+    height: auto;
+    gap: inherit;
+  }
+  main .main-content #top-container #about #mission p {
+    font-size: 24px;
+    text-wrap: balance;
+  }
+  main .main-content #top-container #about #mission #marquee-container span {
+    font-size: 14px;
   }
 }/*# sourceMappingURL=home.component.css.map */

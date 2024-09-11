@@ -1,7 +1,7 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DarkLightModeService } from '../app-service/dark-light-mode.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-nav-bar',
@@ -17,13 +17,16 @@ export class NavBarComponent implements OnInit {
   public menu_icon: string = "menu";
   public menu_mode: string = '';
 
+  constructor(public DarkLightModeService: DarkLightModeService, @Inject(PLATFORM_ID) private platformId: Object){}
+
   ngOnInit() {
-    this.checkScreenSize();
+    if (isPlatformBrowser(this.platformId)){
+      this.checkScreenSize();
+    }
   }
 
-  constructor(public DarkLightModeService: DarkLightModeService){}
-
   @HostListener('window:resize', ['$event'])
+  
   onResize(event: any) {
     this.checkScreenSize();
   }

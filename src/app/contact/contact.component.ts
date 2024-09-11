@@ -1,8 +1,8 @@
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2, Inject, PLATFORM_ID } from '@angular/core';
 import { NavBarComponent } from '../nav-bar/nav-bar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DarkLightModeService } from '../app-service/dark-light-mode.service';
 
 @Component({
@@ -14,13 +14,19 @@ import { DarkLightModeService } from '../app-service/dark-light-mode.service';
 })
 export class ContactComponent implements OnInit {
 
-  constructor( private renderer: Renderer2, public DarkLightModeService: DarkLightModeService) {}
+  constructor( 
+    private renderer: Renderer2,
+    public DarkLightModeService: DarkLightModeService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ){}
 
   ngOnInit(): void {
     const script = this.renderer.createElement('script');
     script.src = 'https://assets.calendly.com/assets/external/widget.js';
     script.async = true;
-    this.renderer.appendChild(document.body, script);
+    if (isPlatformBrowser(this.platformId)){
+      this.renderer.appendChild(document.body, script)
+    }
   }
 
 }

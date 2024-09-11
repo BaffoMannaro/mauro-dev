@@ -5,8 +5,10 @@
 }
 
 body {
-  margin: 0;
+  width: 100%;
+  margin: 0 auto;
   padding: 0;
   background-color: #1b1b1b;
   position: relative;
+  overflow-x: hidden;
 }/*# sourceMappingURL=styles.css.map */

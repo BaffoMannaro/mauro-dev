@@ -3,6 +3,20 @@
   --c-light: #1b1b1b;
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
+
+  .box-main{
+    .box-container{
+      .box{
+        .box-title{
+          .box-icon{
+            img{
+              filter: invert(1) !important;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 .dark-mode{
@@ -21,6 +35,7 @@
 
 main{
   max-width: 860px;
+  width: 90vw;
   height: 100%;
   margin: 100px 0;
   display: flex;
@@ -33,6 +48,7 @@ main{
 
     >img{
       max-width: 860px;
+      width: 90vw;
       border-radius: 25px;
     }
   }
@@ -167,7 +183,7 @@ main{
       }
 
       .box{
-        min-height: 250px;
+        height: 100%;
         width: 48%;
         margin-bottom: 4%;
         flex-wrap: nowrap;
@@ -331,4 +347,204 @@ main{
     }
   }
 
+}
+
+@media (max-width: 800px) {
+  main{
+    overflow-x: hidden;
+
+    .box-type{
+      .box-type-container{
+        flex-direction: column;
+
+        .type{
+          height: auto;
+          gap: 50px;
+        }
+      }
+    }
+    
+    .box-main{
+      .box-container{
+
+        .conclusion{
+          margin-top: 30px;
+        }
+
+        .box-image{
+          width: 100%;
+        }
+        .box:last-child{
+          width: 100%;
+        }
+        .box-ex-container{
+          flex-direction: column;
+  
+          .box-ex-image{
+            width: 100%;
+            img{
+              width: 100%;
+            }
+          }
+          .box-ex{
+            width: 100%;
+            flex-direction: row;
+            gap: 30px;
+  
+            .box-ex-content{
+              width: 50%;
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+  
+              h3{
+                margin: 0;
+                font-weight: 400;
+                font-size: 32px;
+              }
+  
+              p{
+                margin: 0;
+                padding: 0;
+                font-weight: 100;
+                font-size: 16px;
+                line-height: 19px;
+              }
+            }
+          }
+          
+        }
+      }
+    }
+
+    .cta-parliamone{
+      flex-direction: column !important;
+  
+      .cta-box{
+        width: 100% !important;
+      }
+  
+      p{
+        text-align: center;
+        text-wrap: balance;
+      }
+      h3{
+        background-color: var(--c-accent) !important;
+        color: var(--c-light) !important;
+        text-align: center !important;
+      }
+    }
+  }
+
+}
+
+@media (max-width: 540px) {
+  main{
+    overflow-x: hidden;
+
+    .box-main{
+      .box-container{
+        width: 90vw;
+
+        .face-title{
+          padding: 0 !important;
+          h2{
+            text-align: center;
+          }
+        }
+
+        .box{
+          width: 100%;
+          .box-title{
+            .box-icon{
+              display: none;
+            }
+          }
+        }
+      }
+    }
+    .box-ex-container{
+      .box-ex{
+        flex-direction: column !important;
+
+        .box-ex-content{
+          width: 100% !important;
+
+          h3{
+            margin: 0;
+            font-weight: 400;
+            font-size: 32px;
+          }
+
+          p{
+            margin: 0;
+            padding: 0;
+            font-weight: 100;
+            font-size: 16px;
+            line-height: 19px;
+          }
+        }
+      }
+      
+    }
+
+    .cta-parliamone{
+      flex-direction: column !important;
+  
+      .cta-box{
+        width: 100% !important;
+      }
+  
+      h2{
+        text-align: center;
+        text-wrap: balance;
+      }
+      h3{
+        background-color: var(--c-accent) !important;
+        color: var(--c-light) !important;
+        text-align: center !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  .box-main{
+    .box-container{
+      flex-direction: column !important;
+      gap: 20px !important;
+
+      .box{
+        width: 100% !important;
+        .box-title{
+          .box-icon{
+            display: none;
+          }
+        }
+      }
+
+      .conclusion{
+        margin: 0;
+        margin-top: 15px !important;
+      }
+    }
+  }
+
+  .cta-parliamone{
+    flex-direction: column !important;
+
+    .cta-box{
+      width: 100% !important;
+    }
+
+    h2{
+      text-align: center;
+      text-wrap: balance;
+    }
+    h3{
+      background-color: var(--c-accent) !important;
+      color: var(--c-light) !important;
+      text-align: center !important;
+    }
+  }
 }

@@ -99,10 +99,6 @@
   --c-accent: #C72086;
 }
 
-:host{
-  max-width: 1320px;
-}
-
 main{
   display: flex;
   align-items: center;
@@ -110,6 +106,7 @@ main{
 
   .main-content{
     max-width: 1320px;
+    width: 90vw;
     height: 100%;
     padding: 120px 0;
     display: flex;
@@ -185,14 +182,27 @@ main{
 
     #exp-container{
       width: 100%;
+      height: auto;
       display: flex;
       flex-direction: row;
       gap: 50px;
       align-items: center;
       justify-content: space-between;
 
+      .exp:first-child{
+        background-color: var(--c-light);
+        color: var(--c-dark);
+        border: 1px solid var(--c-light);
+
+        .exp-content{
+          border-left: 5px solid var(--c-dark);
+        }
+      }
+
       .exp{
         width: 100%;
+        background-color: var(--c-dark);
+        color: var(--c-light);
         display: flex;
         flex-direction: column;
         gap: 30px;
@@ -269,7 +279,9 @@ main{
 
       .award-content{
         width: 60%;
-        border: 1px solid var(--c-grey);
+        background-color: var(--c-light);
+        color: var(--c-dark);
+        border: 1px solid var(--c-light);
         border-radius: 25px;
         padding: 30px;
         display: flex;
@@ -302,7 +314,7 @@ main{
 
             div{
               width: 100%;
-              border-bottom: 1px solid var(--c-grey);
+              border-bottom: 1px solid var(--c-dark);
             }
           }
         }
@@ -367,10 +379,19 @@ main{
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 30px;
-                height: 30px;
+                min-width: 30px;
+                min-height: 30px;
                 border-radius: 10px;
                 background-color: var(--c-light);
+                
+                img{
+                  height: 20px;
+                }
+                img[src="/assets/icon/2-2.svg"],
+                img[src="/assets/icon/3-3.svg"]{
+                  height: 16px;
+                  padding-left: 2px;
+                }
               }
     
               p{
@@ -424,7 +445,7 @@ main{
             justify-content: space-between;
             padding: 5px 10px;
             border-radius: 25px;
-            background-color: var(--c-light);
+            background-color: var(--c-dark);
 
             &:nth-child(1){ width: 100% }
             &:nth-child(2){ width: 85%; opacity: .7; }
@@ -441,12 +462,17 @@ main{
               font-weight: 200;
               font-size: 12px;
               text-wrap: nowrap;
-              color: var(--c-dark);
+              color: var(--c-light);
             }
           }
         }
     
-      } 
+      }
+
+      .serv-list:last-child{
+        background-color: var(--c-light);
+        color: var(--c-dark);
+      }
 
     }
 
@@ -479,6 +505,94 @@ main{
         &:hover{
           background-color: var(--c-light);
           color: var(--c-dark);
+        }
+      }
+    }
+
+  }
+}
+
+@media (max-width: 860px) {
+  main{
+    overflow-x: hidden;
+
+    .main-content{
+      #award-container{
+        flex-direction: column;
+        gap: 30px;
+
+        .award-side{
+          width: 100%;
+        }
+
+        .award-content{
+          width: 100%;
+        }
+
+      }
+    }
+
+  }
+}
+
+@media (max-width: 540px) {
+  main{
+    overflow-x: hidden;
+
+    .main-content{
+
+      #me{
+        .me-name{
+          width: 100%;
+          h1{
+            text-wrap: balance;
+          }
+          .me-skill{
+            flex-direction: column;
+          }
+        }
+        .me-description{
+          p{
+            text-align: left;
+          }
+        }
+      }
+
+      #exp-container{
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      #award-container{
+        flex-direction: column;
+        gap: 30px;
+
+        .award-side{
+          width: 100%;
+        }
+
+        .award-content{
+          width: 100%;
+        }
+
+      }
+
+      #services-container{
+        flex-direction: column;
+
+        .serv-list{
+          .skill-container{
+            margin: 0;
+            margin-bottom: 10px;
+          }
+        }
+      }
+
+      .cta-parliamone{
+        flex-direction: column;
+        h2{
+          text-align: center;
+          text-wrap: balance;
         }
       }
     }

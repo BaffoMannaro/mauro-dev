@@ -315,6 +315,7 @@ main{
           .service-page-cta{
             h3{
               margin: 0;
+              cursor: pointer;
             }
           }
 
@@ -417,5 +418,175 @@ main{
       }
     }
 
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  main{
+    overflow-x: hidden;
+    .main-content{
+
+      #services-container{
+        .service{
+          &.selected{
+            .service-image{
+              background-color: var(--c-light) !important;
+              .service-page-container{
+                padding: 0 !important;
+                gap: 15px !important;
+                .service-page-cta{
+                  display: flex;
+                  width: 120%;
+                  gap: 0;
+                  padding: 0 5px;
+
+                  h3{
+                    background-color: var(--c-dark);
+                    font-size: 16px;
+                    border: 1px solid var(--c-dark);
+                    border-radius: 15px;
+                    padding: 10px 20px;
+                    cursor: pointer;
+                  }
+                  .page-cta{
+                    display: none;
+                    width: 0;
+                    height: 0;
+  
+                    >img{
+                      display: none;
+                      height: 0;
+                      width: 0;
+                    }
+                  }
+
+                  &:hover{
+                    h3{
+                      background-color: var(--c-accent);
+                      border: 1px solid var(--c-accent);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  main{
+    overflow-x: hidden;
+    .main-content{
+      width: 100vw;
+      padding: 120px 10vw;
+      gap: 30px;
+
+      #services-container{
+        flex-direction: column;
+        .service{
+          &.selected{
+            .service-image{
+              background-color: var(--c-light) !important;
+              .service-page-container{
+                padding: 0 !important;
+                gap: 30px !important;
+                .service-page-cta{
+                  display: flex;
+                  width: 120%;
+                  gap: 0;
+                  padding: 0 5px;
+
+                  h3{
+                    background-color: var(--c-dark);
+                    font-size: 20px;
+                    border: 1px solid var(--c-dark);
+                    border-radius: 15px;
+                    padding: 20px 40px;
+                    cursor: pointer;
+                  }
+                  .page-cta{
+                    display: none;
+                    width: 0;
+                    height: 0;
+  
+                    >img{
+                      display: none;
+                      height: 0;
+                      width: 0;
+                    }
+                  }
+
+                  &:hover{
+                    h3{
+                      background-color: var(--c-accent);
+                      border: 1px solid var(--c-accent);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+    }
+  }
+}
+
+@media (max-width: 540px) {
+  main{
+    .main-content{
+
+      #services-container{
+        flex-direction: column;
+        .service{
+          &.selected{
+            .service-image{
+              background-color: var(--c-light) !important;
+              .service-page-container{
+                flex-direction: column;
+                padding: 0 !important;
+                gap: 15px !important;
+                .service-page-cta{
+                  display: flex;
+                  width: 120%;
+                  gap: 0;
+                  padding: 0 5px;
+
+                  h3{
+                    background-color: var(--c-dark);
+                    font-size: 16px;
+                    border: 1px solid var(--c-dark);
+                    border-radius: 15px;
+                    padding: 10px 20px;
+                  }
+                  .page-cta{
+                    display: none;
+                    width: 0;
+                    height: 0;
+  
+                    >img{
+                      display: none;
+                      height: 0;
+                      width: 0;
+                    }
+                  }
+
+                  &:hover{
+                    h3{
+                      background-color: var(--c-accent);
+                      border: 1px solid var(--c-accent);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

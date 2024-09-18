@@ -4,6 +4,9 @@
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
 }
+.light-mode .box-main .box-container .box .box-title .box-icon img {
+  filter: invert(1) !important;
+}
 
 .dark-mode {
   --c-dark: #1b1b1b;
@@ -21,6 +24,7 @@
 
 main {
   max-width: 860px;
+  width: 90vw;
   height: 100%;
   margin: 100px 0;
   display: flex;
@@ -33,6 +37,7 @@ main .image {
 }
 main .image > img {
   max-width: 860px;
+  width: 90vw;
   border-radius: 25px;
 }
 main .title-container {
@@ -97,6 +102,13 @@ main .box-type {
   flex-direction: column;
   gap: 50px;
 }
+main .box-type .title {
+  width: 90vw;
+  margin: 0 auto;
+}
+main .box-type .title p {
+  text-align: center;
+}
 main .box-type .box-type-container {
   display: flex;
   flex-direction: row;
@@ -154,7 +166,7 @@ main .box-main .box-container .end {
   margin-bottom: 0 !important;
 }
 main .box-main .box-container .box {
-  height: 250px;
+  height: auto;
   width: 48%;
   margin-bottom: 4%;
   flex-wrap: nowrap;
@@ -226,4 +238,47 @@ main .cta-parliamone h3 {
 main .cta-parliamone h3:hover {
   background-color: var(--c-accent);
   color: var(--c-light);
+}
+
+@media (max-width: 540px) {
+  main {
+    overflow-x: hidden;
+  }
+  main .box-type .box-type-container {
+    flex-direction: column;
+  }
+  main .box-type .box-type-container .type {
+    height: auto;
+    gap: 50px;
+  }
+  main .box-main .box-container .box .box-title .box-icon {
+    display: none;
+  }
+}
+@media (max-width: 375px) {
+  .box-main .box-container {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  .box-main .box-container .box {
+    width: 100% !important;
+  }
+  .box-main .box-container .box .box-title .box-icon {
+    display: none;
+  }
+  .box-main .box-container .conclusion {
+    margin: 0;
+    margin-top: 15px !important;
+  }
+  .cta-parliamone {
+    flex-direction: column !important;
+  }
+  .cta-parliamone h2 {
+    text-align: center;
+    text-wrap: balance;
+  }
+  .cta-parliamone h3 {
+    background-color: var(--c-accent) !important;
+    color: var(--c-light) !important;
+  }
 }/*# sourceMappingURL=landing.component.css.map */

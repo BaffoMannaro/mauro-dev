@@ -791,7 +791,10 @@ main{
         .service{
           &.selected{
             .service-image{
-              .service-page-container{  
+              background-color: var(--c-light) !important;
+              .service-page-container{
+                padding: 0 !important;
+                gap: 15px !important;
                 .service-page-cta{
                   display: flex;
                   width: 120%;
@@ -799,9 +802,11 @@ main{
                   padding: 0 5px;
 
                   h3{
+                    background-color: var(--c-dark);
                     font-size: 16px;
-                    border-left: 2px solid var(--c-accent);
-                    padding-left: 10px;
+                    border: 1px solid var(--c-dark);
+                    border-radius: 15px;
+                    padding: 10px 20px;
                   }
                   .page-cta{
                     display: none;
@@ -817,7 +822,8 @@ main{
 
                   &:hover{
                     h3{
-                      border-left: 5px solid var(--c-accent);
+                      background-color: var(--c-accent);
+                      border: 1px solid var(--c-accent);
                     }
                   }
                 }
@@ -983,7 +989,49 @@ main{
 
       #services-container{
         flex-direction: column;
-        gap: 30px;
+        .service{
+          &.selected{
+            .service-image{
+              background-color: var(--c-light) !important;
+              .service-page-container{
+                padding: 0 !important;
+                gap: 30px !important;
+                .service-page-cta{
+                  display: flex;
+                  width: 120%;
+                  gap: 0;
+                  padding: 0 5px;
+
+                  h3{
+                    background-color: var(--c-dark);
+                    font-size: 20px;
+                    border: 1px solid var(--c-dark);
+                    border-radius: 15px;
+                    padding: 20px 40px;
+                  }
+                  .page-cta{
+                    display: none;
+                    width: 0;
+                    height: 0;
+  
+                    >img{
+                      display: none;
+                      height: 0;
+                      width: 0;
+                    }
+                  }
+
+                  &:hover{
+                    h3{
+                      background-color: var(--c-accent);
+                      border: 1px solid var(--c-accent);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
 
       #cta-container{
@@ -1063,6 +1111,7 @@ main{
 @media (max-width: 540px) {
   main{
     .main-content{
+
       #top-container{
         #about{
           #me{
@@ -1091,6 +1140,54 @@ main{
             #marquee-container{
               span{
                 font-size: 14px;
+              }
+            }
+          }
+        }
+      }
+
+      #services-container{
+        flex-direction: column;
+        .service{
+          &.selected{
+            .service-image{
+              background-color: var(--c-light) !important;
+              .service-page-container{
+                flex-direction: column;
+                padding: 0 !important;
+                gap: 15px !important;
+                .service-page-cta{
+                  display: flex;
+                  width: 120%;
+                  gap: 0;
+                  padding: 0 5px;
+
+                  h3{
+                    background-color: var(--c-dark);
+                    font-size: 16px;
+                    border: 1px solid var(--c-dark);
+                    border-radius: 15px;
+                    padding: 10px 20px;
+                  }
+                  .page-cta{
+                    display: none;
+                    width: 0;
+                    height: 0;
+  
+                    >img{
+                      display: none;
+                      height: 0;
+                      width: 0;
+                    }
+                  }
+
+                  &:hover{
+                    h3{
+                      background-color: var(--c-accent);
+                      border: 1px solid var(--c-accent);
+                    }
+                  }
+                }
               }
             }
           }

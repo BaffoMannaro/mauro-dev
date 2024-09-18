@@ -3,6 +3,20 @@
   --c-light: #1b1b1b;
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
+
+  .box-main{
+    .box-container{
+      .box{
+        .box-title{
+          .box-icon{
+            img{
+              filter: invert(1) !important;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 .dark-mode{
@@ -21,6 +35,7 @@
 
 main{
   max-width: 860px;
+  width: 90vw;
   height: 100%;
   margin: 100px 0;
   display: flex;
@@ -33,6 +48,7 @@ main{
 
     >img{
       max-width: 860px;
+      width: 90vw;
       border-radius: 25px;
     }
   }
@@ -110,6 +126,15 @@ main{
     flex-direction: column;
     gap: 50px;
 
+    .title{
+      width: 90vw;
+      margin: 0 auto;
+
+      p{
+        text-align: center;
+      }
+    }
+
     .box-type-container{
       display: flex;
       flex-direction: row;
@@ -175,7 +200,7 @@ main{
       }
 
       .box{
-        height: 250px;
+        height: auto;
         width: 48%;
         margin-bottom: 4%;
         flex-wrap: nowrap;
@@ -264,4 +289,69 @@ main{
     }
   }
 
+}
+
+@media (max-width: 540px) {
+  main{
+    overflow-x: hidden;
+
+    .box-type{
+      .box-type-container{
+        flex-direction: column;
+
+        .type{
+          height: auto;
+          gap: 50px;
+        }
+      }
+    }
+
+    .box-main{
+      .box-container{
+        .box{
+          .box-title{
+            .box-icon{
+              display: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 375px) {
+  .box-main{
+    .box-container{
+      flex-direction: column !important;
+      gap: 20px !important;
+
+      .box{
+        width: 100% !important;
+        .box-title{
+          .box-icon{
+            display: none;
+          }
+        }
+      }
+
+      .conclusion{
+        margin: 0;
+        margin-top: 15px !important;
+      }
+    }
+  }
+
+  .cta-parliamone{
+    flex-direction: column !important;
+
+    h2{
+      text-align: center;
+      text-wrap: balance;
+    }
+    h3{
+      background-color: var(--c-accent) !important;
+      color: var(--c-light) !important;
+    }
+  }
 }

@@ -3,6 +3,20 @@
   --c-light: #1b1b1b;
   --c-grey: #d9d9d9;
   --c-accent: #C72086;
+
+  .box-main{
+    .box-container{
+      .box{
+        .box-title{
+          .box-icon{
+            img{
+              filter: invert(1) !important;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 .dark-mode{
@@ -21,6 +35,7 @@
 
 main{
   max-width: 860px;
+  width: 90vw;
   height: 100%;
   margin: 100px 0;
   display: flex;
@@ -33,6 +48,7 @@ main{
 
     >img{
       max-width: 860px;
+      width: 90vw;
       border-radius: 25px;
     }
   }
@@ -376,6 +392,64 @@ main{
         background-color: var(--c-accent);
         color: var(--c-light);
       }
+    }
+  }
+
+}
+
+@media (max-width: 800px) {
+  main{
+    overflow-x: hidden;
+
+    .box-type{
+      .box-type-container{
+        flex-direction: column;
+
+        .type{
+          width: 100%;
+          height: auto;
+          gap: 50px;
+        }
+      }
+    }
+
+    .box-type2-container{
+      flex-direction: column !important;
+    }
+    
+
+    .cta-parliamone{
+      flex-direction: column !important;
+  
+      .cta-box{
+        width: 100% !important;
+      }
+  
+      p{
+        text-align: center;
+        text-wrap: balance;
+      }
+      h3{
+        background-color: var(--c-accent) !important;
+        color: var(--c-light) !important;
+        text-align: center !important;
+      }
+    }
+  }
+
+}
+
+@media (max-width: 600px) {
+  .box-main{
+    .box-container{
+      flex-direction: column !important;
+      width: 100% !important;
+      height: auto !important;
+
+      .box{
+        width: 100% !important;
+      }
+
     }
   }
 

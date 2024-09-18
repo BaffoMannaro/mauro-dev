@@ -147,7 +147,7 @@ main .main-content .cta-parliamone a:hover {
     overflow: hidden;
   }
 }
-@media (max-width: 375px) {
+@media (max-width: 425px) {
   main {
     overflow-x: hidden;
   }

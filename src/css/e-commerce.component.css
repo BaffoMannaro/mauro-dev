@@ -343,7 +343,7 @@ main .cta-parliamone .cta-box h3:hover {
     text-align: center !important;
   }
 }
-@media (max-width: 375px) {
+@media (max-width: 425px) {
   .box-main .box-container {
     flex-direction: column !important;
     gap: 20px !important;

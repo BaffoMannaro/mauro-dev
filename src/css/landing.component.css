@@ -255,7 +255,7 @@ main .cta-parliamone h3:hover {
     display: none;
   }
 }
-@media (max-width: 375px) {
+@media (max-width: 425px) {
   .box-main .box-container {
     flex-direction: column !important;
     gap: 20px !important;

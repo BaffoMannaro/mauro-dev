@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -7,12 +7,18 @@ import { Observable } from 'rxjs';
 })
 export class CityListService {
 
-  private API_URL_START: string = 'http://api.geonames.org/postalCodeSearchJSON?placename=';
-  private API_URL_END: string = '&maxRows=2&username=BaffoMannaro';
+  private API_URL = 'https://andruxnet-world-cities-v1.p.rapidapi.com/?query=';
+  private API_KEY = '09e2da49a6msh43602a86a717849p17ac83jsn04123964bab8';
 
   constructor(private httpClient: HttpClient) {}
 
   get_city_list(cityName: string): Observable<any>{
-    return this.httpClient.get(`${this.API_URL_START}${cityName}${this.API_URL_END}`);
+    const headers = new HttpHeaders({
+      'x-rapidapi-key': this.API_KEY,
+      'x-rapidapi-host': 'andruxnet-world-cities-v1.p.rapidapi.com'
+    });
+
+    return this.httpClient.get<any>
+    (`${this.API_URL}${cityName}&searchby=city`);
   }
 }

@@ -36,6 +36,10 @@ export class WeatherComponent{
   private city_check: any = [];
   public city_flag: boolean = false;
 
+  public city_country: string = '';
+  public cityList_Italia:any = [];
+  public city_selected_checked: string = '';
+
 
   // costruttore
   constructor(
@@ -68,9 +72,33 @@ export class WeatherComponent{
   inputCity(): void {
 
     this.cityListService.get_city_list(this.selectedCity).subscribe((city:any) => {
-      this.city_check = city.postalCodes[0].placeName;
+
+      for( let i = 0; city.length > i; i++ ){
+        if(city[i].country === 'Italy'){
+          this.cityList_Italia.push(city[i].city);
+
+          if(city[i].city.toLowerCase() !== this.selectedCity.toLowerCase()){
+            this.city_flag = true;
+          }
+          else{
+            this.city_selected_checked = city[i].city;
+          }
+        }
+        else {
+          this.city_flag = true;
+          return
+        }
+      }
+
+      console.log('cityList_Italia = ' + this.cityList_Italia);
+
+      this.weatherService.get_weather(this.city_selected_checked).subscribe((data:any[]) => {
+        this.weather = data;
+        this.formatWeather(this.weather);
+        this.city_flag = false;
+      });
       
-      if (this.city_check.toLowerCase() != this.selectedCity.toLowerCase()){
+      /* if (this.city_check.toLowerCase() != this.selectedCity.toLowerCase()){
         this.city_flag = true;
         return
       }
@@ -79,7 +107,7 @@ export class WeatherComponent{
         this.weather = data;
         this.formatWeather(this.weather);
         this.city_flag = false;
-      });
+      }); */
 
     });
 

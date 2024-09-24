@@ -15,7 +15,7 @@
         name="selectedCity"
         placeholder="{{weather_city}}"
         autocomplete="off"
-        [(ngModel)]="selectedCity"
+        [(ngModel)]="cityInput"
         (keyup.enter)="inputCity()"
         (keyup)="onKeyup($event)"
         [ngClass]="{'wrong-city': city_flag}"

@@ -32,7 +32,7 @@ export class WeatherComponent{
   public today : number = Date.now();
 
   // gestione lista città nell'input
-  public selectedCity: string = 'Monopoli';
+  public cityInput: string = 'Monopoli';
   private city_check: any = [];
   public city_flag: boolean = false;
 
@@ -49,9 +49,9 @@ export class WeatherComponent{
   ){
     
     // METEO
-    this.weatherObservable = this.weatherService.get_weather(this.selectedCity);
+    this.weatherObservable = this.weatherService.get_weather(this.cityInput);
 
-    this.weatherService.get_weather(this.selectedCity).subscribe((res:any[]) => {
+    this.weatherService.get_weather(this.cityInput).subscribe((res:any[]) => {
       this.weather = res;
       this.formatWeather(this.weather);
     })
@@ -71,13 +71,13 @@ export class WeatherComponent{
 
   inputCity(): void {
 
-    this.cityListService.get_city_list(this.selectedCity).subscribe((city:any) => {
+    this.cityListService.get_city_list(this.cityInput).subscribe((city:any) => {
 
       for( let i = 0; city.length > i; i++ ){
         if(city[i].country === 'Italy'){
           this.cityList_Italia.push(city[i].city);
 
-          if(city[i].city.toLowerCase() !== this.selectedCity.toLowerCase()){
+          if(city[i].city.toLowerCase() !== this.cityInput.toLowerCase()){
             this.city_flag = true;
           }
           else{
@@ -86,7 +86,6 @@ export class WeatherComponent{
         }
         else {
           this.city_flag = true;
-          return
         }
       }
 
@@ -97,17 +96,6 @@ export class WeatherComponent{
         this.formatWeather(this.weather);
         this.city_flag = false;
       });
-      
-      /* if (this.city_check.toLowerCase() != this.selectedCity.toLowerCase()){
-        this.city_flag = true;
-        return
-      }
-
-      this.weatherService.get_weather(this.city_check).subscribe((data:any[]) => {
-        this.weather = data;
-        this.formatWeather(this.weather);
-        this.city_flag = false;
-      }); */
 
     });
 

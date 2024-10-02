@@ -1007,6 +1007,9 @@ main .main-content #cta-container #cta2 h3:hover {
   main .main-content #cms .nerd-stats-container .nerd-stats-content ul .sub-metric {
     padding: 10px 0;
   }
+  main .main-content #top-container #video {
+    display: none;
+  }
   main .main-content #top-container #about #me #me-name h1 {
     font-size: 26px;
   }
@@ -1027,6 +1030,15 @@ main .main-content #cta-container #cta2 h3:hover {
   }
   main .main-content #top-container #about #mission #marquee-container span {
     font-size: 14px;
+  }
+  main .main-content #languages-container .language .single-language {
+    top: 14% !important;
+  }
+  main .main-content #languages-container .language .single-language > img {
+    display: block !important;
+  }
+  main .main-content #languages-container .language .single-language h4 {
+    display: none;
   }
   main .main-content #services-container {
     flex-direction: column;

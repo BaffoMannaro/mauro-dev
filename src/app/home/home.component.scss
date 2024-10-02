@@ -1280,6 +1280,10 @@ main{
       }
 
       #top-container{
+        #video{
+          display: none;
+        }
+
         #about{
           #me{
             #me-name{
@@ -1308,6 +1312,22 @@ main{
               span{
                 font-size: 14px;
               }
+            }
+          }
+        }
+      }
+
+      #languages-container{
+        .language{
+          .single-language{
+            top: 14% !important;
+
+            >img{
+              display: block !important;
+            }
+
+            h4{
+              display: none;
             }
           }
         }
@@ -1360,6 +1380,7 @@ main{
           }
         }
       }
+
     }
   }
 }

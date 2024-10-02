@@ -255,6 +255,7 @@ main{
         gap: 20px;
 
         .nerd-stats-title{
+          width: 100%;
           display: flex;
           flex-direction: row;
           align-items: center;
@@ -284,14 +285,19 @@ main{
         }
 
         .nerd-stats-content{
-          background: #292929;
-          color: #ffffff;
-          width: 50%;
+          width: 100%;
+          display: flex;
+          flex-direction: row;
+          gap: 5%;
           
           ul{
+            background: #292929;
+            color: #ffffff;
+            width: 50%;
             list-style: none;
             margin: 0;
             padding: 20px;
+
             li{
               opacity: 0.8;
               padding: 2px 0;
@@ -302,17 +308,29 @@ main{
                 margin: 0;
                 padding: 0;
                 font-family: monospace;
+                
+                &:last-child{
+                  text-align: right;
+                }
               }
             }
-            ul{
-              margin-top: 15px;
-              padding: 0;
 
-              .sub-metric{
-                padding-left: 10px;
+            .sub-metric{
+              padding-left: 15px;
+            }
+
+            .light-metrics{
+              padding: 0;
+              margin-bottom: 15px;
+              align-items: center;
+              img{
+                width: 30px;
+                height: 30px;
               }
             }
+
           }
+
         }
       }
 
@@ -949,6 +967,22 @@ main{
       padding: 120px 10vw;
       gap: 30px;
 
+      #cms{
+        .nerd-stats-container{
+          .nerd-stats-content{
+            flex-direction: column !important;
+
+            ul{
+              width: 100%;
+               
+              &:last-child{
+                margin-top: 20px;
+              }
+            }
+          }
+        }
+      }
+
       #top-container{
         flex-direction: column;
         height: 100%;
@@ -1216,6 +1250,34 @@ main{
 @media (max-width: 540px) {
   main{
     .main-content{
+
+      #cms{
+        .nerd-stats-container{
+          .nerd-stats-content{
+            flex-direction: column !important;
+
+            ul{
+              width: 100%;
+               
+              &:last-child{
+                margin-top: 20px;
+              }
+
+              li{
+                padding: 10px 0;
+                p{
+                  max-width: 50%;
+                  text-wrap: balance;
+                }
+              }
+
+              .sub-metric{
+                padding: 10px 0;
+              }
+            }
+          }
+        }
+      }
 
       #top-container{
         #about{

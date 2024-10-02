@@ -14,6 +14,7 @@
           <h4 [ngClass]="{'nerd-rotate': nerdStatsFlag}">></h4>
         </div>
         <div class="nerd-stats-content" *ngIf="nerdStatsFlag">
+
           <ul>
             <li>
               <p>Angular version</p>
@@ -55,43 +56,45 @@
               <p>Icon</p>
               <p>designed by me</p>
             </li>
-
-            <ul>
-              <li>
-                <p>Lighthouse Metrics</p>
-              </li>
-              <li>
-                <p><strong>Best Practise</strong></p>
-                <p><strong>100%</strong></p>
-              </li>
-              <li>
-                <p><strong>Accessibility</strong></p>
-                <p><strong>92%</strong></p>
-              </li>
-              <li>
-                <p><strong>Performance</strong></p>
-                <p><strong>92%</strong></p>
-              </li>
-              <li class="sub-metric">
-                <p>First Contentful Paint</p>
-                <p>1.0 s</p>
-              </li>
-              <li class="sub-metric">
-                <p>Total Blocking Time</p>
-                <p>150 ms</p>
-              </li>
-              <li class="sub-metric">
-                <p>Speed Index</p>
-                <p>2.4 s</p>
-              </li>
-              <li class="sub-metric">
-                <p>Cumulative Layout Shift</p>
-                <p>0.004</p>
-              </li>              
-            </ul>
-
           </ul>
+
+          <ul>
+            <li class="light-metrics">
+              <p>Lighthouse Metrics</p>
+              <img src="https://avatars.githubusercontent.com/u/60546402?s=200&v=4" alt="Logo di lighthouse metrics">
+            </li>
+            <li>
+              <p><strong>Best Practise</strong></p>
+              <p><strong>100%</strong></p>
+            </li>
+            <li>
+              <p><strong>Accessibility</strong></p>
+              <p><strong>92%</strong></p>
+            </li>
+            <li>
+              <p><strong>Performance</strong></p>
+              <p><strong>92%</strong></p>
+            </li>
+            <li class="sub-metric">
+              <p>First Contentful Paint</p>
+              <p>1.0 s</p>
+            </li>
+            <li class="sub-metric">
+              <p>Total Blocking Time</p>
+              <p>150 ms</p>
+            </li>
+            <li class="sub-metric">
+              <p>Speed Index</p>
+              <p>2.4 s</p>
+            </li>
+            <li class="sub-metric">
+              <p>Cumulative Layout Shift</p>
+              <p>0.004</p>
+            </li>              
+          </ul>
+
         </div>
+        
       </div>
     </div>
 

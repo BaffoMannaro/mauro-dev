@@ -162,6 +162,7 @@ main .main-content #cms .nerd-stats-container {
   gap: 20px;
 }
 main .main-content #cms .nerd-stats-container .nerd-stats-title {
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -188,11 +189,15 @@ main .main-content #cms .nerd-stats-container .nerd-stats-title .nerd-rotate {
   }
 }
 main .main-content #cms .nerd-stats-container .nerd-stats-content {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 5%;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul {
   background: #292929;
   color: #ffffff;
   width: 50%;
-}
-main .main-content #cms .nerd-stats-container .nerd-stats-content ul {
   list-style: none;
   margin: 0;
   padding: 20px;
@@ -208,12 +213,20 @@ main .main-content #cms .nerd-stats-container .nerd-stats-content ul li p {
   padding: 0;
   font-family: monospace;
 }
-main .main-content #cms .nerd-stats-container .nerd-stats-content ul ul {
-  margin-top: 15px;
-  padding: 0;
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul li p:last-child {
+  text-align: right;
 }
-main .main-content #cms .nerd-stats-container .nerd-stats-content ul ul .sub-metric {
-  padding-left: 10px;
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul .sub-metric {
+  padding-left: 15px;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul .light-metrics {
+  padding: 0;
+  margin-bottom: 15px;
+  align-items: center;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul .light-metrics img {
+  width: 30px;
+  height: 30px;
 }
 main .main-content #top-container {
   width: 100%;
@@ -744,6 +757,15 @@ main .main-content #cta-container #cta2 h3:hover {
     padding: 120px 10vw;
     gap: 30px;
   }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content {
+    flex-direction: column !important;
+  }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content ul {
+    width: 100%;
+  }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content ul:last-child {
+    margin-top: 20px;
+  }
   main .main-content #top-container {
     flex-direction: column;
     height: 100%;
@@ -966,6 +988,25 @@ main .main-content #cta-container #cta2 h3:hover {
   }
 }
 @media (max-width: 540px) {
+  main .main-content #cms .nerd-stats-container .nerd-stats-content {
+    flex-direction: column !important;
+  }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content ul {
+    width: 100%;
+  }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content ul:last-child {
+    margin-top: 20px;
+  }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content ul li {
+    padding: 10px 0;
+  }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content ul li p {
+    max-width: 50%;
+    text-wrap: balance;
+  }
+  main .main-content #cms .nerd-stats-container .nerd-stats-content ul .sub-metric {
+    padding: 10px 0;
+  }
   main .main-content #top-container #about #me #me-name h1 {
     font-size: 26px;
   }

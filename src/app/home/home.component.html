@@ -3,6 +3,98 @@
 
   <section class="main-content">
 
+    <div id="cms" *ngIf="cmsFlag">
+      <div class="cms-content">
+        <h3>Tutto quello che vedi è stato scritto riga per riga, senza aiuto di CMS... <span>Quindi sì, ogni bug è esclusivamente colpa mia!</span></h3>
+        <p (click)="closeCms()">X</p>
+      </div>
+      <div class="nerd-stats-container">
+        <div class="nerd-stats-title" (click)="switchNerdStats()">
+          <h4>Statistiche per nerd</h4>
+          <h4 [ngClass]="{'nerd-rotate': nerdStatsFlag}">></h4>
+        </div>
+        <div class="nerd-stats-content" *ngIf="nerdStatsFlag">
+          <ul>
+            <li>
+              <p>Angular version</p>
+              <p>18.1.2</p>
+            </li>
+            <li>
+              <p>TypeScript version</p>
+              <p>5.4.5</p>
+            </li>
+            <li>
+              <p>Node</p>
+              <p>20.14.0</p>
+            </li>
+            <li>
+              <p>Package Manager</p>
+              <p>npm 10.7.0</p>
+            </li>
+            <li>
+              <p>TypeScript version</p>
+              <p>5.4.5</p>
+            </li>
+            <li>
+              <p>Browser bundle</p>
+              <p>363.58 kB</p>
+            </li>
+            <li>
+              <p>CSS Preprocessor</p>
+              <p>Sass</p>
+            </li>
+            <li>
+              <p>Minified code</p>
+              <p>Yes</p>
+            </li>
+            <li>
+              <p>Dark Mode</p>
+              <p>Yes</p>
+            </li>
+            <li>
+              <p>Icon</p>
+              <p>designed by me</p>
+            </li>
+
+            <ul>
+              <li>
+                <p>Lighthouse Metrics</p>
+              </li>
+              <li>
+                <p><strong>Best Practise</strong></p>
+                <p><strong>100%</strong></p>
+              </li>
+              <li>
+                <p><strong>Accessibility</strong></p>
+                <p><strong>92%</strong></p>
+              </li>
+              <li>
+                <p><strong>Performance</strong></p>
+                <p><strong>92%</strong></p>
+              </li>
+              <li class="sub-metric">
+                <p>First Contentful Paint</p>
+                <p>1.0 s</p>
+              </li>
+              <li class="sub-metric">
+                <p>Total Blocking Time</p>
+                <p>150 ms</p>
+              </li>
+              <li class="sub-metric">
+                <p>Speed Index</p>
+                <p>2.4 s</p>
+              </li>
+              <li class="sub-metric">
+                <p>Cumulative Layout Shift</p>
+                <p>0.004</p>
+              </li>              
+            </ul>
+
+          </ul>
+        </div>
+      </div>
+    </div>
+
     <div id="top-container">
       <div id="video">
         <video src="/assets/google-deepmind1.mp4" autoplay loop loading="lazy"></video>

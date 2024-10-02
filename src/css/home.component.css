@@ -124,6 +124,97 @@ main .main-content {
   flex-direction: column;
   gap: 50px;
 }
+main .main-content #cms {
+  border: 1px solid var(--c-grey);
+  border-radius: 25px;
+  padding: 25px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 30px;
+}
+main .main-content #cms .cms-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+}
+main .main-content #cms .cms-content h3 {
+  padding: 0;
+  margin: 0;
+  font-weight: 200;
+  font-size: 1.2em;
+  line-height: 1.2em;
+  text-wrap: balance;
+}
+main .main-content #cms .cms-content h3 span {
+  font-style: italic;
+  opacity: 0.6;
+}
+main .main-content #cms .cms-content p {
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+main .main-content #cms .nerd-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 0;
+  cursor: pointer;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-title h4 {
+  padding: 0;
+  margin: 0;
+  color: var(--c-grey);
+  font-weight: 100;
+  font-size: 1em;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-title .nerd-rotate {
+  animation: rotate 0.5s ease-in-out forwards;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(90deg);
+  }
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content {
+  background: #292929;
+  color: #ffffff;
+  width: 50%;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul {
+  list-style: none;
+  margin: 0;
+  padding: 20px;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul li {
+  opacity: 0.8;
+  padding: 2px 0;
+  display: flex;
+  justify-content: space-between;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul li p {
+  margin: 0;
+  padding: 0;
+  font-family: monospace;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul ul {
+  margin-top: 15px;
+  padding: 0;
+}
+main .main-content #cms .nerd-stats-container .nerd-stats-content ul ul .sub-metric {
+  padding-left: 10px;
+}
 main .main-content #top-container {
   width: 100%;
   height: 700px;

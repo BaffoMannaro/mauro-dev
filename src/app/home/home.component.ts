@@ -29,6 +29,8 @@ export class HomeComponent implements OnInit{
   selectedService1: boolean = false;
   selectedService2: boolean = false;
   selectedService3: boolean = false;
+  public cmsFlag: boolean = true;
+  public nerdStatsFlag: boolean = false;
 
   constructor( public DarkLightModeService: DarkLightModeService){}
 
@@ -44,5 +46,13 @@ export class HomeComponent implements OnInit{
     else if(i === 3){
       this.selectedService3 = !this.selectedService3;
     }
+  }
+
+  closeCms(){
+    this.cmsFlag = false;
+  }
+
+  switchNerdStats(){
+    this.nerdStatsFlag =! this.nerdStatsFlag;
   }
 }

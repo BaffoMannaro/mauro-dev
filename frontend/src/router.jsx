@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Sign from './Components/Pages/Sign';
+
 import Home from './Components/Pages/HomePage';
 import AuthRoot from './Layouts/AuthRoot';
 
@@ -20,10 +20,11 @@ import Typo from './Components/Pages/Typo';
 import Steps from './Components/Pages/Steps';
 import Layout from './Components/Pages/Layout';
 import Charts from './Components/Pages/Charts';
-import Commitments from './Components/Pages/aether/Commitments';
+
 import Login from './Components/Pages/Login';
 import Register from './Components/Pages/Register';
 import AdminPage from './Components/Pages/AdminPage';
+import Landing from './Components/Pages/Landing';
 
 export const router = createBrowserRouter([
     {
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '/',
+                element: <Landing />,
+            },
+            {
+                path: '/login',
                 element: <Login />,
             },
             {
@@ -92,10 +97,7 @@ export const router = createBrowserRouter([
                         path: '/dashboard/form-recipes/',
                         element: <FormRecipes />,
                     },
-                    {
-                        path: '/dashboard/commitments',
-                        element: <Commitments />,
-                    },
+
                     {
                         path: '/dashboard/admin',
                         element: (

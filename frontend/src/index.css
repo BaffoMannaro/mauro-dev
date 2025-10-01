@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@font-face {
+    font-family: "Hubot Sans";
+    src: url("./assets/fonts/HubotSansVF-Regular.ttf") format('truetype-variations');
+    font-weight: 1 999;
+
+    font-style: normal;
+}
+
+* {
+    font-family: "Hubot Sans", sans-serif;
+
+    /* font-variant-alternates: stylistic(ss01); */
+    font-feature-settings: "ss01";
+}
+
+
+
+/* .react-select__option.react-select__option--is-selected {
+    background-color: transparent;
+    color: black;
+}
+
+.react-select__option.react-select__option--is-selected::before {
+    background-color: black;
+    border-radius: 10px;
+    content: " ";
+    display: block;
+    margin-right: 12px;
+    height: 24px;
+    width: 4px;
+    left: -10px;
+    position: relative;
+} */

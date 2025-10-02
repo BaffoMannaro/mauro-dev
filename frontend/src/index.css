@@ -13,5 +13,10 @@
 
 * {
     font-family: "Hubot Sans", sans-serif;
-    font-feature-settings: "ss01" 1;
+    /* font-feature-settings: "ss01" 1; */
+    /* font-feature-settings: 'ss01' on, 'liga' off; */
+
+
+    /* font-variant-alternates: annotation(ss01 on); */
+
 }

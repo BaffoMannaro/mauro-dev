@@ -2,81 +2,109 @@ import logoNavbar from '../../assets/images/logo-navbar.png';
 import landingArm from '../../assets/images/landing-arm.png';
 import product1 from '../../assets/images/product-1.png';
 import product2 from '../../assets/images/product-2.png';
+import LottieATF from '../Atoms/LottieATF';
+
+import PartnersSection from '../Atoms/PartnersSection';
 
 export default function Landing() {
     return (
         <div className="">
-            <div className="bg-slate-600 pt-5 absolute top-0 left-0 w-full z-50">
-                <nav className="flex justify-between items-center px-2 xl:px-8 py-4 bg-[rgba(46,46,51,0.2)] backdrop-blur-[25px] rounded-lg mx-2 xl:mx-8">
-                    {/* Logo */}
-                    <div className="flex items-center">
-                        <img
-                            src={logoNavbar}
-                            alt="Supero Logo"
-                            className="h-8"
-                        />
-                    </div>
-
-                    {/* Navigation Menu */}
-                    <div className="flex items-center xl:space-x-8 ">
-                        <a
-                            href="#about"
-                            className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                        >
-                            About
-                        </a>
-                        <a
-                            href="#applications"
-                            className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                        >
-                            Applications
-                        </a>
-                        <a
-                            href="#how-it-works"
-                            className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                        >
-                            How it works
-                        </a>
-                        <a
-                            href="#contact"
-                            className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                        >
-                            Contact
-                        </a>
-
-                        <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
-                        <button className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[16px] group">
-                            <span>GET A DEMO</span>
-                            <svg
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="ms-3"
-                            >
-                                <path
-                                    d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
-                                    fill="white"
-                                    className=" group-hover:fill-supero-green"
-                                />
-                            </svg>
-                        </button>
-                    </div>
-                </nav>
+            <div className="w-full relative">
+                <LottieATF />
             </div>
-            <header className="min-h-screen flex flex-col bg-slate-600 justify-end px-6 xl:px-12">
-                <div>
+            <header
+                className="min-h-screen flex flex-col  justify-end px-6 xl:px-12 relative overflow-x-hidden"
+                style={{
+                    background:
+                        'linear-gradient(90deg, #626271 0%, #2E2E33 100%)',
+                }}
+            >
+                <div className=" pt-5 absolute top-0 left-0 w-full z-[300]">
+                    <nav className="flex justify-between items-center px-2 xl:px-8 py-4 bg-[rgba(46,46,51,0.2)] backdrop-blur-[25px] rounded-lg mx-2 xl:mx-8">
+                        {/* Logo */}
+                        <div className="flex items-center">
+                            <img
+                                src={logoNavbar}
+                                alt="Supero Logo"
+                                className="h-8"
+                            />
+                        </div>
+
+                        {/* Navigation Menu */}
+                        <div className="flex items-center xl:space-x-8 ">
+                            <a
+                                href="#about"
+                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
+                            >
+                                About
+                            </a>
+                            <a
+                                href="#applications"
+                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
+                            >
+                                Applications
+                            </a>
+                            <a
+                                href="#how-it-works"
+                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
+                            >
+                                How it works
+                            </a>
+                            <a
+                                href="#contact"
+                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
+                            >
+                                Contact
+                            </a>
+
+                            <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
+                            <button className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[16px] group">
+                                <span>GET A DEMO</span>
+                                <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="ms-3"
+                                >
+                                    <path
+                                        d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
+                                        fill="white"
+                                        className=" group-hover:fill-supero-green"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </nav>
+                </div>
+                <div
+                    style={{
+                        position: 'absolute',
+                        zIndex: 1,
+                        width: '489px',
+                        height: '472px',
+                        right: '281px',
+                        top: 'calc(50% - 472px/2 + 23px)',
+                        background: 'rgba(255, 255, 255, 0.74)',
+
+                        filter: 'blur(250px)',
+                    }}
+                ></div>
+
+                <div className="relative z-[300]">
                     <h2 className="text-white text-5xl md:text-6xl lg:text-[110px] font-semibold leading-tight group">
                         Technology <br />
                         that{' '}
-                        <span className="font-extrabold inline-block md:text-7xl xl:text-[150px] group-hover:font-black group-hover:tracking-tight transition-all duration-300">
+                        <span className="font-extrabold inline-block group-hover:font-black group-hover:tracking-tight transition-all duration-300">
                             works
                         </span>{' '}
                         <br /> for you
                     </h2>
-
-                    <div className="mb-6 xl:mb-12 mt-8 xl:mt-48 flex flex-col xl:flex-row">
+                    <h1 className="text-supero-mid-grey uppercase text-[20px] my-12">
+                        Supero – Robotics & Automation Solutions for Industry
+                    </h1>
+                    <div className="mb-6 xl:mb-12 flex flex-col xl:flex-row">
                         <button className="mb-4 xl:mb-0 xl:me-4 group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
                             <span className="relative z-10">
                                 SEE AI IN ACTION
@@ -418,7 +446,7 @@ export default function Landing() {
                         className="absolute top-0 right-0 w-[200px] h-[200px] bg-supero-dark-grey"
                         style={{ clipPath: 'polygon(0 0, 100% 100%, 100% 0)' }}
                     ></div>
-                    <div className="w-full flex items-center">
+                    <div className="w-full flex flex-wrap items-center pb-24">
                         <div className="w-1/2">
                             <img
                                 src={product1}
@@ -477,9 +505,81 @@ export default function Landing() {
                                 </div>
                             </button>
                         </div>
+
+                        <div className="w-1/2 px-12 pt-32">
+                            <p className="text-supero-mid-grey uppercase text-[20px] mb-12">
+                                Why integrate smart robotics?
+                            </p>
+
+                            <p className="font-semibold text-[80px] text-white leading-[90%]">
+                                <span className="font-black block">
+                                    Let it do
+                                </span>
+                                the dirty work.
+                            </p>
+
+                            <p className="text-[16px] text-[#BABABF] leading-[155%] my-12 max-w-[570px]">
+                                Supero automates the heavy, repetitive tasks
+                                that slow production down. With an intuitive
+                                interface that guides every phase—from start to
+                                stop—operators manage processes with ease. The
+                                result: fewer errors, safer workflows, and
+                                higher quality at scale.
+                            </p>
+
+                            <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
+                                <span className="relative z-10">
+                                    GET A DEMO
+                                </span>
+
+                                <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="absolute transition-all duration-300 transform group-hover:translate-x-6 group-hover:-translate-y-6 group-hover:opacity-0"
+                                    >
+                                        <path
+                                            d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
+                                            fill="currentColor"
+                                        />
+                                    </svg>
+                                    <svg
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="absolute transition-all duration-300 transform -translate-x-6 translate-y-6 opacity-0 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+                                    >
+                                        <path
+                                            d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
+                                            fill="currentColor"
+                                        />
+                                    </svg>
+                                </div>
+                            </button>
+
+                            <p className="text-supero-mid-grey uppercase text-[20px] mt-24">
+                                What will You do with supero tomorrow?
+                            </p>
+
+                            <p className="text-supero-mid-grey text-[20px]">
+                                Coating <span className="mx-2">|</span> Spraying{' '}
+                                <span className="mx-2">|</span> Palletising
+                            </p>
+                        </div>
+
+                        <div className="w-1/2 px-12 pt-32">
+                            <img src={product2} alt="robot arm" />
+                        </div>
                     </div>
                 </div>
             </section>
+
+            <PartnersSection />
 
             <section className="bg-red-500">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.

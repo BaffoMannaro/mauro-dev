@@ -5,7 +5,7 @@
 
 @font-face {
     font-family: "Hubot Sans";
-    src: url("./assets/fonts/HubotSansVF-Regular.ttf") format('truetype-variations');
+    src: url("./assets/fonts/Hubot-Sans.ttf");
     font-weight: 1 999;
 
     font-style: normal;
@@ -13,10 +13,17 @@
 
 * {
     font-family: "Hubot Sans", sans-serif;
-    /* font-feature-settings: "ss01" 1; */
+    font-feature-settings: "ss01" 1;
     /* font-feature-settings: 'ss01' on, 'liga' off; */
+}
+
+/* "wdth" 125, "wght" 900, */
 
 
-    /* font-variant-alternates: annotation(ss01 on); */
+.font-stretch-80 {
+    font-stretch: 80%;
+}
 
+.font-stretch-125 {
+    font-stretch: 125%;
 }

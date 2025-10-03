@@ -2,11 +2,41 @@ import logoNavbar from '../../assets/images/logo-navbar.png';
 import landingArm from '../../assets/images/landing-arm.png';
 import product1 from '../../assets/images/product-1.png';
 import product2 from '../../assets/images/product-2.png';
-import LottieATF from '../Atoms/LottieATF';
+import LottieATF from '../Landing/LottieATF';
+import { useState } from 'react';
 
-import PartnersSection from '../Atoms/PartnersSection';
+import PartnersSection from '../Landing/PartnersSection';
+import HowItWorks from '../Landing/HowItWorks';
+import LandingForm from '../Landing/LandingForm';
+import GetInTouch from '../Landing/GetInTouch';
+import Footer from '../Landing/Footer';
 
 export default function Landing() {
+    const [activeAccordion, setActiveAccordion] = useState(false);
+
+    const accordionItems = [
+        {
+            title: 'Advanced sensors',
+            content:
+                'High-precision 3D sensors ensure accurate surface analysis and consistent finishing quality.',
+        },
+        {
+            title: 'Customised End-effectors',
+            content:
+                'Tailor-made tools adapt to complex surfaces and specific finishing needs.',
+        },
+        {
+            title: 'Ease of use',
+            content:
+                'A user-friendly web interface makes setup, control, and monitoring simple and intuitive.',
+        },
+        {
+            title: 'Artificial intelligence',
+            content:
+                'Smart algorithms generate robotic paths and adjust processes in real time.',
+        },
+    ];
+
     return (
         <div className="">
             <div className="w-full relative">
@@ -96,7 +126,7 @@ export default function Landing() {
                     <h2 className="text-white text-5xl md:text-6xl lg:text-[110px] font-semibold leading-tight group">
                         Technology <br />
                         that{' '}
-                        <span className="font-extrabold inline-block group-hover:font-black group-hover:tracking-tight transition-all duration-300">
+                        <span className="font-extrabold inline-block group-hover:font-black group-hover:tracking-tight transition-all duration-300 font-stretch-125">
                             works
                         </span>{' '}
                         <br /> for you
@@ -176,30 +206,126 @@ export default function Landing() {
                 </div>
             </header>
 
-            <section className="bg-supero-dark-grey px-12 pt-24 text-center">
-                <p className="text-supero-mid-grey uppercase text-[20px]">
+            <section className="bg-supero-dark-grey px-4 xl:px-12 pt-24 xl:text-center">
+                <p className="text-supero-mid-grey uppercase text-[14px] xl:text-[20px] mb-6 xl:mb-0">
                     Why integrate smart robotics?
                 </p>
 
                 <h3
-                    className="xl:text-[60px] font-semibold text-white"
+                    className="text-[50px] xl:text-[60px] leading-[40px] xl:leading-[50px] font-semibold text-white"
                     style={{}}
                 >
-                    Working{' '}
-                    <span className="text-supero-green font-black">
+                    Working <br className="xl:hidden" />
+                    <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                         smarter
-                    </span>{' '}
-                    - not harder.
+                    </span>
+                    <br className="xl:hidden" /> - not harder.
                 </h3>
 
+                <p className="text-white mt-6 xl:mt-12 max-w-[600px] mx-auto">
+                    From repetition to risk, production tasks can burden teams.{' '}
+                    <br />
+                    Supero integrates collaborative robots, 3D vision, and
+                    easy-to-use software to automate processes—boosting quality,
+                    throughput, and safety.
+                </p>
+
+                <div className="flex justify-center mt-6">
+                    <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider w-full xl:w-[250px] justify-between">
+                        <span className="relative z-10">GET A DEMO</span>
+
+                        <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="absolute transition-all duration-300 transform group-hover:translate-x-6 group-hover:-translate-y-6 group-hover:opacity-0"
+                            >
+                                <path
+                                    d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
+                                    fill="currentColor"
+                                />
+                            </svg>
+                            <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="absolute transition-all duration-300 transform -translate-x-6 translate-y-6 opacity-0 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+                            >
+                                <path
+                                    d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
+                                    fill="currentColor"
+                                />
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+
+                {/* mobile accordion */}
+                <div className="xl:hidden px-0 py-8">
+                    <div className="space-y-4">
+                        {accordionItems.map((item, index) => (
+                            <div key={index} className="">
+                                <button
+                                    className="w-full py-4 px-2 text-left flex justify-between items-center  bg-[rgba(98,98,113,0.3)] backdrop-blur-[5px] transition-all duration-300"
+                                    onClick={() =>
+                                        setActiveAccordion(
+                                            activeAccordion === index
+                                                ? -1
+                                                : index
+                                        )
+                                    }
+                                >
+                                    <p className="text-[14px] text-supero-green font-bold uppercase px-2">
+                                        {item.title}
+                                    </p>
+                                    <svg
+                                        className={`w-5 h-5 text-white transition-transform duration-300 ${
+                                            activeAccordion === index
+                                                ? 'rotate-180'
+                                                : ''
+                                        }`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M19 9l-7 7-7-7"
+                                        />
+                                    </svg>
+                                </button>
+                                <div
+                                    className={`overflow-hidden transition-all duration-300 ${
+                                        activeAccordion === index
+                                            ? 'max-h-96 opacity-100'
+                                            : 'max-h-0 opacity-0'
+                                    }`}
+                                >
+                                    <div className="pb-4 px-2 bg-[rgba(98,98,113,0.3)] backdrop-blur-[5px] ">
+                                        <p className="text-[14px] text-white leading-relaxed">
+                                            {item.content}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 <div
-                    className="relative h-[700px] flex justify-center items-center top-20"
+                    className="relative h-[700px] justify-center items-center top-20 hidden xl:flex"
                     style={{
                         backgroundImage: `url(${landingArm})`,
                         backgroundSize: '1200px 650px',
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: '50% 50%',
-                        /* backgroundAttachment: 'fixed', */
                     }}
                 >
                     <div
@@ -209,14 +335,7 @@ export default function Landing() {
                         }}
                     >
                         <div className="flex justify-between">
-                            <p
-                                className="text-[24px] text-white font-bold uppercase group-hover:text-supero-green"
-                                style={{
-                                    fontFeatureSettings: "'ss01' on",
-                                    fontStretch: '80',
-                                    fontVariationSettings: "'slnt' 0",
-                                }}
-                            >
+                            <p className="text-[24px] text-white font-bold uppercase group-hover:text-supero-green">
                                 Advanced sensors
                             </p>
                             <svg
@@ -431,8 +550,7 @@ export default function Landing() {
                     </div>
                 </div>
             </section>
-
-            <section className="bg-supero-dark-grey px-12 pb-12">
+            <section className="bg-supero-dark-grey px-12 pb-12 hidden xl:block">
                 <div
                     className="h-auto relative"
                     style={{
@@ -578,25 +696,13 @@ export default function Landing() {
                     </div>
                 </div>
             </section>
-
             <PartnersSection />
 
-            <section className="bg-red-500">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Adipisci, vero iusto! Ad dolorem iste praesentium placeat.
-                Consequuntur sed adipisci quos harum impedit animi voluptatem
-                officiis provident et laboriosam ipsum eveniet tempore labore,
-                quod ducimus velit nesciunt rem dolorum assumenda quis vero!
-                Tempore libero ipsam maxime. Reiciendis quaerat explicabo
-                delectus maiores similique accusantium laboriosam labore saepe
-                quae sunt dolorem fugit aperiam minus minima eos deserunt, eaque
-                magnam doloribus, ipsa ab ex fuga blanditiis vitae voluptatum!
-                Optio exercitationem necessitatibus laboriosam eveniet
-                voluptates nihil id, dolorem assumenda sapiente recusandae
-                asperiores aliquam itaque expedita labore? Voluptatibus,
-                repellat? Unde similique fugiat, distinctio repellendus placeat
-                voluptatem!
-            </section>
+            <HowItWorks />
+            <LandingForm />
+
+            <GetInTouch />
+            <Footer />
         </div>
     );
 }

@@ -324,7 +324,7 @@ export default function LandingForm() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="mx-auto group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-full"
+                                        className="mx-auto group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-24 xl:h-full"
                                     >
                                         <div className="flex">
                                             <span className="relative z-10">

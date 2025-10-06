@@ -40,8 +40,6 @@ export default function Landing() {
 
     return (
         <div className="">
-            <VideoSection />
-
             <div className="w-full relative">
                 <LottieATF />
             </div>
@@ -549,29 +547,27 @@ export default function Landing() {
                     </div>
                 </div>
             </section>
-            <section className="bg-supero-dark-grey px-12 pb-12 hidden xl:block">
+            <section className="bg-supero-dark-grey xl:px-12 pb-12">
                 <div
                     className="h-auto relative"
                     style={{
                         background:
                             'linear-gradient(-90deg, #60606f 0%, #424247 100%)',
-                        /* clipPath:
-                            'polygon(calc(100% - 200px) 0, 100% 200px, 100% 100%, 0 100%, 0 0)', */
                     }}
                 >
                     <div
-                        className="absolute top-0 right-0 w-[200px] h-[200px] bg-supero-dark-grey"
+                        className="absolute top-0 right-0 w-[50px] h-[50px] xl:w-[200px] xl:h-[200px] bg-supero-dark-grey"
                         style={{ clipPath: 'polygon(0 0, 100% 100%, 100% 0)' }}
                     ></div>
-                    <div className="w-full flex flex-wrap items-center pb-24">
-                        <div className="w-1/2">
+                    <div className="w-full flex flex-wrap items-center">
+                        <div className="w-full xl:w-1/2 order-2 xl:order-1">
                             <img
                                 src={product1}
                                 alt="robot arm"
-                                className="transform -translate-x-12 py-16"
+                                className="transform xl:-translate-x-12 py-16"
                             />
                         </div>
-                        <div className="w-1/2">
+                        <div className="w-full xl:w-1/2 order-1 xl:order-2 px-4 xl:px-0 pt-12 xl:pt-0">
                             <p className="title">
                                 Developed <br /> to work, <br />
                                 powered to <br />{' '}
@@ -587,9 +583,9 @@ export default function Landing() {
                                 grow with your production needs.
                             </p>
 
-                            <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
+                            <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0">
                                 <span className="relative z-10">
-                                    SEE AI IN ACTION
+                                    get a demo
                                 </span>
 
                                 <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
@@ -622,10 +618,12 @@ export default function Landing() {
                                 </div>
                             </button>
                         </div>
+                    </div>
 
-                        <div className="w-1/2 px-12 pt-32">
-                            <p className="text-supero-mid-grey uppercase text-[20px] mb-12">
-                                Why integrate smart robotics?
+                    <div className="w-full flex flex-wrap items-center pb-12 mb-24">
+                        <div className="w-full xl:w-1/2 px-4 xl:px-12">
+                            <p className="text-supero-mid-grey uppercase text-body-m mb-12">
+                                what can you do with Supero today
                             </p>
 
                             <p className="title">
@@ -644,7 +642,7 @@ export default function Landing() {
                                 higher quality at scale.
                             </p>
 
-                            <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
+                            <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0">
                                 <span className="relative z-10">
                                     GET A DEMO
                                 </span>
@@ -679,22 +677,43 @@ export default function Landing() {
                                 </div>
                             </button>
 
-                            <p className="text-supero-mid-grey uppercase text-[20px] mt-24">
-                                What will You do with supero tomorrow?
-                            </p>
+                            <div className="hidden xl:block">
+                                <p className="text-supero-mid-grey uppercase text-[20px] mt-24">
+                                    What will You do with supero tomorrow?
+                                </p>
 
-                            <p className="text-supero-mid-grey text-[20px]">
-                                Coating <span className="mx-2">|</span> Spraying{' '}
-                                <span className="mx-2">|</span> Palletising
-                            </p>
+                                <p className="text-supero-mid-grey text-[20px]">
+                                    Coating <span className="mx-2">|</span>{' '}
+                                    Spraying <span className="mx-2">|</span>{' '}
+                                    Palletising
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="w-1/2 px-12 pt-32">
-                            <img src={product2} alt="robot arm" />
+                        <div className="w-full xl:w-1/2 px-12 pt-32">
+                            <img
+                                src={product2}
+                                alt="robot arm"
+                                className="block mx-auto"
+                            />
+
+                            <div className="xl:hidden">
+                                <p className="text-supero-mid-grey uppercase text-body-m mt-24">
+                                    What will You do with supero tomorrow?
+                                </p>
+
+                                <p className="text-supero-mid-grey text-body-s">
+                                    Coating <span className="mx-2">|</span>{' '}
+                                    Spraying <span className="mx-2">|</span>{' '}
+                                    Palletising
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <VideoSection />
             <PartnersSection />
 
             <HowItWorks />

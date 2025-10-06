@@ -4,7 +4,7 @@ export default function HowItWorks() {
     return (
         <section className="w-full flex flex-wrap bg-[#434348]">
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
-                <p className="font-semibold text-[50px] xl:text-[80px] text-white leading-[90%] mb-6">
+                <p className="title mb-6">
                     How it <span className="font-black">works</span>
                 </p>
 
@@ -49,7 +49,7 @@ export default function HowItWorks() {
                             <p className="text-[30px] font-bold">
                                 Problem Analysis
                             </p>
-                            <p className="text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF]">
                                 We carefully examine your production process to
                                 identify inefficiencies and opportunities for
                                 automation.
@@ -63,7 +63,7 @@ export default function HowItWorks() {
                             <p className="text-[30px] font-bold">
                                 Requirement Collection
                             </p>
-                            <p className="text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF]">
                                 We collect all the necessary information about
                                 your goals, constraints, and operational needs
                                 to define a tailored solution.
@@ -77,7 +77,7 @@ export default function HowItWorks() {
                             <p className="text-[30px] font-bold">
                                 Solution Design
                             </p>
-                            <p className="text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF]">
                                 We create a detailed plan that integrates
                                 collaborative robotics, software, and processes
                                 to optimize productivity and safety.
@@ -89,7 +89,7 @@ export default function HowItWorks() {
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-16px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="text-[30px] font-bold">Tech R&D</p>
-                            <p className="text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF]">
                                 We experiment and test advanced technologies to
                                 ensure high performance and innovative
                                 solutions.
@@ -103,7 +103,7 @@ export default function HowItWorks() {
                             <p className="text-[30px] font-bold">
                                 Deployment & Testing
                             </p>
-                            <p className="text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF]">
                                 We install and configure the solution,
                                 performing rigorous tests to guarantee flawless
                                 operation in your production environment.
@@ -117,7 +117,7 @@ export default function HowItWorks() {
                             <p className="text-[30px] font-bold">
                                 Business Integration
                             </p>
-                            <p className="text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF]">
                                 We support your team during adoption, training,
                                 and continuous optimization, turning automation
                                 into a tangible advantage.

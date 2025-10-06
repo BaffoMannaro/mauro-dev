@@ -13,14 +13,14 @@ export default function LandingForm() {
             }}
         >
             <div className="w-full xl:w-2/5">
-                <p className="font-semibold text-[50px] xl:text-[80px] text-white leading-[90%] mb-6">
+                <p className="title mb-6">
                     Does it <br className="hidden xl:block" />{' '}
                     <span className="font-black">work </span>
                     <br className="hidden xl:block" />
                     for you?
                 </p>
 
-                <p className="text-supero-mid-grey text-[18px] mt-12">
+                <p className="text-supero-mid-grey text-body-l mt-12">
                     Want to know more? <br className="hidden xl:block" /> Fill
                     out the form to find out how we can help{' '}
                     <br className="hidden xl:block" /> you transform your
@@ -85,11 +85,11 @@ export default function LandingForm() {
                     }}
                 >
                     {({ isSubmitting, values, errors, setFieldValue }) => (
-                        <Form className="flex flex-wrap xl:p-8 text-white shadow w-full">
+                        <Form className="flex flex-wrap xl:p-8 text-white w-full">
                             <div className="mb-8 w-full xl:w-1/2 px-2">
                                 <label
                                     htmlFor="companyName"
-                                    className="text-[#a6a6ab] text-[14px] mb-2 block"
+                                    className="text-[#a6a6ab] text-body-s mb-2 block"
                                 >
                                     Company Name*
                                 </label>
@@ -109,7 +109,7 @@ export default function LandingForm() {
                             <div className="mb-8 w-full xl:w-1/2 px-2">
                                 <label
                                     htmlFor="email"
-                                    className="text-[#a6a6ab] text-[14px] mb-2 block"
+                                    className="text-[#a6a6ab] text-body-s mb-2 block"
                                 >
                                     Email*
                                 </label>
@@ -127,7 +127,7 @@ export default function LandingForm() {
                             </div>
 
                             <div className="mb-8 w-full px-2">
-                                <label className="text-[#a6a6ab] text-[14px] mb-2 block">
+                                <label className="text-[#a6a6ab] text-body-m mb-2 block">
                                     What kind of product works for you?*
                                 </label>
 
@@ -243,7 +243,7 @@ export default function LandingForm() {
                             <div className="mb-8 w-full px-2">
                                 <label
                                     htmlFor="message"
-                                    className="text-[#a6a6ab] text-[14px] mb-2 block"
+                                    className="text-[#a6a6ab] text-body-s mb-2 block"
                                 >
                                     Tell us more
                                 </label>
@@ -277,7 +277,7 @@ export default function LandingForm() {
                                                 }
                                             ></div>
                                         </div>
-                                        <p className="text-[12px]">
+                                        <p className="text-body-s">
                                             I declared that I have read the
                                             privacy policy*.
                                         </p>
@@ -308,7 +308,7 @@ export default function LandingForm() {
                                                 }
                                             ></div>
                                         </div>
-                                        <p className="text-[12px]">
+                                        <p className="text-body-s">
                                             I consent to the processing of my
                                             personal data in order to receive
                                             e-mail communications, including

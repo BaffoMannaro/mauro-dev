@@ -10,6 +10,7 @@ import HowItWorks from '../Landing/HowItWorks';
 import LandingForm from '../Landing/LandingForm';
 import GetInTouch from '../Landing/GetInTouch';
 import Footer from '../Landing/Footer';
+import VideoSection from '../Landing/VideoSection';
 
 export default function Landing() {
     const [activeAccordion, setActiveAccordion] = useState(false);
@@ -39,6 +40,8 @@ export default function Landing() {
 
     return (
         <div className="">
+            <VideoSection />
+
             <div className="w-full relative">
                 <LottieATF />
             </div>
@@ -211,10 +214,7 @@ export default function Landing() {
                     Why integrate smart robotics?
                 </p>
 
-                <h3
-                    className="text-[50px] xl:text-[60px] leading-[40px] xl:leading-[50px] font-semibold text-white"
-                    style={{}}
-                >
+                <h3 className="title" style={{}}>
                     Working <br className="xl:hidden" />
                     <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                         smarter
@@ -222,9 +222,8 @@ export default function Landing() {
                     <br className="xl:hidden" /> - not harder.
                 </h3>
 
-                <p className="text-white mt-6 xl:mt-12 max-w-[600px] mx-auto">
+                <p className="mt-6 xl:mt-12 max-w-[600px] mx-auto text-left xl:text-center text-body-l">
                     From repetition to risk, production tasks can burden teams.{' '}
-                    <br />
                     Supero integrates collaborative robots, 3D vision, and
                     easy-to-use software to automate processes—boosting quality,
                     throughput, and safety.
@@ -573,14 +572,14 @@ export default function Landing() {
                             />
                         </div>
                         <div className="w-1/2">
-                            <p className="font-semibold text-[80px] text-white leading-[90%]">
+                            <p className="title">
                                 Developed <br /> to work, <br />
                                 powered to <br />{' '}
                                 <span className="font-black">perform.</span>
                             </p>
 
-                            <p className="text-[16px] text-[#BABABF] leading-[155%] my-12 max-w-[570px]">
-                                Supero’s collaborative robotic stations bring
+                            <p className="text-body-l text-[#BABABF] my-12 max-w-[570px]">
+                                Supero's collaborative robotic stations bring
                                 speed, consistency, and scalability to
                                 manufacturing. From sanding and coating to
                                 palletizing, they ensure higher quality, stable
@@ -629,14 +628,14 @@ export default function Landing() {
                                 Why integrate smart robotics?
                             </p>
 
-                            <p className="font-semibold text-[80px] text-white leading-[90%]">
+                            <p className="title">
                                 <span className="font-black block">
                                     Let it do
                                 </span>
                                 the dirty work.
                             </p>
 
-                            <p className="text-[16px] text-[#BABABF] leading-[155%] my-12 max-w-[570px]">
+                            <p className="text-body-l text-[#BABABF] my-12 max-w-[570px]">
                                 Supero automates the heavy, repetitive tasks
                                 that slow production down. With an intuitive
                                 interface that guides every phase—from start to

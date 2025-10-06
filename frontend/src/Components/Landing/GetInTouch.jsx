@@ -27,17 +27,17 @@ export default function GetInTouch() {
                 </Slide>
 
                 <div>
-                    <p className="font-semibold text-[48px] xl:text-[80px] text-white text-center leading-[90%] mb-8">
+                    <p className="title text-center mb-8">
                         Get in <span className="font-black">touch</span>
                     </p>
 
-                    <p className="text-supero-mid-grey text-[18px] text-center">
+                    <p className="text-supero-mid-grey text-body-l text-center">
                         Ready to see how collaborative robotics can transform
                         your production? <br /> Let’s talk about your challenges
                         and design the right solution together.
                     </p>
 
-                    <div className="mt-8 flex-col xl:flex-row justify-center w-full">
+                    <div className="mt-8 flex flex-col xl:flex-row justify-center w-full">
                         <button className="mb-4 xl:mb-0 mx-2 group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between">
                             <span className="relative z-10">
                                 request consultation
@@ -145,38 +145,38 @@ export default function GetInTouch() {
 
             <div className="w-full px-12 bg-supero-dark-grey flex flex-col xl:flex-row flex-wrap">
                 <div className="w-full xl:w-1/3 mb-8 xl:mb-0">
-                    <p className="text-white opacity-70 text-[16px] mb-4">
+                    <p className="text-white opacity-70 text-body-l mb-4">
                         Via Giuseppe Sangiorgi, 15
                     </p>
-                    <p className="text-white opacity-70 text-[16px] mb-4">
+                    <p className="text-white opacity-70 text-body-l mb-4">
                         70124, Bari (BA) - Italy
                     </p>
-                    <p className="text-white opacity-70 text-[16px] mb-4">
+                    <p className="text-white opacity-70 text-body-l mb-4">
                         P.IVA 08787910721
                     </p>
                 </div>
                 <div className="w-full xl:w-1/3 mb-8 xl:mb-0">
                     <a
                         href=""
-                        className="block font-semibold text-[16px] text-white mb-4"
+                        className="block font-semibold text-body-l text-white mb-4"
                     >
                         Youtube
                     </a>
                     <a
                         href=""
-                        className="block font-semibold text-[16px] text-white mb-4"
+                        className="block font-semibold text-body-l text-white mb-4"
                     >
                         LinkedIn
                     </a>
                     <a
                         href=""
-                        className="block font-semibold text-[16px] text-white mb-4"
+                        className="block font-semibold text-body-l text-white mb-4"
                     >
                         Social
                     </a>
                 </div>
                 <div className="w-full xl:w-1/3 mb-8 xl:mb-0">
-                    <p className="text-white text-[16px] mb-2">
+                    <p className=" text-body-m mb-2">
                         Subscribe to the newsletter
                     </p>
 
@@ -228,7 +228,7 @@ export default function GetInTouch() {
                         )}
                     </Formik>
 
-                    <p className="text-[12px] text-white opacity-70">
+                    <p className="text-body-s opacity-70 mt-2">
                         The information you provide through this form will be
                         used in accordance with our privacy policy. If you wish
                         to change or remove any information you provide through

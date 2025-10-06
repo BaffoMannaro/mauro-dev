@@ -27,3 +27,26 @@
 .font-stretch-125 {
     font-stretch: 125%;
 }
+
+@layer components {
+    .title {
+        @apply font-bold text-[50px] xl:text-[80px] text-white leading-[90%];
+        font-stretch: 90%;
+
+    }
+
+    .text-body-l {
+        @apply text-white text-[16px] leading-[155%] xl:text-[18px] xl:leading-[135%];
+        font-stretch: 100%;
+    }
+
+    .text-body-m {
+        @apply text-white text-[14px] leading-[155%] xl:text-[16px] xl:leading-[135%];
+        font-stretch: 100%;
+    }
+
+    .text-body-s {
+        @apply text-white text-[12px] leading-[155%] xl:text-[14px] xl:leading-[135%];
+        font-stretch: 100%;
+    }
+}

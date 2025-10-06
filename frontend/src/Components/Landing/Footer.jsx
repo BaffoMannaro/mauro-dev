@@ -46,7 +46,7 @@ export default function Footer() {
                     </div>
                     <div className="w-full xl:w-1/5">
                         <div className="">
-                            <p className="text-white opacity-70 text-[12px]">
+                            <p className="text-body-s opacity-70">
                                 Bando a Cascata “Future Artificial Intelligence
                                 Research‑FAIR” finanziato nell’ambito
                                 dell’Avviso n. 341 del 15.03.2022 Piano
@@ -97,7 +97,7 @@ export default function Footer() {
                     </div>
                     <div className="w-full xl:w-1/5">
                         <div className="">
-                            <p className="text-white opacity-70 text-[12px]">
+                            <p className="text-body-s opacity-70">
                                 Intervento cofinanziato dall’U.E. a valere sul
                                 PR Puglia FESR-FSE+ 2021-2027 FONDO TECNONIDI
                             </p>

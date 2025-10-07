@@ -14,7 +14,7 @@ export default function VideoSection() {
     };
 
     return (
-        <div className="xl:h-screen bg-supero-dark-grey relative flex flex-col items-center justify-center">
+        <div className=" bg-supero-dark-grey relative flex flex-col items-center justify-center">
             <div className="px-4 xl:hidden">
                 <p className="title mb-2">
                     Finishing made easy. <br />

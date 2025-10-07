@@ -11,6 +11,7 @@ import LandingForm from '../Landing/LandingForm';
 import GetInTouch from '../Landing/GetInTouch';
 import Footer from '../Landing/Footer';
 import VideoSection from '../Landing/VideoSection';
+import Timer from '../Landing/Timer';
 
 export default function Landing() {
     const [activeAccordion, setActiveAccordion] = useState(false);
@@ -51,7 +52,7 @@ export default function Landing() {
                 }}
             >
                 <div className=" pt-5 absolute top-0 left-0 w-full z-[300]">
-                    <nav className="flex justify-between items-center px-2 xl:px-8 py-4 bg-[rgba(46,46,51,0.2)] backdrop-blur-[25px] rounded-lg mx-2 xl:mx-8">
+                    <nav className="flex justify-between items-center px-2 xl:px-8 py-6 bg-[rgba(46,46,51,0.2)] backdrop-blur-[25px] rounded-lg mx-2 xl:mx-8">
                         {/* Logo */}
                         <div className="flex items-center">
                             <img
@@ -63,7 +64,7 @@ export default function Landing() {
 
                         {/* Navigation Menu */}
                         <div className="flex items-center xl:space-x-8 ">
-                            <a
+                            {/*  <a
                                 href="#about"
                                 className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
                             >
@@ -86,7 +87,7 @@ export default function Landing() {
                                 className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
                             >
                                 Contact
-                            </a>
+                            </a> */}
 
                             <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
                             <button className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[16px] group">
@@ -713,6 +714,7 @@ export default function Landing() {
                 </div>
             </section>
 
+            {/* <Timer /> */}
             <VideoSection />
             <PartnersSection />
 

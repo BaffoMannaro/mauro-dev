@@ -4,7 +4,7 @@ export default function HowItWorks() {
     return (
         <section className="w-full flex flex-wrap bg-[#434348]">
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
-                <p className="title mb-6">
+                <p className="title my-6">
                     How it <span className="font-black">works</span>
                 </p>
 
@@ -42,13 +42,11 @@ export default function HowItWorks() {
                 </button>
             </div>
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
-                <div className="mb-0  text-white max-w-[512px] relative after:content-[''] after:absolute after:w-[2px] after:h-full after:left-[-10px] xl:after:left-[-40px] after:top-0 after:bg-supero-green">
+                <div className="mb-0  text-white max-w-[512px] relative after:content-[''] after:absolute after:w-[2px] after:h-full after:left-[-4px] xl:after:left-[-40px] after:top-0 after:bg-supero-green">
                     <Fade direction="up" delay={100} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-16px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="text-[30px] font-bold">
-                                Problem Analysis
-                            </p>
+                            <p className="title-xs">Problem Analysis</p>
                             <p className="text-body-m text-[#BABABF]">
                                 We carefully examine your production process to
                                 identify inefficiencies and opportunities for
@@ -58,11 +56,9 @@ export default function HowItWorks() {
                     </Fade>
 
                     <Fade direction="up" delay={200} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-16px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="text-[30px] font-bold">
-                                Requirement Collection
-                            </p>
+                            <p className="title-xs">Requirement Collection</p>
                             <p className="text-body-m text-[#BABABF]">
                                 We collect all the necessary information about
                                 your goals, constraints, and operational needs
@@ -72,11 +68,9 @@ export default function HowItWorks() {
                     </Fade>
 
                     <Fade direction="up" delay={300} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-16px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="text-[30px] font-bold">
-                                Solution Design
-                            </p>
+                            <p className="title-xs">Solution Design</p>
                             <p className="text-body-m text-[#BABABF]">
                                 We create a detailed plan that integrates
                                 collaborative robotics, software, and processes
@@ -86,9 +80,9 @@ export default function HowItWorks() {
                     </Fade>
 
                     <Fade direction="up" delay={400} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-16px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="text-[30px] font-bold">Tech R&D</p>
+                            <p className="title-xs">Tech R&D</p>
                             <p className="text-body-m text-[#BABABF]">
                                 We experiment and test advanced technologies to
                                 ensure high performance and innovative
@@ -98,11 +92,9 @@ export default function HowItWorks() {
                     </Fade>
 
                     <Fade direction="up" delay={500} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-16px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="text-[30px] font-bold">
-                                Deployment & Testing
-                            </p>
+                            <p className="title-xs">Deployment & Testing</p>
                             <p className="text-body-m text-[#BABABF]">
                                 We install and configure the solution,
                                 performing rigorous tests to guarantee flawless
@@ -112,11 +104,9 @@ export default function HowItWorks() {
                     </Fade>
 
                     <Fade direction="up" delay={600} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-16px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="text-[30px] font-bold">
-                                Business Integration
-                            </p>
+                            <p className="title-xs">Business Integration</p>
                             <p className="text-body-m text-[#BABABF]">
                                 We support your team during adoption, training,
                                 and continuous optimization, turning automation

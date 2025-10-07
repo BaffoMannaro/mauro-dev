@@ -32,6 +32,12 @@
     .title {
         @apply font-bold text-[50px] xl:text-[80px] text-white leading-[90%];
         font-stretch: 90%;
+    }
+
+    .title-xs {
+        @apply font-bold text-[24px] xl:text-[30px] text-white leading-[90%];
+        font-stretch: 90%;
+
 
     }
 

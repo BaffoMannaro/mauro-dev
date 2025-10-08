@@ -5,6 +5,7 @@ import poly from '../../assets/images/poly.png';
 export default function LandingForm() {
     return (
         <div
+            id="landing-form"
             className="w-full flex flex-wrap items-center bg-[#434348] px-4 xl:px-12 pb-24"
             style={{
                 backgroundImage: `url(${poly})`,
@@ -34,9 +35,9 @@ export default function LandingForm() {
                         companyName: '',
                         email: '',
                         sanding: false,
-                        dispensing: false,
-                        palletising: false,
-                        pick_place: false,
+                        polishing: false,
+                        painting: false,
+
                         other: false,
                         message: '',
                         productTypes: '',
@@ -61,17 +62,13 @@ export default function LandingForm() {
                             function (value) {
                                 const {
                                     sanding,
-                                    dispensing,
-                                    palletising,
-                                    pick_place,
+                                    polishing,
+                                    painting,
+
                                     other,
                                 } = this.parent;
                                 return (
-                                    sanding ||
-                                    dispensing ||
-                                    palletising ||
-                                    pick_place ||
-                                    other
+                                    sanding || polishing || painting || other
                                 );
                             }
                         ),
@@ -128,7 +125,7 @@ export default function LandingForm() {
 
                             <div className="mb-8 w-full px-2">
                                 <label className="text-[#a6a6ab] text-body-m mb-2 block">
-                                    What kind of product works for you?*
+                                    Which application are you interested in?*
                                 </label>
 
                                 <div className="flex justify-between flex-wrap gap-4">
@@ -156,60 +153,40 @@ export default function LandingForm() {
                                         className="flex items-center cursor-pointer"
                                         onClick={() => {
                                             setFieldValue(
-                                                'dispensing',
-                                                !values.dispensing
+                                                'polishing',
+                                                !values.polishing
                                             );
                                         }}
                                     >
                                         <div
                                             className={
                                                 'h-5 w-5 border rounded-sm me-3 ' +
-                                                (values.dispensing
+                                                (values.polishing
                                                     ? ' bg-slate-400 '
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Dispensing</p>
+                                        <p>Polishing</p>
                                     </div>
 
                                     <div
                                         className="flex items-center cursor-pointer"
                                         onClick={() => {
                                             setFieldValue(
-                                                'palletising',
-                                                !values.palletising
+                                                'painting',
+                                                !values.painting
                                             );
                                         }}
                                     >
                                         <div
                                             className={
                                                 'h-5 w-5 border rounded-sm me-3 ' +
-                                                (values.palletising
+                                                (values.painting
                                                     ? ' bg-slate-400 '
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Palletising</p>
-                                    </div>
-
-                                    <div
-                                        className="flex items-center cursor-pointer"
-                                        onClick={() => {
-                                            setFieldValue(
-                                                'pick_place',
-                                                !values.pick_place
-                                            );
-                                        }}
-                                    >
-                                        <div
-                                            className={
-                                                'h-5 w-5 border rounded-sm me-3 ' +
-                                                (values.pick_place
-                                                    ? ' bg-slate-400 '
-                                                    : '')
-                                            }
-                                        ></div>
-                                        <p>Pick & Place</p>
+                                        <p>Painting</p>
                                     </div>
 
                                     <div
@@ -324,7 +301,7 @@ export default function LandingForm() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="mx-auto xl:ms-auto group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-24 xl:h-full"
+                                        className="mx-auto xl:ml-auto xl:mr-0 group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-24 xl:h-full"
                                     >
                                         <div className="flex">
                                             <span className="relative z-10">

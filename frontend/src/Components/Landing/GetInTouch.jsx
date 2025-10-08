@@ -143,7 +143,7 @@ export default function GetInTouch() {
                 </div>
             </div>
 
-            <div className="w-full px-12 bg-supero-dark-grey flex flex-col xl:flex-row flex-wrap">
+            <div className="w-full px-4 xl:px-12 bg-supero-dark-grey flex flex-col xl:flex-row flex-wrap">
                 <div className="w-full xl:w-1/3 mb-8 xl:mb-0">
                     <p className="text-white opacity-70 text-body-l mb-4">
                         Via Giuseppe Sangiorgi, 15
@@ -214,7 +214,7 @@ export default function GetInTouch() {
                                         disabled={isSubmitting}
                                         className="group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[12px] uppercase tracking-wider rounded-r-sm"
                                     >
-                                        <span className="relative z-10">
+                                        <span className="relative z-10 text-xs xl:text-base">
                                             subscribe
                                         </span>
                                     </button>

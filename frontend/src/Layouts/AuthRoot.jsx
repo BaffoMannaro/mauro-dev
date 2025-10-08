@@ -56,16 +56,4 @@ export default function AuthRoot() {
             <Outlet />
         </>
     );
-
-    return (
-        <>
-            {/* <nav className={`fixed top-0 right-0 z-20 w-full`}>
-                <Navbar open={open} />
-            </nav> */}
-
-            <ScrollRestoration />
-            <Toaster position="top-center" />
-            <Outlet />
-        </>
-    );
 }

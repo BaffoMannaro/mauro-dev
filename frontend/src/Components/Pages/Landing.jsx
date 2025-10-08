@@ -90,7 +90,10 @@ export default function Landing() {
                             </a> */}
 
                             <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
-                            <button className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[16px] group">
+                            <a
+                                href="#landing-form"
+                                className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[16px] group"
+                            >
                                 <span>GET A DEMO</span>
                                 <svg
                                     width="24"
@@ -106,7 +109,7 @@ export default function Landing() {
                                         className=" group-hover:fill-supero-green"
                                     />
                                 </svg>
-                            </button>
+                            </a>
                         </div>
                     </nav>
                 </div>
@@ -172,7 +175,7 @@ export default function Landing() {
                             </div>
                         </button>
 
-                        <button className="group relative overflow-hidden bg-transparent text-white border border-white hover:bg-[#2E2E33]  hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
+                        {/* <button className="group relative overflow-hidden bg-transparent text-white border border-white hover:bg-[#2E2E33]  hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
                             <span className="relative z-10">GET A DEMO</span>
 
                             <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
@@ -203,13 +206,13 @@ export default function Landing() {
                                     />
                                 </svg>
                             </div>
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </header>
 
             <section className="bg-supero-dark-grey px-4 xl:px-12 pt-24 xl:text-center">
-                <p className="text-supero-mid-grey uppercase text-[14px] xl:text-[20px] mb-6 xl:mb-0">
+                <p className="text-supero-mid-grey uppercase text-body-l mb-6 xl:mb-12">
                     Why integrate smart robotics?
                 </p>
 
@@ -228,8 +231,11 @@ export default function Landing() {
                     throughput, and safety.
                 </p>
 
-                <div className="flex justify-center mt-6">
-                    <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider w-full xl:w-[250px] justify-between">
+                <div className="flex justify-center mt-12">
+                    <a
+                        href="#landing-form"
+                        className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider w-full xl:w-[250px] justify-between"
+                    >
                         <span className="relative z-10">GET A DEMO</span>
 
                         <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
@@ -260,7 +266,7 @@ export default function Landing() {
                                 />
                             </svg>
                         </div>
-                    </button>
+                    </a>
                 </div>
 
                 {/* mobile accordion */}
@@ -318,7 +324,7 @@ export default function Landing() {
                 </div>
 
                 <div
-                    className="relative h-[700px] justify-center items-center top-20 hidden xl:flex"
+                    className="relative h-[620px] justify-center items-center top-12 hidden xl:flex"
                     style={{
                         backgroundImage: `url(${landingArm})`,
                         backgroundSize: '1200px 650px',
@@ -584,7 +590,10 @@ export default function Landing() {
                                 grow with your production needs.
                             </p>
 
-                            <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0">
+                            <a
+                                href="#landing-form"
+                                className="group  relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
+                            >
                                 <span className="relative z-10">
                                     get a demo
                                 </span>
@@ -617,11 +626,11 @@ export default function Landing() {
                                         />
                                     </svg>
                                 </div>
-                            </button>
+                            </a>
                         </div>
                     </div>
 
-                    <div className="w-full flex flex-wrap items-center pb-12 mb-24">
+                    <div className="w-full flex flex-wrap items-center pb-12 mb-8">
                         <div className="w-full xl:w-1/2 px-4 xl:px-12">
                             <p className="text-supero-mid-grey uppercase text-body-m mb-12">
                                 what can you do with Supero today
@@ -643,7 +652,10 @@ export default function Landing() {
                                 higher quality at scale.
                             </p>
 
-                            <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0">
+                            <a
+                                href="#landing-form"
+                                className="group  relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
+                            >
                                 <span className="relative z-10">
                                     GET A DEMO
                                 </span>
@@ -676,7 +688,7 @@ export default function Landing() {
                                         />
                                     </svg>
                                 </div>
-                            </button>
+                            </a>
 
                             <div className="hidden xl:block">
                                 <p className="text-supero-mid-grey uppercase text-[20px] mt-24">
@@ -691,7 +703,7 @@ export default function Landing() {
                             </div>
                         </div>
 
-                        <div className="w-full xl:w-1/2 px-12 pt-32">
+                        <div className="w-full xl:w-1/2 px-4 xl:px-12 pt-8 xl:pt-32">
                             <img
                                 src={product2}
                                 alt="robot arm"
@@ -699,7 +711,7 @@ export default function Landing() {
                             />
 
                             <div className="xl:hidden">
-                                <p className="text-supero-mid-grey uppercase text-body-m mt-24">
+                                <p className="text-supero-mid-grey uppercase text-body-m mt-12">
                                     What will You do with supero tomorrow?
                                 </p>
 

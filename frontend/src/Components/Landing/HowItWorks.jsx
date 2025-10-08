@@ -8,7 +8,10 @@ export default function HowItWorks() {
                     How it <span className="font-black">works</span>
                 </p>
 
-                <button className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
+                <a
+                    href="#landing-form"
+                    className="group  relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
+                >
                     <span className="relative z-10">start your project</span>
 
                     <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
@@ -39,7 +42,7 @@ export default function HowItWorks() {
                             />
                         </svg>
                     </div>
-                </button>
+                </a>
             </div>
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
                 <div className="mb-0  text-white max-w-[512px] relative after:content-[''] after:absolute after:w-[2px] after:h-full after:left-[-4px] xl:after:left-[-40px] after:top-0 after:bg-supero-green">

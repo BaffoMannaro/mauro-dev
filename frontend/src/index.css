@@ -56,3 +56,9 @@
         font-stretch: 100%;
     }
 }
+
+
+html,
+body {
+    scroll-behavior: smooth;
+}

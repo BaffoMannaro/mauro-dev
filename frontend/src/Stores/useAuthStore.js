@@ -11,6 +11,8 @@ const useAuthStore = create(persist(
     user: null,
     setUser: (accessToken) => {
       if (accessToken) {
+        console.log('accessToken >>>>> ', accessToken);
+        
         const user = jwtDecode(accessToken);
         set({ user: user });
       } else {

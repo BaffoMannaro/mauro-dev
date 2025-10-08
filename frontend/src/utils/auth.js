@@ -47,16 +47,16 @@ export const register = async (
 };
 
 export const logout = () => {
-    Cookies.remove('access_token');
-    Cookies.remove('refresh_token');
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
     useAuthStore.getState().setUser(null);
 };
 
 export const setUser = async () => {
     // ON PAGE LOAD
 
-    const accessToken = Cookies.get('access_token');
-    const refreshToken = Cookies.get('refresh_token');
+    const accessToken = Cookies.get('accessToken');
+    const refreshToken = Cookies.get('refreshToken');
     if (!refreshToken) {
         /* useAuthStore.getState().setUser(null); */
         return;
@@ -71,18 +71,18 @@ export const setUser = async () => {
     return true;
 };
 
-export const setAuthUser = (access_token, refresh_token) => {
-    Cookies.set('access_token', access_token, {
+export const setAuthUser = (accessToken, refreshToken) => {
+    Cookies.set('accessToken', accessToken, {
         expires: 1,
         secure: true,
     });
 
-    Cookies.set('refresh_token', refresh_token, {
+    Cookies.set('refreshToken', refreshToken, {
         expires: 7,
         secure: true,
     });
 
-    const user = jwtDecode(access_token) ?? null;
+    const user = jwtDecode(accessToken) ?? null;
 
     if (user) {
         useAuthStore.getState().setUser(user);
@@ -90,9 +90,9 @@ export const setAuthUser = (access_token, refresh_token) => {
     useAuthStore.getState().setLoading(false);
 };
 
-export const getRefreshToken = async (refresh_token) => {
+export const getRefreshToken = async (refreshToken) => {
     const response = await axios.post('token/refresh/', {
-        refresh: refresh_token,
+        refresh: refreshToken,
     });
 
     console.log(response.data, 'refresh token response');

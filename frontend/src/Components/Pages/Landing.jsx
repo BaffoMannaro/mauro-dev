@@ -12,6 +12,7 @@ import GetInTouch from '../Landing/GetInTouch';
 import Footer from '../Landing/Footer';
 import VideoSection from '../Landing/VideoSection';
 import Timer from '../Landing/Timer';
+import logo from '../../assets/images/Logo-home.mp4';
 
 export default function Landing() {
     const [activeAccordion, setActiveAccordion] = useState(false);
@@ -44,6 +45,17 @@ export default function Landing() {
             <div className="w-full relative">
                 <LottieATF />
             </div>
+            {/*  <div className="w-full h-screen absolute top-0 left-0 z-50 bg-red-700">
+                <video
+                    className="w-full h-screen object-cover"
+                    controls={false}
+                    playsInline
+                    src={logo}
+                    autoPlay
+                    muted
+                    loop
+                ></video>
+            </div> */}
             <header
                 className="min-h-screen flex flex-col  justify-end px-6 xl:px-12 relative overflow-x-hidden"
                 style={{

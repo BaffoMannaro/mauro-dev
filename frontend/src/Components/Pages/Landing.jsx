@@ -140,7 +140,10 @@ export default function Landing() {
                         Supero – Robotics & Automation Solutions for Industry
                     </h1>
                     <div className="mb-6 xl:mb-12 flex flex-col xl:flex-row">
-                        <button className="mb-4 xl:mb-0 xl:me-4 group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
+                        <a
+                            href="#landing-form"
+                            className="mb-4 xl:mb-0 xl:me-4 group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between"
+                        >
                             <span className="relative z-10">
                                 SEE AI IN ACTION
                             </span>
@@ -173,7 +176,7 @@ export default function Landing() {
                                     />
                                 </svg>
                             </div>
-                        </button>
+                        </a>
 
                         {/* <button className="group relative overflow-hidden bg-transparent text-white border border-white hover:bg-[#2E2E33]  hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
                             <span className="relative z-10">GET A DEMO</span>

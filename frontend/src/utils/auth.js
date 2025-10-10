@@ -91,7 +91,7 @@ export const setAuthUser = (accessToken, refreshToken) => {
 };
 
 export const getRefreshToken = async (refreshToken) => {
-    const response = await axios.post('token/refresh/', {
+    const response = await axios.post('users/token/refresh/', {
         refresh: refreshToken,
     });
 

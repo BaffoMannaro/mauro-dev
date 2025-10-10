@@ -25,6 +25,7 @@ import Login from './Components/Pages/Login';
 import Register from './Components/Pages/Register';
 import AdminPage from './Components/Pages/AdminPage';
 import Landing from './Components/Pages/Landing';
+import ThankYouPage from './Components/Pages/ThankYouPage';
 
 export const router = createBrowserRouter([
     {
@@ -35,6 +36,10 @@ export const router = createBrowserRouter([
             {
                 path: '/',
                 element: <Landing />,
+            },
+            {
+                path: '/thank-you-page',
+                element: <ThankYouPage />,
             },
             {
                 path: '/login',

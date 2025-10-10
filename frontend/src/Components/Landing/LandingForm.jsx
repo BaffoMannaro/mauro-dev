@@ -1,8 +1,34 @@
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import poly from '../../assets/images/poly.png';
+import { useNavigate } from 'react-router-dom';
 
 export default function LandingForm() {
+    const navigate = useNavigate();
+
+    const handleSubmit = async (values) => {
+        //submit form
+        console.log(values);
+
+        return;
+        const response = await fetch(
+            import.meta.env.VITE_BACKEND_URL + 'contact-form/',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values),
+            }
+        );
+
+        if (response.status == 200) {
+            navigate('/thank-you-page');
+        } else {
+            alert('Error submitting form.');
+        }
+    };
+
     return (
         <div
             id="landing-form"
@@ -74,11 +100,7 @@ export default function LandingForm() {
                         ),
                     })}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
-                        setTimeout(() => {
-                            alert(JSON.stringify(values, null, 2));
-                            setSubmitting(false);
-                            resetForm();
-                        }, 400);
+                        handleSubmit(values);
                     }}
                 >
                     {({ isSubmitting, values, errors, setFieldValue }) => (

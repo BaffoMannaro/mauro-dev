@@ -28,7 +28,7 @@ const Register = () => {
       ); */
 
             const response = await api.post(
-                'http://localhost:8000/api/register/',
+                'http://localhost:8000/users/register/',
                 {
                     username: email,
                     email,

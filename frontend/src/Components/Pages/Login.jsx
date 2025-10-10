@@ -23,7 +23,7 @@ export default function Login() {
     const handleLogin = async (values) => {
         try {
             const response = await api.post(
-                'http://localhost:8000/api/token/',
+                'http://localhost:8000/users/token/',
                 {
                     email: values.email,
                     password: values.password,

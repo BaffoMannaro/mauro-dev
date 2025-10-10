@@ -39,8 +39,10 @@ export default function AuthRoot() {
                 location.pathname.includes('forgot-password') ||
                 location.pathname.includes('complete-registration') ||
                 location.pathname.includes('register') ||
+                location.pathname.includes('login') ||
                 location.pathname.includes('check-your-email') ||
-                location.pathname.includes('confirm-email-change')
+                location.pathname.includes('confirm-email-change') ||
+                location.pathname.includes('thank-you-page')
             ) {
                 //pass
             } else {

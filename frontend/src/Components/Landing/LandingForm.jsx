@@ -10,7 +10,6 @@ export default function LandingForm() {
         //submit form
         console.log(values);
 
-        return;
         const response = await fetch(
             import.meta.env.VITE_BACKEND_URL + 'contact-form/',
             {

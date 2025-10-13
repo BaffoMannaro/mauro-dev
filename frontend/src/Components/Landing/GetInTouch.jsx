@@ -28,7 +28,10 @@ export default function GetInTouch() {
 
                 <div>
                     <p className="title text-center mb-8">
-                        Get in <span className="font-black">touch</span>
+                        Get in{' '}
+                        <span className="font-black font-stretch-125">
+                            touch
+                        </span>
                     </p>
 
                     <p className="text-supero-mid-grey text-body-l text-center">
@@ -38,7 +41,7 @@ export default function GetInTouch() {
                     </p>
 
                     <div className="mt-8 flex flex-col xl:flex-row justify-center w-full">
-                        <button className="mb-4 xl:mb-0 mx-2 group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between">
+                        <button className="mb-4 xl:mb-0 mx-2 group relative overflow-hidden bg-[#CCE535] border border-supero-green hover:bg-transparent text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between">
                             <span className="relative z-10">
                                 request consultation
                             </span>
@@ -85,7 +88,7 @@ export default function GetInTouch() {
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="absolute transition-all duration-300 transform group-hover:translate-x-6 group-hover:-translate-y-6 group-hover:opacity-0"
+                                    className="absolute transition-all duration-300 transform group-hover:-translate-y-6 group-hover:opacity-0"
                                 >
                                     <path
                                         d="M20 18.5V21.5H5V18.5H3.5V21.5C3.5 21.8978 3.65804 22.2794 3.93934 22.5607C4.22064 22.842 4.60218 23 5 23H20C20.3978 23 20.7794 22.842 21.0607 22.5607C21.342 22.2794 21.5 21.8978 21.5 21.5V18.5H20Z"
@@ -114,7 +117,7 @@ export default function GetInTouch() {
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="absolute transition-all duration-300 transform -translate-x-6 translate-y-6 opacity-0 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+                                    className="absolute transition-all duration-300 transform  translate-y-6 opacity-0  group-hover:translate-y-0 group-hover:opacity-100"
                                 >
                                     <path
                                         d="M20 18.5V21.5H5V18.5H3.5V21.5C3.5 21.8978 3.65804 22.2794 3.93934 22.5607C4.22064 22.842 4.60218 23 5 23H20C20.3978 23 20.7794 22.842 21.0607 22.5607C21.342 22.2794 21.5 21.8978 21.5 21.5V18.5H20Z"

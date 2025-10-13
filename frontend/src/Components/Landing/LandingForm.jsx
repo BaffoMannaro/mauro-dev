@@ -41,7 +41,7 @@ export default function LandingForm() {
             <div className="w-full xl:w-2/5">
                 <p className="title mb-6">
                     Does it <br className="hidden xl:block" />{' '}
-                    <span className="font-black">work </span>
+                    <span className="font-black font-stretch-125">work </span>
                     <br className="hidden xl:block" />
                     for you?
                 </p>
@@ -322,7 +322,7 @@ export default function LandingForm() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="mx-auto xl:ml-auto xl:mr-0 group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-24 xl:h-full"
+                                        className="mx-auto xl:ml-auto xl:mr-0 group relative overflow-hidden bg-supero-green hover:bg-transparent text-supero-dark-grey border border-transparent hover:text-supero-green hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-24 xl:h-full"
                                     >
                                         <div className="flex">
                                             <span className="relative z-10">
@@ -354,6 +354,7 @@ export default function LandingForm() {
                                                     <path
                                                         d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
                                                         fill="currentColor"
+                                                        className="group-hover:fill-supero-green"
                                                     />
                                                 </svg>
                                             </div>

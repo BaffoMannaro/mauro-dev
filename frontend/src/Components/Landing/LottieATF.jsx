@@ -48,16 +48,17 @@ const LottieATF = () => {
         <div
             id="lottie"
             style={{
-                width: '120vw',
-                height: '120vh',
+                width: '100vw',
+                height: '100vh',
                 backgroundColor: 'transparent',
                 display: 'block',
                 overflow: 'hidden',
                 position: 'absolute',
                 zIndex: 11,
-                top: window.innerWidth > 768 ? '0vh' : '-10vh',
-                right: window.innerWidth > 768 ? '0vw' : '0vw',
+                top: window.innerWidth > 768 ? '10vh' : '-20vh',
+                right: window.innerWidth > 768 ? '5vw' : '10vw',
                 pointerEvents: 'none',
+                overflowX: 'hidden',
             }}
         >
             <Lottie
@@ -65,10 +66,15 @@ const LottieATF = () => {
                 loop={true}
                 autoplay={true}
                 style={{
-                    width: '120vw',
-                    height: '120vh',
-                    transform: 'scale(2)',
-                    opacity: 1,
+                    width: '100vw',
+                    height: '100vh',
+                    transform:
+                        window.innerWidth > 768 ? 'scale(1.1)' : 'scale(1.3)',
+                    position: 'relative',
+
+                    right: window.innerWidth > 768 ? '0vw' : '20vw',
+                    /* opacity: 1,
+                    background: 'red', */
                 }}
             />
         </div>

@@ -73,8 +73,8 @@ export default function Footer() {
                             <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
                             <div>
                                 <img
-                                    src={pugliaSviluppo}
-                                    alt="Puglia Sviluppo Logo"
+                                    src={cofinanziato}
+                                    alt="Cofinanziato Logo"
                                 />
                             </div>
                             <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
@@ -89,7 +89,10 @@ export default function Footer() {
                                 />
                             </div>
                             <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
-                            <img src={cofinanziato} alt="Cofinanziato Logo" />
+                            <img
+                                src={pugliaSviluppo}
+                                alt="Puglia Sviluppo Logo"
+                            />
                         </div>
                     </div>
                     <div className="w-full xl:w-1/5">

@@ -178,7 +178,7 @@ export default function Landing() {
                     <div className="mb-6 xl:mb-12 flex flex-col xl:flex-row">
                         <a
                             href="#landing-form"
-                            className="mb-4 xl:mb-0 xl:me-4 group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between"
+                            className="mb-4 xl:mb-0 xl:me-4 group relative overflow-hidden bg-[#CCE535] hover:bg-transparent border border-supero-green hover:border-supero-green text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between"
                         >
                             <span className="relative z-10">
                                 SEE AI IN ACTION
@@ -273,7 +273,7 @@ export default function Landing() {
                 <div className="flex justify-center mt-12">
                     <a
                         href="#landing-form"
-                        className=" group relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider w-full xl:w-[250px] justify-between"
+                        className=" group relative overflow-hidden bg-[#CCE535] hover:bg-transparent border border-supero-green hover:border-supero-green text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider w-full xl:w-[250px] justify-between"
                     >
                         <span className="relative z-10">GET A DEMO</span>
 
@@ -617,7 +617,9 @@ export default function Landing() {
                             <p className="title">
                                 Developed <br /> to work, <br />
                                 powered to <br />{' '}
-                                <span className="font-black">perform.</span>
+                                <span className="font-black font-stretch-125 tracking-tight">
+                                    perform.
+                                </span>
                             </p>
 
                             <p className="text-body-l text-[#BABABF] my-12 max-w-[570px]">
@@ -631,7 +633,7 @@ export default function Landing() {
 
                             <a
                                 href="#landing-form"
-                                className="group  relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
+                                className="group  relative overflow-hidden bg-[#CCE535] hover:bg-transparent border border-supero-green hover:border-supero-green text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
                             >
                                 <span className="relative z-10">
                                     get a demo
@@ -676,7 +678,7 @@ export default function Landing() {
                             </p>
 
                             <p className="title">
-                                <span className="font-black block">
+                                <span className="font-black block font-stretch-125 tracking-tight">
                                     Let it do
                                 </span>
                                 the dirty work.
@@ -693,7 +695,7 @@ export default function Landing() {
 
                             <a
                                 href="#landing-form"
-                                className="group  relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
+                                className="group  relative overflow-hidden bg-[#CCE535] hover:bg-transparent border border-supero-green hover:border-supero-green text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
                             >
                                 <span className="relative z-10">
                                     GET A DEMO

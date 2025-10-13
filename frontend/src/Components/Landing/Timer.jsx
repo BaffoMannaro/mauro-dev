@@ -65,7 +65,7 @@ function Timer() {
                             'linear-gradient(-90deg, rgb(96, 96, 111) 0%, rgb(66, 66, 71) 100%)',
                     }}
                     key={interval}
-                    className="w-full md:w-1/2  lg:w-1/5 flex flex-col items-center  p-4 mb-5"
+                    className="w-full md:w-1/2  lg:w-[320px] flex flex-col items-center  p-4 mb-5 mx-2"
                 >
                     <span className="text-white text-6xl font-extrabold">
                         {timeLeft[interval]}
@@ -88,7 +88,7 @@ function Timer() {
             {timeLeft.expired ? (
                 ''
             ) : (
-                <div className="flex justify-evenly flex-wrap ">
+                <div className="flex justify-center flex-wrap ">
                     {timerComponents.length ? timerComponents : ''}
                 </div>
             )}

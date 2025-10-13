@@ -5,12 +5,13 @@ export default function HowItWorks() {
         <section className="w-full flex flex-wrap bg-[#434348]">
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
                 <p className="title my-6">
-                    How it <span className="font-black">works</span>
+                    How it{' '}
+                    <span className="font-black font-stretch-125">works</span>
                 </p>
 
                 <a
                     href="#landing-form"
-                    className="group  relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
+                    className="group  relative overflow-hidden bg-[#CCE535] hover:bg-transparent border border-supero-green  text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
                 >
                     <span className="relative z-10">start your project</span>
 

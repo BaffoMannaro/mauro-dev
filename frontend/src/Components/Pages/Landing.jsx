@@ -741,7 +741,7 @@ export default function Landing() {
                 </div>
             </section>
 
-            {/* <Timer /> */}
+            <Timer />
             <VideoSection />
             <PartnersSection />
 

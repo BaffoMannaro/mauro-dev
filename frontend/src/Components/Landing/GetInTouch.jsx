@@ -6,6 +6,29 @@ import blockRight from '../../../src/assets/images/block-right.png';
 import { Form, Formik } from 'formik';
 
 export default function GetInTouch() {
+    const handleSubmit = async (values) => {
+        try {
+            const response = await fetch(
+                import.meta.env.VITE_BACKEND_URL + 'newsletter-form/',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(values),
+                }
+            );
+
+            if (!response.status === 200) {
+                alert(
+                    'Failed to subscribe to the newsletter. Please try again.'
+                );
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
     return (
         <>
             <div className="w-full bg-supero-dark-grey px-12 pb-12 flex justify-center items-center relative h-[500px] overflow-x-hidden">
@@ -188,9 +211,7 @@ export default function GetInTouch() {
                                 .required('This field is required'),
                         })}
                         onSubmit={(values, { setSubmitting, resetForm }) => {
-                            console.log(values);
-                            setSubmitting(false);
-                            resetForm();
+                            handleSubmit(values);
                         }}
                     >
                         {({ isSubmitting, values, errors, setFieldValue }) => (

@@ -3,7 +3,7 @@ import landingArm from '../../assets/images/landing-arm.png';
 import product1 from '../../assets/images/product-1.png';
 import product2 from '../../assets/images/product-2.png';
 import LottieATF from '../Landing/LottieATF';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 import PartnersSection from '../Landing/PartnersSection';
 import HowItWorks from '../Landing/HowItWorks';
@@ -12,6 +12,8 @@ import GetInTouch from '../Landing/GetInTouch';
 import Footer from '../Landing/Footer';
 import VideoSection from '../Landing/VideoSection';
 import Timer from '../Landing/Timer';
+
+import VariableProximity from '../Landing/VariableProximity';
 import logo from '../../assets/images/Logo-home.mp4';
 
 export default function Landing() {
@@ -39,6 +41,8 @@ export default function Landing() {
                 'Smart algorithms generate robotic paths and adjust processes in real time.',
         },
     ];
+
+    const containerRef = useRef(null);
 
     return (
         <div className="">
@@ -140,14 +144,28 @@ export default function Landing() {
                 ></div>
 
                 <div className="relative z-[300]">
-                    <h2 className="text-white text-5xl md:text-6xl lg:text-[110px] font-semibold leading-tight group">
+                    {/*  <h2 className="text-white text-5xl md:text-6xl lg:text-[110px] font-semibold leading-tight group">
                         Technology <br />
                         that{' '}
                         <span className="font-extrabold inline-block group-hover:font-black group-hover:tracking-tight transition-all duration-300 font-stretch-125">
                             works
                         </span>{' '}
                         <br /> for you
-                    </h2>
+                    </h2> */}
+
+                    <div className="relative max-w-[700px]" ref={containerRef}>
+                        <VariableProximity
+                            label={'Technology that works for you'}
+                            className={
+                                'text-white text-5xl md:text-6xl lg:text-[110px] font-semibold leading-tight'
+                            }
+                            fromFontVariationSettings="'wght' 600, 'opsz' 9"
+                            toFontVariationSettings="'wght' 1000, 'opsz' 40"
+                            containerRef={containerRef}
+                            radius={100}
+                            falloff="linear"
+                        />
+                    </div>
                     <h1 className="text-supero-mid-grey uppercase text-[20px] my-12">
                         Supero – Robotics & Automation Solutions for Industry
                     </h1>

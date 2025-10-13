@@ -68,13 +68,13 @@ export default function Landing() {
                 }}
             >
                 <div className=" pt-5 absolute top-0 left-0 w-full z-[300]">
-                    <nav className="flex justify-between items-center px-2 xl:px-8 py-6 bg-[rgba(46,46,51,0.2)] backdrop-blur-[25px] rounded-lg mx-2 xl:mx-8">
+                    <nav className="flex justify-between items-center px-2 xl:px-8 py-[10px] lg:py-6 bg-[rgba(46,46,51,0.2)] backdrop-blur-[25px] rounded-lg mx-4 xl:mx-8">
                         {/* Logo */}
                         <div className="flex items-center">
                             <img
                                 src={logoNavbar}
                                 alt="Supero Logo"
-                                className="h-8"
+                                className="h-8 ms-1"
                             />
                         </div>
 
@@ -108,7 +108,7 @@ export default function Landing() {
                             <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
                             <a
                                 href="#landing-form"
-                                className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[16px] group"
+                                className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[14px] xl:text-[16px] group"
                             >
                                 <span>GET A DEMO</span>
                                 <svg
@@ -153,12 +153,18 @@ export default function Landing() {
                         <br /> for you
                     </h2> */}
 
-                    <div className="relative max-w-[700px]" ref={containerRef}>
+                    <div
+                        className="relative max-w-[300px] xl:max-w-[700px]"
+                        ref={containerRef}
+                    >
                         <VariableProximity
                             label={'Technology that works for you'}
                             className={
-                                'text-white text-5xl md:text-6xl lg:text-[110px] font-semibold leading-tight'
+                                'text-white text-6xl md:text-6xl lg:text-[110px] font-semibold leading-[48px] 2xl:leading-tight lett'
                             }
+                            style={{
+                                letterSpacing: '-4px',
+                            }}
                             fromFontVariationSettings="'wght' 600, 'opsz' 9"
                             toFontVariationSettings="'wght' 1000, 'opsz' 40"
                             containerRef={containerRef}
@@ -254,7 +260,7 @@ export default function Landing() {
                     <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                         smarter
                     </span>
-                    <br className="xl:hidden" /> - not harder.
+                    <br className="xl:hidden" /> — not harder.
                 </h3>
 
                 <p className="mt-6 xl:mt-12 max-w-[600px] mx-auto text-left xl:text-center text-body-l">

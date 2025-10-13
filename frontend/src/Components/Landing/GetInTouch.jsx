@@ -6,29 +6,6 @@ import blockRight from '../../../src/assets/images/block-right.png';
 import { Form, Formik } from 'formik';
 
 export default function GetInTouch() {
-    const handleSubmit = async (values) => {
-        try {
-            const response = await fetch(
-                import.meta.env.VITE_BACKEND_URL + 'newsletter-form/',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(values),
-                }
-            );
-
-            if (!response.status === 200) {
-                alert(
-                    'Failed to subscribe to the newsletter. Please try again.'
-                );
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
     return (
         <>
             <div className="w-full bg-supero-dark-grey px-12 pb-12 flex justify-center items-center relative h-[500px] overflow-x-hidden">
@@ -167,7 +144,7 @@ export default function GetInTouch() {
             </div>
 
             <div className="w-full px-4 xl:px-12 bg-supero-dark-grey flex flex-col xl:flex-row flex-wrap">
-                <div className="w-full xl:w-1/3 mb-8 xl:mb-0">
+                <div className="w-full xl:w-1/2 mb-8 xl:mb-0">
                     <p className="text-white opacity-70 text-body-l mb-4">
                         Via Giuseppe Sangiorgi, 15
                     </p>
@@ -178,7 +155,7 @@ export default function GetInTouch() {
                         P.IVA 08787910721
                     </p>
                 </div>
-                <div className="w-full xl:w-1/3 mb-8 xl:mb-0">
+                <div className="w-full xl:w-1/2 mb-8 xl:mb-0">
                     <a
                         href=""
                         className="block font-semibold text-body-l text-white mb-4"
@@ -197,64 +174,6 @@ export default function GetInTouch() {
                     >
                         Social
                     </a>
-                </div>
-                <div className="w-full xl:w-1/3 mb-8 xl:mb-0">
-                    <p className=" text-body-m mb-2">
-                        Subscribe to the newsletter
-                    </p>
-
-                    <Formik
-                        initialValues={{ email: '' }}
-                        validationSchema={Yup.object({
-                            email: Yup.string()
-                                .email('Invalid email address')
-                                .required('This field is required'),
-                        })}
-                        onSubmit={(values, { setSubmitting, resetForm }) => {
-                            handleSubmit(values);
-                        }}
-                    >
-                        {({ isSubmitting, values, errors, setFieldValue }) => (
-                            <Form className="w-full">
-                                <div className="flex">
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        placeholder="Email*"
-                                        className="w-full px-4 py-2.5 bg-[#434348] text-white rounded-l-sm focus:outline-none focus:ring-2 focus:ring-supero-green"
-                                        value={values.email}
-                                        onChange={(e) =>
-                                            setFieldValue(
-                                                'email',
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[12px] uppercase tracking-wider rounded-r-sm"
-                                    >
-                                        <span className="relative z-10 text-xs xl:text-base">
-                                            subscribe
-                                        </span>
-                                    </button>
-                                </div>
-                                {errors.email ? (
-                                    <div className="text-red-500 text-sm mt-1">
-                                        {errors.email}
-                                    </div>
-                                ) : null}
-                            </Form>
-                        )}
-                    </Formik>
-
-                    <p className="text-body-s opacity-70 mt-2">
-                        The information you provide through this form will be
-                        used in accordance with our privacy policy. If you wish
-                        to change or remove any information you provide through
-                        this form, please email tech@g-nous.com.
-                    </p>
                 </div>
             </div>
         </>

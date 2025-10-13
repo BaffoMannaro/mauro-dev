@@ -11,7 +11,7 @@ export default function LandingForm() {
         console.log(values);
 
         const response = await fetch(
-            import.meta.env.VITE_BACKEND_URL + 'contact-form/',
+            import.meta.env.VITE_BACKEND_URL + 'marketing/contact-form/',
             {
                 method: 'POST',
                 headers: {

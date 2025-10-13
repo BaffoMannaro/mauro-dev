@@ -21,18 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 env = environ.Env()
-environ.Env.read_env()
+environ.Env.read_env(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xmyy56c+#c$!7u^#8#&(egh&2_+or##y4+t)xps)i#zbhlw(5o'
+SECRET_KEY = env('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 # Application definition
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'users',
+    'marketing',
 ]
 
 MIDDLEWARE = [
@@ -188,11 +189,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+FRONTEND_URL = env('FRONTEND_URL', default='')
+ZAPIER_WEBHOOK_URL = env('ZAPIER_WEBHOOK_URL', default='')
+RECAPTCHA_PUBLIC_KEY = env('RECAPTCHA_PUBLIC_KEY', default='')
+RECAPTCHA_PRIVATE_KEY = env('RECAPTCHA_PRIVATE_KEY', default='')
+GDPR_LEGAL_VERSION = env('GDPR_LEGAL_VERSION', default='v1.0')
+
+SALESFORCE_USERNAME = env('SF_USERNAME', default='')
+SALESFORCE_PASSWORD = env('SF_PASSWORD', default='')
+SALESFORCE_SECURITY_TOKEN = env('SF_SECURITY_TOKEN', default='')
+
+GOOGLE_OAUTH_CLIENT_ID = env('CLIENT_ID', default='')
+GOOGLE_OAUTH_PROJECT_ID = env('PROJECT_ID', default='')
+GOOGLE_OAUTH_AUTH_URI = env('AUTH_URI', default='')
+GOOGLE_OAUTH_TOKEN_URI = env('TOKEN_URI', default='')
+GOOGLE_OAUTH_AUTH_PROVIDER = env('AUTH_PROVIDER', default='')
+GOOGLE_OAUTH_CLIENT_SECRET = env('CLIENT_SECRET', default='')
+GOOGLE_OAUTH_REDIRECT_URIS = env.list('REDIRECT_URIS', default=[])

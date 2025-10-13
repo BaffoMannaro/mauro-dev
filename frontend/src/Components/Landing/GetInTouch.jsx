@@ -9,7 +9,7 @@ export default function GetInTouch() {
     const handleSubmit = async (values) => {
         try {
             const response = await fetch(
-                import.meta.env.VITE_BACKEND_URL + 'newsletter-form/',
+                import.meta.env.VITE_BACKEND_URL + 'marketing/newsletter-form/',
                 {
                     method: 'POST',
                     headers: {

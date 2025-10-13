@@ -45,7 +45,7 @@ export default function Landing() {
             <div className="w-full relative">
                 <LottieATF />
             </div>
-            {/*  <div className="w-full h-screen absolute top-0 left-0 z-50 bg-red-700">
+            {/* <div className="w-full h-screen absolute top-0 left-0 z-50 ">
                 <video
                     className="w-full h-screen object-cover"
                     controls={false}

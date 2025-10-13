@@ -66,10 +66,9 @@ export default function Footer() {
                     <div className="w-full xl:w-4/5 xl:pe-12">
                         <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
                             <div>
-                                <img
-                                    src={cofinanziato}
-                                    alt="Cofinanziato Logo"
-                                />
+                                <div>
+                                    <img src={coesione} alt="Coesione Logo" />
+                                </div>
                             </div>
                             <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
                             <div>
@@ -90,9 +89,7 @@ export default function Footer() {
                                 />
                             </div>
                             <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
-                            <div>
-                                <img src={coesione} alt="Coesione Logo" />
-                            </div>
+                            <img src={cofinanziato} alt="Cofinanziato Logo" />
                         </div>
                     </div>
                     <div className="w-full xl:w-1/5">

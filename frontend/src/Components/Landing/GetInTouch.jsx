@@ -3,9 +3,11 @@ import * as Yup from 'yup';
 
 import blockLeft from '../../../src/assets/images/block-left.png';
 import blockRight from '../../../src/assets/images/block-right.png';
-import { Form, Formik } from 'formik';
-
+import { ErrorMessage, Field, Form, Formik } from 'formik';
+import { useState } from 'react';
+import modal from '../../assets/images/modal.png';
 export default function GetInTouch() {
+    const [showModal, setShowModal] = useState(false);
     return (
         <>
             <div className="w-full bg-supero-dark-grey px-12 pb-12 flex justify-center items-center relative h-[500px] overflow-x-hidden">
@@ -41,7 +43,10 @@ export default function GetInTouch() {
                     </p>
 
                     <div className="mt-8 flex flex-col xl:flex-row justify-center w-full">
-                        <button className="mb-4 xl:mb-0 mx-2 group relative overflow-hidden bg-[#CCE535] border border-supero-green hover:bg-transparent text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between">
+                        <a
+                            href="#landing-form"
+                            className="mb-4 xl:mb-0 mx-2 group relative overflow-hidden bg-[#CCE535] border border-supero-green hover:bg-transparent text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between"
+                        >
                             <span className="relative z-10">
                                 request consultation
                             </span>
@@ -74,9 +79,12 @@ export default function GetInTouch() {
                                     />
                                 </svg>
                             </div>
-                        </button>
+                        </a>
 
-                        <button className="mx-2 group relative overflow-hidden bg-transparent text-white border border-white hover:bg-[#2E2E33]  hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between">
+                        <button
+                            onClick={() => setShowModal(true)}
+                            className="mx-2 group relative overflow-hidden bg-transparent text-white border border-white hover:bg-[#2E2E33]  hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between"
+                        >
                             <span className="relative z-10">
                                 download brochure
                             </span>
@@ -179,6 +187,251 @@ export default function GetInTouch() {
                     </a>
                 </div>
             </div>
+
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-black flex flex-wrap rounded-xl max-w-[95%] lg:max-w-[1200px]  w-full relative h-[830px]">
+                        <button
+                            onClick={() => setShowModal(false)}
+                            className="absolute top-2 right-2 z-10 "
+                        >
+                            <svg
+                                width="40"
+                                height="40"
+                                viewBox="0 0 40 40"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M21.7676 20L32.5 9.26763L30.7324 7.5L20 18.2324L9.26788 7.5L7.5 9.26763L18.2324 20L7.5 30.7324L9.26788 32.5L20 21.7676L30.7324 32.5L32.5 30.7324L21.7676 20Z"
+                                    fill="#fff"
+                                />
+                            </svg>
+                        </button>
+
+                        <div
+                            className="w-full xl:w-1/2 min-h-[250px] p-8 xl:rounded-tl-xl xl:rounded-bl-xl relative"
+                            style={{
+                                backgroundImage: `url(${modal})`,
+                                backgroundSize:
+                                    window.innerWidth > 768
+                                        ? '600px 830px'
+                                        : 'cover',
+                                backgroundPosition: 'center',
+                            }}
+                        >
+                            <p className="xl:hidden title absolute bottom-8">
+                                Make <br />
+                                Technology <br />
+                                Work
+                            </p>
+                        </div>
+                        <div
+                            className="w-full xl:w-1/2 p-8"
+                            style={{
+                                background:
+                                    'linear-gradient(0deg, #626271, #2e2e33)',
+                            }}
+                        >
+                            <p className="hidden xl:block title mb-8">
+                                Make <br />
+                                Technology <br />
+                                Work
+                            </p>
+                            <p className="text-supero-mid-grey uppercase text-body-m mb-12">
+                                Download our 4-Step Guide <br /> to Industrial
+                                Automation
+                            </p>
+                            <Formik
+                                initialValues={{
+                                    name: '',
+                                    email: '',
+
+                                    privacy: false,
+                                    marketing: false,
+                                }}
+                                validationSchema={Yup.object({
+                                    name: Yup.string().required(
+                                        'Name is required'
+                                    ),
+                                    email: Yup.string()
+                                        .email('Invalid email address')
+                                        .required('Email is required'),
+
+                                    privacy: Yup.boolean().oneOf(
+                                        [true],
+                                        'You must accept the privacy policy'
+                                    ),
+                                    marketing: Yup.boolean(),
+                                })}
+                                onSubmit={(values, { setSubmitting }) => {
+                                    setTimeout(() => {
+                                        setSubmitting(false);
+                                        setShowModal(false);
+                                    }, 400);
+                                }}
+                            >
+                                {({
+                                    values,
+                                    errors,
+                                    touched,
+                                    handleChange,
+                                    handleBlur,
+                                    handleSubmit,
+                                    isSubmitting,
+                                    setFieldValue,
+                                }) => (
+                                    <Form onSubmit={handleSubmit}>
+                                        <div className="mb-4 w-full px-2">
+                                            <label
+                                                htmlFor="name"
+                                                className="text-[#a6a6ab] text-body-s mb-2 block"
+                                            >
+                                                Company Name*
+                                            </label>
+                                            <Field
+                                                name="name"
+                                                type="text"
+                                                placeholder="Insert"
+                                                className="w-full bg-[#2E2E33] py-2 px-4 text-white"
+                                            />
+                                            <ErrorMessage
+                                                name="name"
+                                                component="div"
+                                                className="text-red-400 text-sm mt-2"
+                                            />
+                                        </div>
+
+                                        <div className="mb-4 w-full px-2">
+                                            <label
+                                                htmlFor="email"
+                                                className="text-[#a6a6ab] text-body-s mb-2 block"
+                                            >
+                                                Email *
+                                            </label>
+                                            <Field
+                                                name="email"
+                                                type="email"
+                                                placeholder="Insert"
+                                                className="w-full bg-[#2E2E33] py-2 px-4 text-white"
+                                            />
+                                            <ErrorMessage
+                                                name="email"
+                                                component="div"
+                                                className="text-red-400 text-sm mt-2"
+                                            />
+                                        </div>
+
+                                        <div className="mb-8 w-full flex flex-wrap px-2">
+                                            <div className="w-full xl:w-1/2">
+                                                <div
+                                                    className="flex cursor-pointer"
+                                                    onClick={() => {
+                                                        setFieldValue(
+                                                            'privacy',
+                                                            !values.privacy
+                                                        );
+                                                    }}
+                                                >
+                                                    <div>
+                                                        <div
+                                                            className={
+                                                                'h-5 w-5 border rounded-sm me-3 ' +
+                                                                (values.privacy
+                                                                    ? ' bg-slate-400 '
+                                                                    : '')
+                                                            }
+                                                        ></div>
+                                                    </div>
+                                                    <p className="text-body-s">
+                                                        I declared that I have
+                                                        read the privacy
+                                                        policy*.
+                                                    </p>
+                                                </div>
+
+                                                <ErrorMessage
+                                                    name="privacy"
+                                                    component="div"
+                                                    className="text-red-400 text-sm mt-2"
+                                                />
+
+                                                <div
+                                                    className="flex cursor-pointer mt-4"
+                                                    onClick={() => {
+                                                        setFieldValue(
+                                                            'marketing',
+                                                            !values.marketing
+                                                        );
+                                                    }}
+                                                >
+                                                    <div>
+                                                        <div
+                                                            className={
+                                                                'h-5 w-5 border rounded-sm me-3 ' +
+                                                                (values.marketing
+                                                                    ? ' bg-slate-400 '
+                                                                    : '')
+                                                            }
+                                                        ></div>
+                                                    </div>
+                                                    <p className="text-body-s">
+                                                        I agree to receive
+                                                        marketing
+                                                        communications.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className=" group relative overflow-hidden bg-supero-green hover:bg-transparent text-supero-dark-grey border border-transparent hover:text-supero-green hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] w-full xl:w-fit  xl:h-full"
+                                        >
+                                            <div className="flex">
+                                                <span className="relative z-10">
+                                                    download guide
+                                                </span>
+
+                                                <div className="relative w-6 h-6 overflow-hidden transform rotate-90 ms-5">
+                                                    <svg
+                                                        width="24"
+                                                        height="24"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="absolute transition-all duration-300 transform group-hover:translate-x-6 group-hover:-translate-y-6 group-hover:opacity-0"
+                                                    >
+                                                        <path
+                                                            d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
+                                                            fill="currentColor"
+                                                        />
+                                                    </svg>
+                                                    <svg
+                                                        width="24"
+                                                        height="24"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="absolute transition-all duration-300 transform -translate-x-6 translate-y-6 opacity-0 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+                                                    >
+                                                        <path
+                                                            d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
+                                                            fill="currentColor"
+                                                            className="group-hover:fill-supero-green"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

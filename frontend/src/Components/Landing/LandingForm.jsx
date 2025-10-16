@@ -17,7 +17,10 @@ export default function LandingForm() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(values),
+                body: JSON.stringify({
+                    ...values,
+                    recaptcha_token: import.meta.env.VITE_RECAPTCHA_PUBLIC_KEY,
+                }),
             }
         );
 

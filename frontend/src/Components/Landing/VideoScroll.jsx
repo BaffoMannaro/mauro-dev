@@ -1,4 +1,5 @@
 import arm from '../../assets/images/arm.mp4';
+import videoMobile from '../../assets/images/9-16.mp4';
 import { useEffect, useRef, useCallback } from 'react';
 
 export default function VideoScroll() {
@@ -18,8 +19,6 @@ export default function VideoScroll() {
         const containerHeight = containerRect.height;
         const windowHeight = window.innerHeight;
 
-        // Calcola la percentuale di scroll del video nel viewport
-        // Il video inizia quando entra nel viewport e finisce quando esce
         const scrollStart = windowHeight;
         const scrollEnd = -containerHeight;
         const scrollRange = scrollStart - scrollEnd;
@@ -28,15 +27,12 @@ export default function VideoScroll() {
             Math.min(1, (scrollStart - containerTop) / scrollRange)
         );
 
-        // Imposta il tempo del video basato sulla progressione dello scroll
         if (video.duration) {
             const targetTime = scrollProgress * video.duration;
 
-            // Smooth interpolation per transizioni più fluide
             const currentTime = video.currentTime;
             const timeDiff = targetTime - currentTime;
 
-            // Se la differenza è piccola, applica interpolazione
             if (Math.abs(timeDiff) < 0.1) {
                 video.currentTime = currentTime + timeDiff * 0.1;
             } else {
@@ -47,14 +43,13 @@ export default function VideoScroll() {
 
     useEffect(() => {
         const handleScroll = () => {
-            // Throttling con requestAnimationFrame per performance migliori
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
             }
 
             animationFrameRef.current = requestAnimationFrame(() => {
                 const now = performance.now();
-                // Limita gli aggiornamenti a 60fps
+
                 if (now - lastScrollTimeRef.current >= 16) {
                     updateVideoTime();
                     lastScrollTimeRef.current = now;
@@ -62,13 +57,10 @@ export default function VideoScroll() {
             });
         };
 
-        // Aggiungi event listener per lo scroll con passive per performance
         window.addEventListener('scroll', handleScroll, { passive: true });
 
-        // Chiama handleScroll una volta per impostare la posizione iniziale
         handleScroll();
 
-        // Cleanup
         return () => {
             window.removeEventListener('scroll', handleScroll);
             if (animationFrameRef.current) {
@@ -83,7 +75,7 @@ export default function VideoScroll() {
                 className="w-full object-contain"
                 controls={false}
                 playsInline
-                src={arm}
+                src={window.innerWidth < 1280 ? videoMobile : arm}
                 muted
                 preload="metadata"
                 controlsList="nodownload"

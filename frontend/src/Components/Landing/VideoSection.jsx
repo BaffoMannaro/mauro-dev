@@ -1,7 +1,8 @@
 import video from '../../assets/images/video-promo.mp4';
 import poster from '../../assets/images/poster-video.png';
-import arm from '../../assets/images/arm.mp4';
+
 import { useState, useRef } from 'react';
+import VideoScroll from './VideoScroll';
 
 export default function VideoSection() {
     const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -117,19 +118,11 @@ export default function VideoSection() {
                     playsInline
                     src={video}
                     poster={poster}
+                    controlsList="nodownload"
                 ></video>
             </div>
 
-            <video
-                className="w-full object-contain"
-                controls={false}
-                playsInline
-                src={arm}
-                loop
-                autoPlay
-                muted
-                controlsList="nodownload"
-            ></video>
+            <VideoScroll />
         </>
     );
 }

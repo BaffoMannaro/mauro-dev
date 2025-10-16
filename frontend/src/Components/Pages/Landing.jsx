@@ -769,11 +769,10 @@ export default function Landing() {
 
             <Timer />
             <VideoSection />
-            <PartnersSection />
 
             <HowItWorks />
             <LandingForm />
-
+            <PartnersSection />
             <GetInTouch />
             <Footer />
         </div>

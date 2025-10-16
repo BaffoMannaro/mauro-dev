@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 function Timer() {
     const targetDate = new Date();
     targetDate.setMonth(10);
-    targetDate.setDate(8);
+    targetDate.setDate(27);
     targetDate.setHours(0, 0, 0, 0);
 
     if (targetDate.getTime() < new Date().getTime()) {

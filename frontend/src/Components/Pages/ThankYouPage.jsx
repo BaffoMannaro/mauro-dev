@@ -3,7 +3,6 @@ import Footer from '../Landing/Footer';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 export default function ThankYouPage() {
-    const navigate = useNavigate();
     return (
         <>
             <div className="min-h-screen pt-24 bg-supero-dark-grey flex flex-col items-center justify-center bg-typ">
@@ -27,7 +26,7 @@ export default function ThankYouPage() {
                         href="#landing-form"
                         className="group  relative overflow-hidden bg-[#CCE535] hover:bg-transparent border border-supero-green hover:border-supero-green text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
                     >
-                        <span className="relative z-10">Learn mode</span>
+                        <span className="relative z-10">Learn more</span>
 
                         <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
                             <svg

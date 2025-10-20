@@ -6,8 +6,54 @@ import blockRight from '../../../src/assets/images/block-right.png';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { useState } from 'react';
 import modal from '../../assets/images/modal.png';
+
+import brochure from '../../assets/brochure-supero.pdf';
+import { useNavigate } from 'react-router-dom';
+
 export default function GetInTouch() {
     const [showModal, setShowModal] = useState(false);
+
+    const navigate = useNavigate();
+
+    const handleSubmit = async (values) => {
+        try {
+            const response = await fetch(
+                import.meta.env.VITE_BACKEND_URL + 'marketing/brochure-form/',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...values,
+                        recaptcha_token: import.meta.env
+                            .VITE_RECAPTCHA_PUBLIC_KEY,
+                    }),
+                }
+            );
+
+            if (response.status === 200) {
+                // Handle successful response
+                console.log('Form submitted successfully');
+                setShowModal(false);
+
+                // trigger file download
+                const link = document.createElement('a');
+                link.href = brochure;
+                link.download = 'brochure-supero.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                navigate('/thank-you-page?from=brochure');
+            } else {
+                // Handle error response
+                console.error('Error submitting form');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
     return (
         <>
             <div className="w-full bg-supero-dark-grey px-12 pb-12 flex justify-center items-center relative h-[500px] overflow-x-hidden">
@@ -265,10 +311,8 @@ export default function GetInTouch() {
                                     marketing: Yup.boolean(),
                                 })}
                                 onSubmit={(values, { setSubmitting }) => {
-                                    setTimeout(() => {
-                                        setSubmitting(false);
-                                        setShowModal(false);
-                                    }, 400);
+                                    handleSubmit(values);
+                                    setSubmitting(false);
                                 }}
                             >
                                 {({
@@ -277,11 +321,11 @@ export default function GetInTouch() {
                                     touched,
                                     handleChange,
                                     handleBlur,
-                                    handleSubmit,
+
                                     isSubmitting,
                                     setFieldValue,
                                 }) => (
-                                    <Form onSubmit={handleSubmit}>
+                                    <Form>
                                         <div className="mb-4 w-full px-2">
                                             <label
                                                 htmlFor="name"

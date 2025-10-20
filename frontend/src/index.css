@@ -70,3 +70,23 @@ body {
     background-position: center;
     background-repeat: no-repeat;
 }
+
+
+
+.video-scroll-container {
+
+    height: 400vh;
+    position: relative;
+}
+
+.video-fixed-wrapper {
+
+    position: sticky;
+    top: 0;
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}

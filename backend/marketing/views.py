@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from django.conf import settings
 
 from .models import Contact, GDPRConsent
-from .serializers import ContactFormSerializer
+from .serializers import BrochureFormSerializer, ContactFormSerializer
 from .services import post_to_zapier, send_to_salesforce, verify_recaptcha
 
 
@@ -57,6 +57,22 @@ class ContactFormView(APIView):
         send_to_salesforce("contact_form", payload)
 
         return Response({"message": "Contact request received.", "language": contact.language}, status=status.HTTP_200_OK)
+
+
+class BrochureFormView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = BrochureFormSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        recaptcha_token = serializer.validated_data.get("recaptcha_token", "")
+        if recaptcha_token and not verify_recaptcha(recaptcha_token):
+            return Response({"detail": "reCAPTCHA validation failed."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "Brochure request received."}, status=status.HTTP_200_OK)
+
+
 def normalize_contact_payload(payload: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """
     Map frontend field names (camelCase / booleans per service, etc.) to serializer fields.
@@ -117,6 +133,8 @@ def normalize_contact_payload(payload: Dict[str, Any]) -> Tuple[Dict[str, Any], 
     }
 
     return normalized, snapshot
+
+
 def to_snake_case(name: str) -> str:
     name = name.replace("-", "_").replace(" ", "_")
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()

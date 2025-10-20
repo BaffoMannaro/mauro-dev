@@ -24,3 +24,16 @@ class ContactFormSerializer(serializers.ModelSerializer):
         if not attrs.get("privacy_consent"):
             raise serializers.ValidationError({"privacy_consent": "Consent is required to submit the form."})
         return attrs
+
+
+class BrochureFormSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    email = serializers.EmailField()
+    privacy = serializers.BooleanField()
+    marketing = serializers.BooleanField(required=False, default=False)
+    recaptcha_token = serializers.CharField(write_only=True, allow_blank=True, required=False)
+
+    def validate_privacy(self, value):
+        if not value:
+            raise serializers.ValidationError("Consent is required to download the brochure.")
+        return value

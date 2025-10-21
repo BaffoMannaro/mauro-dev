@@ -236,7 +236,7 @@ export default function GetInTouch() {
 
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-black flex flex-wrap rounded-xl max-w-[95%] lg:max-w-[1200px]  w-full relative h-[830px]">
+                    <div className="bg-black flex flex-wrap rounded-xl max-w-[95%] lg:max-w-[1200px]  w-full relative max-h-[90vh] xl:h-[830px] overflow-y-scroll">
                         <button
                             onClick={() => setShowModal(false)}
                             className="absolute top-2 right-2 z-10 "

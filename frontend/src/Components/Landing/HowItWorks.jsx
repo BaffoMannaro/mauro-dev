@@ -56,9 +56,12 @@ export default function HowItWorks() {
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Problem Analysis</p>
                             <p className="text-body-m text-[#BABABF]">
-                                We carefully examine your production process to
-                                identify inefficiencies and opportunities for
-                                automation.
+                                Understanding the process to unlock efficiency.{' '}
+                                <br />
+                                We study your workflow in detail, identifying
+                                friction points, repetitive tasks, and
+                                opportunities where automation can deliver real
+                                performance gains.
                             </p>
                         </div>
                     </Fade>
@@ -72,9 +75,11 @@ export default function HowItWorks() {
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Requirement Collection</p>
                             <p className="text-body-m text-[#BABABF]">
-                                We collect all the necessary information about
-                                your goals, constraints, and operational needs
-                                to define a tailored solution.
+                                From challenges to measurable goals. <br />
+                                We define every operational need — targets,
+                                constraints, materials, and cycles — translating
+                                them into technical requirements for a precise
+                                solution design.
                             </p>
                         </div>
                     </Fade>
@@ -86,11 +91,11 @@ export default function HowItWorks() {
                     >
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="title-xs">Solution Design</p>
+                            <p className="title-xs">Technology at work</p>
                             <p className="text-body-m text-[#BABABF]">
-                                We create a detailed plan that integrates
-                                collaborative robotics, software, and processes
-                                to optimize productivity and safety.
+                                We integrate robotics, software, and process
+                                control into one functional system — engineered
+                                to perform, optimized to last.
                             </p>
                         </div>
                     </Fade>
@@ -102,11 +107,11 @@ export default function HowItWorks() {
                     >
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="title-xs">Tech R&D</p>
+                            <p className="title-xs">Deployment & Validation</p>
                             <p className="text-body-m text-[#BABABF]">
-                                We experiment and test advanced technologies to
-                                ensure high performance and innovative
-                                solutions.
+                                Our team manages setup, calibration, and
+                                validation directly on-site, ensuring the system
+                                runs reliably under real production conditions.
                             </p>
                         </div>
                     </Fade>
@@ -118,27 +123,13 @@ export default function HowItWorks() {
                     >
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="title-xs">Deployment & Testing</p>
-                            <p className="text-body-m text-[#BABABF]">
-                                We install and configure the solution,
-                                performing rigorous tests to guarantee flawless
-                                operation in your production environment.
-                            </p>
-                        </div>
-                    </Fade>
-
-                    <Fade
-                        direction="up"
-                        delay={600}
-                        className="relative mb-12 xl:mb-4"
-                    >
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
-                        <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Business Integration</p>
                             <p className="text-body-m text-[#BABABF]">
-                                We support your team during adoption, training,
-                                and continuous optimization, turning automation
-                                into a tangible advantage.
+                                Automation that becomes part of your workflow.{' '}
+                                <br />
+                                We train your team, monitor data, and optimize
+                                performance over time — turning technology into
+                                a concrete, measurable advantage.
                             </p>
                         </div>
                     </Fade>

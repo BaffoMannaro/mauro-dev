@@ -90,3 +90,26 @@ body {
     align-items: center;
     overflow: hidden;
 }
+
+
+
+
+::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

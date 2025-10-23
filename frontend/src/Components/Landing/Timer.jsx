@@ -78,12 +78,12 @@ function Timer() {
 
     return (
         <div className="w-full  bg-supero-dark-grey pb-32 px-4">
-            <p className="title text-center mb-24">
-                Discover us at{' '}
+            <p className="text-3xl xl:text-6xl font-bold text-white text-center mb-12 xl:mb-24">
+                Meet Supero Finish at{' '}
                 <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                     MecSpe
                 </span>{' '}
-                in
+                Bari 2025 in
             </p>
             {timeLeft.expired ? (
                 ''

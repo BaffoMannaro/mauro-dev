@@ -80,31 +80,6 @@ export default function Landing() {
 
                         {/* Navigation Menu */}
                         <div className="flex items-center xl:space-x-8 ">
-                            {/*  <a
-                                href="#about"
-                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                            >
-                                About
-                            </a>
-                            <a
-                                href="#applications"
-                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                            >
-                                Applications
-                            </a>
-                            <a
-                                href="#how-it-works"
-                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                            >
-                                How it works
-                            </a>
-                            <a
-                                href="#contact"
-                                className="hidden xl:block text-white hover:text-supero-green transition-colors duration-200 text-[18px] relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-supero-green after:transition-all after:duration-200 hover:after:w-full"
-                            >
-                                Contact
-                            </a> */}
-
                             <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
                             <a
                                 href="#landing-form"
@@ -264,10 +239,11 @@ export default function Landing() {
                 </h3>
 
                 <p className="mt-6 xl:mt-12 max-w-[600px] mx-auto text-left xl:text-center text-body-l">
-                    From repetition to risk, production tasks can burden teams.{' '}
-                    Supero integrates collaborative robots, 3D vision, and
-                    easy-to-use software to automate processes—boosting quality,
-                    throughput, and safety.
+                    From repetition to risk, production tasks can burden teams.
+                    Our Supero Finish platform integrates both collaborative and
+                    industrial robotic solutions, 3D vision, and easy-to-use
+                    software to automate processes—boosting quality, throughput,
+                    and safety.
                 </p>
 
                 <div className="flex justify-center mt-12">
@@ -623,12 +599,12 @@ export default function Landing() {
                             </p>
 
                             <p className="text-body-l text-[#BABABF] my-12 max-w-[570px]">
-                                Supero's collaborative robotic stations bring
-                                speed, consistency, and scalability to
-                                manufacturing. From sanding and coating to
-                                palletizing, they ensure higher quality, stable
-                                throughput, and measurable efficiency—ready to
-                                grow with your production needs.
+                                Supero's robotic solutions bring speed,
+                                consistency, and scalability to manufacturing.
+                                From sanding and coating to welding, they ensure
+                                higher quality, stable throughput, and
+                                measurable efficiency—ready to grow with your
+                                production needs.
                             </p>
 
                             <a
@@ -674,7 +650,7 @@ export default function Landing() {
                     <div className="w-full flex flex-wrap items-center pb-12 mb-8">
                         <div className="w-full xl:w-1/2 px-4 xl:px-12">
                             <p className="text-supero-mid-grey uppercase text-body-m mb-12">
-                                what can you do with Supero today
+                                What can you do with our Supero platform today
                             </p>
 
                             <p className="title">
@@ -733,18 +709,19 @@ export default function Landing() {
 
                             <div className="hidden xl:block">
                                 <p className="text-supero-mid-grey uppercase text-[20px] mt-24">
-                                    What will You do with supero tomorrow?
+                                    What will you be able to do with our Supero
+                                    platform tomorrow?
                                 </p>
 
                                 <p className="text-supero-mid-grey text-[20px]">
-                                    Coating <span className="mx-2">|</span>{' '}
-                                    Spraying <span className="mx-2">|</span>{' '}
-                                    Palletising
+                                    Painting <span className="mx-2">|</span>{' '}
+                                    Inspection <span className="mx-2">|</span>{' '}
+                                    Welding
                                 </p>
                             </div>
                         </div>
 
-                        <div className="w-full xl:w-1/2 px-4 xl:px-12 pt-8 xl:pt-32">
+                        <div className="w-full xl:w-1/2 px-4 xl:px-12 ">
                             <img
                                 src={product2}
                                 alt="robot arm"
@@ -753,13 +730,14 @@ export default function Landing() {
 
                             <div className="xl:hidden">
                                 <p className="text-supero-mid-grey uppercase text-body-m mt-12">
-                                    What will You do with supero tomorrow?
+                                    What will you be able to do with our Supero
+                                    platform tomorrow?
                                 </p>
 
                                 <p className="text-supero-mid-grey text-body-s">
-                                    Coating <span className="mx-2">|</span>{' '}
-                                    Spraying <span className="mx-2">|</span>{' '}
-                                    Palletising
+                                    Painting <span className="mx-2">|</span>{' '}
+                                    Inspection <span className="mx-2">|</span>{' '}
+                                    Welding
                                 </p>
                             </div>
                         </div>

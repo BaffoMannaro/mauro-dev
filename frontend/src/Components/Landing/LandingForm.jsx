@@ -152,9 +152,9 @@ export default function LandingForm() {
                                     Which application are you interested in?*
                                 </label>
 
-                                <div className="flex justify-between flex-wrap gap-4">
+                                <div className="flex justify-between flex-wrap ">
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'sanding',
@@ -174,7 +174,7 @@ export default function LandingForm() {
                                     </div>
 
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'polishing',
@@ -194,7 +194,7 @@ export default function LandingForm() {
                                     </div>
 
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'painting',
@@ -214,7 +214,7 @@ export default function LandingForm() {
                                     </div>
 
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'other',

@@ -42,14 +42,17 @@ def verify_recaptcha(token: str) -> bool:
 
 
 def post_to_zapier(event_type: str, payload: Dict[str, Any]) -> bool:
-    """Send payload to Zapier webhook if configured."""
-    if not settings.ZAPIER_WEBHOOK_URL:
-        logger.debug("ZAPIER_WEBHOOK_URL not configured; skipping Zapier notification.")
+    """Send payload to the Zapier webhook configured for the given event."""
+    webhook_urls = getattr(settings, "ZAPIER_WEBHOOK_URLS", {}) or {}
+    webhook_url = webhook_urls.get(event_type) or getattr(settings, "ZAPIER_WEBHOOK_URL", "")
+
+    if not webhook_url:
+        logger.debug("No Zapier webhook configured for event %s; skipping notification.", event_type)
         return False
 
     body = {"event_type": event_type, "payload": payload}
     try:
-        response = requests.post(settings.ZAPIER_WEBHOOK_URL, json=body, timeout=10)
+        response = requests.post(webhook_url, json=body, timeout=10)
         response.raise_for_status()
         logger.info("Zapier webhook delivered for %s.", event_type)
         return True

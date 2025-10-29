@@ -66,9 +66,25 @@ class BrochureFormView(APIView):
         serializer = BrochureFormSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        recaptcha_token = serializer.validated_data.get("recaptcha_token", "")
+        validated_data = serializer.validated_data
+
+        recaptcha_token = validated_data.get("recaptcha_token", "")
         if recaptcha_token and not verify_recaptcha(recaptcha_token):
             return Response({"detail": "reCAPTCHA validation failed."}, status=status.HTTP_400_BAD_REQUEST)
+
+        form_snapshot = serialize_payload(request.data)
+        form_snapshot.pop("recaptcha_token", None)
+
+        payload = {
+            "name": (validated_data.get("name", "") or "").strip(),
+            "email": (validated_data.get("email", "") or "").strip(),
+            "privacy_consent": bool(validated_data.get("privacy", False)),
+            "marketing_consent": bool(validated_data.get("marketing", False)),
+            "requested_at": timezone.now().isoformat(),
+            "form_snapshot": form_snapshot,
+        }
+
+        post_to_zapier("brochure_form", payload)
 
         return Response({"message": "Brochure request received."}, status=status.HTTP_200_OK)
 

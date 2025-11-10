@@ -42,7 +42,8 @@ export default function AuthRoot() {
                 location.pathname.includes('login') ||
                 location.pathname.includes('check-your-email') ||
                 location.pathname.includes('confirm-email-change') ||
-                location.pathname.includes('thank-you-page')
+                location.pathname.includes('thank-you-page') ||
+                location.pathname.includes('comunicato-stampa-rebranding')
             ) {
                 //pass
             } else {

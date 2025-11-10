@@ -26,6 +26,7 @@ import Register from './Components/Pages/Register';
 import AdminPage from './Components/Pages/AdminPage';
 import Landing from './Components/Pages/Landing';
 import ThankYouPage from './Components/Pages/ThankYouPage';
+import PressRelease from './Components/Pages/PressRelease';
 
 export const router = createBrowserRouter([
     {
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
             {
                 path: '/thank-you-page',
                 element: <ThankYouPage />,
+            },
+            {
+                path: '/comunicato-stampa-rebranding',
+                element: <PressRelease />,
             },
             {
                 path: '/login',

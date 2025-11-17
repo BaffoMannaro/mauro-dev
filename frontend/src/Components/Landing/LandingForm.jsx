@@ -57,7 +57,7 @@ export default function LandingForm() {
                 </p>
             </div>
 
-            <div className="w-full xl:w-3/5 p-4 xl:p-12 text-white">
+            <div className="w-full xl:w-3/5 py-4 xl:p-12 text-white">
                 <Formik
                     initialValues={{
                         companyName: '',
@@ -107,7 +107,7 @@ export default function LandingForm() {
                 >
                     {({ isSubmitting, values, errors, setFieldValue }) => (
                         <Form className="flex flex-wrap xl:p-8 text-white w-full">
-                            <div className="mb-8 w-full xl:w-1/2 px-2">
+                            <div className="mb-8 w-full xl:w-1/2">
                                 <label
                                     htmlFor="companyName"
                                     className="text-[#a6a6ab] text-body-s mb-2 block"
@@ -127,7 +127,7 @@ export default function LandingForm() {
                                 />
                             </div>
 
-                            <div className="mb-8 w-full xl:w-1/2 px-2">
+                            <div className="mb-8 w-full xl:w-1/2">
                                 <label
                                     htmlFor="email"
                                     className="text-[#a6a6ab] text-body-s mb-2 block"
@@ -241,7 +241,7 @@ export default function LandingForm() {
                                 />
                             </div>
 
-                            <div className="mb-8 w-full px-2">
+                            <div className="mb-8 w-full">
                                 <label
                                     htmlFor="message"
                                     className="text-[#a6a6ab] text-body-s mb-2 block"

@@ -19,7 +19,7 @@ export default function VideoSection() {
         <>
             <div className=" bg-supero-dark-grey relative flex flex-col items-center justify-center">
                 <div className="px-4 xl:hidden">
-                    <p className="title mb-2">
+                    <p className="title text-4xl mb-4">
                         Finishing made easy. <br />
                         <span className="hidden xl:inline">
                             Watch it at work

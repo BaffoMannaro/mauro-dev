@@ -20,7 +20,7 @@ export default function Footer() {
                 className="mx-auto block relative bottom-[-1px]"
             />
 
-            <div className="bg-[#434348] py-12 px-12">
+            <div className="bg-[#434348] py-12 px-4 xl:px-12">
                 <div className="w-full flex justify-around flex-wrap">
                     <div className="w-full xl:w-4/5 xl:pe-12">
                         <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
@@ -61,7 +61,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="bg-[#434348] py-12 px-12">
+            <div className="bg-[#434348] py-12 px-4 xl:px-12">
                 <div className="w-full flex items-center justify-around flex-wrap">
                     <div className="w-full xl:w-4/5 xl:pe-12">
                         <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">

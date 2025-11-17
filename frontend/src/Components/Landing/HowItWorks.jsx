@@ -46,13 +46,13 @@ export default function HowItWorks() {
                 </a>
             </div>
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
-                <div className="mb-0  text-white max-w-[512px] relative after:content-[''] after:absolute after:w-[2px] after:h-full after:left-[-4px] xl:after:left-[-40px] after:top-0 after:bg-supero-green">
+                <div className="mb-0  text-white max-w-[512px] relative after:content-[''] after:absolute after:w-[2px] after:h-full after:left-[2px] xl:after:left-[-40px] after:top-0 after:bg-supero-green">
                     <Fade
                         direction="up"
                         delay={100}
                         className="relative mb-12 xl:mb-4"
                     >
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Problem Analysis</p>
                             <p className="text-body-m text-[#BABABF]">
@@ -71,7 +71,7 @@ export default function HowItWorks() {
                         delay={200}
                         className="relative mb-12 xl:mb-4"
                     >
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Requirement Collection</p>
                             <p className="text-body-m text-[#BABABF]">
@@ -89,7 +89,7 @@ export default function HowItWorks() {
                         delay={300}
                         className="relative mb-12 xl:mb-4"
                     >
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Technology at work</p>
                             <p className="text-body-m text-[#BABABF]">
@@ -105,7 +105,7 @@ export default function HowItWorks() {
                         delay={400}
                         className="relative mb-12 xl:mb-4"
                     >
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Deployment & Validation</p>
                             <p className="text-body-m text-[#BABABF]">
@@ -121,7 +121,7 @@ export default function HowItWorks() {
                         delay={500}
                         className="relative mb-12 xl:mb-4"
                     >
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Business Integration</p>
                             <p className="text-body-m text-[#BABABF]">

@@ -107,7 +107,7 @@ export default function LandingForm() {
                 >
                     {({ isSubmitting, values, errors, setFieldValue }) => (
                         <Form className="flex flex-wrap xl:p-8 text-white w-full">
-                            <div className="mb-8 w-full xl:w-1/2">
+                            <div className="mb-8 w-full xl:w-1/2 xl:px-2">
                                 <label
                                     htmlFor="companyName"
                                     className="text-[#a6a6ab] text-body-s mb-2 block"
@@ -127,7 +127,7 @@ export default function LandingForm() {
                                 />
                             </div>
 
-                            <div className="mb-8 w-full xl:w-1/2">
+                            <div className="mb-8 w-full xl:w-1/2 xl:px-2">
                                 <label
                                     htmlFor="email"
                                     className="text-[#a6a6ab] text-body-s mb-2 block"

@@ -214,22 +214,28 @@ export default function GetInTouch() {
                 </div>
                 <div className="w-full xl:w-1/2 mb-8 xl:mb-0">
                     <a
-                        href=""
+                        href="https://youtube.com/@supero.robotics"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="block font-semibold text-body-l text-white mb-4"
                     >
                         Youtube
                     </a>
                     <a
-                        href=""
+                        href="https://www.linkedin.com/company/supero-gnous-tech-robotics/"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="block font-semibold text-body-l text-white mb-4"
                     >
                         LinkedIn
                     </a>
                     <a
-                        href=""
+                        href="https://www.instagram.com/supero.robotics/"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="block font-semibold text-body-l text-white mb-4"
                     >
-                        Social
+                        Instagram
                     </a>
                 </div>
             </div>

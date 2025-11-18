@@ -50,7 +50,7 @@ export const router = createBrowserRouter([
                 path: '/login',
                 element: <Login />,
             },
-            {
+            /*  {
                 path: '/register',
                 element: <Register />,
             },
@@ -71,10 +71,7 @@ export const router = createBrowserRouter([
                         path: '/dashboard/',
                         element: <Home />,
                     },
-                    /*  {
-                        path: '/dashboard/profile-page',
-                        element: <ProfilePage />,
-                    }, */
+                  
                     {
                         path: '/dashboard/buttons/',
                         element: <Buttons />,
@@ -117,7 +114,7 @@ export const router = createBrowserRouter([
                         ),
                     },
                 ],
-            },
+            }, */
         ],
     },
 ]);

@@ -314,10 +314,10 @@ export default function LandingForm() {
                                             personal data in order to receive
                                             e-mail communications, including
                                             newsletters, relating to initiatives
-                                            organised or co-organised by G-nous
-                                            Tech. Personal data may be used for
-                                            the purposes indicated in the
-                                            privacy policy.
+                                            organised or co-organised by Supero.
+                                            Personal data may be used for the
+                                            purposes indicated in the privacy
+                                            policy.
                                         </p>
                                     </div>
                                 </div>

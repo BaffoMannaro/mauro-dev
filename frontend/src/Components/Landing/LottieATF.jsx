@@ -69,7 +69,7 @@ const LottieATF = () => {
                     width: '100vw',
                     height: '100vh',
                     transform:
-                        window.innerWidth > 768 ? 'scale(1.1)' : 'scale(1.3)',
+                        window.innerWidth > 768 ? 'scale(1)' : 'scale(1.3)',
                     position: 'relative',
 
                     right: window.innerWidth > 768 ? '0vw' : '20vw',

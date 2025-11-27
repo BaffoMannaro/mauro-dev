@@ -83,15 +83,15 @@ function Timer() {
                 <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                     MecSpe
                 </span>{' '}
-                Bari 2025 in
+                Bari 2025
             </p>
-            {timeLeft.expired ? (
+            {/* {timeLeft.expired ? (
                 ''
             ) : (
                 <div className="flex justify-center flex-wrap ">
                     {timerComponents.length ? timerComponents : ''}
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

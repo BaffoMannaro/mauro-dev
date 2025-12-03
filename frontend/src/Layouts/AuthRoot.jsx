@@ -9,6 +9,7 @@ import useAuthStore from '../Stores/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import useSidebarStore from '../Stores/sidebarStore';
+import GTMTracker from '../Components/GTMTracker';
 /* import Navbar from '../Components/Navbar'; */
 
 export default function AuthRoot() {
@@ -54,6 +55,7 @@ export default function AuthRoot() {
 
     return loading ? null : (
         <>
+            <GTMTracker />
             <ScrollRestoration />
             <Toaster position="top-center" />
             <Outlet />

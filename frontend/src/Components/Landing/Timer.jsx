@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 
 function Timer() {
     const targetDate = new Date();
-    targetDate.setMonth(10);
-    targetDate.setDate(27);
+    targetDate.setMonth(3);
+    targetDate.setDate(4);
     targetDate.setHours(0, 0, 0, 0);
 
     if (targetDate.getTime() < new Date().getTime()) {
@@ -83,15 +83,15 @@ function Timer() {
                 <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                     MecSpe
                 </span>{' '}
-                Bari 2025
+                Bologna 2026
             </p>
-            {/* {timeLeft.expired ? (
+             {timeLeft.expired ? (
                 ''
             ) : (
                 <div className="flex justify-center flex-wrap ">
                     {timerComponents.length ? timerComponents : ''}
                 </div>
-            )} */}
+            )}
         </div>
     );
 }

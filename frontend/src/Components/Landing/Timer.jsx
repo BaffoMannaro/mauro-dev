@@ -4,11 +4,12 @@ function Timer() {
     const targetDate = new Date();
     targetDate.setMonth(3);
     targetDate.setDate(4);
+    targetDate.setFullYear(2026);
     targetDate.setHours(0, 0, 0, 0);
 
-    if (targetDate.getTime() < new Date().getTime()) {
+    /* if (targetDate.getTime() < new Date().getTime()) {
         targetDate.setFullYear(targetDate.getFullYear() + 1);
-    }
+    } */
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 

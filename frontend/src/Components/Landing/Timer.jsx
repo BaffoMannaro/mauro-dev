@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 function Timer() {
     const targetDate = new Date();
-    targetDate.setMonth(3);
+    targetDate.setMonth(2);
     targetDate.setDate(4);
     targetDate.setFullYear(2026);
     targetDate.setHours(0, 0, 0, 0);

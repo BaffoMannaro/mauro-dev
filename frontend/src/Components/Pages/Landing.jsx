@@ -662,9 +662,9 @@ export default function Landing() {
                                 </p>
 
                                 <p className="text-supero-mid-grey text-[20px]">
-                                    Painting <span className="mx-2">|</span>{' '}
-                                    Inspection <span className="mx-2">|</span>{' '}
-                                    Welding
+                                    {t('painting')} <span className="mx-2">|</span>{' '}
+                                    {t('inspection')} <span className="mx-2">|</span>{' '}
+                                    {t('welding')}
                                 </p>
                             </div>
                         </div>

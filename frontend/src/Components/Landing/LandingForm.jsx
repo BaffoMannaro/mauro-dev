@@ -52,7 +52,7 @@ export default function LandingForm() {
                     for you?
                 </p>
 
-                <p className="text-supero-mid-grey text-body-l mt-12">
+                <p className="text-supero-mid-grey text-body-l mt-12 whitespace-pre-line">
                     {t('does_it_work')}
                 </p>
             </div>
@@ -117,7 +117,7 @@ export default function LandingForm() {
                                 <Field
                                     name="companyName"
                                     type="text"
-                                    placeholder="Insert"
+                                    placeholder={t('insert')}
                                     className="w-full bg-[#121212] py-2 px-4 "
                                 />
                                 <ErrorMessage
@@ -170,7 +170,7 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Sanding</p>
+                                        <p>{t('sanding')}</p>
                                     </div>
 
                                     <div
@@ -190,7 +190,7 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Polishing</p>
+                                        <p>{t('polishing')}</p>
                                     </div>
 
                                     <div
@@ -210,7 +210,7 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Painting</p>
+                                        <p>{t('painting')}</p>
                                     </div>
 
                                     <div
@@ -230,7 +230,7 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Other</p>
+                                        <p>{t('other')}</p>
                                     </div>
                                 </div>
 
@@ -246,13 +246,13 @@ export default function LandingForm() {
                                     htmlFor="message"
                                     className="text-[#a6a6ab] text-body-s mb-2 block"
                                 >
-                                    Tell us more
+                                    {t('tell_us')}
                                 </label>
                                 <Field
                                     name="message"
                                     as="textarea"
                                     rows="4"
-                                    placeholder="Write something"
+                                    placeholder={t('write_something')}
                                     className="w-full bg-[#121212] py-2 px-4 resize-none"
                                 />
                             </div>

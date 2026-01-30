@@ -84,7 +84,7 @@ export default function GetInTouch() {
                         </span>
                     </p>
 
-                    <p className="text-supero-mid-grey text-body-l text-center">
+                    <p className="text-supero-mid-grey text-body-l text-center whitespace-pre-line">
                         {t('get_in_touch')}
                     </p>
 

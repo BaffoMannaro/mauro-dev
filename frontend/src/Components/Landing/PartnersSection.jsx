@@ -13,15 +13,17 @@ import uniba from '../../assets/images/partners/uniba.png';
 import ur from '../../assets/images/partners/ur.png';
 import wenglor from '../../assets/images/partners/wenglor.png';
 import zivid from '../../assets/images/partners/zivid.png';
+import { useTranslation } from 'react-i18next';
 
 export default function PartnersSection() {
+    const { t } = useTranslation();
     return (
         <>
             <div className="bg-supero-dark-grey flex flex-col xl:flex-row xl:justify-around py-12">
                 <div className="w-full xl:w-1/4 px-8 flex justify-center items-center relative ">
                     <div className="hidden xl:block absolute top-0 -right-12 w-[1px] h-full bg-supero-mid-grey"></div>
                     <div className="w-full flex justify-center items-center flex-col">
-                        <p className="text-center text-white">We are</p>
+                        <p className="text-center text-white">{t('we_are')}</p>
                         <img src={urLogo} alt="ur" />
                     </div>
                 </div>
@@ -32,7 +34,7 @@ export default function PartnersSection() {
                 <div className="w-full xl:w-3/4 xl:max-w-[870px] flex flex-row items-center xl:flex-wrap px-8 overflow-x-scroll overflow-y-hidden">
                     <div className="hidden xl:block w-full my-12">
                         <p className="text-white text-center">
-                            Proud partners of
+                            {t('proud_partners')}
                         </p>
                     </div>
                     {/*  <div className="w-full min-w-[180px] xl:w-1/3 max-w-[280px] 2xl:max-w-[440px] h-[122px] 2xl:h-[140px] flex justify-center items-center hover:bg-[#424247] me-8 xl:me-0">

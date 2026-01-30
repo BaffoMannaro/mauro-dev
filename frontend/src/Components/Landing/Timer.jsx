@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 function Timer() {
+    const { t } = useTranslation();
     const targetDate = new Date();
     targetDate.setMonth(2);
     targetDate.setDate(4);
@@ -80,7 +82,7 @@ function Timer() {
     return (
         <div className="w-full  bg-supero-dark-grey pb-32 px-4">
             <p className="text-3xl xl:text-6xl font-bold text-white text-center mb-12 xl:mb-24">
-                Meet Supero Finish at{' '}
+                {t('meet_supero')} {' '}
                 <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                     MecSpe
                 </span>{' '}

@@ -6,8 +6,8 @@ export default function HowItWorks() {
         <section className="w-full flex flex-wrap bg-[#434348]">
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
                 <p className="title my-6">
-                    How it{' '}
-                    <span className="font-black font-stretch-125">works</span>
+                    {t('how_it')}{' '}
+                    <span className="font-black font-stretch-125">{t('works')}</span>
                 </p>
 
                 <a
@@ -56,7 +56,7 @@ export default function HowItWorks() {
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Problem Analysis</p>
-                            <p className="text-body-m text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
                                 {t('problem_analysis')}
                             </p>
                         </div>
@@ -70,7 +70,7 @@ export default function HowItWorks() {
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Requirement Collection</p>
-                            <p className="text-body-m text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
                                 {t('requirement_collection')}
                             </p>
                         </div>
@@ -84,7 +84,7 @@ export default function HowItWorks() {
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Technology at work</p>
-                            <p className="text-body-m text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
                                 {t('tech_r&d')}
                             </p>
                         </div>
@@ -98,7 +98,7 @@ export default function HowItWorks() {
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Deployment & Validation</p>
-                            <p className="text-body-m text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
                                 {t('deployment_testing')}
                             </p>
                         </div>
@@ -112,7 +112,7 @@ export default function HowItWorks() {
                         <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Business Integration</p>
-                            <p className="text-body-m text-[#BABABF]">
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
                                 {t('business_integration')}
                             </p>
                         </div>

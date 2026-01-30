@@ -31,5 +31,9 @@
     "sensor_description": "I sensori 3D ad alta precisione garantiscono un'analisi accurata della superficie e una qualità di finitura costante.",
     "ai_description": "Algoritmi intelligenti generano percorsi robotici e regolano i processi in tempo reale.",
     "custom_end_effectors_description": "Strumenti su misura si adattano a superfici complesse e esigenze specifiche di finitura.",
-    "easy_configuration_description": "Un'interfaccia web intuitiva rende semplice e immediato configurare, controllare e monitorare."
+    "easy_configuration_description": "Un'interfaccia web intuitiva rende semplice e immediato configurare, controllare e monitorare.",
+    "days": "giorni",
+    "hours": "ore",
+    "minutes": "minuti",
+    "seconds": "secondi"
 }

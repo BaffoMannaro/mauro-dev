@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 function Timer() {
+    const { t } = useTranslation();
+
     const targetDate = new Date();
     targetDate.setMonth(2);
     targetDate.setDate(4);
@@ -47,10 +50,10 @@ function Timer() {
     const timerComponents = [];
 
     const labels = {
-        days: 'Days',
-        hours: 'Hours',
-        minutes: 'Minutes',
-        seconds: 'Seconds',
+        days: t('days'),
+        hours: t('hours'),
+        minutes: t('minutes'),
+        seconds: t('seconds'),
     };
 
     Object.keys(timeLeft).forEach((interval) => {
@@ -86,7 +89,7 @@ function Timer() {
                 </span>{' '}
                 Bologna 2026
             </p>
-             {timeLeft.expired ? (
+            {timeLeft.expired ? (
                 ''
             ) : (
                 <div className="flex justify-center flex-wrap ">

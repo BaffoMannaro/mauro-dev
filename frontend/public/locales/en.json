@@ -31,5 +31,9 @@
     "sensor_description": "High-precision 3D sensors ensure accurate surface analysis and consistent finishing quality.",
     "ai_description": "Smart algorithms generate robotic paths and adjust processes in real time.",
     "custom_end_effectors_description": "Tailor-made tools adapt to complex surfaces and specific finishing needs.",
-    "easy_configuration_description": "A user-friendly web interface makes setup, control, and monitoring simple and intuitive."
+    "easy_configuration_description": "A user-friendly web interface makes setup, control, and monitoring simple and intuitive.",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
 }

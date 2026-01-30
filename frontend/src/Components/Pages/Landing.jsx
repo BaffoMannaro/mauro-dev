@@ -205,7 +205,7 @@ export default function Landing() {
                     <br className="xl:hidden" /> — not harder.
                 </h3>
 
-                <p className="mt-6 xl:mt-12 max-w-[600px] mx-auto text-left xl:text-center text-body-l">
+                <p className="mt-6 xl:mt-12 max-w-[700px] mx-auto text-left xl:text-center text-body-l whitespace-pre-line">
                     {t('working_description')}
                 </p>
 
@@ -456,14 +456,14 @@ export default function Landing() {
                                 />
                             </svg>
                             <p
-                                className="text-[24px] text-white font-bold uppercase group-hover:text-supero-green text-left"
+                                className="text-[24px] text-white font-bold uppercase group-hover:text-supero-green text-right"
                                 style={{
                                     fontFeatureSettings: "'ss01' on",
                                     fontStretch: '80',
                                     fontVariationSettings: "'slnt' 0",
                                 }}
                             >
-                                {t('easy_configuration')}
+                                 {t('easy_configuration')}
                             </p>
                         </div>
                         <div className="text-white mt-4 text-left w-[270px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -512,7 +512,7 @@ export default function Landing() {
                                 />
                             </svg>
                             <p
-                                className="text-[24px] text-white font-bold uppercase group-hover:text-supero-green text-left"
+                                className="text-[24px] text-white font-bold uppercase group-hover:text-supero-green text-right"
                                 style={{
                                     fontFeatureSettings: "'ss01' on",
                                     fontStretch: '80',
@@ -662,9 +662,9 @@ export default function Landing() {
                                 </p>
 
                                 <p className="text-supero-mid-grey text-[20px]">
-                                    {t('painting')} <span className="mx-2">|</span>{' '}
-                                    {t('inspection')} <span className="mx-2">|</span>{' '}
-                                    {t('welding')}
+                                    {t('grinding')} <span className="mx-2">|</span>{' '}
+                                    {t('welding')} <span className="mx-2">|</span>{' '}
+                                    {t('inspection')}
                                 </p>
                             </div>
                         </div>

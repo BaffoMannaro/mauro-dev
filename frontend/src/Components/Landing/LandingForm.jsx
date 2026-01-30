@@ -321,7 +321,7 @@ export default function LandingForm() {
                                     >
                                         <div className="flex">
                                             <span className="relative z-10">
-                                                send
+                                                {t('send')}
                                             </span>
 
                                             <div className="relative w-6 h-6 overflow-hidden transform rotate-90">

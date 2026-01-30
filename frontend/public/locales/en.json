@@ -1,7 +1,7 @@
 {
     "payoff": "Supero - robotic automation solutions for industry",
     "why_intergrate": "Why integrate intelligent robotics?",
-    "working_description": "From repetitiveness to risk, production activities can be a burden for teams. Supero integrates collaborative robots, 3D vision, and easy-to-use software to automate processes, improving quality, productivity, and safety.",
+    "working_description": "From repetitiveness to risk, production activities can be a burden for teams.\n Supero integrates collaborative and industrial robots, 3D vision, and easy-to-use software to automate processes, improving quality, productivity, and safety.",
     "advanced_sensors": "Advanced sensors",
     "artificial_intelligence": "Artificial intelligence",
     "custom_end_effectors": "Customised end-effectors",
@@ -11,6 +11,7 @@
     "let_it_do_description": "Supero automates the heavy, repetitive tasks that slow production down. With an intuitive interface that guides every phase—from start to stop—operators manage processes with ease. The result: fewer errors, safer workflows, and higher quality at scale.",
     "what_you_will_do_tomorrow": "What will you be able to do with our Supero platform tomorrow?",
     "sanding": "Sanding",
+    "grinding": "Grinding",
     "polishing": "Polishing",
     "painting": "Painting",
     "inspection": "Inspection",
@@ -37,11 +38,14 @@
     "insert": "Insert",
     "tell_us": "Tell us more",
     "write_something": "Write something...",
-    "get_in_touch": "Ready to see how collaborative robotics can transform your production? \nLet’s talk about your challenges and design the right solution together.",
-    "banded_with": "Bando a Cascata “Future Artificial Intelligence Research-FAIR” finanziato nell’ambito dell’Avviso n. 341 del 15.03.2022 Piano Nazionale di Ripresa e Resilienza (PNRR), Missione 4 Componente 2 “Dalla Ricerca all’Impresa” Linea di Investimento 1.3 ” Finanziato dall’Unione Europea – NextGenerationEU",
-    "intervent_cofinanced": "Intervento cofinanziato dall’U.E. a valere sul PR Puglia FESR-FSE+ 2021-2027 FONDO TECNONIDI",
+    "get_in_touch": "Ready to see how robotics can transform your production? \nLet’s talk about your challenges and design the right solution together.",
+    "banded_with": "Cascade Call “Future Artificial Intelligence Research-FAIR” funded under Call No. 341 of 15 March 2022, National Recovery and Resilience Plan (PNRR), Mission 4, Component 2 “From Research to Business”, Investment Line 1.3, funded by the European Union – NextGenerationEU",
+    "intervent_cofinanced": "Intervention co-financed by the European Union under the Puglia ERDF ESF+ Regional Programme 2021–2027 – TECNONIDI Fund",
     "privacy_policy": "I declared that I have read the privacy policy*.",
     "marketing_consent": "I consent to the processing of my personal data in order to receive e-mail communications, including newsletters, relating to initiatives organised or co-organised by Supero. Personal data may be used for the purposes indicated in the privacy policy.",
+    "marketing_consent_short": "I agree to receive marketing communications.",
+    "download_4_guide": "Download our 4-Step Guide \n to Industrial Automation",
+    "request_consultation": "Request Consultation",
     "sensor_description": "High-precision 3D sensors ensure accurate surface analysis and consistent finishing quality.",
     "ai_description": "Smart algorithms generate robotic paths and adjust processes in real time.",
     "custom_end_effectors_description": "Tailor-made tools adapt to complex surfaces and specific finishing needs.",
@@ -49,5 +53,6 @@
     "days": "days",
     "hours": "hours",
     "minutes": "minutes",
-    "seconds": "seconds"
+    "seconds": "seconds",
+    "send": "Send"
 }

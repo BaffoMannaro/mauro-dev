@@ -94,7 +94,7 @@ export default function GetInTouch() {
                             className="mb-4 xl:mb-0 mx-2 group relative overflow-hidden bg-[#CCE535] border border-supero-green hover:bg-transparent text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[12px] xl:text-[16px] uppercase tracking-wider min-w-[280px] justify-between"
                         >
                             <span className="relative z-10">
-                                request consultation
+                                {t('request_consultation')}
                             </span>
 
                             <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
@@ -290,9 +290,8 @@ export default function GetInTouch() {
                                 Technology <br />
                                 Work
                             </p>
-                            <p className="text-supero-mid-grey uppercase text-body-m mb-12">
-                                Download our 4-Step Guide <br /> to Industrial
-                                Automation
+                            <p className="text-supero-mid-grey uppercase text-body-m mb-12 whitespace-pre-line">
+                                {t('download_4_guide')}
                             </p>
                             <Formik
                                 initialValues={{
@@ -342,7 +341,7 @@ export default function GetInTouch() {
                                             <Field
                                                 name="name"
                                                 type="text"
-                                                placeholder="Insert"
+                                                placeholder={t('insert')}
                                                 className="w-full bg-[#2E2E33] py-2 px-4 text-white"
                                             />
                                             <ErrorMessage
@@ -362,7 +361,7 @@ export default function GetInTouch() {
                                             <Field
                                                 name="email"
                                                 type="email"
-                                                placeholder="Insert"
+                                                placeholder={t('insert')}
                                                 className="w-full bg-[#2E2E33] py-2 px-4 text-white"
                                             />
                                             <ErrorMessage
@@ -394,7 +393,7 @@ export default function GetInTouch() {
                                                         ></div>
                                                     </div>
                                                     <p className="text-body-s">
-                                                        {t('privacy_consent')}
+                                                        {t('privacy_policy')}
                                                     </p>
                                                 </div>
 
@@ -424,7 +423,7 @@ export default function GetInTouch() {
                                                         ></div>
                                                     </div>
                                                     <p className="text-body-s">
-                                                        {t('marketing_consent')}
+                                                        {t('marketing_consent_short')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -437,7 +436,7 @@ export default function GetInTouch() {
                                         >
                                             <div className="flex">
                                                 <span className="relative z-10">
-                                                    download guide
+                                                    download brochure
                                                 </span>
 
                                                 <div className="relative w-6 h-6 overflow-hidden transform rotate-90 ms-5">

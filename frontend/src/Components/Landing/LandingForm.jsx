@@ -2,9 +2,12 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import poly from '../../assets/images/poly.png';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function LandingForm() {
     const navigate = useNavigate();
+
+    const { t } = useTranslation();
 
     const handleSubmit = async (values) => {
         //submit form
@@ -50,10 +53,7 @@ export default function LandingForm() {
                 </p>
 
                 <p className="text-supero-mid-grey text-body-l mt-12">
-                    Want to know more? <br className="hidden xl:block" /> Fill
-                    out the form to find out how we can help{' '}
-                    <br className="hidden xl:block" /> you transform your
-                    business.
+                    {t('does_it_work')}
                 </p>
             </div>
 
@@ -112,7 +112,7 @@ export default function LandingForm() {
                                     htmlFor="companyName"
                                     className="text-[#a6a6ab] text-body-s mb-2 block"
                                 >
-                                    Company Name*
+                                    {t('company_name')}*
                                 </label>
                                 <Field
                                     name="companyName"
@@ -149,7 +149,7 @@ export default function LandingForm() {
 
                             <div className="mb-8 w-full px-2">
                                 <label className="text-[#a6a6ab] text-body-m mb-2 block">
-                                    Which application are you interested in?*
+                                    {t('which_product')}
                                 </label>
 
                                 <div className="flex justify-between flex-wrap ">
@@ -279,8 +279,7 @@ export default function LandingForm() {
                                             ></div>
                                         </div>
                                         <p className="text-body-s">
-                                            I declared that I have read the
-                                            privacy policy*.
+                                            {t('privacy_policy')}
                                         </p>
                                     </div>
 
@@ -310,14 +309,7 @@ export default function LandingForm() {
                                             ></div>
                                         </div>
                                         <p className="text-body-s">
-                                            I consent to the processing of my
-                                            personal data in order to receive
-                                            e-mail communications, including
-                                            newsletters, relating to initiatives
-                                            organised or co-organised by Supero.
-                                            Personal data may be used for the
-                                            purposes indicated in the privacy
-                                            policy.
+                                            {t('marketing_consent')}
                                         </p>
                                     </div>
                                 </div>

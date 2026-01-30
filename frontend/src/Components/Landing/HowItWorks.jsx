@@ -1,6 +1,7 @@
 import { Fade } from 'react-awesome-reveal';
-
+import { useTranslation } from 'react-i18next';
 export default function HowItWorks() {
+    const { t } = useTranslation();
     return (
         <section className="w-full flex flex-wrap bg-[#434348]">
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
@@ -56,12 +57,7 @@ export default function HowItWorks() {
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Problem Analysis</p>
                             <p className="text-body-m text-[#BABABF]">
-                                Understanding the process to unlock efficiency.{' '}
-                                <br />
-                                We study your workflow in detail, identifying
-                                friction points, repetitive tasks, and
-                                opportunities where automation can deliver real
-                                performance gains.
+                                {t('problem_analysis')}
                             </p>
                         </div>
                     </Fade>
@@ -75,11 +71,7 @@ export default function HowItWorks() {
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Requirement Collection</p>
                             <p className="text-body-m text-[#BABABF]">
-                                From challenges to measurable goals. <br />
-                                We define every operational need — targets,
-                                constraints, materials, and cycles — translating
-                                them into technical requirements for a precise
-                                solution design.
+                                {t('requirement_collection')}
                             </p>
                         </div>
                     </Fade>
@@ -93,9 +85,7 @@ export default function HowItWorks() {
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Technology at work</p>
                             <p className="text-body-m text-[#BABABF]">
-                                We integrate robotics, software, and process
-                                control into one functional system — engineered
-                                to perform, optimized to last.
+                                {t('tech_r&d')}
                             </p>
                         </div>
                     </Fade>
@@ -109,9 +99,7 @@ export default function HowItWorks() {
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Deployment & Validation</p>
                             <p className="text-body-m text-[#BABABF]">
-                                Our team manages setup, calibration, and
-                                validation directly on-site, ensuring the system
-                                runs reliably under real production conditions.
+                                {t('deployment_testing')}
                             </p>
                         </div>
                     </Fade>
@@ -125,11 +113,7 @@ export default function HowItWorks() {
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Business Integration</p>
                             <p className="text-body-m text-[#BABABF]">
-                                Automation that becomes part of your workflow.{' '}
-                                <br />
-                                We train your team, monitor data, and optimize
-                                performance over time — turning technology into
-                                a concrete, measurable advantage.
+                                {t('business_integration')}
                             </p>
                         </div>
                     </Fade>

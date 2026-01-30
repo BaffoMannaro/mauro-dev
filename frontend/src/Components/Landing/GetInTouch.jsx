@@ -9,9 +9,11 @@ import modal from '../../assets/images/modal.png';
 
 import brochure from '../../assets/brochure-supero.pdf';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function GetInTouch() {
     const [showModal, setShowModal] = useState(false);
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
 
@@ -83,9 +85,7 @@ export default function GetInTouch() {
                     </p>
 
                     <p className="text-supero-mid-grey text-body-l text-center">
-                        Ready to see how collaborative robotics can transform
-                        your production? <br /> Let’s talk about your challenges
-                        and design the right solution together.
+                        {t('get_in_touch')}
                     </p>
 
                     <div className="mt-8 flex flex-col xl:flex-row justify-center w-full">
@@ -337,7 +337,7 @@ export default function GetInTouch() {
                                                 htmlFor="name"
                                                 className="text-[#a6a6ab] text-body-s mb-2 block"
                                             >
-                                                Company Name*
+                                                {t('company_name')} *
                                             </label>
                                             <Field
                                                 name="name"
@@ -394,9 +394,7 @@ export default function GetInTouch() {
                                                         ></div>
                                                     </div>
                                                     <p className="text-body-s">
-                                                        I declared that I have
-                                                        read the privacy
-                                                        policy*.
+                                                        {t('privacy_consent')}
                                                     </p>
                                                 </div>
 
@@ -426,9 +424,7 @@ export default function GetInTouch() {
                                                         ></div>
                                                     </div>
                                                     <p className="text-body-s">
-                                                        I agree to receive
-                                                        marketing
-                                                        communications.
+                                                        {t('marketing_consent')}
                                                     </p>
                                                 </div>
                                             </div>

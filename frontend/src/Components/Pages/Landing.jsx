@@ -14,31 +14,30 @@ import VideoSection from '../Landing/VideoSection';
 import Timer from '../Landing/Timer';
 
 import VariableProximity from '../Landing/VariableProximity';
-import logo from '../../assets/images/Logo-home.mp4';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../Atoms/LanguageSwitcher';
 
 export default function Landing() {
+    const { t } = useTranslation();
+
     const [activeAccordion, setActiveAccordion] = useState(false);
 
     const accordionItems = [
         {
             title: 'Advanced sensors',
-            content:
-                'High-precision 3D sensors ensure accurate surface analysis and consistent finishing quality.',
+            content: t('sensor_description'),
         },
         {
             title: 'Customised End-effectors',
-            content:
-                'Tailor-made tools adapt to complex surfaces and specific finishing needs.',
+            content: t('custom_end_effectors_description'),
         },
         {
             title: 'Ease of use',
-            content:
-                'A user-friendly web interface makes setup, control, and monitoring simple and intuitive.',
+            content: t('easy_configuration_description'),
         },
         {
             title: 'Artificial intelligence',
-            content:
-                'Smart algorithms generate robotic paths and adjust processes in real time.',
+            content: t('ai_description'),
         },
     ];
 
@@ -80,6 +79,7 @@ export default function Landing() {
 
                         {/* Navigation Menu */}
                         <div className="flex items-center xl:space-x-8 ">
+                            <LanguageSwitcher />
                             <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
                             <a
                                 href="#landing-form"
@@ -148,7 +148,7 @@ export default function Landing() {
                         />
                     </div>
                     <h1 className="text-supero-mid-grey uppercase text-[20px] my-12">
-                        Supero – Robotics & Automation Solutions for Industry
+                        {t('payoff')}
                     </h1>
                     <div className="mb-6 xl:mb-12 flex flex-col xl:flex-row">
                         <a
@@ -188,46 +188,13 @@ export default function Landing() {
                                 </svg>
                             </div>
                         </a>
-
-                        {/* <button className="group relative overflow-hidden bg-transparent text-white border border-white hover:bg-[#2E2E33]  hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between">
-                            <span className="relative z-10">GET A DEMO</span>
-
-                            <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="absolute transition-all duration-300 transform group-hover:translate-x-6 group-hover:-translate-y-6 group-hover:opacity-0"
-                                >
-                                    <path
-                                        d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
-                                        fill="currentColor"
-                                    />
-                                </svg>
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="absolute transition-all duration-300 transform -translate-x-6 translate-y-6 opacity-0 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
-                                >
-                                    <path
-                                        d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
-                                        fill="currentColor"
-                                    />
-                                </svg>
-                            </div>
-                        </button> */}
                     </div>
                 </div>
             </header>
 
             <section className="bg-supero-dark-grey px-4 xl:px-12 pt-24 xl:text-center">
                 <p className="text-supero-mid-grey uppercase text-body-l mb-6 xl:mb-12">
-                    Why integrate smart robotics?
+                    {t('why_intergrate')}
                 </p>
 
                 <h3 className="title" style={{}}>
@@ -239,11 +206,7 @@ export default function Landing() {
                 </h3>
 
                 <p className="mt-6 xl:mt-12 max-w-[600px] mx-auto text-left xl:text-center text-body-l">
-                    From repetition to risk, production tasks can burden teams.
-                    Our Supero Finish platform integrates both collaborative and
-                    industrial robotic solutions, 3D vision, and easy-to-use
-                    software to automate processes—boosting quality, throughput,
-                    and safety.
+                    {t('working_description')}
                 </p>
 
                 <div className="flex justify-center mt-12">
@@ -355,7 +318,7 @@ export default function Landing() {
                     >
                         <div className="flex justify-between">
                             <p className="text-[24px] text-white font-bold uppercase group-hover:text-supero-green">
-                                Advanced sensors
+                                {t('advanced_sensors')}
                             </p>
                             <svg
                                 width="35"
@@ -392,8 +355,7 @@ export default function Landing() {
                             </svg>
                         </div>
                         <div className="text-white mt-4 text-left w-[270px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            High-precision 3D sensors ensure accurate surface
-                            analysis and consistent finishing quality.
+                            {t('sensor_description')}
                         </div>
                     </div>
 
@@ -412,7 +374,7 @@ export default function Landing() {
                                     fontVariationSettings: "'slnt' 0",
                                 }}
                             >
-                                Customised <br /> End-effectors
+                                {t('custom_end_effectors')}
                             </p>
                             <svg
                                 width="35"
@@ -449,8 +411,7 @@ export default function Landing() {
                             </svg>
                         </div>
                         <div className="text-white mt-4 text-left w-[270px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            Tailor-made tools adapt to complex surfaces and
-                            specific finishing needs.
+                            {t('custom_end_effectors_description')}
                         </div>
                     </div>
 
@@ -502,12 +463,11 @@ export default function Landing() {
                                     fontVariationSettings: "'slnt' 0",
                                 }}
                             >
-                                Ease of use
+                                {t('easy_configuration')}
                             </p>
                         </div>
                         <div className="text-white mt-4 text-left w-[270px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            A user-friendly web interface makes setup, control,
-                            and monitoring simple and intuitive.
+                            {t('easy_configuration_description')}
                         </div>
                     </div>
 
@@ -559,12 +519,11 @@ export default function Landing() {
                                     fontVariationSettings: "'slnt' 0",
                                 }}
                             >
-                                Artificial <br /> intelligence
+                                {t('artificial_intelligence')}
                             </p>
                         </div>
                         <div className="text-white mt-4 text-left w-[270px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            Smart algorithms generate robotic paths and adjust
-                            processes in real time.
+                            {t('ai_description')}
                         </div>
                     </div>
                 </div>
@@ -599,12 +558,7 @@ export default function Landing() {
                             </p>
 
                             <p className="text-body-l text-[#BABABF] my-12 max-w-[570px]">
-                                Supero's robotic solutions bring speed,
-                                consistency, and scalability to manufacturing.
-                                From sanding and coating to welding, they ensure
-                                higher quality, stable throughput, and
-                                measurable efficiency—ready to grow with your
-                                production needs.
+                                {t('developed_performs_description')}
                             </p>
 
                             <a
@@ -650,7 +604,7 @@ export default function Landing() {
                     <div className="w-full flex flex-wrap items-center pb-12 mb-8">
                         <div className="w-full xl:w-1/2 px-4 xl:px-12">
                             <p className="text-supero-mid-grey uppercase text-body-m mb-12">
-                                What can you do with our Supero platform today
+                                {t('what_can_you_do')}
                             </p>
 
                             <p className="title">
@@ -661,12 +615,7 @@ export default function Landing() {
                             </p>
 
                             <p className="text-body-l text-[#BABABF] my-12 max-w-[570px]">
-                                Supero automates the heavy, repetitive tasks
-                                that slow production down. With an intuitive
-                                interface that guides every phase—from start to
-                                stop—operators manage processes with ease. The
-                                result: fewer errors, safer workflows, and
-                                higher quality at scale.
+                                {t('let_it_do_description')}
                             </p>
 
                             <a
@@ -709,8 +658,7 @@ export default function Landing() {
 
                             <div className="hidden xl:block">
                                 <p className="text-supero-mid-grey uppercase text-[20px] mt-24">
-                                    What will you be able to do with our Supero
-                                    platform tomorrow?
+                                    {t('what_you_will_do_tomorrow')}
                                 </p>
 
                                 <p className="text-supero-mid-grey text-[20px]">
@@ -730,14 +678,15 @@ export default function Landing() {
 
                             <div className="xl:hidden">
                                 <p className="text-supero-mid-grey uppercase text-body-m mt-12">
-                                    What will you be able to do with our Supero
-                                    platform tomorrow?
+                                    {t('what_you_will_do_tomorrow')}
                                 </p>
 
                                 <p className="text-supero-mid-grey text-body-s">
-                                    Painting <span className="mx-2">|</span>{' '}
-                                    Inspection <span className="mx-2">|</span>{' '}
-                                    Welding
+                                    {t('coating')}{' '}
+                                    <span className="mx-2">|</span>{' '}
+                                    {t('vernishing')}{' '}
+                                    <span className="mx-2">|</span>{' '}
+                                    {t('palletizing')}
                                 </p>
                             </div>
                         </div>

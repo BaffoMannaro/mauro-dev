@@ -10,8 +10,11 @@ import regionePuglia from '../../assets/images/logos/regionePuglia.png';
 import repubblica from '../../assets/images/logos/repubblica.png';
 import pugliaSviluppo from '../../assets/images/logos/pugliaSviluppo.png';
 import cofinanziato from '../../assets/images/logos/cofinanziato.png';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+    const { t } = useTranslation();
+
     return (
         <footer className="bg-supero-dark-grey py-12">
             <img
@@ -47,14 +50,7 @@ export default function Footer() {
                     <div className="w-full xl:w-1/5">
                         <div className="">
                             <p className="text-body-s opacity-70">
-                                Bando a Cascata “Future Artificial Intelligence
-                                Research‑FAIR” finanziato nell’ambito
-                                dell’Avviso n. 341 del 15.03.2022 Piano
-                                Nazionale di Ripresa e Resilienza (PNRR),
-                                Missione 4 Componente 2 “Dalla Ricerca
-                                all’Impresa” Linea di Investimento 1.3 ”
-                                Finanziato dall’Unione Europea –
-                                NextGenerationEU
+                                {t('banded_with')}
                             </p>
                         </div>
                     </div>
@@ -98,8 +94,7 @@ export default function Footer() {
                     <div className="w-full xl:w-1/5">
                         <div className="">
                             <p className="text-body-s opacity-70">
-                                Intervento cofinanziato dall’U.E. a valere sul
-                                PR Puglia FESR-FSE+ 2021-2027 FONDO TECNONIDI
+                                {t('intervent_cofinanced')}
                             </p>
                         </div>
                     </div>

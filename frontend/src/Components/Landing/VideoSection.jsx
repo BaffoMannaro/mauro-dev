@@ -3,10 +3,13 @@ import poster from '../../assets/images/poster-video.png';
 
 import { useState, useRef } from 'react';
 import VideoScroll from './VideoScroll';
+import { useTranslation } from 'react-i18next';
 
 export default function VideoSection() {
     const [isVideoPlaying, setIsVideoPlaying] = useState(false);
     const videoRef = useRef(null);
+
+    const { t } = useTranslation();
 
     const handleStartVideo = () => {
         setIsVideoPlaying(true);
@@ -19,20 +22,12 @@ export default function VideoSection() {
         <>
             <div className=" bg-supero-dark-grey relative flex flex-col items-center justify-center">
                 <div className="px-4 xl:hidden">
-                    <p className="title text-4xl mb-4">
-                        Finishing made easy. <br />
-                        <span className="hidden xl:inline">
-                            Watch it at work
-                        </span>
-                    </p>
+                    <p className="title text-4xl mb-4">{t('video_claim')}</p>
                 </div>
                 {!isVideoPlaying && (
                     <div className="xl:absolute z-10 text-white xl:text-center px-4">
-                        <p className="title mb-6 xl:mb-0 hidden xl:block">
-                            Finishing made easy. <br />
-                            <span className="hidden xl:inline">
-                                Watch it at work
-                            </span>
+                        <p className="title mb-6 xl:mb-0 hidden xl:block whitespace-pre-line">
+                            {t('video_claim')}
                         </p>
                         <div className="absolute bottom-[50px] left-[50%] translate-x-[-50%] xl:hidden">
                             <button

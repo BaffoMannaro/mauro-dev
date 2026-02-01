@@ -2,7 +2,11 @@ import React from 'react';
 import Footer from '../Landing/Footer';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
 export default function ThankYouPage() {
+    const { t } = useTranslation();
+
     return (
         <>
             <div className="min-h-screen pt-24 bg-supero-dark-grey flex flex-col items-center justify-center bg-typ">
@@ -14,11 +18,10 @@ export default function ThankYouPage() {
                 </p>
                 <div className="max-w-[600px] text-center mt-8">
                     <p className="mt-4 text-body-l text-white">
-                        Thanks for reaching out to the Supero team.
+                        {t('thanks_reaching_out')}
                     </p>
                     <p className="mt-4 text-body-l text-white mb-12">
-                        We’ll be in touch soon to explore how Supero’s robotics
-                        and automation can power your next industrial evolution.
+                        {t('will_be_in_tounch')}
                     </p>
 
                     <Link

@@ -54,5 +54,7 @@
     "hours": "hours",
     "minutes": "minutes",
     "seconds": "seconds",
-    "send": "Send"
+    "send": "Send",
+    "thanks_reaching_out": "Thanks for reaching out to the Supero team.",
+    "will_be_in_tounch": "We’ll be in touch soon to explore how Supero’s robotics and automation can power your next industrial evolution."
 }

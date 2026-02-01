@@ -83,7 +83,7 @@ export default function Landing() {
                             <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
                             <a
                                 href="#landing-form"
-                                className="bg-transparent text-white xl:px-6 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[14px] xl:text-[16px] group"
+                                className="bg-transparent text-white xl:px-4 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[14px] xl:text-[16px] group"
                             >
                                 <span>GET A DEMO</span>
                                 <svg
@@ -603,7 +603,7 @@ export default function Landing() {
 
                     <div className="w-full flex flex-wrap items-center pb-12 mb-8">
                         <div className="w-full xl:w-1/2 px-4 xl:px-12">
-                            <p className="text-supero-mid-grey uppercase text-body-m mb-12">
+                            <p className="text-supero-mid-grey uppercase text-[20px] mb-20">
                                 {t('what_can_you_do')}
                             </p>
 

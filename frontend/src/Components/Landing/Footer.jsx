@@ -16,14 +16,14 @@ export default function Footer() {
     const { t } = useTranslation();
 
     return (
-        <footer className="bg-supero-dark-grey py-12">
+        <footer className="bg-supero-dark-grey py-6">
             <img
                 src={footerLogo}
                 alt="Supero Logo"
                 className="mx-auto block relative bottom-[-1px]"
             />
 
-            <div className="bg-[#434348] py-12 px-4 xl:px-12">
+            <div className="bg-[#434348] py-10 px-41 xl:px-12">
                 <div className="w-full flex justify-around flex-wrap">
                     <div className="w-full xl:w-4/5 xl:pe-12">
                         <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
@@ -57,7 +57,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="bg-[#434348] py-12 px-4 xl:px-12">
+            <div className="bg-[#434348] py-10 px-4 xl:px-12">
                 <div className="w-full flex items-center justify-around flex-wrap">
                     <div className="w-full xl:w-4/5 xl:pe-12">
                         <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">

@@ -16,7 +16,7 @@ export default function Footer() {
     const { t } = useTranslation();
 
     return (
-        <footer className="bg-supero-dark-grey py-6">
+        <footer className="bg-supero-dark-grey py-2">
             <img
                 src={footerLogo}
                 alt="Supero Logo"
@@ -97,6 +97,32 @@ export default function Footer() {
                                 {t('intervent_cofinanced')}
                             </p>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div className="bg-supero-dark-grey py-4">
+                <div className="w-full text-center">
+                    <p className="text-body-m opacity-60">
+                        © {new Date().getFullYear()} All rights reserved
+                    </p>
+                    <div className="flex justify-center gap-4 mt-1">
+                        <a
+                            href="https://www.iubenda.com/privacy-policy/23263641"
+                            className="text-body-m opacity-60 hover:opacity-100 transition-opacity underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Privacy Policy
+                        </a>
+                        <span className="text-body-m opacity-60">|</span>
+                        <a
+                            href="https://www.iubenda.com/privacy-policy/23263641/cookie-policy"
+                            className="text-body-m opacity-60 hover:opacity-100 transition-opacity underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Cookie Policy
+                        </a>
                     </div>
                 </div>
             </div>

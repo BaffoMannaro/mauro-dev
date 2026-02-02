@@ -303,15 +303,15 @@ export default function GetInTouch() {
                                 }}
                                 validationSchema={Yup.object({
                                     name: Yup.string().required(
-                                        'Name is required'
+                                        t('required_field')
                                     ),
                                     email: Yup.string()
-                                        .email('Invalid email address')
-                                        .required('Email is required'),
+                                        .email(t('invalid_email'))
+                                        .required(t('required_field')),
 
                                     privacy: Yup.boolean().oneOf(
                                         [true],
-                                        'You must accept the privacy policy'
+                                        t('accept_privacy')
                                     ),
                                     marketing: Yup.boolean(),
                                 })}
@@ -334,7 +334,7 @@ export default function GetInTouch() {
                                         <div className="mb-4 w-full px-2">
                                             <label
                                                 htmlFor="name"
-                                                className="text-[#a6a6ab] text-body-s mb-2 block"
+                                                className="text-[#a6a6ab] text-body-m mb-2 block"
                                             >
                                                 {t('company_name')} *
                                             </label>
@@ -354,7 +354,7 @@ export default function GetInTouch() {
                                         <div className="mb-4 w-full px-2">
                                             <label
                                                 htmlFor="email"
-                                                className="text-[#a6a6ab] text-body-s mb-2 block"
+                                                className="text-[#a6a6ab] text-body-m mb-2 block"
                                             >
                                                 Email *
                                             </label>
@@ -393,7 +393,16 @@ export default function GetInTouch() {
                                                         ></div>
                                                     </div>
                                                     <p className="text-body-s">
-                                                        {t('privacy_policy')}
+                                                        {t('privacy_policy_prefix')}
+                                                        <a
+                                                            href="https://www.iubenda.com/privacy-policy/23263641"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="underline"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            {t('privacy_policy_link')}
+                                                        </a>*.
                                                     </p>
                                                 </div>
 

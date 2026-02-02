@@ -74,19 +74,19 @@ export default function LandingForm() {
                     }}
                     validationSchema={Yup.object().shape({
                         companyName: Yup.string().required(
-                            'This field is required'
+                            t('required_field')
                         ),
                         email: Yup.string()
-                            .email('Invalid email')
-                            .required('This field is required'),
+                            .email(t('invalid_email'))
+                            .required(t('required_field')),
                         privacy: Yup.boolean().oneOf(
                             [true],
-                            'You must accept the privacy policy'
+                            t('accept_privacy')
                         ),
                         marketing: Yup.boolean(),
                         productTypes: Yup.mixed().test(
                             'has-product-selected',
-                            'Select at least one product type',
+                            t('select_product_type'),
                             function (value) {
                                 const {
                                     sanding,
@@ -110,7 +110,7 @@ export default function LandingForm() {
                             <div className="mb-8 w-full xl:w-1/2 xl:px-2">
                                 <label
                                     htmlFor="companyName"
-                                    className="text-[#a6a6ab] text-body-s mb-2 block"
+                                    className="text-[#a6a6ab] text-body-m mb-2 block"
                                 >
                                     {t('company_name')}*
                                 </label>
@@ -130,14 +130,14 @@ export default function LandingForm() {
                             <div className="mb-8 w-full xl:w-1/2 xl:px-2">
                                 <label
                                     htmlFor="email"
-                                    className="text-[#a6a6ab] text-body-s mb-2 block"
+                                    className="text-[#a6a6ab] text-body-m mb-2 block"
                                 >
                                     Email*
                                 </label>
                                 <Field
                                     name="email"
                                     type="email"
-                                    placeholder="Email"
+                                    placeholder={t('insert')}
                                     className="w-full bg-[#121212] py-2 px-4 "
                                 />
                                 <ErrorMessage
@@ -244,7 +244,7 @@ export default function LandingForm() {
                             <div className="mb-8 w-full">
                                 <label
                                     htmlFor="message"
-                                    className="text-[#a6a6ab] text-body-s mb-2 block"
+                                    className="text-[#a6a6ab] text-body-m mb-2 block"
                                 >
                                     {t('tell_us')}
                                 </label>
@@ -279,7 +279,16 @@ export default function LandingForm() {
                                             ></div>
                                         </div>
                                         <p className="text-body-s">
-                                            {t('privacy_policy')}
+                                            {t('privacy_policy_prefix')}
+                                            <a
+                                                href="https://www.iubenda.com/privacy-policy/23263641"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="underline"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {t('privacy_policy_link')}
+                                            </a>*.
                                         </p>
                                     </div>
 

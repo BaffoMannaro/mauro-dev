@@ -20,6 +20,9 @@ i18next
         backend: {
             loadPath: `${env}locales/{{lng}}.json`,
         },
+        react: {
+            useSuspense: true,
+        },
     });
 
 export default i18next;

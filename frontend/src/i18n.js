@@ -1,28 +1,22 @@
-import i18next from 'i18next';
-import I18NextHttpBackend from 'i18next-http-backend';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
-const env =
-    import.meta.env.MODE === 'development'
-        ? 'http://localhost:5173/'
-        : import.meta.env.VITE_PROD_URL;
+import it from "./locales/it.json";
+import en from "./locales/en.json";
 
-i18next
-    .use(LanguageDetector)
-    .use(I18NextHttpBackend)
-    .use(initReactI18next)
-    .init({
-        debug: true,
-        fallbackLng: 'it',
-        supportedLngs: ['it', 'en'],
-        lng: 'it',
-        backend: {
-            loadPath: `${env}locales/{{lng}}.json`,
-        },
-        react: {
-            useSuspense: true,
-        },
-    });
+i18n
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    fallbackLng: "it",
+    supportedLngs: ["it", "en"],
+    resources: {
+      it: { translation: it },
+      en: { translation: en },
+    },
+    react: { useSuspense: true },
+    interpolation: { escapeValue: false },
+  });
 
-export default i18next;
+export default i18n;

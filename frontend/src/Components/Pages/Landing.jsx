@@ -16,6 +16,9 @@ import Timer from '../Landing/Timer';
 import VariableProximity from '../Landing/VariableProximity';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../Atoms/LanguageSwitcher';
+import useAuthStore from '../../Stores/useAuthStore';
+import { Link } from 'react-router-dom';
+import Navbar from '../Molecules/Navbar';
 
 export default function Landing() {
     const { t } = useTranslation();
@@ -43,6 +46,8 @@ export default function Landing() {
 
     const containerRef = useRef(null);
 
+    const { user } = useAuthStore((state) => state);
+
     return (
         <div className="">
             <div className="w-full relative">
@@ -66,44 +71,7 @@ export default function Landing() {
                         'linear-gradient(90deg, #626271 0%, #2E2E33 100%)',
                 }}
             >
-                <div className=" pt-5 absolute top-0 left-0 w-full z-[300]">
-                    <nav className="flex justify-between items-center px-2 xl:px-8 py-[10px] lg:py-6 bg-[rgba(46,46,51,0.2)] backdrop-blur-[25px] rounded-lg mx-4 xl:mx-8">
-                        {/* Logo */}
-                        <div className="flex items-center">
-                            <img
-                                src={logoNavbar}
-                                alt="Supero Logo"
-                                className="h-8 ms-1"
-                            />
-                        </div>
-
-                        {/* Navigation Menu */}
-                        <div className="flex items-center xl:space-x-8 ">
-                            <LanguageSwitcher />
-                            <span className="hidden xl:block h-[24px] w-[2px] bg-white"></span>
-                            <a
-                                href="#landing-form"
-                                className="bg-transparent text-white xl:px-4 py-2 hover:text-supero-green transition-all duration-200 font-medium flex items-center text-[14px] xl:text-[16px] group"
-                            >
-                                <span>GET A DEMO</span>
-                                <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="ms-3"
-                                >
-                                    <path
-                                        d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
-                                        fill="white"
-                                        className=" group-hover:fill-supero-green"
-                                    />
-                                </svg>
-                            </a>
-                        </div>
-                    </nav>
-                </div>
+                <Navbar />
                 <div
                     style={{
                         position: 'absolute',
@@ -463,7 +431,7 @@ export default function Landing() {
                                     fontVariationSettings: "'slnt' 0",
                                 }}
                             >
-                                 {t('easy_configuration')}
+                                {t('easy_configuration')}
                             </p>
                         </div>
                         <div className="text-white mt-4 text-left w-[270px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -662,8 +630,10 @@ export default function Landing() {
                                 </p>
 
                                 <p className="text-supero-mid-grey text-[20px]">
-                                    {t('grinding')} <span className="mx-2">|</span>{' '}
-                                    {t('welding')} <span className="mx-2">|</span>{' '}
+                                    {t('grinding')}{' '}
+                                    <span className="mx-2">|</span>{' '}
+                                    {t('welding')}{' '}
+                                    <span className="mx-2">|</span>{' '}
                                     {t('inspection')}
                                 </p>
                             </div>

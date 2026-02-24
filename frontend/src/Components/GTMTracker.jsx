@@ -7,20 +7,19 @@ import { trackPageView } from '../utils/gtm';
  * Should be placed in the root of the app
  */
 const GTMTracker = () => {
-  const location = useLocation();
+    const location = useLocation();
 
-  useEffect(() => {
-    // Small delay to ensure GTM is fully loaded
-    const timer = setTimeout(() => {
-      // Track page view on route change
-      trackPageView(location.pathname + location.search);
-    }, 100);
+    useEffect(() => {
+        // Small delay to ensure GTM is fully loaded
+        const timer = setTimeout(() => {
+            // Track page view on route change
+            trackPageView(location.pathname + location.search);
+        }, 100);
 
-    return () => clearTimeout(timer);
-  }, [location]);
+        return () => clearTimeout(timer);
+    }, [location]);
 
-  return null; // This component doesn't render anything
+    return null; // This component doesn't render anything
 };
 
 export default GTMTracker;
-

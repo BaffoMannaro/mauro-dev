@@ -1,0 +1,203 @@
+import json
+from rest_framework import viewsets, filters, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+
+from .models import Tag, Article, Block
+from .serializers import (
+    TagSerializer,
+    ArticleListSerializer,
+    ArticleDetailSerializer,
+    ArticleCreateUpdateSerializer,
+    BlockSerializer
+)
+
+
+class ArticlePagination(PageNumberPagination):
+    """Custom pagination class for articles that allows page_size parameter"""
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing tags
+    
+    Permissions:
+    - GET requests: Public (no authentication required)
+    - POST, PUT, PATCH, DELETE: Requires JWT authentication
+    """
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'display_name_it', 'display_name_en']
+    ordering_fields = ['name', 'display_name_it', 'display_name_en']
+
+
+class ArticleViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing articles
+    
+    Permissions:
+    - GET requests: Public (no authentication required)
+      * Unauthenticated users see only published articles
+      * Authenticated users see all articles
+    - POST, PUT, PATCH, DELETE: Requires JWT authentication
+    """
+    queryset = Article.objects.prefetch_related('main_tag', 'other_tags', 'blocks').all()
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = ArticlePagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['is_published', 'main_tag', 'other_tags']
+    search_fields = ['title_it', 'title_en', 'slug', 'meta_title_it', 'meta_title_en', 'meta_description_it', 'meta_description_en']
+    ordering_fields = ['created_at', 'published_at', 'title_it', 'title_en']
+    lookup_field = 'slug'
+    
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ArticleListSerializer
+        elif self.action in ['create', 'update', 'partial_update']:
+            return ArticleCreateUpdateSerializer
+        return ArticleDetailSerializer
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # If user is not authenticated, show only published articles
+        if not self.request.user.is_authenticated:
+            queryset = queryset.filter(is_published=True)
+        return queryset
+    
+    @action(detail=False, methods=['get'])
+    def published(self, request):
+        """Get only published articles"""
+        queryset = self.get_queryset().filter(is_published=True).order_by('-published_at')
+        queryset = self.filter_queryset(queryset)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ArticleListSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = ArticleListSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['get'])
+    def by_slug(self, request, slug=None):
+        """Get article by slug"""
+        article = self.get_object()
+        serializer = ArticleDetailSerializer(article)
+        return Response(serializer.data)
+    
+    def create(self, request, *args, **kwargs):
+        """Custom create to handle block images from FormData"""
+        # Estrai i blocchi dal JSON
+        blocks_json = request.data.get('blocks', '[]')
+        blocks_data = json.loads(blocks_json) if isinstance(blocks_json, str) else blocks_json
+        
+        # Prepara i dati per il serializer (senza blocchi)
+        article_data = request.data.copy()
+        article_data.pop('blocks', None)
+        
+        # Rimuovi i file dei blocchi dai dati dell'articolo
+        block_images = {}
+        keys_to_remove = []
+        for key in request.data.keys():
+            if key.startswith('block_image_'):
+                idx = key.replace('block_image_', '')
+                block_images[int(idx)] = request.FILES[key]
+                keys_to_remove.append(key)
+        
+        for key in keys_to_remove:
+            article_data.pop(key, None)
+        
+        # Crea l'articolo
+        serializer = self.get_serializer(data=article_data)
+        serializer.is_valid(raise_exception=True)
+        article = serializer.save()
+        
+        # Crea i blocchi con le loro immagini
+        for idx, block_data in enumerate(blocks_data):
+            block = Block.objects.create(
+                article=article,
+                block_type=block_data['block_type'],
+                content_it=block_data.get('content_it', ''),
+                content_en=block_data.get('content_en', ''),
+                order=block_data['order']
+            )
+            if idx in block_images:
+                block.image = block_images[idx]
+                block.save()
+        
+        # Restituisci la risposta con l'articolo completo
+        output_serializer = ArticleDetailSerializer(article)
+        headers = self.get_success_headers(output_serializer.data)
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    def update(self, request, *args, **kwargs):
+        """Custom update to handle block images from FormData"""
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        # Estrai i blocchi dal JSON
+        blocks_json = request.data.get('blocks', '[]')
+        blocks_data = json.loads(blocks_json) if isinstance(blocks_json, str) else blocks_json
+        
+        # Prepara i dati per il serializer (senza blocchi)
+        article_data = request.data.copy()
+        article_data.pop('blocks', None)
+        
+        # Rimuovi i file dei blocchi dai dati dell'articolo
+        block_images = {}
+        keys_to_remove = []
+        for key in request.data.keys():
+            if key.startswith('block_image_'):
+                idx = key.replace('block_image_', '')
+                block_images[int(idx)] = request.FILES[key]
+                keys_to_remove.append(key)
+        
+        for key in keys_to_remove:
+            article_data.pop(key, None)
+        
+        # Aggiorna l'articolo
+        serializer = self.get_serializer(instance, data=article_data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        article = serializer.save()
+        
+        # Elimina i blocchi esistenti
+        instance.blocks.all().delete()
+        
+        # Crea i nuovi blocchi con le loro immagini
+        for idx, block_data in enumerate(blocks_data):
+            block = Block.objects.create(
+                article=article,
+                block_type=block_data['block_type'],
+                content_it=block_data.get('content_it', ''),
+                content_en=block_data.get('content_en', ''),
+                order=block_data['order']
+            )
+            if idx in block_images:
+                block.image = block_images[idx]
+                block.save()
+        
+        # Restituisci la risposta con l'articolo completo
+        output_serializer = ArticleDetailSerializer(article)
+        return Response(output_serializer.data)
+
+
+class BlockViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing blocks
+    
+    Permissions:
+    - GET requests: Public (no authentication required)
+    - POST, PUT, PATCH, DELETE: Requires JWT authentication
+    """
+    queryset = Block.objects.all()
+    serializer_class = BlockSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['article', 'block_type']
+    ordering_fields = ['order']

@@ -2,58 +2,46 @@ import { Outlet, ScrollRestoration } from 'react-router-dom';
 
 import { Toaster } from 'react-hot-toast';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { logout, setUser } from '../utils/auth';
 
 import useAuthStore from '../Stores/useAuthStore';
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
-import useSidebarStore from '../Stores/sidebarStore';
 import GTMTracker from '../Components/GTMTracker';
 /* import Navbar from '../Components/Navbar'; */
 
 export default function AuthRoot() {
-    const user = useAuthStore((state) => state.user);
-    let location = useLocation();
-
-    const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const setIsLoading = useAuthStore((state) => state.setIsLoading);
+    const isLoading = useAuthStore((state) => state.isLoading);
 
     useEffect(() => {
-        if (localStorage.getItem('rememberMe') === 'false') {
-            logout();
-            navigate('/');
-        }
-    }, []);
+        const initAuth = async () => {
+            console.log('AuthRoot initAuth - starting');
 
-    useEffect(() => {
-        const handler = async () => {
-            setLoading(true);
-            await setUser();
-            setLoading(false);
-        };
-        handler();
-
-        if (!user) {
-            if (
-                location.pathname.includes('reset-password') ||
-                location.pathname.includes('forgot-password') ||
-                location.pathname.includes('complete-registration') ||
-                location.pathname.includes('register') ||
-                location.pathname.includes('login') ||
-                location.pathname.includes('check-your-email') ||
-                location.pathname.includes('confirm-email-change') ||
-                location.pathname.includes('thank-you-page') ||
-                location.pathname.includes('comunicato-stampa-rebranding')
-            ) {
-                //pass
-            } else {
-                navigate('/');
+            // Verifica rememberMe
+            if (localStorage.getItem('rememberMe') === 'false') {
+                console.log('rememberMe is false, logging out');
+                logout();
+                setIsLoading(false);
+                return;
             }
-        }
+
+            // Carica lo stato dell'utente dai cookies
+            try {
+                const result = await setUser();
+                console.log('setUser completed, result:', result);
+                // setUser() chiama internamente setUser dello store che setta isLoading = false
+            } catch (error) {
+                console.error('Error setting user:', error);
+                setIsLoading(false);
+            }
+        };
+
+        // Esegui solo al mount iniziale
+        initAuth();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return loading ? null : (
+    return isLoading ? null : (
         <>
             <GTMTracker />
             <ScrollRestoration />

@@ -1,14 +1,13 @@
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import Input from '../Molecules/Input';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Button from '../Atoms/Button';
 import useAxios from '../../utils/useAxios';
 
 import { toast } from 'react-hot-toast';
 import useAuthStore from '../../Stores/useAuthStore';
-import { useEffect } from 'react';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -22,13 +21,10 @@ export default function Login() {
 
     const handleLogin = async (values) => {
         try {
-            const response = await api.post(
-                'http://localhost:8000/users/token/',
-                {
-                    email: values.email,
-                    password: values.password,
-                }
-            );
+            const response = await api.post('/users/token/', {
+                email: values.email,
+                password: values.password,
+            });
             const { access, refresh } = response.data;
             setTokens(access, refresh);
             setUser(access);
@@ -52,8 +48,8 @@ export default function Login() {
         <div className="min-h-screen pt-24 bg-deep-space-2 flex flex-col items-center justify-center">
             <Formik
                 initialValues={{
-                    email: 'bbb@bbb.bbb',
-                    password: 'bbbbbb',
+                    email: 'root@root.root',
+                    password: 'root',
                     showPassword: false,
                 }}
                 validationSchema={Yup.object({
@@ -68,7 +64,7 @@ export default function Login() {
                     <Form className="flex w-4/5 flex-wrap rounded-lg bg-slate-50 p-8 text-black shadow dark:bg-gray-900 md:w-1/3">
                         <div className="w-full text-center">
                             <h1 className="text-6xl font-esa text-black dark:text-white font-black">
-                                smarter
+                                Login
                             </h1>
                         </div>
                         <div className="mb-8 w-full px-2">
@@ -111,8 +107,6 @@ export default function Login() {
                                 <i className="fal fa-long-arrow-right ml-8"></i>
                             </Button>
                         </div>
-
-                        <Link to="/register">Register</Link>
                     </Form>
                 )}
             </Formik>

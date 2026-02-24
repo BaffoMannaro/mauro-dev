@@ -6,7 +6,7 @@ export default function DashRoot() {
     /* const open = useSidebarStore((state) => state.open); */
     const open = true;
     return (
-        <div>
+        <div className="bg-black">
             <aside
                 className={`fixed top-0 left-0 z-30 ${
                     open ? 'w-64' : 'w-16'

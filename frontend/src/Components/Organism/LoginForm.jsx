@@ -17,13 +17,10 @@ export default function LoginForm() {
 
     const handleLogin = async (values) => {
         try {
-            const response = await api.post(
-                'http://localhost:8000/api/token/',
-                {
-                    email: values.email,
-                    password: values.password,
-                }
-            );
+            const response = await api.post('/users/token/', {
+                email: values.email,
+                password: values.password,
+            });
             const { access, refresh } = response.data;
             setTokens(access, refresh);
             toast.success('Logged in!');

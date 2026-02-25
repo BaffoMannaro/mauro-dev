@@ -23,7 +23,6 @@ import 'ckeditor5/ckeditor5.css';
 const BACKEND_URL =
     import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-// Validation Schema
 const articleValidationSchema = Yup.object({
     title_it: Yup.string().required('Il titolo in italiano è obbligatorio'),
     title_en: Yup.string().required('Il titolo in inglese è obbligatorio'),
@@ -32,10 +31,19 @@ const articleValidationSchema = Yup.object({
     meta_title_en: Yup.string(),
     meta_description_it: Yup.string(),
     meta_description_en: Yup.string(),
-    main_tag: Yup.number().nullable(),
+    main_tag: Yup.number().required('Il tag principale è obbligatorio'),
     other_tags: Yup.array().of(Yup.number()),
     is_published: Yup.boolean(),
-    published_at: Yup.string().nullable(),
+    published_at: Yup.string()
+        .nullable()
+        .when('is_published', {
+            is: true,
+            then: (schema) =>
+                schema.required(
+                    "La data di pubblicazione è obbligatoria quando l'articolo è pubblicato"
+                ),
+            otherwise: (schema) => schema.nullable(),
+        }),
     blocks: Yup.array().of(
         Yup.object({
             block_type: Yup.string().required(),
@@ -70,6 +78,9 @@ export default function ArticleForm() {
     const [loading, setLoading] = useState(false);
     const [mainImageFile, setMainImageFile] = useState(null);
     const [mainImagePreview, setMainImagePreview] = useState(null);
+    const [mainImageError, setMainImageError] = useState('');
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
     const [initialValues, setInitialValues] = useState({
         title_it: '',
         title_en: '',
@@ -125,6 +136,7 @@ export default function ArticleForm() {
                 blocks:
                     article.blocks?.map((block) => ({
                         id: block.id,
+                        _key: block.id || `temp-${Date.now()}-${Math.random()}`,
                         block_type: block.block_type,
                         content_it: block.content?.it || '',
                         content_en: block.content?.en || '',
@@ -156,6 +168,7 @@ export default function ArticleForm() {
         const file = e.target.files[0];
         if (file) {
             setMainImageFile(file);
+            setMainImageError('');
             const reader = new FileReader();
             reader.onloadend = () => {
                 setMainImagePreview(reader.result);
@@ -186,6 +199,13 @@ export default function ArticleForm() {
     };
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+        // Validate main image
+        if (!mainImageFile && !mainImagePreview) {
+            setMainImageError("L'immagine principale è obbligatoria");
+            setSubmitting(false);
+            return;
+        }
+
         try {
             const formDataToSend = new FormData();
 
@@ -296,7 +316,7 @@ export default function ArticleForm() {
                 {({ values, setFieldValue, isSubmitting }) => (
                     <Form className="space-y-6">
                         {/* Basic Information */}
-                        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                        <div className="bg-white shadow-md rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">
                                 Informazioni di Base
                             </h2>
@@ -309,7 +329,7 @@ export default function ArticleForm() {
                                     <Field
                                         type="text"
                                         name="title_it"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                     <ErrorMessage
                                         name="title_it"
@@ -320,12 +340,12 @@ export default function ArticleForm() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        🇬 Title (English) *
+                                        Title (English) *
                                     </label>
                                     <Field
                                         type="text"
                                         name="title_en"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                     <ErrorMessage
                                         name="title_en"
@@ -341,7 +361,7 @@ export default function ArticleForm() {
                                     <Field
                                         type="text"
                                         name="slug"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                     <ErrorMessage
                                         name="slug"
@@ -353,60 +373,60 @@ export default function ArticleForm() {
                         </div>
 
                         {/* SEO Section */}
-                        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                        <div className="bg-white shadow-md rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">SEO</h2>
 
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        🇮🇹 Meta Title (Italiano)
+                                        Meta Title (Italiano)
                                     </label>
                                     <Field
                                         type="text"
                                         name="meta_title_it"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        🇬🇧 Meta Title (English)
+                                        Meta Title (English)
                                     </label>
                                     <Field
                                         type="text"
                                         name="meta_title_en"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        🇮🇹 Meta Description (Italiano)
+                                        Meta Description (Italiano)
                                     </label>
                                     <Field
                                         as="textarea"
                                         name="meta_description_it"
                                         rows="3"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        🇬🇧 Meta Description (English)
+                                        Meta Description (English)
                                     </label>
                                     <Field
                                         as="textarea"
                                         name="meta_description_en"
                                         rows="3"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Main Image */}
-                        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                        <div className="bg-white shadow-md rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">
                                 Immagine Principale
                             </h2>
@@ -444,14 +464,19 @@ export default function ArticleForm() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Carica Immagine
+                                        Carica Immagine *
                                     </label>
                                     <input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleMainImageChange}
-                                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
                                     />
+                                    {mainImageError && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {mainImageError}
+                                        </p>
+                                    )}
                                     <p className="text-xs text-gray-500 mt-1">
                                         Formati supportati: JPG, PNG, GIF, WebP
                                     </p>
@@ -460,18 +485,18 @@ export default function ArticleForm() {
                         </div>
 
                         {/* Tags */}
-                        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                        <div className="bg-white shadow-md rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">Tag</h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Tag Principale
+                                        Tag Principale *
                                     </label>
                                     <Field
                                         as="select"
                                         name="main_tag"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="">
                                             Seleziona un tag
@@ -483,6 +508,11 @@ export default function ArticleForm() {
                                             </option>
                                         ))}
                                     </Field>
+                                    <ErrorMessage
+                                        name="main_tag"
+                                        component="p"
+                                        className="text-red-500 text-sm mt-1"
+                                    />
                                 </div>
 
                                 <div>
@@ -493,7 +523,7 @@ export default function ArticleForm() {
                                         as="select"
                                         name="other_tags"
                                         multiple
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         size="4"
                                     >
                                         {tags.map((tag) => (
@@ -512,7 +542,7 @@ export default function ArticleForm() {
                         </div>
 
                         {/* Publishing */}
-                        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                        <div className="bg-white shadow-md rounded-lg p-6">
                             <h2 className="text-xl font-semibold mb-4">
                                 Pubblicazione
                             </h2>
@@ -532,12 +562,17 @@ export default function ArticleForm() {
                                 {values.is_published && (
                                     <div>
                                         <label className="block text-sm font-medium mb-2">
-                                            Data di Pubblicazione
+                                            Data di Pubblicazione *
                                         </label>
                                         <Field
                                             type="date"
                                             name="published_at"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        />
+                                        <ErrorMessage
+                                            name="published_at"
+                                            component="p"
+                                            className="text-red-500 text-sm mt-1"
                                         />
                                     </div>
                                 )}
@@ -545,7 +580,7 @@ export default function ArticleForm() {
                         </div>
 
                         {/* Content Blocks */}
-                        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                        <div className="bg-white shadow-md rounded-lg p-6">
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-semibold">
                                     Contenuto (Blocchi)
@@ -555,6 +590,7 @@ export default function ArticleForm() {
                                         type="button"
                                         onClick={() => {
                                             const newBlock = {
+                                                _key: `temp-${Date.now()}-${Math.random()}`,
                                                 block_type: 'text',
                                                 content_it: '',
                                                 content_en: '',
@@ -576,6 +612,7 @@ export default function ArticleForm() {
                                         type="button"
                                         onClick={() => {
                                             const newBlock = {
+                                                _key: `temp-${Date.now()}-${Math.random()}`,
                                                 block_type: 'image',
                                                 content_it: '',
                                                 content_en: '',
@@ -610,8 +647,12 @@ export default function ArticleForm() {
                                             values.blocks.map(
                                                 (block, index) => (
                                                     <div
-                                                        key={index}
-                                                        className="border border-gray-300 dark:border-gray-600 rounded-lg p-4"
+                                                        key={
+                                                            block._key ||
+                                                            block.id ||
+                                                            index
+                                                        }
+                                                        className="border border-gray-300 rounded-lg p-4"
                                                     >
                                                         <div className="flex justify-between items-center mb-2">
                                                             <span className="font-medium">
@@ -649,9 +690,25 @@ export default function ArticleForm() {
                                                                         index ===
                                                                         0
                                                                     }
-                                                                    className="text-gray-600 hover:text-gray-900 disabled:text-gray-400"
+                                                                    className="px-2 py-1 text-gray-600 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                                                    title="Sposta su"
                                                                 >
-                                                                    ↑
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            1.5
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="size-6"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
+                                                                        />
+                                                                    </svg>
                                                                 </button>
                                                                 <button
                                                                     type="button"
@@ -669,9 +726,25 @@ export default function ArticleForm() {
                                                                             .length -
                                                                             1
                                                                     }
-                                                                    className="text-gray-600 hover:text-gray-900 disabled:text-gray-400"
+                                                                    className="px-2 py-1 text-gray-600 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                                                                    title="Sposta giù"
                                                                 >
-                                                                    ↓
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            1.5
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="size-6"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                                                                        />
+                                                                    </svg>
                                                                 </button>
                                                                 <button
                                                                     type="button"
@@ -680,9 +753,25 @@ export default function ArticleForm() {
                                                                             index
                                                                         )
                                                                     }
-                                                                    className="text-red-600 hover:text-red-900"
+                                                                    className="px-3 py-1  rounded text-sm font-medium"
+                                                                    title="Rimuovi blocco"
                                                                 >
-                                                                    <i className="fas fa-trash"></i>
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth={
+                                                                            1.5
+                                                                        }
+                                                                        stroke="currentColor"
+                                                                        className="size-6"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                                                        />
+                                                                    </svg>
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -692,7 +781,6 @@ export default function ArticleForm() {
                                                             <div className="space-y-3">
                                                                 <div>
                                                                     <label className="block text-sm font-medium mb-2">
-                                                                        🇮🇹
                                                                         Contenuto
                                                                         (Italiano)
                                                                         *
@@ -820,7 +908,6 @@ export default function ArticleForm() {
                                                                 </div>
                                                                 <div>
                                                                     <label className="block text-sm font-medium mb-2">
-                                                                        🇬🇧
                                                                         Content
                                                                         (English)
                                                                         *
@@ -980,7 +1067,7 @@ export default function ArticleForm() {
                                                                                 values
                                                                             )
                                                                         }
-                                                                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                                                                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -995,29 +1082,158 @@ export default function ArticleForm() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex justify-end space-x-4">
-                            <button
-                                type="button"
-                                onClick={() => navigate('/dashboard/articles')}
-                                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-                            >
-                                Annulla
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-400"
-                            >
-                                {isSubmitting
-                                    ? 'Salvataggio...'
-                                    : isEditMode
-                                      ? 'Aggiorna'
-                                      : 'Crea'}
-                            </button>
+                        <div className="flex justify-between items-center">
+                            <div>
+                                {!values.is_published && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setPreviewData(values);
+                                            setIsPreviewOpen(true);
+                                        }}
+                                        className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                                    >
+                                        <i className="fas fa-eye mr-2"></i>
+                                        Preview
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex space-x-4">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        navigate('/dashboard/articles')
+                                    }
+                                    className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-400"
+                                >
+                                    {isSubmitting
+                                        ? 'Salvataggio...'
+                                        : isEditMode
+                                          ? 'Aggiorna'
+                                          : 'Crea'}
+                                </button>
+                            </div>
                         </div>
                     </Form>
                 )}
             </Formik>
+
+            {/* Preview Modal */}
+            {isPreviewOpen && previewData && (
+                <div className="fixed inset-0 z-50 overflow-y-auto bg-[#1a1a1a]">
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setIsPreviewOpen(false)}
+                        className="fixed top-4 right-4 z-50 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full"
+                        aria-label="Chiudi preview"
+                    >
+                        Chiudi preview
+                    </button>
+
+                    <div className="py-12 px-4 sm:px-6 pt-48">
+                        <div className="max-w-5xl mx-auto">
+                            {/* Tags */}
+                            <div className="flex items-center justify-center mb-12">
+                                {previewData.main_tag && (
+                                    <span className="bg-supero-green text-black px-3 py-1 border border-supero-green me-2">
+                                        {tags.find(
+                                            (t) => t.id == previewData.main_tag
+                                        )?.display_name?.it || 'Tag'}
+                                    </span>
+                                )}
+
+                                {previewData.other_tags?.map((tagId) => {
+                                    const tag = tags.find((t) => t.id == tagId);
+                                    return tag ? (
+                                        <span
+                                            key={tag.id}
+                                            className="border border-[#434348] text-white px-3 py-1 me-2"
+                                        >
+                                            {tag.display_name?.it || '-'}
+                                        </span>
+                                    ) : null;
+                                })}
+                            </div>
+
+                            {/* Title */}
+                            <h1 className="text-4xl text-center font-bold text-white mb-4">
+                                {previewData.title_it || 'Titolo articolo'}
+                            </h1>
+
+                            {/* Date */}
+                            {previewData.published_at && (
+                                <p className="text-white text-center my-16">
+                                    {new Date(
+                                        previewData.published_at
+                                    ).toLocaleDateString('it-IT', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Main Image */}
+                        {mainImagePreview && (
+                            <div className="w-full xl:max-w-6xl mx-auto overflow-hidden mb-12 px-12 xl:px-0">
+                                <img
+                                    src={mainImagePreview}
+                                    alt={
+                                        previewData.title_it ||
+                                        'Immagine principale'
+                                    }
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+
+                        {/* Article Content */}
+                        <article className="max-w-5xl mx-auto">
+                            <div className="p-8">
+                                <div className="prose prose-lg max-w-none">
+                                    {previewData.blocks?.map((block, index) => (
+                                        <div
+                                            key={block._key || index}
+                                            className="mb-6"
+                                        >
+                                            {block.block_type === 'text' ? (
+                                                <div
+                                                    dangerouslySetInnerHTML={{
+                                                        __html:
+                                                            block.content_it ||
+                                                            '',
+                                                    }}
+                                                    className="text-gray-200"
+                                                />
+                                            ) : (
+                                                <div className="my-8">
+                                                    {block.imagePreview && (
+                                                        <img
+                                                            src={
+                                                                block.imagePreview
+                                                            }
+                                                            alt={`Immagine blocco ${index + 1}`}
+                                                            className="w-full"
+                                                        />
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

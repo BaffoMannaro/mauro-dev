@@ -7,13 +7,11 @@ import useAxios from '../../utils/useAxios';
 import Footer from '../Landing/Footer';
 import GetInTouch from '../Landing/GetInTouch';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-
 export default function Articles() {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
-    const [error, setError] = useState(null);
+
     const [selectedTag, setSelectedTag] = useState('');
     const [tags, setTags] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -82,7 +80,6 @@ export default function Articles() {
             setHasMore(page * pageSize < totalCount);
         } catch (err) {
             console.error('Errore nel caricamento degli articoli', err);
-            setError('Errore nel caricamento degli articoli');
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -95,27 +92,10 @@ export default function Articles() {
         fetchArticles(nextPage, false);
     };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('it-IT', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-    };
-
-    const getImageUrl = (imageUrl) => {
-        if (!imageUrl) return null;
-        return imageUrl.startsWith('http')
-            ? imageUrl
-            : `${BACKEND_URL}${imageUrl}`;
-    };
-
     return (
         <>
             <Navbar />
-            <div className="h-[90vh] flex flex-wrap items-center pt-32 pb-6 xl:py-6 relative">
+            <div className="h-[70vh] xl:h-[80vh] flex flex-wrap items-center pt-2 xl:pt-32 pb-6 xl:py-6 relative">
                 <div className="px-6 xl:px-12 w-full xl:w-1/2 relative z-10">
                     <h3 className="title" style={{}}>
                         Knowledge <br className="xl:hidden" />
@@ -145,7 +125,7 @@ export default function Articles() {
                     <div className="max-w-7xl mx-auto">
                         {/* Tag Filter */}
                         {tags.length > 0 && (
-                            <div className="mb-8 flex px-12 xl:px-0 border-b border-[#434348] pb-4">
+                            <div className="mb-8 flex px-4 xl:px-0 border-b border-[#434348] pb-4">
                                 <div className="flex flex-wrap gap-2">
                                     <button
                                         onClick={() => setSelectedTag('')}
@@ -185,20 +165,17 @@ export default function Articles() {
                                 </p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-12 xl:px-0">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 xl:px-0">
                                 {articles.map((article) => (
-                                    <Link
-                                        to={`/articles/${article.slug}`}
+                                    <div
                                         key={article.id}
                                         className="overflow-hidden group"
                                     >
                                         {/* Article Image */}
                                         {article.main_image && (
-                                            <div className="h-[280px] w-full overflow-hidden relative">
+                                            <div className="h-[240px] xl:h-[280px] w-full overflow-hidden relative">
                                                 <img
-                                                    src={getImageUrl(
-                                                        article.main_image
-                                                    )}
+                                                    src={`${import.meta.env.VITE_BACKEND_URL}${article.main_image}`}
                                                     alt={
                                                         article.title?.[
                                                             activeLang
@@ -208,7 +185,10 @@ export default function Articles() {
                                                 />
 
                                                 <div className="absolute bottom-0 right-0 bg-supero-green h-12 w-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                    <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
+                                                    <Link
+                                                        to={`/articles/${article.slug}`}
+                                                        className="relative w-6 h-6 overflow-hidden transform rotate-90"
+                                                    >
                                                         <svg
                                                             width="24"
                                                             height="24"
@@ -235,7 +215,7 @@ export default function Articles() {
                                                                 fill="currentColor"
                                                             ></path>
                                                         </svg>
-                                                    </div>
+                                                    </Link>
                                                 </div>
                                             </div>
                                         )}
@@ -244,7 +224,7 @@ export default function Articles() {
                                         <div className="py-6">
                                             {/* Tag */}
                                             {article.main_tag && (
-                                                <span className=" bg-[#434348] text-white text-xs px-3 py-1 border border-[#434348] me-2">
+                                                <span className=" bg-[#434348] text-white  px-3 py-1 border border-[#434348] me-2">
                                                     {article.main_tag
                                                         .display_name?.[
                                                         activeLang
@@ -256,7 +236,7 @@ export default function Articles() {
                                                 return (
                                                     <span
                                                         key={tag.id}
-                                                        className="border border-[#434348] text-white text-xs px-3 py-1 me-2"
+                                                        className="border border-[#434348] text-white  px-3 py-1 me-2"
                                                     >
                                                         {tag.display_name?.[
                                                             activeLang
@@ -271,14 +251,14 @@ export default function Articles() {
                                                     '-'}
                                             </h2>
                                         </div>
-                                    </Link>
+                                    </div>
                                 ))}
                             </div>
                         )}
 
                         {/* Load More Button */}
                         {hasMore && !loading && (
-                            <div className="mt-12 mb-8">
+                            <div className="mt-12 mb-8 px-4">
                                 <button
                                     onClick={loadMore}
                                     disabled={loadingMore}

@@ -4,6 +4,7 @@ import axios from 'axios';
 import Navbar from '../Molecules/Navbar';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
+import SuggestedArticles from '../Molecules/SuggestedArticles';
 
 const BACKEND_URL =
     import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -53,18 +54,12 @@ export default function ArticleDetail() {
     const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleDateString('it-IT', {
+        const lang = activeLang === 'en' ? 'en-US' : 'it-IT';
+        return date.toLocaleDateString(lang, {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
         });
-    };
-
-    const getImageUrl = (imageUrl) => {
-        if (!imageUrl) return null;
-        return imageUrl.startsWith('http')
-            ? imageUrl
-            : `${BACKEND_URL}${imageUrl}`;
     };
 
     if (loading) {
@@ -95,6 +90,7 @@ export default function ArticleDetail() {
         <>
             <Helmet>
                 <title>
+                    Supero |{' '}
                     {activeLang == 'en' ? article.title?.en : article.title?.it}
                 </title>
                 <meta
@@ -107,10 +103,10 @@ export default function ArticleDetail() {
                 />
             </Helmet>
             <Navbar />
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 pt-48">
-                <div className="max-w-4xl mx-auto">
+            <div className="py-12 px-4 sm:px-6 pt-48">
+                <div className="max-w-5xl mx-auto">
                     {/* Back Button */}
-                    <button
+                    {/*  <button
                         onClick={() => navigate('/articles')}
                         className="mb-6 inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                     >
@@ -128,107 +124,96 @@ export default function ArticleDetail() {
                             />
                         </svg>
                         Torna agli articoli
-                    </button>
-
-                    {/* Article Header */}
-                    <article className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-                        {/* Main Image */}
-                        {article.main_image && (
-                            <div className="w-full h-96 overflow-hidden">
-                                <img
-                                    src={getImageUrl(article.main_image)}
-                                    alt={
-                                        activeLang == 'en'
-                                            ? article.title?.en
-                                            : article.title?.it
-                                    }
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
+                    </button> */}
+                    <div className="flex items-center justify-center mb-12">
+                        {article.main_tag && (
+                            <span className=" bg-supero-green text-black  px-3 py-1 border border-supero-green me-2">
+                                {article.main_tag.display_name?.[activeLang] ||
+                                    '-'}
+                            </span>
                         )}
 
-                        {/* Article Content */}
-                        <div className="p-8">
-                            {/* Tags */}
-                            <div className="mb-4 flex flex-wrap gap-2">
-                                {article.main_tag && (
-                                    <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm px-3 py-1 rounded-full font-semibold">
-                                        {activeLang == 'en'
-                                            ? article.main_tag.display_name?.en
-                                            : article.main_tag.display_name?.it}
-                                    </span>
-                                )}
-                                {article.other_tags?.map((tag) => (
-                                    <span
-                                        key={tag.id}
-                                        className="inline-block bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm px-3 py-1 rounded-full"
-                                    >
-                                        {activeLang == 'en'
-                                            ? tag.display_name?.en
-                                            : tag.display_name?.it}
-                                    </span>
-                                ))}
-                            </div>
+                        {article.other_tags.map((tag) => {
+                            return (
+                                <span
+                                    key={tag.id}
+                                    className="border border-[#434348] text-white  px-3 py-1 me-2"
+                                >
+                                    {tag.display_name?.[activeLang] || '-'}
+                                </span>
+                            );
+                        })}
+                    </div>
+                    {/* Title */}
+                    <h1 className="text-4xl text-center font-bold text-gray-900 dark:text-white mb-4">
+                        {activeLang == 'en'
+                            ? article.title?.en
+                            : article.title?.it}
+                    </h1>
 
-                            {/* Title */}
-                            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                                {activeLang == 'en'
-                                    ? article.title?.en
-                                    : article.title?.it}
-                            </h1>
+                    {/* Date */}
 
-                            {/* Date */}
-                            {article.published_at && (
-                                <p className="text-gray-500 dark:text-gray-400 mb-8">
-                                    Pubblicato il{' '}
-                                    {formatDate(article.published_at)}
-                                </p>
+                    {article.published_at && (
+                        <p className="text-white text-center my-16">
+                            {formatDate(
+                                article.published_at || article.created_at
                             )}
-
-                            {/* Meta Description */}
-                            {article.meta_description && (
-                                <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                                    {activeLang == 'en'
-                                        ? article.meta_description?.en
-                                        : article.meta_description?.it}
-                                </p>
-                            )}
-
-                            {/* Content Blocks */}
-                            <div className="prose prose-lg dark:prose-invert max-w-none">
-                                {article.blocks?.map((block) => (
-                                    <div key={block.id} className="mb-6">
-                                        {block.block_type === 'text' ? (
-                                            <div
-                                                dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        activeLang == 'en'
-                                                            ? block.content?.en
-                                                            : block.content?.it,
-                                                }}
-                                                className="text-gray-800 dark:text-gray-200"
-                                            />
-                                        ) : (
-                                            <div className="my-8">
-                                                <img
-                                                    src={getImageUrl(
-                                                        block.image ||
-                                                            block.content
-                                                    )}
-                                                    alt={`Immagine blocco ${block.order}`}
-                                                    className="w-full rounded-lg shadow-md"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </article>
-
-                    {/* Related Articles could go here */}
+                        </p>
+                    )}
                 </div>
             </div>
+
+            {article.main_image && (
+                <div className="w-full xl:max-w-6xl mx-auto overflow-hidden mb-12 px-12 xl:px-0">
+                    <img
+                        src={article.main_image}
+                        alt={
+                            activeLang == 'en'
+                                ? article.title?.en
+                                : article.title?.it
+                        }
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            )}
+
+            <article className="max-w-5xl mx-auto">
+                {/* Main Image */}
+
+                {/* Article Content */}
+                <div className="p-8">
+                    {/* Content Blocks */}
+                    <div className="prose prose-lg dark:prose-invert max-w-none">
+                        {article.blocks?.map((block) => (
+                            <div key={block.id} className="mb-6">
+                                {block.block_type === 'text' ? (
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html:
+                                                activeLang == 'en'
+                                                    ? block.content?.en
+                                                    : block.content?.it,
+                                        }}
+                                        className="text-gray-200"
+                                    />
+                                ) : (
+                                    <div className="my-8">
+                                        <img
+                                            src={block.image}
+                                            alt={`Immagine blocco ${block.order}`}
+                                            className="block mx-auto"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </article>
+
+            {/* related articles */}
+
+            <SuggestedArticles mainTagId={article.main_tag?.id} />
         </>
     );
 }

@@ -2,17 +2,10 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import Home from './Components/Pages/HomePage';
 import AuthRoot from './Layouts/AuthRoot';
-
 import DashRoot from './Layouts/DashRoot';
-
-import WithRoles from './Components/WithRole';
 import ProtectedRoute from './Components/ProtectedRoute';
-/* import AdminPage from './Components/Pages/AdminPage'; */
 import NotFound from './Components/Pages/NotFound';
-
 import Login from './Components/Pages/Login';
-
-import AdminPage from './Components/Pages/AdminPage';
 import Landing from './Components/Pages/Landing';
 import ThankYouPage from './Components/Pages/ThankYouPage';
 import PressRelease from './Components/Pages/PressRelease';
@@ -96,15 +89,6 @@ export const router = createBrowserRouter([
                             <ProtectedRoute>
                                 <TagsList />
                             </ProtectedRoute>
-                        ),
-                    },
-
-                    {
-                        path: '/dashboard/admin',
-                        element: (
-                            <WithRoles allowedRoles={['admin']}>
-                                <AdminPage />
-                            </WithRoles>
                         ),
                     },
                 ],

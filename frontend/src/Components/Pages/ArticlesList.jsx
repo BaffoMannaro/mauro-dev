@@ -72,7 +72,7 @@ export default function ArticlesList() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[80vw] mx-auto">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold">Gestione Articoli</h1>
                 <Link
@@ -96,7 +96,7 @@ export default function ArticlesList() {
                     placeholder="Cerca articoli..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 {loading && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -105,31 +105,31 @@ export default function ArticlesList() {
                 )}
             </div>
 
-            <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-900">
+            <div className="bg-white shadow-md rounded-lg overflow-scroll">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider max-w-[300px] w-[300px]">
                                 Titolo
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Slug
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Tag Principale
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Stato
                             </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Data Creazione
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Azioni
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className="bg-white divide-y divide-gray-200">
                         {articles.length === 0 ? (
                             <tr>
                                 <td
@@ -143,23 +143,24 @@ export default function ArticlesList() {
                             articles.map((article) => (
                                 <tr
                                     key={article.id}
-                                    className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                    className="hover:bg-gray-50"
                                 >
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                            {article.title?.it ||
-                                                article.title?.en ||
-                                                '-'}
+                                    <td className="px-6 py-4 w-[300px] max-w-[300px]">
+                                        <div className="text-sm font-medium text-gray-900 truncate overflow-hidden">
+                                            {article.title.it}
+                                        </div>
+                                        <div className="text-sm font-medium italic text-gray-900 truncate overflow-hidden">
+                                            {article.title.en}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                                        <div className="text-sm text-gray-500">
                                             {article.slug}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {article.main_tag ? (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                                 {article.main_tag.display_name
                                                     ?.it ||
                                                     article.main_tag
@@ -174,34 +175,60 @@ export default function ArticlesList() {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         {article.is_published ? (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                 Pubblicato
                                             </span>
                                         ) : (
-                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                                 Bozza
                                             </span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {new Date(
                                             article.created_at
                                         ).toLocaleDateString('it-IT')}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center">
                                         <Link
                                             to={`/dashboard/articles/edit/${article.slug}`}
-                                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
+                                            className="text-blue-600 hover:text-blue-900 mr-3"
                                         >
-                                            edit
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="size-6"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                                                />
+                                            </svg>
                                         </Link>
                                         <button
                                             onClick={() =>
                                                 handleDelete(article.slug)
                                             }
-                                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                            className="text-red-600 hover:text-red-900"
                                         >
-                                            elimina
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth={1.5}
+                                                stroke="currentColor"
+                                                className="size-6"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                                />
+                                            </svg>
                                         </button>
                                     </td>
                                 </tr>
@@ -247,7 +274,7 @@ export default function ArticlesList() {
                                         className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                                             currentPage === pageNumber
                                                 ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                         }`}
                                     >
                                         {pageNumber}
@@ -288,11 +315,9 @@ export default function ArticlesList() {
                 </div>
             )}
 
-            <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
-                Mostrando{' '}
+            <div className="text-center text-sm text-gray-600 mt-4">
                 {articles.length > 0 ? (currentPage - 1) * pageSize + 1 : 0} -{' '}
-                {Math.min(currentPage * pageSize, totalCount)} di {totalCount}{' '}
-                articoli
+                {Math.min(currentPage * pageSize, totalCount)} ({totalCount})
             </div>
         </div>
     );

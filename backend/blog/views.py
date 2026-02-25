@@ -91,6 +91,27 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer = ArticleDetailSerializer(article)
         return Response(serializer.data)
     
+    @action(detail=False, methods=['get'])
+    def suggested(self, request):
+        """Get suggested articles by main_tag"""
+        main_tag_id = request.query_params.get('main_tag', None)
+        exclude_slug = request.query_params.get('exclude_slug', None)
+        
+        if not main_tag_id:
+            return Response({'error': 'main_tag parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        queryset = self.get_queryset().filter(
+            is_published=True,
+            main_tag_id=main_tag_id
+        ).order_by('-published_at')[:12]
+        
+        # Exclude current article if slug provided
+        if exclude_slug:
+            queryset = queryset.exclude(slug=exclude_slug)
+        
+        serializer = ArticleListSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
     def create(self, request, *args, **kwargs):
         """Custom create to handle block images from FormData"""
         # Estrai i blocchi dal JSON

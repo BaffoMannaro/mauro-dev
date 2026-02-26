@@ -31,6 +31,7 @@ export default function ArticleDetail() {
             const response = await axios.get(
                 `${BACKEND_URL}/blog/articles/${slug}/`
             );
+            console.log(response);
 
             // Verifica che l'articolo sia pubblicato (per utenti non autenticati)
             if (!response.data.is_published) {
@@ -170,7 +171,7 @@ export default function ArticleDetail() {
             {article.main_image && (
                 <div className="w-full xl:max-w-6xl mx-auto overflow-hidden mb-12 px-12 xl:px-0">
                     <img
-                        src={article.main_image}
+                        src={`${BACKEND_URL}${article.main_image}`}
                         alt={
                             activeLang == 'en'
                                 ? article.title?.en
@@ -203,7 +204,7 @@ export default function ArticleDetail() {
                                 ) : (
                                     <div className="my-8">
                                         <img
-                                            src={block.image}
+                                            src={`${BACKEND_URL}${block.image}`}
                                             alt={`Immagine blocco ${block.order}`}
                                             className="block mx-auto"
                                         />

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.conf import settings
 from .models import Category, Tag, Article, Block
 
 
@@ -71,6 +72,7 @@ class TagSerializer(serializers.ModelSerializer):
 class BlockSerializer(serializers.ModelSerializer):
     """Serializer for Block model with nested i18n for text blocks"""
     content = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     
     class Meta:
         model = Block
@@ -89,6 +91,12 @@ class BlockSerializer(serializers.ModelSerializer):
                 'it': '',
                 'en': ''
             }
+    
+    def get_image(self, obj):
+        """Return relative URL for image"""
+        if obj.image:
+            return f"{settings.MEDIA_URL}{obj.image.name}"
+        return None
     
     def to_internal_value(self, data):
         """Handle input data: accept both nested and flat structure"""
@@ -120,6 +128,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     meta_title = serializers.SerializerMethodField()
     meta_description = serializers.SerializerMethodField()
+    main_image = serializers.SerializerMethodField()
     
     class Meta:
         model = Article
@@ -128,6 +137,11 @@ class ArticleListSerializer(serializers.ModelSerializer):
             'main_image', 'category', 'tags', 'created_at', 'published_at', 'is_published',
         ]
 
+    def get_main_image(self, obj):
+        """Return relative URL for main_image"""
+        if obj.main_image:
+            return f"{settings.MEDIA_URL}{obj.main_image.name}"
+        return None
     
     def get_title(self, obj):
         return {'it': obj.title_it, 'en': obj.title_en}
@@ -147,6 +161,7 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     meta_title = serializers.SerializerMethodField()
     meta_description = serializers.SerializerMethodField()
+    main_image = serializers.SerializerMethodField()
     
     class Meta:
         model = Article
@@ -155,6 +170,12 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
             'main_image', 'category', 'tags', 'created_at', 
             'updated_at', 'published_at', 'is_published', 'blocks'
         ]
+    
+    def get_main_image(self, obj):
+        """Return relative URL for main_image"""
+        if obj.main_image:
+            return f"{settings.MEDIA_URL}{obj.main_image.name}"
+        return None
     
     def get_title(self, obj):
         return {'it': obj.title_it, 'en': obj.title_en}

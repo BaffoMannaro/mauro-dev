@@ -45,6 +45,14 @@ export default function Sidebar() {
                             </li>
                             <li>
                                 <SidebarLink
+                                    path="dashboard/categories"
+                                    icon="fa-folder"
+                                    label="Categorie"
+                                    open={open}
+                                />
+                            </li>
+                            <li>
+                                <SidebarLink
                                     path="dashboard/tags"
                                     icon="fa-tags"
                                     label="Tag"

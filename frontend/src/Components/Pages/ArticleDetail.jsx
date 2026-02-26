@@ -126,14 +126,14 @@ export default function ArticleDetail() {
                         Torna agli articoli
                     </button> */}
                     <div className="flex items-center justify-center mb-12">
-                        {article.main_tag && (
+                        {article.category && (
                             <span className=" bg-supero-green text-black  px-3 py-1 border border-supero-green me-2">
-                                {article.main_tag.display_name?.[activeLang] ||
+                                {article.category.display_name?.[activeLang] ||
                                     '-'}
                             </span>
                         )}
 
-                        {article.other_tags.map((tag) => {
+                        {article.tags.map((tag) => {
                             return (
                                 <span
                                     key={tag.id}
@@ -213,7 +213,7 @@ export default function ArticleDetail() {
 
             {/* related articles */}
 
-            <SuggestedArticles mainTagId={article.main_tag?.id} />
+            <SuggestedArticles categoryId={article.category?.id} />
         </>
     );
 }

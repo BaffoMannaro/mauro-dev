@@ -6,8 +6,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Tag, Article, Block
+from .models import Category, Tag, Article, Block
 from .serializers import (
+    CategorySerializer,
     TagSerializer,
     ArticleListSerializer,
     ArticleDetailSerializer,
@@ -21,6 +22,22 @@ class ArticlePagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 100
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing categories
+    
+    Permissions:
+    - GET requests: Public (no authentication required)
+    - POST, PUT, PATCH, DELETE: Requires JWT authentication
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['display_name_it', 'display_name_en']
+    ordering_fields = ['display_name_it', 'display_name_en']
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -49,11 +66,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
       * Authenticated users see all articles
     - POST, PUT, PATCH, DELETE: Requires JWT authentication
     """
-    queryset = Article.objects.prefetch_related('main_tag', 'other_tags', 'blocks').all()
+    queryset = Article.objects.prefetch_related('category', 'tags', 'blocks').all()
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = ArticlePagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['is_published', 'main_tag', 'other_tags']
+    filterset_fields = ['is_published', 'category', 'tags']
     search_fields = ['title_it', 'title_en', 'slug', 'meta_title_it', 'meta_title_en', 'meta_description_it', 'meta_description_en']
     ordering_fields = ['created_at', 'published_at', 'title_it', 'title_en']
     lookup_field = 'slug'
@@ -93,16 +110,16 @@ class ArticleViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def suggested(self, request):
-        """Get suggested articles by main_tag"""
-        main_tag_id = request.query_params.get('main_tag', None)
+        """Get suggested articles by category"""
+        category_id = request.query_params.get('category', None)
         exclude_slug = request.query_params.get('exclude_slug', None)
         
-        if not main_tag_id:
-            return Response({'error': 'main_tag parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not category_id:
+            return Response({'error': 'category parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         queryset = self.get_queryset().filter(
             is_published=True,
-            main_tag_id=main_tag_id
+            category_id=category_id
         ).order_by('-published_at')[:12]
         
         # Exclude current article if slug provided

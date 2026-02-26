@@ -31,8 +31,8 @@ const articleValidationSchema = Yup.object({
     meta_title_en: Yup.string(),
     meta_description_it: Yup.string(),
     meta_description_en: Yup.string(),
-    main_tag: Yup.number().required('Il tag principale è obbligatorio'),
-    other_tags: Yup.array().of(Yup.number()),
+    category: Yup.number().required('La categoria è obbligatoria'),
+    tags: Yup.array().of(Yup.number()),
     is_published: Yup.boolean(),
     published_at: Yup.string()
         .nullable()
@@ -74,6 +74,7 @@ export default function ArticleForm() {
     const axios = useAxios();
     const isEditMode = !!slug;
 
+    const [categories, setCategories] = useState([]);
     const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(false);
     const [mainImageFile, setMainImageFile] = useState(null);
@@ -89,20 +90,30 @@ export default function ArticleForm() {
         meta_title_en: '',
         meta_description_it: '',
         meta_description_en: '',
-        main_tag: '',
-        other_tags: [],
+        category: '',
+        tags: [],
         is_published: false,
         published_at: '',
         blocks: [],
     });
 
     useEffect(() => {
+        fetchCategories();
         fetchTags();
         if (isEditMode) {
             fetchArticle();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug]);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get('/blog/categories/');
+            setCategories(response.data.results || response.data);
+        } catch (err) {
+            console.error('Errore nel caricamento delle categorie', err);
+        }
+    };
 
     const fetchTags = async () => {
         try {
@@ -127,8 +138,8 @@ export default function ArticleForm() {
                 meta_title_en: article.meta_title?.en || '',
                 meta_description_it: article.meta_description?.it || '',
                 meta_description_en: article.meta_description?.en || '',
-                main_tag: article.main_tag?.id || '',
-                other_tags: article.other_tags?.map((t) => t.id) || [],
+                category: article.category?.id || '',
+                tags: article.tags?.map((t) => t.id) || [],
                 is_published: article.is_published || false,
                 published_at: article.published_at
                     ? article.published_at.split('T')[0]
@@ -225,8 +236,8 @@ export default function ArticleForm() {
             );
             formDataToSend.append('is_published', values.is_published);
 
-            if (values.main_tag) {
-                formDataToSend.append('main_tag', values.main_tag);
+            if (values.category) {
+                formDataToSend.append('category', values.category);
             }
 
             if (values.published_at) {
@@ -236,9 +247,9 @@ export default function ArticleForm() {
                 );
             }
 
-            // Add other_tags
-            values.other_tags.forEach((tagId) => {
-                formDataToSend.append('other_tags', tagId);
+            // Add tags
+            values.tags.forEach((tagId) => {
+                formDataToSend.append('tags', tagId);
             });
 
             // Add main_image if present
@@ -484,32 +495,37 @@ export default function ArticleForm() {
                             </div>
                         </div>
 
-                        {/* Tags */}
+                        {/* Category and Tags */}
                         <div className="bg-white shadow-md rounded-lg p-6">
-                            <h2 className="text-xl font-semibold mb-4">Tag</h2>
+                            <h2 className="text-xl font-semibold mb-4">
+                                Categoria e Tag
+                            </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Tag Principale *
+                                        Categoria *
                                     </label>
                                     <Field
                                         as="select"
-                                        name="main_tag"
+                                        name="category"
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="">
-                                            Seleziona un tag
+                                            Seleziona una categoria
                                         </option>
-                                        {tags.map((tag) => (
-                                            <option key={tag.id} value={tag.id}>
-                                                {tag.display_name?.it} /{' '}
-                                                {tag.display_name?.en}
+                                        {categories.map((category) => (
+                                            <option
+                                                key={category.id}
+                                                value={category.id}
+                                            >
+                                                {category.display_name?.it} /{' '}
+                                                {category.display_name?.en}
                                             </option>
                                         ))}
                                     </Field>
                                     <ErrorMessage
-                                        name="main_tag"
+                                        name="category"
                                         component="p"
                                         className="text-red-500 text-sm mt-1"
                                     />
@@ -517,11 +533,11 @@ export default function ArticleForm() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Altri Tag
+                                        Tag
                                     </label>
                                     <Field
                                         as="select"
-                                        name="other_tags"
+                                        name="tags"
                                         multiple
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                         size="4"
@@ -1139,17 +1155,17 @@ export default function ArticleForm() {
 
                     <div className="py-12 px-4 sm:px-6 pt-48">
                         <div className="max-w-5xl mx-auto">
-                            {/* Tags */}
+                            {/* Category and Tags */}
                             <div className="flex items-center justify-center mb-12">
-                                {previewData.main_tag && (
+                                {previewData.category && (
                                     <span className="bg-supero-green text-black px-3 py-1 border border-supero-green me-2">
-                                        {tags.find(
-                                            (t) => t.id == previewData.main_tag
-                                        )?.display_name?.it || 'Tag'}
+                                        {categories.find(
+                                            (c) => c.id == previewData.category
+                                        )?.display_name?.it || 'Categoria'}
                                     </span>
                                 )}
 
-                                {previewData.other_tags?.map((tagId) => {
+                                {previewData.tags?.map((tagId) => {
                                     const tag = tags.find((t) => t.id == tagId);
                                     return tag ? (
                                         <span

@@ -159,11 +159,11 @@ export default function ArticlesList() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        {article.main_tag ? (
+                                        {article.category ? (
                                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                {article.main_tag.display_name
+                                                {article.category.display_name
                                                     ?.it ||
-                                                    article.main_tag
+                                                    article.category
                                                         .display_name?.en ||
                                                     '-'}
                                             </span>

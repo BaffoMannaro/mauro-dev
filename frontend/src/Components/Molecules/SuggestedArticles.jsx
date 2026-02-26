@@ -6,7 +6,7 @@ import useAxios from '../../utils/useAxios';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-export default function SuggestedArticles({ mainTagId, excludeSlug }) {
+export default function SuggestedArticles({ categoryId, excludeSlug }) {
     const [articles, setArticles] = useState([]);
 
     const [slidesToShow, setSlidesToShow] = useState(1);
@@ -38,15 +38,15 @@ export default function SuggestedArticles({ mainTagId, excludeSlug }) {
     useEffect(() => {
         fetchSuggestedArticles();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mainTagId, excludeSlug]);
+    }, [categoryId, excludeSlug]);
 
     const fetchSuggestedArticles = async () => {
-        if (!mainTagId) {
+        if (!categoryId) {
             return;
         }
 
         try {
-            let url = `/blog/articles/suggested/?main_tag=${mainTagId}`;
+            let url = `/blog/articles/suggested/?category=${categoryId}`;
             if (excludeSlug) {
                 url += `&exclude_slug=${excludeSlug}`;
             }
@@ -152,16 +152,16 @@ export default function SuggestedArticles({ mainTagId, excludeSlug }) {
 
                                 {/* Article Content */}
                                 <div className="py-6">
-                                    {/* Tag */}
-                                    {article.main_tag && (
+                                    {/* Category */}
+                                    {article.category && (
                                         <span className="bg-supero-green text-black px-3 py-1 border border-[#434348] me-2">
-                                            {article.main_tag.display_name?.[
+                                            {article.category.display_name?.[
                                                 activeLang
                                             ] || '-'}
                                         </span>
                                     )}
 
-                                    {article.other_tags?.map((tag) => (
+                                    {article.tags?.map((tag) => (
                                         <span
                                             key={tag.id}
                                             className="border bg-[#626271] border-[#434348] text-white px-3 py-1 me-2"

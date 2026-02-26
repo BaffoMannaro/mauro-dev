@@ -2,6 +2,19 @@ from django.db import models
 from django.utils.text import slugify
 
 
+class Category(models.Model):
+    """Model representing a category for blog articles"""
+    display_name_it = models.CharField(max_length=100, help_text="Display name in Italian")
+    display_name_en = models.CharField(max_length=100, help_text="Display name in English")
+    
+    class Meta:
+        ordering = ['display_name_it']
+        verbose_name_plural = "Categories"
+    
+    def __str__(self):
+        return f"{self.display_name_it} / {self.display_name_en}"
+
+
 class Tag(models.Model):
     """Model representing a tag for blog articles"""
     name = models.CharField(max_length=100, unique=True, help_text="Internal tag name (lowercase, no spaces)")
@@ -31,9 +44,9 @@ class Article(models.Model):
     # Main image
     main_image = models.ImageField(upload_to='blog/images/', blank=True, null=True, help_text="Main article image")
     
-    # Tags
-    main_tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True, blank=True, related_name='main_articles', help_text="Primary tag for this article")
-    other_tags = models.ManyToManyField(Tag, blank=True, related_name='articles', help_text="Additional tags")
+    # Category and Tags
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='articles', help_text="Article category")
+    tags = models.ManyToManyField(Tag, blank=True, related_name='articles', help_text="Article tags")
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)

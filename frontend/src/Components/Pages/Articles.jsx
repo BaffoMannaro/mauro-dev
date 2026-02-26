@@ -12,8 +12,8 @@ export default function Articles() {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
 
-    const [selectedTag, setSelectedTag] = useState('');
-    const [tags, setTags] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
     const pageSize = 6; // 6 articoli per pagina per /published/
@@ -26,31 +26,31 @@ export default function Articles() {
 
     const api = useAxios();
 
-    // Fetch tags and initial articles on mount
+    // Fetch categories and initial articles on mount
     useEffect(() => {
-        fetchTags();
+        fetchCategories();
         fetchArticles(1, true);
         isInitialMount.current = false;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Reset and fetch articles when tag changes (skip initial mount)
+    // Reset and fetch articles when category changes (skip initial mount)
     useEffect(() => {
         if (!isInitialMount.current) {
             setCurrentPage(1);
             fetchArticles(1, true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedTag]);
+    }, [selectedCategory]);
 
-    const fetchTags = async () => {
+    const fetchCategories = async () => {
         try {
-            const response = await api.get(`/blog/tags/`);
+            const response = await api.get(`/blog/categories/`);
             console.log(response);
 
-            setTags(response.data.results);
+            setCategories(response.data.results);
         } catch (err) {
-            console.error('Errore nel caricamento dei tag', err);
+            console.error('Errore nel caricamento delle categorie', err);
         }
     };
 
@@ -63,8 +63,8 @@ export default function Articles() {
             }
 
             let url = `/blog/articles/published/?page=${page}&page_size=${pageSize}`;
-            if (selectedTag) {
-                url += `&main_tag=${selectedTag}`;
+            if (selectedCategory) {
+                url += `&category=${selectedCategory}`;
             }
             const response = await api.get(url);
             const newArticles = response.data.results || response.data;
@@ -123,34 +123,35 @@ export default function Articles() {
             ) : (
                 <>
                     <div className="max-w-7xl mx-auto">
-                        {/* Tag Filter */}
-                        {tags.length > 0 && (
+                        {/* Category Filter */}
+                        {categories.length > 0 && (
                             <div className="mb-8 flex px-4 xl:px-0 border-b border-[#434348] pb-4">
                                 <div className="flex flex-wrap gap-2">
                                     <button
-                                        onClick={() => setSelectedTag('')}
+                                        onClick={() => setSelectedCategory('')}
                                         className={`px-4 py-2  text-sm font-medium transition-colors border border-[#434348] ${
-                                            selectedTag === ''
+                                            selectedCategory === ''
                                                 ? 'bg-[#434348] text-white'
                                                 : 'text-gray-300 '
                                         }`}
                                     >
                                         Tutti
                                     </button>
-                                    {tags.map((tag) => (
+                                    {categories.map((category) => (
                                         <button
-                                            key={tag.id}
+                                            key={category.id}
                                             onClick={() =>
-                                                setSelectedTag(tag.id)
+                                                setSelectedCategory(category.id)
                                             }
                                             className={`px-4 py-2  text-sm font-medium transition-colors border border-[#434348] ${
-                                                selectedTag === tag.id
+                                                selectedCategory === category.id
                                                     ? 'bg-[#434348] text-white'
                                                     : 'text-gray-300 '
                                             }`}
                                         >
-                                            {tag.display_name?.[activeLang] ||
-                                                '-'}
+                                            {category.display_name?.[
+                                                activeLang
+                                            ] || '-'}
                                         </button>
                                     ))}
                                 </div>
@@ -222,17 +223,17 @@ export default function Articles() {
 
                                         {/* Article Content */}
                                         <div className="py-6">
-                                            {/* Tag */}
-                                            {article.main_tag && (
+                                            {/* Category */}
+                                            {article.category && (
                                                 <span className=" bg-[#434348] text-white  px-3 py-1 border border-[#434348] me-2">
-                                                    {article.main_tag
+                                                    {article.category
                                                         .display_name?.[
                                                         activeLang
                                                     ] || '-'}
                                                 </span>
                                             )}
 
-                                            {article.other_tags.map((tag) => {
+                                            {article.tags.map((tag) => {
                                                 return (
                                                     <span
                                                         key={tag.id}

@@ -12,6 +12,7 @@ import PressRelease from './Components/Pages/PressRelease';
 import ArticlesList from './Components/Pages/ArticlesList';
 import ArticleForm from './Components/Pages/ArticleForm';
 import TagsList from './Components/Pages/TagsList';
+import CategoriesList from './Components/Pages/CategoriesList';
 import Articles from './Components/Pages/Articles';
 import ArticleDetail from './Components/Pages/ArticleDetail';
 
@@ -88,6 +89,14 @@ export const router = createBrowserRouter([
                         element: (
                             <ProtectedRoute>
                                 <TagsList />
+                            </ProtectedRoute>
+                        ),
+                    },
+                    {
+                        path: '/dashboard/categories/',
+                        element: (
+                            <ProtectedRoute>
+                                <CategoriesList />
                             </ProtectedRoute>
                         ),
                     },

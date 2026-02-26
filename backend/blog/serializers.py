@@ -1,5 +1,37 @@
 from rest_framework import serializers
-from .models import Tag, Article, Block
+from .models import Category, Tag, Article, Block
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Serializer for Category model with nested i18n structure"""
+    display_name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Category
+        fields = ['id', 'display_name']
+    
+    def get_display_name(self, obj):
+        """Return display_name as nested object with it/en"""
+        return {
+            'it': obj.display_name_it,
+            'en': obj.display_name_en
+        }
+    
+    def to_internal_value(self, data):
+        """Handle input data: accept both nested and flat structure"""
+        # If display_name is an object with it/en, flatten it
+        if 'display_name' in data and isinstance(data['display_name'], dict):
+            display_name = data['display_name']
+            data = data.copy()
+            data['display_name_it'] = display_name.get('it', '')
+            data['display_name_en'] = display_name.get('en', '')
+            del data['display_name']
+        
+        internal = {}
+        internal['display_name_it'] = data.get('display_name_it', '')
+        internal['display_name_en'] = data.get('display_name_en', '')
+        
+        return internal
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -83,8 +115,8 @@ class BlockSerializer(serializers.ModelSerializer):
 
 class ArticleListSerializer(serializers.ModelSerializer):
     """Serializer for Article list view with nested i18n"""
-    main_tag = TagSerializer(read_only=True)
-    other_tags = TagSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
     title = serializers.SerializerMethodField()
     meta_title = serializers.SerializerMethodField()
     meta_description = serializers.SerializerMethodField()
@@ -93,7 +125,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
         model = Article
         fields = [
             'id', 'title', 'slug', 'meta_title', 'meta_description',
-            'main_image', 'main_tag', 'other_tags', 'created_at', 'published_at', 'is_published',
+            'main_image', 'category', 'tags', 'created_at', 'published_at', 'is_published',
         ]
 
     
@@ -109,8 +141,8 @@ class ArticleListSerializer(serializers.ModelSerializer):
 
 class ArticleDetailSerializer(serializers.ModelSerializer):
     """Serializer for Article detail view with blocks and nested i18n"""
-    main_tag = TagSerializer(read_only=True)
-    other_tags = TagSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
     blocks = BlockSerializer(many=True, read_only=True)
     title = serializers.SerializerMethodField()
     meta_title = serializers.SerializerMethodField()
@@ -120,7 +152,7 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
         model = Article
         fields = [
             'id', 'title', 'slug', 'meta_title', 'meta_description',
-            'main_image', 'main_tag', 'other_tags', 'created_at', 
+            'main_image', 'category', 'tags', 'created_at', 
             'updated_at', 'published_at', 'is_published', 'blocks'
         ]
     
@@ -144,7 +176,7 @@ class ArticleCreateUpdateSerializer(serializers.ModelSerializer):
             'id', 'title_it', 'title_en', 'slug', 
             'meta_title_it', 'meta_title_en',
             'meta_description_it', 'meta_description_en',
-            'main_image', 'main_tag', 'other_tags', 'is_published',
+            'main_image', 'category', 'tags', 'is_published',
             'published_at', 'blocks'
         ]
     
@@ -174,10 +206,10 @@ class ArticleCreateUpdateSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         blocks_data = validated_data.pop('blocks', [])
-        other_tags = validated_data.pop('other_tags', [])
+        tags = validated_data.pop('tags', [])
         
         article = Article.objects.create(**validated_data)
-        article.other_tags.set(other_tags)
+        article.tags.set(tags)
         
         for block_data in blocks_data:
             Block.objects.create(article=article, **block_data)
@@ -186,16 +218,16 @@ class ArticleCreateUpdateSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         blocks_data = validated_data.pop('blocks', None)
-        other_tags = validated_data.pop('other_tags', None)
+        tags = validated_data.pop('tags', None)
         
         # Update article fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         
-        # Update other_tags if provided
-        if other_tags is not None:
-            instance.other_tags.set(other_tags)
+        # Update tags if provided
+        if tags is not None:
+            instance.tags.set(tags)
         
         # Update blocks if provided
         if blocks_data is not None:

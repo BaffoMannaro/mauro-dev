@@ -15,6 +15,7 @@ import TagsList from './Components/Pages/TagsList';
 import CategoriesList from './Components/Pages/CategoriesList';
 import Articles from './Components/Pages/Articles';
 import ArticleDetail from './Components/Pages/ArticleDetail';
+import CategoryList from './Components/Pages/CategoryList';
 
 export const router = createBrowserRouter([
     {
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
             {
                 path: '/articles/:slug',
                 element: <ArticleDetail />,
+            },
+            {
+                path: '/category/:id',
+                element: <CategoryList />,
             },
 
             {

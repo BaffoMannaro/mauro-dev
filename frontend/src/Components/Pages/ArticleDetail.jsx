@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from '../Molecules/Navbar';
-import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
+import { toast } from 'react-hot-toast';
+import Navbar from '../Molecules/Navbar';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
 
 const BACKEND_URL =
@@ -41,6 +42,7 @@ export default function ArticleDetail() {
             setArticle(response.data);
         } catch (err) {
             console.error("Errore nel caricamento dell'articolo", err);
+            toast.error("Errore nel caricamento dell'articolo");
             if (err.response?.status === 404) {
                 setError('Articolo non trovato');
             } else {
@@ -65,7 +67,7 @@ export default function ArticleDetail() {
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
-                <div className="text-xl">Caricamento articolo...</div>
+                {/* <div className="text-xl">Caricamento articolo...</div> */}
             </div>
         );
     }
@@ -127,10 +129,13 @@ export default function ArticleDetail() {
                     </button> */}
                     <div className="flex items-center justify-center mb-12">
                         {article.category && (
-                            <span className=" bg-supero-green text-black  px-3 py-1 border border-supero-green me-2">
+                            <Link
+                                to={`/category/${article.category.id}`}
+                                className=" bg-supero-green text-black  px-3 py-1 border border-supero-green me-2"
+                            >
                                 {article.category.display_name?.[activeLang] ||
                                     '-'}
-                            </span>
+                            </Link>
                         )}
 
                         {article.tags.map((tag) => {

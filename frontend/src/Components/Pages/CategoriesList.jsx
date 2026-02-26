@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { toast } from 'react-hot-toast';
 import useAxios from '../../utils/useAxios';
 
 const categoryValidationSchema = Yup.object({
@@ -32,6 +33,7 @@ export default function CategoriesList() {
             setError(null);
         } catch (err) {
             setError('Errore nel caricamento delle categorie');
+            toast.error('Errore nel caricamento delle categorie');
             console.error(err);
         } finally {
             setLoading(false);
@@ -49,7 +51,7 @@ export default function CategoriesList() {
             await axios.delete(`/blog/categories/${id}/`);
             setCategories(categories.filter((category) => category.id !== id));
         } catch (err) {
-            alert("Errore nell'eliminazione della categoria");
+            toast.error("Errore nell'eliminazione della categoria");
             console.error(err);
         }
     };
@@ -91,10 +93,9 @@ export default function CategoriesList() {
             closeModal();
         } catch (err) {
             console.error(err);
+            toast.error('Errore nel salvataggio della categoria');
             if (err.response?.data) {
                 setErrors(err.response.data);
-            } else {
-                alert('Errore nel salvataggio della categoria');
             }
         } finally {
             setSubmitting(false);

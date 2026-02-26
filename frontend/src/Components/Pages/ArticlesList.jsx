@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import useAxios from '../../utils/useAxios';
 
 export default function ArticlesList() {
@@ -51,6 +52,7 @@ export default function ArticlesList() {
             setError(null);
         } catch (err) {
             setError('Errore nel caricamento degli articoli');
+            toast.error('Errore nel caricamento degli articoli');
             console.error(err);
         } finally {
             setLoading(false);
@@ -66,7 +68,7 @@ export default function ArticlesList() {
             await api.delete(`/blog/articles/${slug}/`);
             setArticles(articles.filter((article) => article.slug !== slug));
         } catch (err) {
-            alert("Errore nell'eliminazione dell'articolo");
+            toast.error("Errore nell'eliminazione dell'articolo");
             console.error(err);
         }
     };

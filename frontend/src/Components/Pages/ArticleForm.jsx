@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { toast } from 'react-hot-toast';
 import useAxios from '../../utils/useAxios';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import {
@@ -112,6 +113,7 @@ export default function ArticleForm() {
             setCategories(response.data.results || response.data);
         } catch (err) {
             console.error('Errore nel caricamento delle categorie', err);
+            toast.error('Errore nel caricamento delle categorie');
         }
     };
 
@@ -121,6 +123,7 @@ export default function ArticleForm() {
             setTags(response.data.results || response.data);
         } catch (err) {
             console.error('Errore nel caricamento dei tag', err);
+            toast.error('Errore nel caricamento dei tag');
         }
     };
 
@@ -169,7 +172,7 @@ export default function ArticleForm() {
             }
         } catch (err) {
             console.error("Errore nel caricamento dell'articolo", err);
-            alert("Errore nel caricamento dell'articolo");
+            toast.error("Errore nel caricamento dell'articolo");
         } finally {
             setLoading(false);
         }
@@ -293,10 +296,10 @@ export default function ArticleForm() {
             navigate('/dashboard/articles');
         } catch (err) {
             console.error('Errore nel salvataggio', err);
+            toast.error("Errore nel salvataggio dell'articolo");
             if (err.response?.data) {
                 setErrors(err.response.data);
             }
-            alert("Errore nel salvataggio dell'articolo");
         } finally {
             setSubmitting(false);
         }

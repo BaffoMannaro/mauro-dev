@@ -1,58 +1,62 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import Navbar from '../Molecules/Navbar';
-import blockRight from '../../assets/images/block-right-kh.png';
-import useAxios from '../../utils/useAxios';
 import Footer from '../Landing/Footer';
 import GetInTouch from '../Landing/GetInTouch';
+import useAxios from '../../utils/useAxios';
 
-export default function Articles() {
+export default function CategoryList() {
+    const { id } = useParams();
     const [articles, setArticles] = useState([]);
+    const [category, setCategory] = useState(null);
+    const [tags, setTags] = useState([]);
+    const [selectedTag, setSelectedTag] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
-
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [categories, setCategories] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
-    const pageSize = 6; // 6 articoli per pagina per /published/
-    const isInitialMount = useRef(true);
+    const pageSize = 6;
 
-    const { t } = useTranslation();
-
-    const { i18n } = useTranslation();
+    const { i18n, t } = useTranslation();
     const activeLang = i18n.resolvedLanguage;
-
     const api = useAxios();
 
-    // Fetch categories and initial articles on mount
+    // Fetch category details and all tags when id changes
     useEffect(() => {
-        fetchCategories();
+        fetchCategory();
+        fetchAllTags();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
+
+    // Fetch articles when id or selectedTag changes
+    useEffect(() => {
         fetchArticles(1, true);
-        isInitialMount.current = false;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [id, selectedTag]);
 
-    // Reset and fetch articles when category changes (skip initial mount)
-    useEffect(() => {
-        if (!isInitialMount.current) {
-            setCurrentPage(1);
-            fetchArticles(1, true);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedCategory]);
-
-    const fetchCategories = async () => {
+    const fetchCategory = async () => {
         try {
-            const response = await api.get(`/blog/categories/`);
-            console.log(response);
-
-            setCategories(response.data.results);
+            const response = await api.get(`/blog/categories/${id}/`);
+            setCategory(response.data);
         } catch (err) {
-            console.error('Errore nel caricamento delle categorie', err);
-            toast.error('Errore nel caricamento delle categorie');
+            console.error('Errore nel caricamento della categoria', err);
+            toast.error('Errore nel caricamento della categoria');
+        }
+    };
+
+    const fetchAllTags = async () => {
+        try {
+            // Fetch all articles from this category to extract all tags
+            const response = await api.get(
+                `/blog/articles/published/?category=${id}&page_size=100`
+            );
+            const allArticles = response.data.results || response.data;
+            extractTags(allArticles);
+        } catch (err) {
+            console.error('Errore nel caricamento dei tag', err);
+            toast.error('Errore nel caricamento dei tag');
         }
     };
 
@@ -64,10 +68,11 @@ export default function Articles() {
                 setLoadingMore(true);
             }
 
-            let url = `/blog/articles/published/?page=${page}&page_size=${pageSize}`;
-            if (selectedCategory) {
-                url += `&category=${selectedCategory}`;
+            let url = `/blog/articles/published/?page=${page}&page_size=${pageSize}&category=${id}`;
+            if (selectedTag) {
+                url += `&tags=${selectedTag}`;
             }
+
             const response = await api.get(url);
             const newArticles = response.data.results || response.data;
             const totalCount = response.data.count || 0;
@@ -89,6 +94,26 @@ export default function Articles() {
         }
     };
 
+    const extractTags = (articlesList) => {
+        // Extract all unique tags from the articles
+        const tagMap = new Map();
+        articlesList.forEach((article) => {
+            if (article.tags && Array.isArray(article.tags)) {
+                article.tags.forEach((tag) => {
+                    if (!tagMap.has(tag.id)) {
+                        tagMap.set(tag.id, tag);
+                    }
+                });
+            }
+        });
+        setTags(Array.from(tagMap.values()));
+    };
+
+    const handleTagClick = (tagId) => {
+        setSelectedTag(tagId);
+        setCurrentPage(1);
+    };
+
     const loadMore = () => {
         const nextPage = currentPage + 1;
         setCurrentPage(nextPage);
@@ -98,32 +123,22 @@ export default function Articles() {
     return (
         <>
             <Navbar />
-            <div className="h-[70vh] xl:h-[80vh] flex flex-wrap items-center pt-2 xl:pt-32 pb-6 xl:py-6 relative">
-                <div className="px-6 xl:px-12 w-full xl:w-1/2 relative z-10">
-                    <h3 className="title" style={{}}>
-                        Knowledge <br className="xl:hidden" />
-                        <span className="text-supero-green font-black font-stretch-125  tracking-tight">
-                            Hub
-                        </span>
-                    </h3>
-                    <p className="mt-6 xl:mt-12 max-w-[700px] text-left text-body-l whitespace-pre-line">
-                        {t('knowledge_hub_description')}
-                    </p>
-                </div>
+            <div className="min-h-screen pt-32 xl:pt-32 ">
+                <div className="max-w-7xl mx-auto px-4 xl:px-0">
+                    {/* Category Header */}
+                    <div className="mb-8">
+                        <h1 className="title mb-4 text-white">
+                            {category?.display_name?.[activeLang] ||
+                                'Categoria'}
+                        </h1>
+                    </div>
 
-                <img
-                    src={blockRight}
-                    alt="Decorative block"
-                    className="hidden xl:block absolute right-0 top-1/2 transform -translate-y-1/2" // center this block vertically on the right side
-                />
-            </div>
-            <div className="max-w-7xl mx-auto">
-                {loading ? (
-                    <>
-                        {/* Skeleton Loader */}
-                        <div className="mb-8 flex px-4 xl:px-0 border-b border-[#434348] pb-4">
+                    {/* Tags Filter */}
+                    {loading ? (
+                        <div className="mb-8 border-b border-[#434348] pb-4">
+                            <div className="h-6 bg-gray-700 animate-pulse w-32 mb-3" />
                             <div className="flex flex-wrap gap-2">
-                                {[1, 2, 3, 4].map((i) => (
+                                {[1, 2, 3, 4, 5].map((i) => (
                                     <div
                                         key={i}
                                         className="h-10 w-24 bg-gray-700 animate-pulse"
@@ -131,7 +146,47 @@ export default function Articles() {
                                 ))}
                             </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 xl:px-0">
+                    ) : (
+                        tags.length > 0 && (
+                            <div className="mb-8 border-b border-[#434348] pb-4">
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedTag(null);
+                                            setCurrentPage(1);
+                                        }}
+                                        className={`px-4 py-2 text-sm font-medium transition-colors border border-[#434348] ${
+                                            selectedTag === null
+                                                ? 'bg-supero-green text-black border-supero-green'
+                                                : 'text-gray-300 hover:bg-[#434348] hover:text-white'
+                                        }`}
+                                    >
+                                        {t('all')}
+                                    </button>
+                                    {tags.map((tag) => (
+                                        <button
+                                            key={tag.id}
+                                            onClick={() =>
+                                                handleTagClick(tag.id)
+                                            }
+                                            className={`px-4 py-2 text-sm font-medium transition-colors border border-[#434348] ${
+                                                selectedTag === tag.id
+                                                    ? 'bg-supero-green text-black border-supero-green'
+                                                    : 'text-gray-300 hover:bg-[#434348] hover:text-white'
+                                            }`}
+                                        >
+                                            {tag.display_name?.[activeLang] ||
+                                                tag.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    )}
+
+                    {/* Articles Grid */}
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
                                 <div key={i} className="overflow-hidden">
                                     <div className="h-[240px] xl:h-[280px] w-full bg-gray-700 animate-pulse" />
@@ -143,52 +198,15 @@ export default function Articles() {
                                 </div>
                             ))}
                         </div>
-                    </>
-                ) : (
-                    <>
-                        {/* Category Filter */}
-                        {categories.length > 0 && (
-                            <div className="mb-8 flex px-4 xl:px-0 border-b border-[#434348] pb-4">
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        onClick={() => setSelectedCategory('')}
-                                        className={`px-4 py-2  text-sm font-medium transition-colors border border-[#434348] ${
-                                            selectedCategory === ''
-                                                ? 'bg-[#434348] text-white'
-                                                : 'text-gray-300 '
-                                        }`}
-                                    >
-                                        {t('all')}
-                                    </button>
-                                    {categories.map((category) => (
-                                        <button
-                                            key={category.id}
-                                            onClick={() =>
-                                                setSelectedCategory(category.id)
-                                            }
-                                            className={`px-4 py-2  text-sm font-medium transition-colors border border-[#434348] ${
-                                                selectedCategory === category.id
-                                                    ? 'bg-[#434348] text-white'
-                                                    : 'text-gray-300 '
-                                            }`}
-                                        >
-                                            {category.display_name?.[
-                                                activeLang
-                                            ] || '-'}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Articles Grid */}
-                        {articles.length === 0 ? (
-                            <div className="text-center py-12">
-                                <p className="text-xl text-gray-600 dark:text-gray-400">
-                                    Nessun articolo pubblicato al momento.
-                                </p>
-                            </div>
-                        ) : (
+                    ) : articles.length === 0 ? (
+                        <div className="text-center py-12">
+                            <p className="text-xl text-gray-600 dark:text-gray-400">
+                                Nessun articolo trovato per questa categoria
+                                {selectedTag && ' con il tag selezionato'}.
+                            </p>
+                        </div>
+                    ) : (
+                        <>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 xl:px-0">
                                 {articles.map((article) => (
                                     <div
@@ -278,22 +296,24 @@ export default function Articles() {
                                     </div>
                                 ))}
                             </div>
-                        )}
 
-                        {/* Load More Button */}
-                        {hasMore && !loading && (
-                            <div className="mt-12 mb-8 px-4">
-                                <button
-                                    onClick={loadMore}
-                                    disabled={loadingMore}
-                                    className="w-full px-8 py-3 bg-[#A6A6AB] text-black uppercase transition-colors text-center hover:bg-[#555559] disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold"
-                                >
-                                    {loadingMore ? 'Loading...' : 'Load more'}
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
+                            {/* Load More Button */}
+                            {hasMore && (
+                                <div className="flex justify-center mt-12">
+                                    <button
+                                        onClick={loadMore}
+                                        disabled={loadingMore}
+                                        className="px-8 py-3 bg-supero-green text-white font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50"
+                                    >
+                                        {loadingMore
+                                            ? 'Caricamento...'
+                                            : 'Carica altri articoli'}
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
 
             <GetInTouch />

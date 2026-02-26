@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { toast } from 'react-hot-toast';
 import useAxios from '../../utils/useAxios';
 
 // Validation schema
@@ -36,6 +37,7 @@ export default function TagsList() {
             setError(null);
         } catch (err) {
             setError('Errore nel caricamento dei tag');
+            toast.error('Errore nel caricamento dei tag');
             console.error(err);
         } finally {
             setLoading(false);
@@ -51,7 +53,7 @@ export default function TagsList() {
             await axios.delete(`/blog/tags/${id}/`);
             setTags(tags.filter((tag) => tag.id !== id));
         } catch (err) {
-            alert("Errore nell'eliminazione del tag");
+            toast.error("Errore nell'eliminazione del tag");
             console.error(err);
         }
     };
@@ -93,10 +95,9 @@ export default function TagsList() {
             closeModal();
         } catch (err) {
             console.error(err);
+            toast.error('Errore nel salvataggio del tag');
             if (err.response?.data) {
                 setErrors(err.response.data);
-            } else {
-                alert('Errore nel salvataggio del tag');
             }
         } finally {
             setSubmitting(false);

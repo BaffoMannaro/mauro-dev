@@ -7,8 +7,7 @@ import { toast } from 'react-hot-toast';
 import Navbar from '../Molecules/Navbar';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
 
-const BACKEND_URL =
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 export default function ArticleDetail() {
     const { slug } = useParams();

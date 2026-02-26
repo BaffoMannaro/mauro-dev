@@ -48,8 +48,8 @@ export default function Login() {
         <div className="min-h-screen pt-24 bg-deep-space-2 flex flex-col items-center justify-center">
             <Formik
                 initialValues={{
-                    email: 'root@root.root',
-                    password: 'root',
+                    email: '',
+                    password: '',
                     showPassword: false,
                 }}
                 validationSchema={Yup.object({

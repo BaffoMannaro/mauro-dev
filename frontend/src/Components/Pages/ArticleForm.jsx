@@ -21,8 +21,7 @@ import {
 
 import 'ckeditor5/ckeditor5.css';
 
-const BACKEND_URL =
-    import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 const articleValidationSchema = Yup.object({
     title_it: Yup.string().required('Il titolo in italiano è obbligatorio'),

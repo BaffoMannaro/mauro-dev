@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.conf import settings
 from .models import Category, Tag, Article, Block
 
+MAX_UPLOAD_SIZE = 15 * 1024 * 1024
 
 class CategorySerializer(serializers.ModelSerializer):
     """Serializer for Category model with nested i18n structure"""
@@ -258,3 +259,8 @@ class ArticleCreateUpdateSerializer(serializers.ModelSerializer):
                 Block.objects.create(article=instance, **block_data)
         
         return instance
+
+    def validate_main_image(self, f):
+        if f and f.size > MAX_UPLOAD_SIZE:
+            raise serializers.ValidationError("Max file size is 15 MB.")
+        return f

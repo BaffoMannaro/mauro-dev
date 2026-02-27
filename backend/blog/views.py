@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.exceptions import ValidationError
 
 from .models import Category, Tag, Article, Block
 from .serializers import (
@@ -16,6 +17,11 @@ from .serializers import (
     BlockSerializer
 )
 
+MAX_UPLOAD_SIZE = 15 * 1024 * 1024
+
+def _validate_upload(f, name="file"):
+    if f.size > MAX_UPLOAD_SIZE:
+        raise ValidationError({name: "Max file size is 15 MB."}
 
 class ArticlePagination(PageNumberPagination):
     """Custom pagination class for articles that allows page_size parameter"""
@@ -134,7 +140,12 @@ class ArticleViewSet(viewsets.ModelViewSet):
         # Estrai i blocchi dal JSON
         blocks_json = request.data.get('blocks', '[]')
         blocks_data = json.loads(blocks_json) if isinstance(blocks_json, str) else blocks_json
-        
+
+        # Validate uploads (main_image + block_image_*)
+        for key, f in request.FILES.items():
+            if key == "main_image" or key.startswith("block_image_"):
+                _validate_upload(f, key)
+
         # Collect block images from FILES
         block_images = {}
         for key in request.FILES.keys():
@@ -188,7 +199,12 @@ class ArticleViewSet(viewsets.ModelViewSet):
         # Estrai i blocchi dal JSON
         blocks_json = request.data.get('blocks', '[]')
         blocks_data = json.loads(blocks_json) if isinstance(blocks_json, str) else blocks_json
-        
+
+        # Validate uploads (main_image + block_image_*)
+        for key, f in request.FILES.items():
+            if key == "main_image" or key.startswith("block_image_"):
+                _validate_upload(f, key)
+
         # Collect block images from FILES
         block_images = {}
         for key in request.FILES.keys():

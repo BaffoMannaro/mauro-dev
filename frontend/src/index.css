@@ -114,7 +114,9 @@ body {
     background: #555;
 }
 
-
+.ck.ck-content.ck-editor__editable {
+    background: #333;
+}
 
 .ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline ol,
 .ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline ul {

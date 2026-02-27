@@ -135,21 +135,27 @@ class ArticleViewSet(viewsets.ModelViewSet):
         blocks_json = request.data.get('blocks', '[]')
         blocks_data = json.loads(blocks_json) if isinstance(blocks_json, str) else blocks_json
         
-        # Prepara i dati per il serializer (senza blocchi)
-        article_data = request.data.copy()
-        article_data.pop('blocks', None)
-        
-        # Rimuovi i file dei blocchi dai dati dell'articolo
+        # Collect block images from FILES
         block_images = {}
-        keys_to_remove = []
-        for key in request.data.keys():
+        for key in request.FILES.keys():
             if key.startswith('block_image_'):
                 idx = key.replace('block_image_', '')
                 block_images[int(idx)] = request.FILES[key]
-                keys_to_remove.append(key)
         
-        for key in keys_to_remove:
-            article_data.pop(key, None)
+        # Build article_data manually to avoid deep copying file objects
+        # Skip 'blocks' and 'block_image_*' fields
+        article_data = {}
+        for key in request.data.keys():
+            if key != 'blocks' and not key.startswith('block_image_'):
+                # Use getlist for fields that expect multiple values
+                if key == 'tags':
+                    article_data[key] = request.data.getlist(key)
+                else:
+                    article_data[key] = request.data[key]
+        
+        # Add main_image from FILES if present
+        if 'main_image' in request.FILES:
+            article_data['main_image'] = request.FILES['main_image']
         
         # Crea l'articolo
         serializer = self.get_serializer(data=article_data)
@@ -183,21 +189,27 @@ class ArticleViewSet(viewsets.ModelViewSet):
         blocks_json = request.data.get('blocks', '[]')
         blocks_data = json.loads(blocks_json) if isinstance(blocks_json, str) else blocks_json
         
-        # Prepara i dati per il serializer (senza blocchi)
-        article_data = request.data.copy()
-        article_data.pop('blocks', None)
-        
-        # Rimuovi i file dei blocchi dai dati dell'articolo
+        # Collect block images from FILES
         block_images = {}
-        keys_to_remove = []
-        for key in request.data.keys():
+        for key in request.FILES.keys():
             if key.startswith('block_image_'):
                 idx = key.replace('block_image_', '')
                 block_images[int(idx)] = request.FILES[key]
-                keys_to_remove.append(key)
         
-        for key in keys_to_remove:
-            article_data.pop(key, None)
+        # Build article_data manually to avoid deep copying file objects
+        # Skip 'blocks' and 'block_image_*' fields
+        article_data = {}
+        for key in request.data.keys():
+            if key != 'blocks' and not key.startswith('block_image_'):
+                # Use getlist for fields that expect multiple values
+                if key == 'tags':
+                    article_data[key] = request.data.getlist(key)
+                else:
+                    article_data[key] = request.data[key]
+        
+        # Add main_image from FILES if present
+        if 'main_image' in request.FILES:
+            article_data['main_image'] = request.FILES['main_image']
         
         # Aggiorna l'articolo
         serializer = self.get_serializer(instance, data=article_data, partial=partial)

@@ -924,15 +924,15 @@ export default function ArticleForm() {
                                                                         className="text-red-500 text-sm mt-1"
                                                                     />
                                                                 </div>
-                                                                <div>
+                                                                <div className="">
                                                                     <label className="block text-sm font-medium mb-2">
                                                                         Content
                                                                         (English)
                                                                         *
                                                                     </label>
-                                                                    <div className="editor-container editor-container_classic-editor">
+                                                                    <div className="editor-container editor-container_classic-editor ">
                                                                         <div className="editor-container__editor text-black prose">
-                                                                            <div>
+                                                                            <div className="">
                                                                                 <CKEditor
                                                                                     onChange={(
                                                                                         event,

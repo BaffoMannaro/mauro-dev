@@ -23,7 +23,7 @@ export default function Footer() {
                 className="mx-auto block relative bottom-[-1px]"
             />
 
-            <div className="bg-[#434348] py-10 px-41 xl:px-12">
+            <div className="bg-[#434348] py-10 px-4 xl:px-12">
                 <div className="w-full flex justify-around flex-wrap">
                     <div className="w-full xl:w-4/5 xl:pe-12">
                         <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
@@ -55,6 +55,7 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
+                <hr className="bg-[#626271] mt-12" />
             </div>
 
             <div className="bg-[#434348] py-10 px-4 xl:px-12">
@@ -88,6 +89,7 @@ export default function Footer() {
                             <img
                                 src={pugliaSviluppo}
                                 alt="Puglia Sviluppo Logo"
+                                className="max-w-32"
                             />
                         </div>
                     </div>
@@ -99,7 +101,41 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
+                <hr className="bg-[#626271] mt-12" />
             </div>
+            <div className="bg-[#434348] py-10 px-4 xl:px-12">
+                <div className="w-full flex items-center justify-around flex-wrap">
+                    <div className="w-full xl:w-4/5 xl:pe-12">
+                        <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
+                            <div>
+                                <img
+                                    src={cofinanziato}
+                                    alt="Cofinanziato Logo"
+                                />
+                            </div>
+                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
+                            <div>
+                                <img src={repubblica} alt="Repubblica Logo" />
+                            </div>
+                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
+                            <div>
+                                <img
+                                    src={regionePuglia}
+                                    alt="Regione Puglia Logo"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="w-full xl:w-1/5">
+                        <div className="">
+                            <p className="text-body-s opacity-70">
+                                {t('visioprint_cofinanced')}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="bg-supero-dark-grey py-4">
                 <div className="w-full text-center">
                     <p className="text-body-m opacity-60">

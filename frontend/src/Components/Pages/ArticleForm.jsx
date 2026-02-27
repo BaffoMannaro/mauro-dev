@@ -22,6 +22,41 @@ import {
 import 'ckeditor5/ckeditor5.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+const MAX_UPLOAD_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
+
+const getFirstApiErrorMessage = (data) => {
+    if (!data) return null;
+    if (typeof data === 'string') return data;
+    if (Array.isArray(data)) return data[0] ?? null;
+    if (typeof data === 'object') {
+        // Prefer common DRF keys / our known fields.
+        const preferredKeys = [
+            'main_image',
+            'image',
+            'file',
+            'detail',
+            'non_field_errors',
+        ];
+
+        for (const key of preferredKeys) {
+            if (data[key]) {
+                const msg = getFirstApiErrorMessage(data[key]);
+                if (!msg) continue;
+                if (key === 'detail' || key === 'non_field_errors') return msg;
+                return `${key}: ${msg}`;
+            }
+        }
+
+        const keys = Object.keys(data);
+        if (!keys.length) return null;
+        const key = keys[0];
+        const msg = getFirstApiErrorMessage(data[key]);
+        if (!msg) return null;
+        if (key === 'detail' || key === 'non_field_errors') return msg;
+        return `${key}: ${msg}`;
+    }
+    return null;
+};
 
 const articleValidationSchema = Yup.object({
     title_it: Yup.string().required('Il titolo in italiano è obbligatorio'),
@@ -180,6 +215,12 @@ export default function ArticleForm() {
     const handleMainImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+                setMainImageError('Max file size is 15 MB.');
+                // Reset input so the user can re-select the same file after fixing it.
+                e.target.value = '';
+                return;
+            }
             setMainImageFile(file);
             setMainImageError('');
             const reader = new FileReader();
@@ -295,9 +336,16 @@ export default function ArticleForm() {
             navigate('/dashboard/articles');
         } catch (err) {
             console.error('Errore nel salvataggio', err);
-            toast.error("Errore nel salvataggio dell'articolo");
-            if (err.response?.data) {
-                setErrors(err.response.data);
+            const apiData = err.response?.data;
+            const apiMessage = getFirstApiErrorMessage(apiData);
+            toast.error(apiMessage || "Errore nel salvataggio dell'articolo");
+
+            if (apiData) {
+                // main_image isn't a Formik field (it's handled via local state), so show it under the input too.
+                if (apiData.main_image) {
+                    setMainImageError(getFirstApiErrorMessage(apiData.main_image) || String(apiData.main_image));
+                }
+                setErrors(apiData);
             }
         } finally {
             setSubmitting(false);

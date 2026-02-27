@@ -21,7 +21,7 @@ MAX_UPLOAD_SIZE = 15 * 1024 * 1024
 
 def _validate_upload(f, name="file"):
     if f.size > MAX_UPLOAD_SIZE:
-        raise ValidationError({name: "Max file size is 15 MB."})
+        raise ValidationError({name: "La dimensione massima del file è 15 MB."})
 
 class ArticlePagination(PageNumberPagination):
     """Custom pagination class for articles that allows page_size parameter"""

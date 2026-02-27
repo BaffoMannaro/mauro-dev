@@ -262,5 +262,5 @@ class ArticleCreateUpdateSerializer(serializers.ModelSerializer):
 
     def validate_main_image(self, f):
         if f and f.size > MAX_UPLOAD_SIZE:
-            raise serializers.ValidationError("Max file size is 15 MB.")
+            raise serializers.ValidationError("La dimensione massima del file è 15 MB.")
         return f

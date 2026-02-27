@@ -216,7 +216,9 @@ export default function ArticleForm() {
         const file = e.target.files[0];
         if (file) {
             if (file.size > MAX_UPLOAD_SIZE_BYTES) {
-                setMainImageError('Max file size is 15 MB.');
+                const msg = 'La dimensione massima del file è 15 MB.';
+                setMainImageError(msg);
+                toast.error(msg);
                 // Reset input so the user can re-select the same file after fixing it.
                 e.target.value = '';
                 return;
@@ -238,6 +240,10 @@ export default function ArticleForm() {
 
     const handleBlockImageChange = (index, file, setFieldValue, values) => {
         if (file) {
+            if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+                toast.error('La dimensione massima del file è 15 MB.');
+                return;
+            }
             const reader = new FileReader();
             reader.onloadend = () => {
                 const updatedBlocks = [...values.blocks];
@@ -336,9 +342,27 @@ export default function ArticleForm() {
             navigate('/dashboard/articles');
         } catch (err) {
             console.error('Errore nel salvataggio', err);
-            const apiData = err.response?.data;
-            const apiMessage = getFirstApiErrorMessage(apiData);
-            toast.error(apiMessage || "Errore nel salvataggio dell'articolo");
+            // Axios should give us err.response.data, but in some environments it can be missing
+            // while the raw XHR responseText is still available.
+            let apiData = err.response?.data;
+            if (!apiData && err.request?.responseText) {
+                try {
+                    apiData = JSON.parse(err.request.responseText);
+                } catch {
+                    apiData = err.request.responseText;
+                }
+            }
+            // Prefer the specific main_image error (we want to show the validator message as-is).
+            const mainImageApiMessage =
+                apiData && typeof apiData === 'object' && apiData.main_image
+                    ? getFirstApiErrorMessage(apiData.main_image)
+                    : null;
+            const apiMessage = getFirstApiErrorMessage(apiData) || err.message;
+            toast.error(
+                mainImageApiMessage ||
+                    apiMessage ||
+                    "Errore nel salvataggio dell'articolo"
+            );
 
             if (apiData) {
                 // main_image isn't a Formik field (it's handled via local state), so show it under the input too.

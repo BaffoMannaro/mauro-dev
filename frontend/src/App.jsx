@@ -1,6 +1,6 @@
 import './App.css';
 import { RouterProvider } from 'react-router-dom';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider } from 'react-helmet-async';
 
 import { router } from './router';
 

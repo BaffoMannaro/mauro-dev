@@ -39,8 +39,8 @@ const staticPages = [
  */
 async function fetchArticles() {
     try {
-        console.log(`Fetching articles from ${BACKEND_URL}/blog/articles/published/...`);
-        const response = await fetch(`${BACKEND_URL}/blog/articles/published/?page_size=1000`);
+        console.log(`Fetching articles from https://superotech.ai/backend/blog/articles/published/...`);
+        const response = await fetch(`https://superotech.ai/backend/blog/articles/published/?page_size=1000`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -61,8 +61,8 @@ async function fetchArticles() {
  */
 async function fetchCategories() {
     try {
-        console.log(`Fetching categories from ${BACKEND_URL}/blog/categories/...`);
-        const response = await fetch(`${BACKEND_URL}/blog/categories/?page_size=1000`);
+        console.log(`Fetching categories from https://superotech.ai/backend/blog/categories/...`);
+        const response = await fetch(`https://superotech.ai/backend/blog/categories/?page_size=1000`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import Footer from '../Landing/Footer';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -9,6 +10,27 @@ export default function ThankYouPage() {
 
     return (
         <>
+            <Helmet>
+                <title>Supero | Thank You</title>
+                <link
+                    rel="canonical"
+                    href="https://superotech.ai/thank-you-page"
+                />
+                <meta
+                    name="description"
+                    content="Thank you for reaching out to SUPERO. We'll be in touch soon."
+                />
+                <meta property="og:title" content="Supero | Thank You" />
+                <meta
+                    property="og:description"
+                    content="Thank you for reaching out to SUPERO. We'll be in touch soon."
+                />
+                <meta
+                    property="og:url"
+                    content="https://superotech.ai/thank-you-page"
+                />
+                <meta property="og:type" content="website" />
+            </Helmet>
             <div className="min-h-screen pt-24 bg-supero-dark-grey flex flex-col items-center justify-center bg-typ">
                 <p className="title text-center">
                     Let's make <br /> technology <br />

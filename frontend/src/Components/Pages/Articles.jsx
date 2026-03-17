@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
 import blockRight from '../../assets/images/block-right-kh.png';
 import useAxios from '../../utils/useAxios';
@@ -97,6 +98,27 @@ export default function Articles() {
 
     return (
         <>
+            <Helmet>
+                <title>SUPERO Knowledge Hub – Articles & Insights</title>
+                <link rel="canonical" href="https://superotech.ai/articles" />
+                <meta
+                    name="description"
+                    content="Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation."
+                />
+                <meta
+                    property="og:title"
+                    content="SUPERO Knowledge Hub – Articles & Insights"
+                />
+                <meta
+                    property="og:description"
+                    content="Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation."
+                />
+                <meta
+                    property="og:url"
+                    content="https://superotech.ai/articles"
+                />
+                <meta property="og:type" content="website" />
+            </Helmet>
             <Navbar />
             <div className="h-[70vh] xl:h-[80vh] flex flex-wrap items-center pt-2 xl:pt-32 pb-6 xl:py-6 relative">
                 <div className="px-6 xl:px-12 w-full xl:w-1/2 relative z-10">

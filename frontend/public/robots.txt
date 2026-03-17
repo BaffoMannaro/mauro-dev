@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow dashboard and admin pages
+Disallow: /dashboard/
+Disallow: /login
+
+# Sitemap location
+Sitemap: https://superotech.ai/sitemap.xml

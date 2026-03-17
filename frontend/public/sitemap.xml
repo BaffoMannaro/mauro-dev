@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+    
+    <!-- Homepage -->
+    <url>
+        <loc>https://superotech.ai/</loc>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+        <lastmod>2026-03-16</lastmod>
+    </url>
+    
+    <!-- Articles List -->
+    <url>
+        <loc>https://superotech.ai/articles</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+        <lastmod>2026-03-16</lastmod>
+    </url>
+    
+    <!-- Press Release -->
+    <url>
+        <loc>https://superotech.ai/comunicato-stampa-rebranding</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+        <lastmod>2026-03-16</lastmod>
+    </url>
+    
+    <!-- Thank You Page -->
+    <url>
+        <loc>https://superotech.ai/thank-you-page</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.3</priority>
+        <lastmod>2026-03-16</lastmod>
+    </url>
+    
+    <!-- 
+    NOTE: This sitemap should be dynamically generated to include:
+    - All published articles: /articles/{slug}
+    - All categories: /category/{id}
+    
+    Consider using a server-side script or backend endpoint to generate
+    a complete sitemap.xml file that includes all dynamic content.
+    
+    For dynamic sitemap generation, you can create an endpoint in your backend:
+    GET /api/sitemap.xml that queries the database for all published articles
+    and categories, then generates the complete sitemap.
+    -->
+    
+</urlset>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
 import Footer from '../Landing/Footer';
 import GetInTouch from '../Landing/GetInTouch';
@@ -122,6 +123,33 @@ export default function CategoryList() {
 
     return (
         <>
+            <Helmet>
+                <title>
+                    Supero |{' '}
+                    {category?.display_name?.[activeLang] || 'Category'}
+                </title>
+                <link
+                    rel="canonical"
+                    href={`https://superotech.ai/category/${id}`}
+                />
+                <meta
+                    name="description"
+                    content={`Explore ${category?.display_name?.[activeLang] || 'category'} articles in SUPERO Knowledge Hub`}
+                />
+                <meta
+                    property="og:title"
+                    content={`Supero | ${category?.display_name?.[activeLang] || 'Category'}`}
+                />
+                <meta
+                    property="og:description"
+                    content={`Explore ${category?.display_name?.[activeLang] || 'category'} articles in SUPERO Knowledge Hub`}
+                />
+                <meta
+                    property="og:url"
+                    content={`https://superotech.ai/category/${id}`}
+                />
+                <meta property="og:type" content="website" />
+            </Helmet>
             <Navbar />
             <div className="min-h-screen pt-32 xl:pt-32 ">
                 <div className="max-w-7xl mx-auto px-4 xl:px-0">

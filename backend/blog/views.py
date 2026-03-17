@@ -1,6 +1,8 @@
 import json
+from datetime import datetime
+from django.http import HttpResponse
 from rest_framework import viewsets, filters, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
@@ -267,3 +269,62 @@ class BlockViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['article', 'block_type']
     ordering_fields = ['order']
+
+
+@api_view(['GET'])
+def sitemap_xml(request):
+    """
+    Generate dynamic sitemap.xml with all published articles and categories
+    """
+    base_url = "https://superotech.ai"
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    # Start XML
+    xml_content = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    
+    # Static pages
+    static_pages = [
+        {'loc': f'{base_url}/', 'priority': '1.0', 'changefreq': 'weekly'},
+        {'loc': f'{base_url}/articles', 'priority': '0.9', 'changefreq': 'daily'},
+        {'loc': f'{base_url}/comunicato-stampa-rebranding', 'priority': '0.7', 'changefreq': 'monthly'},
+        {'loc': f'{base_url}/thank-you-page', 'priority': '0.3', 'changefreq': 'monthly'},
+    ]
+    
+    for page in static_pages:
+        xml_content.append('  <url>')
+        xml_content.append(f'    <loc>{page["loc"]}</loc>')
+        xml_content.append(f'    <changefreq>{page["changefreq"]}</changefreq>')
+        xml_content.append(f'    <priority>{page["priority"]}</priority>')
+        xml_content.append(f'    <lastmod>{today}</lastmod>')
+        xml_content.append('  </url>')
+    
+    # Add all published articles
+    articles = Article.objects.filter(is_published=True).order_by('-published_at')
+    for article in articles:
+        lastmod = article.updated_at.strftime('%Y-%m-%d') if article.updated_at else today
+        xml_content.append('  <url>')
+        xml_content.append(f'    <loc>{base_url}/articles/{article.slug}</loc>')
+        xml_content.append(f'    <changefreq>monthly</changefreq>')
+        xml_content.append(f'    <priority>0.8</priority>')
+        xml_content.append(f'    <lastmod>{lastmod}</lastmod>')
+        xml_content.append('  </url>')
+    
+    # Add all categories
+    categories = Category.objects.all()
+    for category in categories:
+        xml_content.append('  <url>')
+        xml_content.append(f'    <loc>{base_url}/category/{category.id}</loc>')
+        xml_content.append(f'    <changefreq>weekly</changefreq>')
+        xml_content.append(f'    <priority>0.7</priority>')
+        xml_content.append(f'    <lastmod>{today}</lastmod>')
+        xml_content.append('  </url>')
+    
+    # Close XML
+    xml_content.append('</urlset>')
+    
+    # Return XML response
+    xml_string = '\n'.join(xml_content)
+    return HttpResponse(xml_string, content_type='application/xml')

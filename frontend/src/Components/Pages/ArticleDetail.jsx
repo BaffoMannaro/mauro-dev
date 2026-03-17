@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { toast } from 'react-hot-toast';
 import Navbar from '../Molecules/Navbar';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
+import Footer from '../Landing/Footer';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
@@ -95,6 +96,10 @@ export default function ArticleDetail() {
                     Supero |{' '}
                     {activeLang == 'en' ? article.title?.en : article.title?.it}
                 </title>
+                <link
+                    rel="canonical"
+                    href={`https://superotech.ai/articles/${article.slug}`}
+                />
                 <meta
                     name="description"
                     content={
@@ -103,6 +108,33 @@ export default function ArticleDetail() {
                             : article.meta_description?.it
                     }
                 />
+                <meta
+                    property="og:title"
+                    content={
+                        activeLang == 'en'
+                            ? article.title?.en
+                            : article.title?.it
+                    }
+                />
+                <meta
+                    property="og:description"
+                    content={
+                        activeLang == 'en'
+                            ? article.meta_description?.en
+                            : article.meta_description?.it
+                    }
+                />
+                <meta
+                    property="og:url"
+                    content={`https://superotech.ai/articles/${article.slug}`}
+                />
+                <meta property="og:type" content="article" />
+                {article.main_image && (
+                    <meta
+                        property="og:image"
+                        content={`${BACKEND_URL}${article.main_image}`}
+                    />
+                )}
             </Helmet>
             <Navbar />
             <div className="py-12 px-4 sm:px-6 pt-48">
@@ -219,6 +251,8 @@ export default function ArticleDetail() {
             {/* related articles */}
 
             <SuggestedArticles categoryId={article.category?.id} />
+
+            <Footer />
         </>
     );
 }

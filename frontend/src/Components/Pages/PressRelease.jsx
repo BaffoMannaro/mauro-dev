@@ -1,9 +1,34 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Footer from '../Landing/Footer';
 
 export default function PressRelease() {
     return (
         <>
+            <Helmet>
+                <title>Supero | Comunicato Stampa Rebranding</title>
+                <link
+                    rel="canonical"
+                    href="https://superotech.ai/comunicato-stampa-rebranding"
+                />
+                <meta
+                    name="description"
+                    content="G-nous Tech diventa SUPERO. Un ecosistema software-driven per l'automazione robotica collaborativa e il controllo dei processi industriali."
+                />
+                <meta
+                    property="og:title"
+                    content="Supero | Comunicato Stampa Rebranding"
+                />
+                <meta
+                    property="og:description"
+                    content="G-nous Tech diventa SUPERO. Un ecosistema software-driven per l'automazione robotica collaborativa e il controllo dei processi industriali."
+                />
+                <meta
+                    property="og:url"
+                    content="https://superotech.ai/comunicato-stampa-rebranding"
+                />
+                <meta property="og:type" content="article" />
+            </Helmet>
             <div className="min-h-screen pt-24 bg-supero-dark-grey flex flex-col items-center justify-center bg-typ">
                 <div className="max-w-[800px] mt-8 px-8 ">
                     <h1 className="title-xs font-extrabold text-white font-stretch-125 tracking-tight">

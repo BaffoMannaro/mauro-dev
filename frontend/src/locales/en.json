@@ -72,15 +72,15 @@
     "steps": {
         "step_0": {
             "title": "Software that adapts to your production",
-            "description": "Software that adapts to your production"
+            "description": "SUPERO is the software platform designed to automate surface finishing processes on unknown and variable geometries, the ideal solution for high-mix production.\n\nIt integrates with industrial and collaborative robots and supports external axes, extending the working volume to meet production requirements."
         },
         "step_1": {
-            "title": "Head\nMirka",
-            "description": "The Mirka pad performs sanding and polishing operations. Thanks to the SUPERO OS control system, it adjusts the pressure and speed to suit the surface being worked on, ensuring a uniform finish on any shape."
+            "title": "Sander \nMirka",
+            "description": "The Mirka random orbital sander performs sanding and polishing operations. Thanks to SUPERO OS control, pressure and feed rate are managed throughout the process, ensuring a uniform finish on any geometry."
         },
         "step_2": {
-            "title": "Schunk Force Sensor",
-            "description": "Integrated into the arm, it detects the contact force between the tool and the workpiece in real time. SUPERO OS uses this data to automatically compensate for surface variations, maintaining constant pressure even on complex and irregular shapes."
+            "title": "Schunk Compensation UNit",
+            "description": "Integrated on the robot arm, it automatically compensates for surface variations, maintaining constant pressure even on complex and irregular shapes."
         },
         "step_3": {
             "title": "3D Vision Zivid",
@@ -95,7 +95,7 @@
         "title": "simple steps",
         "scan": "Thanks to its integrated vision system, Supero Finish autonomously performs a high-precision 3D scan to capture data relating to topology, position and colour. It instantly generates a complete digital twin of the component, which is reconstructed and rendered within our proprietary SUPERO OS software.\n\nThe system automatically performs the necessary data cleaning and optimisation operations, providing a digital model ready for process definition and toolpath generation.",
         "path": "With SUPERO OS, the operator selects the work areas directly on the component’s digital twin. The software automatically generates the toolpath for the selected area or, if preferred, for the entire surface, without any manual input. For each pass, the process parameters can be configured: applied force, feed rate and tool rotation speed.\n\nIt is also possible to programme multiple passes with different parameters, combining, for example, an initial roughing pass and a final polishing pass to achieve the desired result.",
-        "let_it_work": "Once started, SUPERO Finish manages the entire process autonomously. The tool maintains optimal alignment with the surface and adjusts the applied force in real time.\nThe integrated compensation unit ensures constant pressure and uniform contact even on complex geometries, delivering a high-quality finish on every workpiece.",
-        "switch_repeat": "Achieve continuous production with zero downtime. When the part is replaced, Supero Finish is able to generate a new 3D surface map and seamlessly resumes processing. Simply switch the part, the system does the rest."
+        "let_it_work": "Once started, SUPERO Finish manages the entire process autonomously. The tool maintains optimal alignment with the surface and adjusts the applied force in real time.\n\nThe integrated compensation unit ensures constant pressure and uniform contact even on complex geometries, delivering a high-quality finish on every workpiece.",
+        "switch_repeat": "Achieve continuous production with zero downtime. When the part is replaced, Supero Finish is able to generate a new 3D surface map and seamlessly resumes processing.\n\nSimply switch the part, the system does the rest."
     }
 }

@@ -283,7 +283,7 @@ export default function SuperoFinish() {
                                     <h2 className="text-white text-3xl font-bold mb-4">
                                         {t('steps.step_0.title')}
                                     </h2>
-                                    <p className="text-supero-mid-grey text-">
+                                    <p className="text-supero-mid-grey whitespace-pre-line text-">
                                         {t('steps.step_0.description')}
                                     </p>
                                 </div>

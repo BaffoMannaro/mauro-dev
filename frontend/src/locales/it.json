@@ -79,15 +79,15 @@
             "description": "La levigatrice rotorbitale Mirka esegue le operazioni di carteggio e lucidatura. Grazie al controllo di SUPERO OS, viene gestita pressione e velocità di avanzamento durante la lavorazione, garantendo una finitura uniforme su ogni geometria."
         },
         "step_2": {
-            "title": "Compensatore Schunk",
+            "title": "Compensatore\nSchunk",
             "description": "Integrato sul braccio, compensa automaticamente le variazioni di superficie, mantenendo una pressione costante anche su forme complesse e irregolari."
         },
         "step_3": {
-            "title": "Visione 3D Zivid",
+            "title": "Sistema di Visione 3D\nZivid",
             "description": "Il sistema di visione montato sul cobot esegue la scansione 3D del componente, acquisendo dati su forma, posizione e colore. SUPERO OS elabora la scansione per generare il gemello digitale su cui pianificare automaticamente il percorso di lavorazione."
         },
         "step_4": {
-            "title": "Asse lineare R3GO Monguzzi",
+            "title": "Asse lineare\nR3GO Monguzzi",
             "description": "Asse lineare R3GO di Monguzzi srl estende il raggio d'azione del braccio robotico lungo un asse di traslazione, ampliando il volume di lavoro di SUPERO Finish. Permette di lavorare pezzi di grandi dimensioni o coprire più postazioni in un unico ciclo."
         }
     },

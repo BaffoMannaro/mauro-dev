@@ -290,7 +290,7 @@ export default function SuperoFinish() {
                             )) ||
                                 (step === 1 && (
                                     <div>
-                                        <h2 className="text-white text-3xl font-bold mb-4">
+                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_1.title')}
                                         </h2>
                                         <p className="text-supero-mid-grey text-">
@@ -300,7 +300,7 @@ export default function SuperoFinish() {
                                 )) ||
                                 (step === 2 && (
                                     <div>
-                                        <h2 className="text-white text-3xl font-bold mb-4">
+                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_2.title')}
                                         </h2>{' '}
                                         <p className="text-supero-mid-grey text-">
@@ -310,7 +310,7 @@ export default function SuperoFinish() {
                                 )) ||
                                 (step === 3 && (
                                     <div>
-                                        <h2 className="text-white text-3xl font-bold mb-4">
+                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_3.title')}
                                         </h2>
                                         <p className="text-supero-mid-grey text-">
@@ -320,7 +320,7 @@ export default function SuperoFinish() {
                                 )) ||
                                 (step === 4 && (
                                     <div>
-                                        <h2 className="text-white text-3xl font-bold mb-4">
+                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_4.title')}
                                         </h2>
                                         <p className="text-supero-mid-grey text-">

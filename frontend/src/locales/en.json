@@ -75,19 +75,19 @@
             "description": "SUPERO is the software platform designed to automate surface finishing processes on unknown and variable geometries, the ideal solution for high-mix production.\n\nIt integrates with industrial and collaborative robots and supports external axes, extending the working volume to meet production requirements."
         },
         "step_1": {
-            "title": "Sander \nMirka",
+            "title": "Mirka\nSander",
             "description": "The Mirka random orbital sander performs sanding and polishing operations. Thanks to SUPERO OS control, pressure and feed rate are managed throughout the process, ensuring a uniform finish on any geometry."
         },
         "step_2": {
-            "title": "Schunk Compensation UNit",
+            "title": "Compensation Unit\nSchunk",
             "description": "Integrated on the robot arm, it automatically compensates for surface variations, maintaining constant pressure even on complex and irregular shapes."
         },
         "step_3": {
-            "title": "3D Vision Zivid",
+            "title": "3D Vision System\nZivid",
             "description": "The vision system mounted on the cobot performs a 3D scan of the component, capturing data on its shape, position and colour. SUPERO OS processes the scan to generate a digital twin, on which the machining path is automatically planned."
         },
         "step_4": {
-            "title": "R3GO linear axis Monguzzi",
+            "title": "Linear axis\nR3GO Monguzzi",
             "description": "The R3GO linear axis from Monguzzi srl extends the reach of the robotic arm along a translational axis, increasing the working volume of the SUPERO Finish. It enables the processing of large workpieces or the coverage of multiple workstations in a single cycle."
         }
     },

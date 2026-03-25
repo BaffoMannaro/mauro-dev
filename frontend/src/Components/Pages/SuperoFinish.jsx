@@ -8,6 +8,7 @@ import step1 from '../../assets/finish/step-1.png';
 import step2 from '../../assets/finish/step-2.png';
 import step3 from '../../assets/finish/step-3.png';
 import step4 from '../../assets/finish/step-4.png';
+import superoos from '../../assets/finish/supero-os.png';
 import scanVideo from '../../assets/finish/01-scan.mp4';
 import pathVideo from '../../assets/finish/02-path.mp4';
 import workVideo from '../../assets/finish/03-work.mp4';
@@ -210,6 +211,14 @@ export default function SuperoFinish() {
                 <div className="flex items-center flex-col xl:flex-row min-h-screen ">
                     <div className="w-full xl:w-1/2 order-2 xl:order-1 relative h-[500px] xl:h-[800px]">
                         <img
+                            src={superoos}
+                            alt=""
+                            className={
+                                'max-h-full absolute top-[60px] -right-4 xl:right-0 transition-opacity duration-500 scale-50 xl:scale-100 ' +
+                                (step === 0 ? 'opacity-100' : 'opacity-0')
+                            }
+                        />
+                        <img
                             src={step0}
                             alt=""
                             className={
@@ -217,6 +226,7 @@ export default function SuperoFinish() {
                                 (step === 0 ? 'opacity-100' : 'opacity-20')
                             }
                         />
+
                         <img
                             src={step1}
                             alt=""

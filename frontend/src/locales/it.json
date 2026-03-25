@@ -1,5 +1,6 @@
 {
     "payoff": "Supero - soluzioni di automazione e robotica industriale",
+    "payoff_supero_finish": "Finitura robotica intelligente:\n dalla scansione alla lucidatura in un unico flusso",
     "why_intergrate": "Perché integrare la robotoca intelligente?",
     "working_description": "Dalla ripetitività al rischio, le attività produttive possono rappresentare \n un peso per i team. Supero integra robot collaborativi e industriali, visione 3D e software di facile utilizzo per automatizzare i processi, migliorando la qualità,\n la produttività e la sicurezza.",
     "advanced_sensors": "Sensori avanzati",
@@ -23,7 +24,9 @@
     "meet_supero": "Scopri Supero Finish a",
     "how_it": "How it",
     "works": "Works",
+    "areas_of_application": "Settori di applicazione",
     "video_claim": "Finitura automatizzata.\nGuardalo in azione.",
+    "video_claim_finish": "Guarda Supero Finish in azione.",
     "how_it_works": "Come funziona",
     "problem_analysis": "Comprendere il processo per sbloccare l'efficienza.\nStudiamo il vostro flusso di lavoro in dettaglio, identificando i punti di attrito, le attività ripetitive e le opportunità in cui l'automazione può offrire reali miglioramenti delle prestazioni.",
     "requirement_collection": "Dalle sfide agli obiettivi misurabili.\nOgni esigenza operativa diventa un requisito tecnico, per progettare soluzioni precise, efficienti e su misura.",
@@ -65,5 +68,34 @@
     "knowledge_hub_description": "Il centro di conoscenza dedicato a imprese e professionisti che vogliono comprendere come l’innovazione tecnologica può generare valore strategico. Analisi, case study e approfondimenti per guidare la trasformazione digitale del business.",
     "resources": "Risorse",
     "all": "Tutti",
-    "visioprint_cofinanced": "PR Puglia FESR FSE+2021–2027 (fondo FESR) — Azione 1.5 “Interventi per il rafforzamento del sistema innovativo regionale e sostegno alla collaborazione tra imprese e strutture di ricerca” — Avviso “Reti”\nProgetto: VISIOPRINT3D"
+    "visioprint_cofinanced": "PR Puglia FESR FSE+2021–2027 (fondo FESR) — Azione 1.5 “Interventi per il rafforzamento del sistema innovativo regionale e sostegno alla collaborazione tra imprese e strutture di ricerca” — Avviso “Reti”\nProgetto: VISIOPRINT3D",
+    "steps": {
+        "step_0": {
+            "title": "Un software che si adatta alla tua produzione",
+            "description": "SUPERO è una piattaforma software progettata per automatizzare le lavorazioni di finitura superficiale su geometrie sconosciute e variabili — il contesto ideale per la produzione high-mix. Si integra con robot industriali e collaborativi e supporta assi esterni, estendendo il volume di lavoro in base alle esigenze produttive."
+        },
+        "step_1": {
+            "title": "Testa\nMirka",
+            "description": "Il supporto Mirka esegue le operazioni di levigatura e lucidatura. Grazie al controllo di SUPERO OS, adatta pressione e velocità alla superficie in lavorazione, garantendo una finitura uniforme su ogni geometria."
+        },
+        "step_2": {
+            "title": "Sensore di forza Schunk",
+            "description": "Integrato sul braccio, rileva in tempo reale la forza di contatto tra utensile e pezzo. SUPERO OS utilizza questi dati per compensare automaticamente le variazioni di superficie, mantenendo una pressione costante anche su forme complesse e irregolari."
+        },
+        "step_3": {
+            "title": "Visione 3D Zivid",
+            "description": "Il sistema di visione montato sul cobot esegue la scansione 3D del componente, acquisendo dati su forma, posizione e colore. SUPERO OS elabora la scansione per generare il gemello digitale su cui pianificare automaticamente il percorso di lavorazione."
+        },
+        "step_4": {
+            "title": "Asse lineare R3GO Monguzzi",
+            "description": "Asse lineare R3GO di Monguzzi srl estende il raggio d'azione del braccio robotico lungo un asse di traslazione, ampliando il volume di lavoro di SUPERO Finish. Permette di lavorare pezzi di grandi dimensioni o coprire più postazioni in un unico ciclo."
+        }
+    },
+    "step_section": {
+        "title": "semplici passi",
+        "scan": "Grazie al suo sistema di visione integrato, Supero Finish esegue in modo autonomo una scansione 3D ad alta precisione per acquisire dati relativi alla topologia, alla posizione e al colore.  Genera istantaneamente un gemello digitale completo del componente, che viene ricostruito e renderizzato all’interno del nostro software proprietario SUPERO OS.\n\nIl sistema esegue automaticamente le opportune operazioni di pulizia e ottimizzazione dei dati, fornendo un modello digitale pronto per la definizione del processo e la generazione del percorso utensile.",
+        "path": "Attraverso SUPERO OS, l'operatore seleziona le aree di lavoro direttamente sul gemello digitale del componente. Il software genera automaticamente il percorso utensile sull'area selezionata o, se preferito, sull'intera superficie, senza alcun input manuale. Per ogni passata è possibile configurare i parametri di processo: forza applicata, velocità di avanzamento e velocità di rotazione dell'utensile.\n\nSi possono inoltre programmare più ripetizioni con parametri diversi, combinando ad esempio una sgrossatura iniziale e una lucidatura finale per ottenere il risultato desiderato.",
+        "let_it_work": "Una volta avviato, SUPERO Finish gestisce l'intero processo in autonomia. L'utensile mantiene un orientamento ottimale rispetto alla superficie e regola in tempo reale la forza applicata.\nL'unità di compensazione integrata assicura pressione costante e contatto uniforme anche su geometrie complesse, per una finitura di qualità elevata su ogni pezzo.",
+        "switch_repeat": "Garantisci una produzione continua senza tempi di fermo. Quando il pezzo viene sostituito, Supero Finish è in grado di generare una nuova mappa 3D della superficie e riprende la lavorazione senza interruzioni. Basta sostituire il pezzo, al resto ci pensa il sistema."
+    }
 }

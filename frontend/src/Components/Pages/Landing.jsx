@@ -109,15 +109,6 @@ export default function Landing() {
                     ></div>
 
                     <div className="relative z-[300]">
-                        {/*  <h2 className="text-white text-5xl md:text-6xl lg:text-[110px] font-semibold leading-tight group">
-                        Technology <br />
-                        that{' '}
-                        <span className="font-extrabold inline-block group-hover:font-black group-hover:tracking-tight transition-all duration-300 font-stretch-125">
-                            works
-                        </span>{' '}
-                        <br /> for you
-                    </h2> */}
-
                         <div
                             className="relative max-w-[300px] xl:max-w-[700px]"
                             ref={containerRef}

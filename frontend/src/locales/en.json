@@ -1,5 +1,6 @@
 {
     "payoff": "Supero - robotic automation solutions for industry",
+    "payoff_supero_finish": "Intelligent robotic finishing:\n from scanning to polishing in a single flow",
     "why_intergrate": "Why integrate intelligent robotics?",
     "working_description": "From repetitiveness to risk, production activities can be a burden for teams.\n Supero integrates collaborative and industrial robots, 3D vision, and easy-to-use software to automate processes, improving quality, productivity, and safety.",
     "advanced_sensors": "Advanced sensors",
@@ -23,7 +24,9 @@
     "meet_supero": "Meet Supero Finish at",
     "how_it": "How it",
     "works": "works",
+    "areas_of_application": "Areas of application",
     "video_claim": "Automated finishing.\nWatch it in action.",
+    "video_claim_finish": "Watch Supero Finish in action.",
     "how_it_works": "How it works",
     "problem_analysis": "Understanding the process to unlock efficiency. We study your workflow in detail, identifying friction points, repetitive tasks, and opportunities where automation can deliver real performance gains.",
     "requirement_collection": "From challenges to measurable goals. We define every operational need — targets, constraints, materials, and cycles — translating them into technical requirements for a precise solution design.",
@@ -65,5 +68,34 @@
     "knowledge_hub_description": "The knowledge hub dedicated to businesses and professionals who want to understand how technological innovation can generate strategic value. Analysis, case studies, and insights to guide the digital transformation of business.",
     "resources": "Resources",
     "all": "All",
-    "visioprint_cofinanced": "PR Puglia ERDF ESF+2021–2027 (ERDF fund) — Action 1.5 “Interventions to strengthen the regional innovation system and support collaboration between enterprises and research structures” — Call “Reti”\nProject: VISIOPRINT3D"
+    "visioprint_cofinanced": "PR Puglia ERDF ESF+2021–2027 (ERDF fund) — Action 1.5 “Interventions to strengthen the regional innovation system and support collaboration between enterprises and research structures” — Call “Reti”\nProject: VISIOPRINT3D",
+    "steps": {
+        "step_0": {
+            "title": "Software that adapts to your production",
+            "description": "Software that adapts to your production"
+        },
+        "step_1": {
+            "title": "Head\nMirka",
+            "description": "The Mirka pad performs sanding and polishing operations. Thanks to the SUPERO OS control system, it adjusts the pressure and speed to suit the surface being worked on, ensuring a uniform finish on any shape."
+        },
+        "step_2": {
+            "title": "Schunk Force Sensor",
+            "description": "Integrated into the arm, it detects the contact force between the tool and the workpiece in real time. SUPERO OS uses this data to automatically compensate for surface variations, maintaining constant pressure even on complex and irregular shapes."
+        },
+        "step_3": {
+            "title": "3D Vision Zivid",
+            "description": "The vision system mounted on the cobot performs a 3D scan of the component, capturing data on its shape, position and colour. SUPERO OS processes the scan to generate a digital twin, on which the machining path is automatically planned."
+        },
+        "step_4": {
+            "title": "R3GO linear axis Monguzzi",
+            "description": "The R3GO linear axis from Monguzzi srl extends the reach of the robotic arm along a translational axis, increasing the working volume of the SUPERO Finish. It enables the processing of large workpieces or the coverage of multiple workstations in a single cycle."
+        }
+    },
+    "step_section": {
+        "title": "simple steps",
+        "scan": "Thanks to its integrated vision system, Supero Finish autonomously performs a high-precision 3D scan to capture data relating to topology, position and colour. It instantly generates a complete digital twin of the component, which is reconstructed and rendered within our proprietary SUPERO OS software.\n\nThe system automatically performs the necessary data cleaning and optimisation operations, providing a digital model ready for process definition and toolpath generation.",
+        "path": "With SUPERO OS, the operator selects the work areas directly on the component’s digital twin. The software automatically generates the toolpath for the selected area or, if preferred, for the entire surface, without any manual input. For each pass, the process parameters can be configured: applied force, feed rate and tool rotation speed.\n\nIt is also possible to programme multiple passes with different parameters, combining, for example, an initial roughing pass and a final polishing pass to achieve the desired result.",
+        "let_it_work": "Once started, SUPERO Finish manages the entire process autonomously. The tool maintains optimal alignment with the surface and adjusts the applied force in real time.\nThe integrated compensation unit ensures constant pressure and uniform contact even on complex geometries, delivering a high-quality finish on every workpiece.",
+        "switch_repeat": "Achieve continuous production with zero downtime. When the part is replaced, Supero Finish is able to generate a new 3D surface map and seamlessly resumes processing. Simply switch the part, the system does the rest."
+    }
 }

@@ -37,7 +37,7 @@ export default function LandingForm() {
     return (
         <div
             id="landing-form"
-            className="w-full flex flex-wrap items-center bg-[#434348] px-4 xl:px-12 pb-24"
+            className="w-full flex flex-wrap items-center bg-[#434348] px-4 xl:px-12 pb-24 pt-8"
             style={{
                 backgroundImage: `url(${poly})`,
                 backgroundOrigin: 'border-box',
@@ -73,9 +73,7 @@ export default function LandingForm() {
                         marketing: false,
                     }}
                     validationSchema={Yup.object().shape({
-                        companyName: Yup.string().required(
-                            t('required_field')
-                        ),
+                        companyName: Yup.string().required(t('required_field')),
                         email: Yup.string()
                             .email(t('invalid_email'))
                             .required(t('required_field')),
@@ -285,10 +283,13 @@ export default function LandingForm() {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="underline"
-                                                onClick={(e) => e.stopPropagation()}
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
                                             >
                                                 {t('privacy_policy_link')}
-                                            </a>*.
+                                            </a>
+                                            *.
                                         </p>
                                     </div>
 

@@ -16,6 +16,7 @@ import CategoriesList from './Components/Pages/CategoriesList';
 import Articles from './Components/Pages/Articles';
 import ArticleDetail from './Components/Pages/ArticleDetail';
 import CategoryList from './Components/Pages/CategoryList';
+import SuperoFinish from './Components/Pages/SuperoFinish';
 
 export const router = createBrowserRouter([
     {
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
             {
                 path: '/comunicato-stampa-rebranding',
                 element: <PressRelease />,
+            },
+            {
+                path: '/supero-finish',
+                element: <SuperoFinish />,
             },
             {
                 path: '/login',

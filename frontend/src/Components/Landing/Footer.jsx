@@ -1,14 +1,14 @@
 import footerLogo from '../../assets/images/logo-footer.png';
 
-import eu from '../../assets/images/logos/eu.png';
-import italiadomani from '../../assets/images/logos/italiadomani.png';
-import miur from '../../assets/images/logos/miur.png';
-import fair from '../../assets/images/logos/fair.png';
+import eu from '../../assets/images/logos/eu.svg';
+import italiadomani from '../../assets/images/logos/italiadomani.svg';
+import miur from '../../assets/images/logos/miur.svg';
+import fair from '../../assets/images/logos/fair.svg';
 
-import coesione from '../../assets/images/logos/coesione.png';
-import regionePuglia from '../../assets/images/logos/regionePuglia.png';
-import pugliaSviluppo from '../../assets/images/logos/pugliaSviluppo.png';
-import cofinanziato from '../../assets/images/logos/cofinanziato.png';
+import coesione from '../../assets/images/logos/coesione.svg';
+import regionePuglia from '../../assets/images/logos/regionePuglia.svg';
+import pugliaSviluppo from '../../assets/images/logos/pugliaSviluppo.svg';
+import cofinanziato from '../../assets/images/logos/cofinanziato.svg';
 import { useTranslation } from 'react-i18next';
 
 export default function Footer() {

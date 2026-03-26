@@ -1,18 +1,18 @@
 import urLogo from '../../assets/images/logos/ur-logo.png';
-import caracol from '../../assets/images/partners/caracol.png';
-import esa from '../../assets/images/partners/esa.png';
-import fincons from '../../assets/images/partners/fincons.png';
-import keyence from '../../assets/images/partners/keyence.png';
-import layerloop from '../../assets/images/partners/layerloop.png';
-import mirka from '../../assets/images/partners/mirka.png';
-import schunk from '../../assets/images/partners/schunk.png';
-import politecnico from '../../assets/images/partners/politecnico.png';
-import rina from '../../assets/images/partners/rina.png';
-import robotiq from '../../assets/images/partners/robotiq.png';
-import uniba from '../../assets/images/partners/uniba.png';
-import ur from '../../assets/images/partners/ur.png';
-import wenglor from '../../assets/images/partners/wenglor.png';
-import zivid from '../../assets/images/partners/zivid.png';
+import caracol from '../../assets/images/partners/caracol.svg';
+
+import fincons from '../../assets/images/partners/fincons.svg';
+import keyence from '../../assets/images/partners/keyence.svg';
+import layerloop from '../../assets/images/partners/layerloop.svg';
+import mirka from '../../assets/images/partners/mirka.svg';
+import schunk from '../../assets/images/partners/schunk.svg';
+import politecnico from '../../assets/images/partners/politecnico.svg';
+import rina from '../../assets/images/partners/rina.svg';
+import monguzzi from '../../assets/images/partners/monguzzi.svg';
+import uniba from '../../assets/images/partners/uniba.svg';
+
+import wenglor from '../../assets/images/partners/wenglor.svg';
+import zivid from '../../assets/images/partners/zivid.svg';
 import { useTranslation } from 'react-i18next';
 
 export default function PartnersSection() {
@@ -53,7 +53,11 @@ export default function PartnersSection() {
                         <img src={schunk} alt="schunk" />
                     </div>
                     <div className="w-full min-w-[180px] xl:w-1/3 max-w-[280px] 2xl:max-w-[440px] h-[122px] 2xl:h-[140px] flex justify-center items-center hover:bg-[#424247] me-8 xl:me-0">
-                        <img src={robotiq} alt="robotiq" />
+                        <img
+                            src={monguzzi}
+                            alt="monguzzi"
+                            className="scale-[0.8]"
+                        />
                     </div>
                     <div className="w-full min-w-[180px] xl:w-1/3 max-w-[280px] 2xl:max-w-[440px] h-[122px] 2xl:h-[140px] flex justify-center items-center hover:bg-[#424247] me-8 xl:me-0">
                         <img src={wenglor} alt="wenglor" />

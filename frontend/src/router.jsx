@@ -18,100 +18,77 @@ import ArticleDetail from './Components/Pages/ArticleDetail';
 import CategoryList from './Components/Pages/CategoryList';
 import SuperoFinish from './Components/Pages/SuperoFinish';
 
+const publicChildren = [
+    { index: true, element: <Landing /> },
+    { path: 'articles', element: <Articles /> },
+    { path: 'articles/:slug', element: <ArticleDetail /> },
+    { path: 'category/:id', element: <CategoryList /> },
+    { path: 'thank-you-page', element: <ThankYouPage /> },
+    { path: 'comunicato-stampa-rebranding', element: <PressRelease /> },
+    { path: 'supero-finish', element: <SuperoFinish /> },
+    { path: 'login', element: <Login /> },
+];
+
+const dashboardRoute = {
+    path: 'dashboard',
+    element: <DashRoot />,
+    children: [
+        {
+            index: true,
+            element: (
+                <ProtectedRoute>
+                    <Home />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: 'articles',
+            element: (
+                <ProtectedRoute>
+                    <ArticlesList />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: 'articles/new',
+            element: (
+                <ProtectedRoute>
+                    <ArticleForm />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: 'articles/edit/:slug',
+            element: (
+                <ProtectedRoute>
+                    <ArticleForm />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: 'tags',
+            element: (
+                <ProtectedRoute>
+                    <TagsList />
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: 'categories',
+            element: (
+                <ProtectedRoute>
+                    <CategoriesList />
+                </ProtectedRoute>
+            ),
+        },
+    ],
+};
+
 export const router = createBrowserRouter([
     {
         path: '/',
         element: <AuthRoot />,
         errorElement: <NotFound />,
-        children: [
-            {
-                path: '/',
-                element: <Landing />,
-            },
-            {
-                path: '/articles',
-                element: <Articles />,
-            },
-            {
-                path: '/articles/:slug',
-                element: <ArticleDetail />,
-            },
-            {
-                path: '/category/:id',
-                element: <CategoryList />,
-            },
-
-            {
-                path: '/thank-you-page',
-                element: <ThankYouPage />,
-            },
-            {
-                path: '/comunicato-stampa-rebranding',
-                element: <PressRelease />,
-            },
-            {
-                path: '/supero-finish',
-                element: <SuperoFinish />,
-            },
-            {
-                path: '/login',
-                element: <Login />,
-            },
-            {
-                path: '/dashboard/',
-                element: <DashRoot />,
-                children: [
-                    {
-                        path: '/dashboard/',
-                        element: (
-                            <ProtectedRoute>
-                                <Home />
-                            </ProtectedRoute>
-                        ),
-                    },
-
-                    {
-                        path: '/dashboard/articles/',
-                        element: (
-                            <ProtectedRoute>
-                                <ArticlesList />
-                            </ProtectedRoute>
-                        ),
-                    },
-                    {
-                        path: '/dashboard/articles/new',
-                        element: (
-                            <ProtectedRoute>
-                                <ArticleForm />
-                            </ProtectedRoute>
-                        ),
-                    },
-                    {
-                        path: '/dashboard/articles/edit/:slug',
-                        element: (
-                            <ProtectedRoute>
-                                <ArticleForm />
-                            </ProtectedRoute>
-                        ),
-                    },
-                    {
-                        path: '/dashboard/tags/',
-                        element: (
-                            <ProtectedRoute>
-                                <TagsList />
-                            </ProtectedRoute>
-                        ),
-                    },
-                    {
-                        path: '/dashboard/categories/',
-                        element: (
-                            <ProtectedRoute>
-                                <CategoriesList />
-                            </ProtectedRoute>
-                        ),
-                    },
-                ],
-            },
-        ],
+        children: [...publicChildren, dashboardRoute],
     },
 ]);

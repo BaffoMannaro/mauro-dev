@@ -20,9 +20,12 @@ import LanguageSwitcher from '../Atoms/LanguageSwitcher';
 import useAuthStore from '../../Stores/useAuthStore';
 import { Link } from 'react-router-dom';
 import Navbar from '../Molecules/Navbar';
+import { siteUrl } from '../../utils/seo';
+import { useLocation } from 'react-router-dom';
 
 export default function Landing() {
     const { t } = useTranslation();
+    const location = useLocation();
 
     const [activeAccordion, setActiveAccordion] = useState(false);
 
@@ -55,7 +58,7 @@ export default function Landing() {
                 <title>
                     SUPERO – AI-Driven Robotic Surface Finishing Systems
                 </title>
-                <link rel="canonical" href="https://superotech.ai/" />
+                <link rel="canonical" href={siteUrl(location.pathname)} />
                 <meta
                     name="description"
                     content="AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces."
@@ -68,7 +71,7 @@ export default function Landing() {
                     property="og:description"
                     content="AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces."
                 />
-                <meta property="og:url" content="https://superotech.ai/" />
+                <meta property="og:url" content={siteUrl(location.pathname)} />
                 <meta property="og:type" content="website" />
             </Helmet>
             <div className="">

@@ -130,11 +130,12 @@ class ArticleListSerializer(serializers.ModelSerializer):
     meta_title = serializers.SerializerMethodField()
     meta_description = serializers.SerializerMethodField()
     main_image = serializers.SerializerMethodField()
+    slugs = serializers.SerializerMethodField()
     
     class Meta:
         model = Article
         fields = [
-            'id', 'title', 'slug', 'meta_title', 'meta_description',
+            'id', 'title', 'slug', 'slug_en', 'slugs', 'meta_title', 'meta_description',
             'main_image', 'category', 'tags', 'created_at', 'published_at', 'is_published',
         ]
 
@@ -153,6 +154,9 @@ class ArticleListSerializer(serializers.ModelSerializer):
     def get_meta_description(self, obj):
         return {'it': obj.meta_description_it, 'en': obj.meta_description_en}
 
+    def get_slugs(self, obj):
+        return {'it': obj.slug, 'en': obj.slug_en}
+
 
 class ArticleDetailSerializer(serializers.ModelSerializer):
     """Serializer for Article detail view with blocks and nested i18n"""
@@ -163,11 +167,12 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
     meta_title = serializers.SerializerMethodField()
     meta_description = serializers.SerializerMethodField()
     main_image = serializers.SerializerMethodField()
+    slugs = serializers.SerializerMethodField()
     
     class Meta:
         model = Article
         fields = [
-            'id', 'title', 'slug', 'meta_title', 'meta_description',
+            'id', 'title', 'slug', 'slug_en', 'slugs', 'meta_title', 'meta_description',
             'main_image', 'category', 'tags', 'created_at', 
             'updated_at', 'published_at', 'is_published', 'blocks'
         ]
@@ -187,20 +192,45 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
     def get_meta_description(self, obj):
         return {'it': obj.meta_description_it, 'en': obj.meta_description_en}
 
+    def get_slugs(self, obj):
+        return {'it': obj.slug, 'en': obj.slug_en}
+
 
 class ArticleCreateUpdateSerializer(serializers.ModelSerializer):
     """Serializer for creating/updating articles with i18n support"""
     blocks = BlockSerializer(many=True, required=False)
+    slug = serializers.SlugField(required=False, allow_blank=True, allow_null=True, validators=[])
+    slug_en = serializers.SlugField(required=False, allow_blank=True, allow_null=True, validators=[])
     
     class Meta:
         model = Article
         fields = [
-            'id', 'title_it', 'title_en', 'slug', 
+            'id', 'title_it', 'title_en', 'slug', 'slug_en',
             'meta_title_it', 'meta_title_en',
             'meta_description_it', 'meta_description_en',
             'main_image', 'category', 'tags', 'is_published',
             'published_at', 'blocks'
         ]
+
+    def validate_slug(self, value):
+        if value in (None, ""):
+            return value
+        qs = Article.objects.filter(slug=value)
+        if self.instance is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("This slug is already in use.")
+        return value
+
+    def validate_slug_en(self, value):
+        if value in (None, ""):
+            return value
+        qs = Article.objects.filter(slug_en=value)
+        if self.instance is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("This English slug is already in use.")
+        return value
     
     def validate(self, data):
         """Ensure both languages are provided for required fields"""

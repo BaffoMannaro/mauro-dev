@@ -24,6 +24,17 @@ import 'ckeditor5/ckeditor5.css';
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 const MAX_UPLOAD_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
 
+const slugifyValue = (value) => {
+    return String(value ?? '')
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/['"]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+};
+
 const getFirstApiErrorMessage = (data) => {
     if (!data) return null;
     if (typeof data === 'string') return data;
@@ -61,7 +72,8 @@ const getFirstApiErrorMessage = (data) => {
 const articleValidationSchema = Yup.object({
     title_it: Yup.string().required('Il titolo in italiano è obbligatorio'),
     title_en: Yup.string().required('Il titolo in inglese è obbligatorio'),
-    slug: Yup.string().required('Lo slug è obbligatorio'),
+    slug: Yup.string(),
+    slug_en: Yup.string(),
     meta_title_it: Yup.string(),
     meta_title_en: Yup.string(),
     meta_description_it: Yup.string(),
@@ -117,10 +129,13 @@ export default function ArticleForm() {
     const [mainImageError, setMainImageError] = useState('');
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [previewData, setPreviewData] = useState(null);
+    const [slugEnAutoMode, setSlugEnAutoMode] = useState(true);
+    const [slugAutoMode, setSlugAutoMode] = useState(true);
     const [initialValues, setInitialValues] = useState({
         title_it: '',
         title_en: '',
         slug: '',
+        slug_en: '',
         meta_title_it: '',
         meta_title_en: '',
         meta_description_it: '',
@@ -133,6 +148,8 @@ export default function ArticleForm() {
     });
 
     useEffect(() => {
+        setSlugAutoMode(true);
+        setSlugEnAutoMode(true);
         fetchCategories();
         fetchTags();
         if (isEditMode) {
@@ -171,6 +188,7 @@ export default function ArticleForm() {
                 title_it: article.title?.it || '',
                 title_en: article.title?.en || '',
                 slug: article.slug || '',
+                slug_en: article.slug_en || article.slugs?.en || '',
                 meta_title_it: article.meta_title?.it || '',
                 meta_title_en: article.meta_title?.en || '',
                 meta_description_it: article.meta_description?.it || '',
@@ -272,7 +290,12 @@ export default function ArticleForm() {
             // Add text fields
             formDataToSend.append('title_it', values.title_it);
             formDataToSend.append('title_en', values.title_en);
-            formDataToSend.append('slug', values.slug);
+            if (values.slug !== undefined) {
+                formDataToSend.append('slug', values.slug);
+            }
+            if (values.slug_en !== undefined) {
+                formDataToSend.append('slug_en', values.slug_en);
+            }
             formDataToSend.append('meta_title_it', values.meta_title_it);
             formDataToSend.append('meta_title_en', values.meta_title_en);
             formDataToSend.append(
@@ -411,11 +434,34 @@ export default function ArticleForm() {
                                     <label className="block text-sm font-medium mb-2">
                                         Titolo (Italiano) *
                                     </label>
-                                    <Field
-                                        type="text"
-                                        name="title_it"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
+                                    <Field name="title_it">
+                                        {({ field }) => (
+                                            <input
+                                                {...field}
+                                                type="text"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                onChange={(e) => {
+                                                    const nextTitleIt =
+                                                        e.target.value;
+                                                    setFieldValue(
+                                                        'title_it',
+                                                        nextTitleIt
+                                                    );
+                                                    if (
+                                                        slugAutoMode &&
+                                                        !values.slug
+                                                    ) {
+                                                        setFieldValue(
+                                                            'slug',
+                                                            slugifyValue(
+                                                                nextTitleIt
+                                                            )
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
                                     <ErrorMessage
                                         name="title_it"
                                         component="p"
@@ -427,11 +473,34 @@ export default function ArticleForm() {
                                     <label className="block text-sm font-medium mb-2">
                                         Title (English) *
                                     </label>
-                                    <Field
-                                        type="text"
-                                        name="title_en"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
+                                    <Field name="title_en">
+                                        {({ field }) => (
+                                            <input
+                                                {...field}
+                                                type="text"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                onChange={(e) => {
+                                                    const nextTitleEn =
+                                                        e.target.value;
+                                                    setFieldValue(
+                                                        'title_en',
+                                                        nextTitleEn
+                                                    );
+                                                    if (
+                                                        slugEnAutoMode &&
+                                                        !values.slug_en
+                                                    ) {
+                                                        setFieldValue(
+                                                            'slug_en',
+                                                            slugifyValue(
+                                                                nextTitleEn
+                                                            )
+                                                        );
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
                                     <ErrorMessage
                                         name="title_en"
                                         component="p"
@@ -441,15 +510,55 @@ export default function ArticleForm() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Slug *
+                                        Slug (Italiano)
                                     </label>
-                                    <Field
-                                        type="text"
-                                        name="slug"
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
+                                    <Field name="slug">
+                                        {({ field }) => (
+                                            <input
+                                                {...field}
+                                                type="text"
+                                                placeholder="Leave empty to auto-generate from Titolo (Italiano)"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                onChange={(e) => {
+                                                    setSlugAutoMode(false);
+                                                    setFieldValue(
+                                                        'slug',
+                                                        e.target.value
+                                                    );
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
                                     <ErrorMessage
                                         name="slug"
+                                        component="p"
+                                        className="text-red-500 text-sm mt-1"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Slug (English)
+                                    </label>
+                                    <Field name="slug_en">
+                                        {({ field }) => (
+                                            <input
+                                                {...field}
+                                                type="text"
+                                                placeholder="Leave empty to auto-generate from Title (English)"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                onChange={(e) => {
+                                                    setSlugEnAutoMode(false);
+                                                    setFieldValue(
+                                                        'slug_en',
+                                                        e.target.value
+                                                    );
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage
+                                        name="slug_en"
                                         component="p"
                                         className="text-red-500 text-sm mt-1"
                                     />

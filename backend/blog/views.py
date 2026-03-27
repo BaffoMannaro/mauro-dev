@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 from django.http import HttpResponse
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -79,7 +81,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     pagination_class = ArticlePagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['is_published', 'category', 'tags']
-    search_fields = ['title_it', 'title_en', 'slug', 'meta_title_it', 'meta_title_en', 'meta_description_it', 'meta_description_en']
+    search_fields = ['title_it', 'title_en', 'slug', 'slug_en', 'meta_title_it', 'meta_title_en', 'meta_description_it', 'meta_description_en']
     ordering_fields = ['created_at', 'published_at', 'title_it', 'title_en']
     lookup_field = 'slug'
     
@@ -96,6 +98,18 @@ class ArticleViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_authenticated:
             queryset = queryset.filter(is_published=True)
         return queryset
+
+    def get_object(self):
+        """
+        Allow retrieving an article by either Italian slug (`slug`) or English slug (`slug_en`).
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs.get(lookup_url_kwarg)
+
+        obj = get_object_or_404(queryset, Q(slug=lookup_value) | Q(slug_en=lookup_value))
+        self.check_object_permissions(self.request, obj)
+        return obj
     
     @action(detail=False, methods=['get'])
     def published(self, request):

@@ -1,15 +1,18 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../Landing/Footer';
+import { siteUrl } from '../../utils/seo';
+import { useLocation } from 'react-router-dom';
 
 export default function PressRelease() {
+    const location = useLocation();
     return (
         <>
             <Helmet>
                 <title>Supero | Comunicato Stampa Rebranding</title>
                 <link
                     rel="canonical"
-                    href="https://superotech.ai/comunicato-stampa-rebranding"
+                    href={siteUrl(location.pathname)}
                 />
                 <meta
                     name="description"
@@ -25,7 +28,7 @@ export default function PressRelease() {
                 />
                 <meta
                     property="og:url"
-                    content="https://superotech.ai/comunicato-stampa-rebranding"
+                    content={siteUrl(location.pathname)}
                 />
                 <meta property="og:type" content="article" />
             </Helmet>

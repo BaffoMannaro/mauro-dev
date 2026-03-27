@@ -4,12 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
+import { siteUrl } from '../../utils/seo';
+import { useLocation } from 'react-router-dom';
 import blockRight from '../../assets/images/block-right-kh.png';
 import useAxios from '../../utils/useAxios';
 import Footer from '../Landing/Footer';
 import GetInTouch from '../Landing/GetInTouch';
 
 export default function Articles() {
+    const location = useLocation();
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -100,7 +103,7 @@ export default function Articles() {
         <>
             <Helmet>
                 <title>SUPERO Knowledge Hub – Articles & Insights</title>
-                <link rel="canonical" href="https://superotech.ai/articles" />
+                <link rel="canonical" href={siteUrl(location.pathname)} />
                 <meta
                     name="description"
                     content="Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation."
@@ -115,7 +118,7 @@ export default function Articles() {
                 />
                 <meta
                     property="og:url"
-                    content="https://superotech.ai/articles"
+                    content={siteUrl(location.pathname)}
                 />
                 <meta property="og:type" content="website" />
             </Helmet>

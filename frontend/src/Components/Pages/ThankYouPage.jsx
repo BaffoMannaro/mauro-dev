@@ -4,9 +4,12 @@ import Footer from '../Landing/Footer';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { siteUrl } from '../../utils/seo';
+import { useLocation } from 'react-router-dom';
 
 export default function ThankYouPage() {
     const { t } = useTranslation();
+    const location = useLocation();
 
     return (
         <>
@@ -14,7 +17,7 @@ export default function ThankYouPage() {
                 <title>Supero | Thank You</title>
                 <link
                     rel="canonical"
-                    href="https://superotech.ai/thank-you-page"
+                    href={siteUrl(location.pathname)}
                 />
                 <meta
                     name="description"
@@ -27,7 +30,7 @@ export default function ThankYouPage() {
                 />
                 <meta
                     property="og:url"
-                    content="https://superotech.ai/thank-you-page"
+                    content={siteUrl(location.pathname)}
                 />
                 <meta property="og:type" content="website" />
             </Helmet>

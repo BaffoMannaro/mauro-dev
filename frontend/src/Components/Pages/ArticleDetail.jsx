@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
@@ -7,12 +7,14 @@ import { toast } from 'react-hot-toast';
 import Navbar from '../Molecules/Navbar';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
 import Footer from '../Landing/Footer';
+import { backendUrl, siteUrl } from '../../utils/seo';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 export default function ArticleDetail() {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [article, setArticle] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -20,6 +22,15 @@ export default function ArticleDetail() {
     const { i18n } = useTranslation();
 
     const activeLang = i18n.resolvedLanguage;
+    const localizedArticleTitle =
+        activeLang == 'en' ? article?.title?.en : article?.title?.it;
+    const localizedMetaTitle =
+        activeLang == 'en' ? article?.meta_title?.en : article?.meta_title?.it;
+    const localizedMetaDescription =
+        activeLang == 'en'
+            ? article?.meta_description?.en
+            : article?.meta_description?.it;
+    const pageTitle = localizedMetaTitle || `Supero | ${localizedArticleTitle}`;
 
     useEffect(() => {
         fetchArticle();
@@ -92,47 +103,32 @@ export default function ArticleDetail() {
     return (
         <>
             <Helmet>
-                <title>
-                    Supero |{' '}
-                    {activeLang == 'en' ? article.title?.en : article.title?.it}
-                </title>
+                <title>{pageTitle}</title>
                 <link
                     rel="canonical"
-                    href={`https://superotech.ai/articles/${article.slug}`}
+                    href={siteUrl(location.pathname)}
                 />
                 <meta
                     name="description"
-                    content={
-                        activeLang == 'en'
-                            ? article.meta_description?.en
-                            : article.meta_description?.it
-                    }
+                    content={localizedMetaDescription}
                 />
                 <meta
                     property="og:title"
-                    content={
-                        activeLang == 'en'
-                            ? article.title?.en
-                            : article.title?.it
-                    }
+                    content={localizedMetaTitle || localizedArticleTitle}
                 />
                 <meta
                     property="og:description"
-                    content={
-                        activeLang == 'en'
-                            ? article.meta_description?.en
-                            : article.meta_description?.it
-                    }
+                    content={localizedMetaDescription}
                 />
                 <meta
                     property="og:url"
-                    content={`https://superotech.ai/articles/${article.slug}`}
+                    content={siteUrl(location.pathname)}
                 />
                 <meta property="og:type" content="article" />
                 {article.main_image && (
                     <meta
                         property="og:image"
-                        content={`${BACKEND_URL}${article.main_image}`}
+                        content={backendUrl(article.main_image)}
                     />
                 )}
             </Helmet>

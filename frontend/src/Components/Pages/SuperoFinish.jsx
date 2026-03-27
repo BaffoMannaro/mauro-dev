@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
+import { siteUrl } from '../../utils/seo';
 import VariableProximity from '../Landing/VariableProximity';
 import { useTranslation } from 'react-i18next';
 import step0 from '../../assets/finish/step-0.png';
@@ -21,8 +22,10 @@ import PartnersSectionFinish from '../Landing/PartnersSectionFinish';
 import Applications from '../Landing/Applications';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
 import LandingForm from '../Landing/LandingForm';
+import { useLocation } from 'react-router-dom';
 
 export default function SuperoFinish() {
+    const location = useLocation();
     const [step, setStep] = useState(0);
     const [playingVideo, setPlayingVideo] = useState(null);
 
@@ -73,7 +76,7 @@ export default function SuperoFinish() {
                 <title>SUPERO Finish</title>
                 <link
                     rel="canonical"
-                    href="https://superotech.ai/supero-finish"
+                    href={siteUrl(location.pathname)}
                 />
                 <meta
                     name="description"
@@ -86,7 +89,7 @@ export default function SuperoFinish() {
                 />
                 <meta
                     property="og:url"
-                    content="https://superotech.ai/supero-finish"
+                    content={siteUrl(location.pathname)}
                 />
                 <meta property="og:type" content="website" />
             </Helmet>

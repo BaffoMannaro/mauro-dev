@@ -33,7 +33,20 @@ class Article(models.Model):
     # Multilingual fields
     title_it = models.CharField(max_length=255, help_text="Article title in Italian")
     title_en = models.CharField(max_length=255, help_text="Article title in English")
-    slug = models.SlugField(max_length=255, unique=True, help_text="URL-friendly version of title")
+    slug = models.SlugField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="URL-friendly version of Italian title",
+    )
+    slug_en = models.SlugField(
+        max_length=255,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="URL-friendly version of English title (for English article URL)",
+    )
     
     # Meta information for SEO (multilingual)
     meta_title_it = models.CharField(max_length=255, blank=True, help_text="SEO meta title in Italian")
@@ -63,11 +76,22 @@ class Article(models.Model):
             models.UniqueConstraint(fields=['title_it'], name='unique_title_it'),
             models.UniqueConstraint(fields=['title_en'], name='unique_title_en'),
         ]
+
+    def _generate_unique_slug(self, field_name: str, source_value: str) -> str:
+        base = slugify(source_value or "") or "article"
+        candidate = base
+        i = 2
+        while Article.objects.filter(**{field_name: candidate}).exclude(pk=self.pk).exists():
+            candidate = f"{base}-{i}"
+            i += 1
+        return candidate
     
     def save(self, *args, **kwargs):
-        # Auto-generate slug from Italian title if not provided
-        if not self.slug and self.title_it:
-            self.slug = slugify(self.title_it)
+        # Auto-generate slugs from titles if not provided.
+        if (self.slug is None or self.slug == "") and self.title_it:
+            self.slug = self._generate_unique_slug("slug", self.title_it)
+        if (self.slug_en is None or self.slug_en == "") and self.title_en:
+            self.slug_en = self._generate_unique_slug("slug_en", self.title_en)
         # Auto-fill meta titles if empty
         if not self.meta_title_it and self.title_it:
             self.meta_title_it = self.title_it

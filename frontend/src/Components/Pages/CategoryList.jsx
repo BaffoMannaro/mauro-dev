@@ -4,11 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
+import { siteUrl } from '../../utils/seo';
+import { useLocation } from 'react-router-dom';
 import Footer from '../Landing/Footer';
 import GetInTouch from '../Landing/GetInTouch';
 import useAxios from '../../utils/useAxios';
 
 export default function CategoryList() {
+    const location = useLocation();
     const { id } = useParams();
     const [articles, setArticles] = useState([]);
     const [category, setCategory] = useState(null);
@@ -130,7 +133,7 @@ export default function CategoryList() {
                 </title>
                 <link
                     rel="canonical"
-                    href={`https://superotech.ai/category/${id}`}
+                    href={siteUrl(location.pathname)}
                 />
                 <meta
                     name="description"
@@ -138,7 +141,7 @@ export default function CategoryList() {
                 />
                 <meta
                     property="og:title"
-                    content={`Supero | ${category?.display_name?.[activeLang] || 'Category'}`}
+                    content={category?.display_name?.[activeLang] || 'Category'}
                 />
                 <meta
                     property="og:description"
@@ -146,7 +149,7 @@ export default function CategoryList() {
                 />
                 <meta
                     property="og:url"
-                    content={`https://superotech.ai/category/${id}`}
+                    content={siteUrl(location.pathname)}
                 />
                 <meta property="og:type" content="website" />
             </Helmet>

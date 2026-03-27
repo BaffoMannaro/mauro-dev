@@ -35,6 +35,34 @@
 	      window._iub_cs_configuration = cfg;
 	    })();
 	  </script>
+	  <script>
+	    (function () {
+	      // Skip Iubenda during prerender to keep HTML snapshots clean.
+	      if (window.__PRERENDER__ === true) return;
+
+	      // Load Cookie Solution once (avoid duplicates if some other tag already injected it).
+	      var alreadyLoaded = false;
+	      try {
+	        alreadyLoaded = Array.prototype.some.call(
+	          document.scripts,
+	          function (s) {
+	            return (
+	              s &&
+	              s.src &&
+	              String(s.src).indexOf('cdn.iubenda.com/cookie_solution/iubenda_cs') !== -1
+	            );
+	          }
+	        );
+	      } catch (e) { }
+	      if (alreadyLoaded) return;
+
+	      var s = document.createElement('script');
+	      s.async = true;
+	      s.charset = 'UTF-8';
+	      s.src = 'https://cdn.iubenda.com/cookie_solution/iubenda_cs.js';
+	      document.head.appendChild(s);
+	    })();
+	  </script>
 
 	  <!-- In development only Disable cache
 	  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />

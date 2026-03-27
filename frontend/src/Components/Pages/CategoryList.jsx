@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
-import { siteUrl } from '../../utils/seo';
+import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import Footer from '../Landing/Footer';
 import GetInTouch from '../Landing/GetInTouch';

@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import Navbar from '../Molecules/Navbar';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
 import Footer from '../Landing/Footer';
-import { backendUrl, siteUrl } from '../../utils/seo';
+import { backendUrl, siteUrl } from '../../utils/seo.js';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 

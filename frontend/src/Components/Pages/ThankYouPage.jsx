@@ -4,7 +4,7 @@ import Footer from '../Landing/Footer';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { siteUrl } from '../../utils/seo';
+import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 
 export default function ThankYouPage() {

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
-import { siteUrl } from '../../utils/seo';
+import { siteUrl } from '../../utils/seo.js';
 import VariableProximity from '../Landing/VariableProximity';
 import { useTranslation } from 'react-i18next';
 import step0 from '../../assets/finish/step-0.png';

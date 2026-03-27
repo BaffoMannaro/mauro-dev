@@ -286,6 +286,12 @@ async function main() {
       const context = await browser.newContext({ locale });
       await context.addInitScript((lng) => {
         try {
+          // Mark this run as prerender so index.html can skip GTM/analytics.
+          window.__PRERENDER__ = true;
+        } catch {
+          // ignore
+        }
+        try {
           localStorage.setItem("i18nextLng", lng);
         } catch {
           // ignore
@@ -296,6 +302,23 @@ async function main() {
           // ignore
         }
       }, item.lang);
+
+      // Extra safety: block third-party scripts during prerender (avoids polluting the HTML snapshot).
+      await context.route("**/*", async (route) => {
+        const url = route.request().url();
+        if (
+          /googletagmanager\.com/i.test(url) ||
+          /google-analytics\.com/i.test(url) ||
+          /connect\.facebook\.net/i.test(url) ||
+          /facebook\.com\/tr/i.test(url) ||
+          /snap\.licdn\.com/i.test(url) ||
+          /iubenda\.com/i.test(url)
+        ) {
+          await route.abort();
+          return;
+        }
+        await route.continue();
+      });
 
       const page = await context.newPage();
       try {

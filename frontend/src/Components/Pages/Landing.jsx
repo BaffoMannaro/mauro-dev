@@ -20,7 +20,7 @@ import LanguageSwitcher from '../Atoms/LanguageSwitcher';
 import useAuthStore from '../../Stores/useAuthStore';
 import { Link } from 'react-router-dom';
 import Navbar from '../Molecules/Navbar';
-import { siteUrl } from '../../utils/seo';
+import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 
 export default function Landing() {

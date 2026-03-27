@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../Landing/Footer';
-import { siteUrl } from '../../utils/seo';
+import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 
 export default function PressRelease() {

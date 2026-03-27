@@ -7,23 +7,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SUPERO – AI-Driven Robotic Surface Finishing Systems</title>
 
-	  <meta name="robots" content="index, follow">
+		  <meta name="robots" content="index, follow">
 
-  <!-- In development only Disable cache
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />-->
+	  <!-- Iubenda (Cookie Solution) -->
+	  <script>
+	    (function () {
+	      // Define config BEFORE the Iubenda script loads (via our snippet or GTM).
+	      if (window._iub_cs_configuration) return;
 
-  <!-- Google Tag Manager -->
-  <script>(function (w, d, s, l, i) {
-      w[l] = w[l] || []; w[l].push({
-        'gtm.start':
-          new Date().getTime(), event: 'gtm.js'
-      }); var f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-NG72LWLN');</script>
-  <!-- End Google Tag Manager -->
+	      function detectLang() {
+	        try {
+	          var lng = localStorage.getItem('i18nextLng') || '';
+	          if (String(lng).toLowerCase().startsWith('it')) return 'it';
+	          if (String(lng).toLowerCase().startsWith('en')) return 'en';
+	        } catch (e) { }
+	        var nav = (navigator && navigator.language) ? navigator.language : '';
+	        return String(nav).toLowerCase().startsWith('it') ? 'it' : 'en';
+	      }
+
+	      var rawSiteId = '%VITE_IUBENDA_SITE_ID%';
+	      var rawPolicyId = '%VITE_IUBENDA_COOKIE_POLICY_ID%';
+
+	      var cfg = { lang: detectLang() };
+	      if (rawSiteId && rawSiteId.indexOf('%') === -1) cfg.siteId = Number(rawSiteId);
+	      if (rawPolicyId && rawPolicyId.indexOf('%') === -1) cfg.cookiePolicyId = Number(rawPolicyId);
+
+	      window._iub_cs_configuration = cfg;
+	    })();
+	  </script>
+
+	  <!-- In development only Disable cache
+	  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	  <meta http-equiv="Pragma" content="no-cache" />
+	  <meta http-equiv="Expires" content="0" />-->
+
+	  <!-- Google Tag Manager -->
+	  <script>
+	    (function () {
+	      // Avoid running GTM during prerender (it injects third-party scripts into the HTML snapshot).
+	      if (window.__PRERENDER__ === true) return;
+	      (function (w, d, s, l, i) {
+	        w[l] = w[l] || []; w[l].push({
+	          'gtm.start':
+	            new Date().getTime(), event: 'gtm.js'
+	        }); var f = d.getElementsByTagName(s)[0],
+	          j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+	            'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+	      })(window, document, 'script', 'dataLayer', 'GTM-NG72LWLN');
+	    })();
+	  </script>
+	  <!-- End Google Tag Manager -->
 
   <!-- Hide Iubenda notice collection widget -->
   <style>

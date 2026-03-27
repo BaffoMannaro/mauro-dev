@@ -152,7 +152,21 @@ function extractRoutesFromSitemap(xml) {
     seen.add(key);
     out.push(it);
   }
-  return out;
+
+  // If multiple languages point to the same URL path, we can only write one HTML file.
+  // Prefer Italian as default for shared URLs to avoid last-write-wins overwriting.
+  const byPath = new Map();
+  for (const it of out) {
+    const existing = byPath.get(it.path);
+    if (!existing) {
+      byPath.set(it.path, it);
+      continue;
+    }
+    if (existing.lang !== "it" && it.lang === "it") {
+      byPath.set(it.path, it);
+    }
+  }
+  return [...byPath.values()];
 }
 
 function defaultRoutes() {
@@ -231,6 +245,22 @@ function promoteHelmetTitle(html) {
   }
 
   return html.slice(0, headInnerStart) + newHeadInner + html.slice(headClose);
+}
+
+function forceHtmlLang(html, lang) {
+  const lng = String(lang || "").toLowerCase().startsWith("en") ? "en" : "it";
+  const htmlTagRe = /<html\b[^>]*>/i;
+  const m = html.match(htmlTagRe);
+  if (!m) return html;
+  const tag = m[0];
+  const hasLang = /\blang=["'][^"']*["']/i.test(tag);
+  let newTag;
+  if (hasLang) {
+    newTag = tag.replace(/\blang=["'][^"']*["']/i, `lang="${lng}"`);
+  } else {
+    newTag = tag.replace(/>$/, ` lang="${lng}">`);
+  }
+  return html.replace(htmlTagRe, newTag);
 }
 
 function localeForLang(lang) {
@@ -329,6 +359,7 @@ async function main() {
         let html = await page.content();
         html = rewriteCanonicalAndOgUrl(html, siteUrl, item.path);
         html = promoteHelmetTitle(html);
+        html = forceHtmlLang(html, item.lang);
 
         const outFile = safeRouteToFile(distDir, item.path);
         fs.writeFileSync(outFile, html, "utf8");

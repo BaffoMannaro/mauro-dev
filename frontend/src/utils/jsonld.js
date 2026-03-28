@@ -14,6 +14,51 @@ export function organizationJsonLd({ url }) {
     };
 }
 
+export function organizationJsonLdWithDetails({
+    url,
+    description,
+    email,
+    telephone,
+    address,
+    sameAs,
+}) {
+    const json = organizationJsonLd({ url });
+    if (description) json.description = description;
+    if (email) json.email = email;
+    if (telephone) json.telephone = telephone;
+
+    if (Array.isArray(sameAs) && sameAs.length) {
+        json.sameAs = sameAs.filter(Boolean);
+    }
+
+    if (address && typeof address === 'object') {
+        const addr = {
+            '@type': 'PostalAddress',
+        };
+        if (address.streetAddress) addr.streetAddress = address.streetAddress;
+        if (address.addressLocality) addr.addressLocality = address.addressLocality;
+        if (address.addressRegion) addr.addressRegion = address.addressRegion;
+        if (address.postalCode) addr.postalCode = address.postalCode;
+        if (address.addressCountry) addr.addressCountry = address.addressCountry;
+
+        const hasAny = Object.keys(addr).length > 1;
+        if (hasAny) json.address = addr;
+    }
+
+    if (email || telephone) {
+        json.contactPoint = [
+            {
+                '@type': 'ContactPoint',
+                contactType: 'customer support',
+                ...(email ? { email } : {}),
+                ...(telephone ? { telephone } : {}),
+            },
+        ];
+    }
+
+    return json;
+}
+
 export function websiteJsonLd({ url }) {
     return {
         '@context': 'https://schema.org',

@@ -24,7 +24,7 @@ import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import {
     jsonLdString,
-    organizationJsonLd,
+    organizationJsonLdWithDetails,
     websiteJsonLd,
     webPageJsonLd,
 } from '../../utils/jsonld.js';
@@ -35,6 +35,24 @@ export default function Landing() {
     const pageUrl = siteUrl(location.pathname);
     const pageDescription =
         'AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces.';
+
+    const companyEmail = import.meta.env.VITE_COMPANY_EMAIL || '';
+    const companyPhone = import.meta.env.VITE_COMPANY_PHONE || '';
+    const companySocialsRaw = import.meta.env.VITE_COMPANY_SOCIALS || '';
+    const companySocials = companySocialsRaw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+    const address = {
+        streetAddress: import.meta.env.VITE_COMPANY_ADDRESS_STREET || undefined,
+        addressLocality: import.meta.env.VITE_COMPANY_ADDRESS_CITY || undefined,
+        addressRegion: import.meta.env.VITE_COMPANY_ADDRESS_REGION || undefined,
+        postalCode:
+            import.meta.env.VITE_COMPANY_ADDRESS_POSTAL_CODE || undefined,
+        addressCountry:
+            import.meta.env.VITE_COMPANY_ADDRESS_COUNTRY || undefined,
+    };
 
     const [activeAccordion, setActiveAccordion] = useState(false);
 
@@ -83,7 +101,17 @@ export default function Landing() {
                 <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json">
-                    {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
+                    {jsonLdString(
+                        organizationJsonLdWithDetails({
+                            url: siteUrl('/'),
+                            description:
+                                'Software solutions with AI for industrial robots and surface finishing (sanding and polishing) across automotive, marine and complex surfaces.',
+                            email: companyEmail || undefined,
+                            telephone: companyPhone || undefined,
+                            address,
+                            sameAs: companySocials,
+                        })
+                    )}
                 </script>
                 <script type="application/ld+json">
                     {jsonLdString(websiteJsonLd({ url: siteUrl('/') }))}

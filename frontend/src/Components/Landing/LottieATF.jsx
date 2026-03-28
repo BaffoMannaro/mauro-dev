@@ -44,6 +44,26 @@ import Lottie from 'lottie-react';
 import logoAnimationData from '../../assets/logohomedef.json';
 
 const LottieATF = () => {
+    // Prerender snapshots should stay small. Lottie renders a large inline SVG (often with base64 images),
+    // which can blow up `dist/index.html` into tens of megabytes. Skip it during prerender.
+    if (typeof window !== 'undefined' && window.__PRERENDER__ === true) {
+        return (
+            <div
+                id="lottie"
+                style={{
+                    width: '100vw',
+                    height: '100vh',
+                    position: 'absolute',
+                    zIndex: 11,
+                    top: '10vh',
+                    right: '5vw',
+                    pointerEvents: 'none',
+                    overflow: 'hidden',
+                }}
+            />
+        );
+    }
+
     return (
         <div
             id="lottie"

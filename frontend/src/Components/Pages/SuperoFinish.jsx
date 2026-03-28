@@ -23,9 +23,20 @@ import Applications from '../Landing/Applications';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
 import LandingForm from '../Landing/LandingForm';
 import { useLocation } from 'react-router-dom';
+import {
+    jsonLdString,
+    organizationJsonLd,
+    productJsonLd,
+    websiteJsonLd,
+    webPageJsonLd,
+} from '../../utils/jsonld.js';
 
 export default function SuperoFinish() {
     const location = useLocation();
+    const pageUrl = siteUrl(location.pathname);
+    const pageTitle = 'SUPERO Finish';
+    const pageDescription =
+        'Discover the SUPERO Finish, a revolutionary approach to surface finishing technology and industrial automation.';
     const [step, setStep] = useState(0);
     const [playingVideo, setPlayingVideo] = useState(null);
 
@@ -73,25 +84,49 @@ export default function SuperoFinish() {
                 }
             `}</style>
             <Helmet>
-                <title>SUPERO Finish</title>
+                <title>{pageTitle}</title>
                 <link
                     rel="canonical"
-                    href={siteUrl(location.pathname)}
+                    href={pageUrl}
                 />
                 <meta
                     name="description"
-                    content="Discover the SUPERO Finish, a revolutionary approach to surface finishing technology and industrial automation."
+                    content={pageDescription}
                 />
-                <meta property="og:title" content="SUPERO Finish" />
+                <meta property="og:title" content={pageTitle} />
                 <meta
                     property="og:description"
-                    content="Discover the SUPERO Finish, a revolutionary approach to surface finishing technology and industrial automation."
+                    content={pageDescription}
                 />
                 <meta
                     property="og:url"
-                    content={siteUrl(location.pathname)}
+                    content={pageUrl}
                 />
                 <meta property="og:type" content="website" />
+                <script type="application/ld+json">
+                    {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(websiteJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        webPageJsonLd({
+                            url: pageUrl,
+                            name: pageTitle,
+                            description: pageDescription,
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        productJsonLd({
+                            url: pageUrl,
+                            name: pageTitle,
+                            description: pageDescription,
+                        })
+                    )}
+                </script>
             </Helmet>
             <Navbar />
 

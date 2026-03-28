@@ -8,6 +8,12 @@ import Navbar from '../Molecules/Navbar';
 import SuggestedArticles from '../Molecules/SuggestedArticles';
 import Footer from '../Landing/Footer';
 import { backendUrl, siteUrl } from '../../utils/seo.js';
+import {
+    blogPostingJsonLd,
+    jsonLdString,
+    organizationJsonLd,
+    websiteJsonLd,
+} from '../../utils/jsonld.js';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
@@ -31,6 +37,16 @@ export default function ArticleDetail() {
             ? article?.meta_description?.en
             : article?.meta_description?.it;
     const pageTitle = localizedMetaTitle || `Supero | ${localizedArticleTitle}`;
+    const pageUrl = siteUrl(location.pathname);
+    const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
+    const jsonLdImage = article?.main_image
+        ? backendUrl(article.main_image)
+        : null;
+    const jsonLdKeywords = (article?.tags || [])
+        .map((t) =>
+            activeLang === 'en' ? t?.display_name?.en : t?.display_name?.it
+        )
+        .filter(Boolean);
 
     useEffect(() => {
         fetchArticle();
@@ -106,7 +122,7 @@ export default function ArticleDetail() {
                 <title>{pageTitle}</title>
                 <link
                     rel="canonical"
-                    href={siteUrl(location.pathname)}
+                    href={pageUrl}
                 />
                 <meta
                     name="description"
@@ -122,15 +138,36 @@ export default function ArticleDetail() {
                 />
                 <meta
                     property="og:url"
-                    content={siteUrl(location.pathname)}
+                    content={pageUrl}
                 />
                 <meta property="og:type" content="article" />
                 {article.main_image && (
                     <meta
                         property="og:image"
-                        content={backendUrl(article.main_image)}
+                        content={jsonLdImage}
                     />
                 )}
+                <script type="application/ld+json">
+                    {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(websiteJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        blogPostingJsonLd({
+                            url: pageUrl,
+                            headline:
+                                localizedMetaTitle || localizedArticleTitle,
+                            description: localizedMetaDescription,
+                            image: jsonLdImage,
+                            datePublished: article?.published_at || null,
+                            dateModified: article?.updated_at || null,
+                            lang: jsonLdLang,
+                            keywords: jsonLdKeywords,
+                        })
+                    )}
+                </script>
             </Helmet>
             <Navbar />
             <div className="py-12 px-4 sm:px-6 pt-48">

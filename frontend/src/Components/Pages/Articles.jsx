@@ -6,6 +6,12 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
 import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
+import {
+    jsonLdString,
+    organizationJsonLd,
+    websiteJsonLd,
+    webPageJsonLd,
+} from '../../utils/jsonld.js';
 import blockRight from '../../assets/images/block-right-kh.png';
 import useAxios from '../../utils/useAxios';
 import Footer from '../Landing/Footer';
@@ -13,6 +19,10 @@ import GetInTouch from '../Landing/GetInTouch';
 
 export default function Articles() {
     const location = useLocation();
+    const pageUrl = siteUrl(location.pathname);
+    const pageTitle = 'SUPERO Knowledge Hub – Articles & Insights';
+    const pageDescription =
+        'Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation.';
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -102,25 +112,40 @@ export default function Articles() {
     return (
         <>
             <Helmet>
-                <title>SUPERO Knowledge Hub – Articles & Insights</title>
-                <link rel="canonical" href={siteUrl(location.pathname)} />
+                <title>{pageTitle}</title>
+                <link rel="canonical" href={pageUrl} />
                 <meta
                     name="description"
-                    content="Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation."
+                    content={pageDescription}
                 />
                 <meta
                     property="og:title"
-                    content="SUPERO Knowledge Hub – Articles & Insights"
+                    content={pageTitle}
                 />
                 <meta
                     property="og:description"
-                    content="Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation."
+                    content={pageDescription}
                 />
                 <meta
                     property="og:url"
-                    content={siteUrl(location.pathname)}
+                    content={pageUrl}
                 />
                 <meta property="og:type" content="website" />
+                <script type="application/ld+json">
+                    {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(websiteJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        webPageJsonLd({
+                            url: pageUrl,
+                            name: pageTitle,
+                            description: pageDescription,
+                        })
+                    )}
+                </script>
             </Helmet>
             <Navbar />
             <div className="h-[70vh] xl:h-[80vh] flex flex-wrap items-center pt-2 xl:pt-32 pb-6 xl:py-6 relative">

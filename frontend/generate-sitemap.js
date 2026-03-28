@@ -78,7 +78,6 @@ const staticPages = [
     { loc: '/articles', priority: '0.9', changefreq: 'daily' },
     { loc: '/supero-finish', priority: '0.8', changefreq: 'monthly' },
     { loc: '/comunicato-stampa-rebranding', priority: '0.7', changefreq: 'monthly' },
-    { loc: '/thank-you-page', priority: '0.3', changefreq: 'monthly' },
 ];
 
 /**

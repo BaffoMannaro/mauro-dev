@@ -22,10 +22,19 @@ import { Link } from 'react-router-dom';
 import Navbar from '../Molecules/Navbar';
 import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
+import {
+    jsonLdString,
+    organizationJsonLd,
+    websiteJsonLd,
+    webPageJsonLd,
+} from '../../utils/jsonld.js';
 
 export default function Landing() {
     const { t } = useTranslation();
     const location = useLocation();
+    const pageUrl = siteUrl(location.pathname);
+    const pageDescription =
+        'AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces.';
 
     const [activeAccordion, setActiveAccordion] = useState(false);
 
@@ -58,10 +67,10 @@ export default function Landing() {
                 <title>
                     SUPERO – AI-Driven Robotic Surface Finishing Systems
                 </title>
-                <link rel="canonical" href={siteUrl(location.pathname)} />
+                <link rel="canonical" href={pageUrl} />
                 <meta
                     name="description"
-                    content="AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces."
+                    content={pageDescription}
                 />
                 <meta
                     property="og:title"
@@ -69,10 +78,27 @@ export default function Landing() {
                 />
                 <meta
                     property="og:description"
-                    content="AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces."
+                    content={pageDescription}
                 />
-                <meta property="og:url" content={siteUrl(location.pathname)} />
+                <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="website" />
+                <script type="application/ld+json">
+                    {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(websiteJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        webPageJsonLd({
+                            url: pageUrl,
+                            name:
+                                'SUPERO – AI-Driven Robotic Surface Finishing Systems',
+                            description: pageDescription,
+                            lang: 'en',
+                        })
+                    )}
+                </script>
             </Helmet>
             <div className="">
                 <div className="w-full relative">

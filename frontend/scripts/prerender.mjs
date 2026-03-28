@@ -208,6 +208,20 @@ function rewriteCanonicalAndOgUrl(html, siteUrl, routePath) {
   return html;
 }
 
+function rewriteJsonLdOrigin(html, siteUrl) {
+  if (!siteUrl) return html;
+  const base = siteUrl.replace(/\/+$/, "");
+  return html.replace(
+    /(<script\b[^>]*\btype=["']application\/ld\+json["'][^>]*>)([\s\S]*?)(<\/script>)/gi,
+    (_m, open, body, close) => {
+      const rewritten = body
+        .replace(/http:\/\/127\.0\.0\.1:\d+/g, base)
+        .replace(/http:\/\/localhost:\d+/g, base);
+      return `${open}${rewritten}${close}`;
+    }
+  );
+}
+
 function promoteHelmetTitle(html) {
   // Some scrapers take the first <title> only. react-helmet-async usually marks its title with data-rh="true".
   const headStart = html.search(/<head\b[^>]*>/i);
@@ -358,6 +372,7 @@ async function main() {
 
         let html = await page.content();
         html = rewriteCanonicalAndOgUrl(html, siteUrl, item.path);
+        html = rewriteJsonLdOrigin(html, siteUrl);
         html = promoteHelmetTitle(html);
         html = forceHtmlLang(html, item.lang);
 

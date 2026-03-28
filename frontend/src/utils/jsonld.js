@@ -45,15 +45,31 @@ export function blogPostingJsonLd({
     dateModified,
     lang,
     keywords,
+    siteUrl,
+    publisherLogoUrl,
 }) {
+    const org = {
+        '@type': 'Organization',
+        name: 'SUPERO',
+    };
+    if (siteUrl) org.url = siteUrl;
+
+    const publisher = { ...org };
+    if (publisherLogoUrl) {
+        publisher.logo = {
+            '@type': 'ImageObject',
+            url: publisherLogoUrl,
+        };
+    }
+
     const json = {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
         headline,
         description,
-        author: { '@type': 'Organization', name: 'SUPERO' },
-        publisher: { '@type': 'Organization', name: 'SUPERO' },
+        author: org,
+        publisher,
         url,
     };
     if (lang) json.inLanguage = lang;

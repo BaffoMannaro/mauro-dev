@@ -42,6 +42,8 @@ export default function ArticleDetail() {
     const jsonLdImage = article?.main_image
         ? backendUrl(article.main_image)
         : null;
+    const jsonLdSiteUrl = siteUrl('/');
+    const jsonLdPublisherLogoUrl = siteUrl('/fav.png');
     const jsonLdKeywords = (article?.tags || [])
         .map((t) =>
             activeLang === 'en' ? t?.display_name?.en : t?.display_name?.it
@@ -165,6 +167,8 @@ export default function ArticleDetail() {
                             dateModified: article?.updated_at || null,
                             lang: jsonLdLang,
                             keywords: jsonLdKeywords,
+                            siteUrl: jsonLdSiteUrl,
+                            publisherLogoUrl: jsonLdPublisherLogoUrl,
                         })
                     )}
                 </script>

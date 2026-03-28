@@ -22,10 +22,55 @@ export default function Footer() {
                 className="mx-auto block relative bottom-[-1px]"
             />
 
-            <div className="bg-[#434348] py-6 px-4 xl:px-12 mt-18">
+            <div className="bg-[#434348] py-4 px-4 xl:px-12">
                 <div className="w-full flex items-center justify-around flex-wrap">
-                    <div className="w-full xl:w-4/5 xl:pe-12">
-                        <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
+                    <div className="w-full xl:w-3/4 xl:pe-12">
+                        <div className="flex flex-col xl:flex-row xl:items-center gap-8">
+                            <div>
+                                <img
+                                    src={cofinanziato}
+                                    alt="Cofinanziato Logo"
+                                />
+                            </div>
+                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
+                            <div>
+                                <img src={miur} alt="MIUR Logo" />
+                            </div>
+                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
+                            <div>
+                                <img
+                                    src={regionePuglia}
+                                    alt="Regione Puglia Logo"
+                                />
+                            </div>
+                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
+                            <div>
+                                <div>
+                                    <img src={coesione} alt="Coesione Logo" />
+                                </div>
+                            </div>
+                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
+                            <img
+                                src={pugliaSviluppo}
+                                alt="Puglia Sviluppo Logo"
+                                className="max-w-32"
+                            />
+                        </div>
+                    </div>
+                    <div className="w-full xl:w-1/4 mt-2">
+                        <div className="">
+                            <p className="text-body-s opacity-70">
+                                {t('intervent_cofinanced')}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <hr className="bg-[#626271] mt-4" />
+            </div>
+            <div className="bg-[#434348] py-2 px-4 xl:px-12 mt-18">
+                <div className="w-full flex items-center justify-around flex-wrap">
+                    <div className="w-full xl:w-3/4 xl:pe-12">
+                        <div className="flex flex-col xl:flex-row xl:items-center gap-8">
                             <div>
                                 <img src={eu} alt="European Union Logo" />
                             </div>
@@ -46,7 +91,7 @@ export default function Footer() {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full xl:w-1/5">
+                    <div className="w-full xl:w-1/4 mt-4">
                         <div className="">
                             <p className="text-body-s opacity-70">
                                 {t('banded_with')}
@@ -54,58 +99,14 @@ export default function Footer() {
                         </div>
                     </div>
                 </div>
-                <hr className="bg-[#626271] mt-8" />
+                <hr className="bg-[#626271] mt-4" />
             </div>
 
-            <div className="bg-[#434348] py-6 px-4 xl:px-12">
+
+            <div className="bg-[#434348] py-4 px-4 xl:px-12">
                 <div className="w-full flex items-center justify-around flex-wrap">
-                    <div className="w-full xl:w-4/5 xl:pe-12">
-                        <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
-                            <div>
-                                <img
-                                    src={cofinanziato}
-                                    alt="Cofinanziato Logo"
-                                />
-                            </div>
-                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
-                            <div>
-                                <img src={miur} alt="MIUR Logo" />
-                            </div>
-                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
-                            <div>
-                                <div>
-                                    <img src={coesione} alt="Coesione Logo" />
-                                </div>
-                            </div>
-                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
-                            <div>
-                                <img
-                                    src={regionePuglia}
-                                    alt="Regione Puglia Logo"
-                                />
-                            </div>
-                            <div className="hidden xl:block w-[1px] h-20 bg-[#626271]"></div>
-                            <img
-                                src={pugliaSviluppo}
-                                alt="Puglia Sviluppo Logo"
-                                className="max-w-32"
-                            />
-                        </div>
-                    </div>
-                    <div className="w-full xl:w-1/5">
-                        <div className="">
-                            <p className="text-body-s opacity-70">
-                                {t('intervent_cofinanced')}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <hr className="bg-[#626271] mt-8" />
-            </div>
-            <div className="bg-[#434348] py-6 px-4 xl:px-12">
-                <div className="w-full flex items-center justify-around flex-wrap">
-                    <div className="w-full xl:w-4/5 xl:pe-12">
-                        <div className="flex flex-col xl:flex-row xl:items-center gap-8 mb-8">
+                    <div className="w-full xl:w-3/4 xl:pe-12">
+                        <div className="flex flex-col xl:flex-row xl:items-center gap-8">
                             <div>
                                 <img
                                     src={cofinanziato}
@@ -125,7 +126,7 @@ export default function Footer() {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full xl:w-1/5">
+                    <div className="w-full xl:w-1/4 mt-2">
                         <div className="">
                             <p className="text-body-s opacity-70">
                                 {t('visioprint_cofinanced')}
@@ -135,12 +136,12 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="bg-supero-dark-grey py-4">
-                <div className="w-full text-center">
+            <div className="bg-supero-dark-grey py-2">
+                <div className="w-full text-center mt-1">
                     <p className="text-body-m opacity-60">
                         © {new Date().getFullYear()} All rights reserved
                     </p>
-                    <div className="flex justify-center gap-4 mt-1">
+                    <div className="flex justify-center gap-4">
                         <a
                             href="https://www.iubenda.com/privacy-policy/23263641"
                             className="text-body-m opacity-60 hover:opacity-100 transition-opacity underline"

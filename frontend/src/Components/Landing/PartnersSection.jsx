@@ -29,7 +29,7 @@ export default function PartnersSection() {
                 </div>
 
                 <div className="block xl:hidden w-full my-12">
-                    <p className="text-white text-center">Proud partners of</p>
+                    <p className="text-white text-center">{t('proud_partners')}</p>
                 </div>
                 <div className="w-full xl:w-3/4 xl:max-w-[870px] flex flex-row items-center xl:flex-wrap px-8 overflow-x-scroll overflow-y-hidden">
                     <div className="hidden xl:block w-full my-12">

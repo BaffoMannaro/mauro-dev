@@ -239,7 +239,7 @@ export default function LandingForm() {
                                 />
                             </div>
 
-                            <div className="mb-8 w-full">
+                            <div className="mb-8 w-full px-2">
                                 <label
                                     htmlFor="message"
                                     className="text-[#a6a6ab] text-body-m mb-2 block"
@@ -320,6 +320,18 @@ export default function LandingForm() {
                                         </div>
                                         <p className="text-body-s">
                                             {t('marketing_consent')}
+                                            <a
+                                                href="https://www.iubenda.com/privacy-policy/23263641"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="underline"
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                {t('privacy_policy_link')}
+                                            </a>
+                                            .
                                         </p>
                                     </div>
                                 </div>

@@ -24,6 +24,7 @@ import SuggestedArticles from '../Molecules/SuggestedArticles';
 import LandingForm from '../Landing/LandingForm';
 import { useLocation } from 'react-router-dom';
 import {
+    breadcrumbListJsonLd,
     jsonLdString,
     organizationJsonLd,
     productJsonLd,
@@ -46,7 +47,10 @@ export default function SuperoFinish() {
     const video3Ref = useRef(null);
     const video4Ref = useRef(null);
 
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const activeLang = i18n.resolvedLanguage;
+    const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
+    const finishLabel = activeLang === 'en' ? 'Supero Finish' : 'Supero Finish';
 
     const handleVideoToggle = (videoNumber) => {
         const refs = [video1Ref, video2Ref, video3Ref, video4Ref];
@@ -124,6 +128,17 @@ export default function SuperoFinish() {
                             url: pageUrl,
                             name: pageTitle,
                             description: pageDescription,
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        breadcrumbListJsonLd({
+                            lang: jsonLdLang,
+                            items: [
+                                { name: 'Home', url: siteUrl('/') },
+                                { name: finishLabel, url: pageUrl },
+                            ],
                         })
                     )}
                 </script>

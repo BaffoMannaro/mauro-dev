@@ -7,6 +7,7 @@ import Navbar from '../Molecules/Navbar';
 import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import {
+    breadcrumbListJsonLd,
     jsonLdString,
     organizationJsonLd,
     websiteJsonLd,
@@ -38,6 +39,8 @@ export default function Articles() {
 
     const { i18n } = useTranslation();
     const activeLang = i18n.resolvedLanguage;
+    const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
+    const resourcesLabel = activeLang === 'en' ? 'Resources' : 'Risorse';
 
     const api = useAxios();
 
@@ -143,6 +146,23 @@ export default function Articles() {
                             url: pageUrl,
                             name: pageTitle,
                             description: pageDescription,
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        breadcrumbListJsonLd({
+                            lang: jsonLdLang,
+                            items: [
+                                {
+                                    name: 'Home',
+                                    url: siteUrl('/'),
+                                },
+                                {
+                                    name: resourcesLabel,
+                                    url: pageUrl,
+                                },
+                            ],
                         })
                     )}
                 </script>

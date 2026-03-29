@@ -9,6 +9,7 @@ import SuggestedArticles from '../Molecules/SuggestedArticles';
 import Footer from '../Landing/Footer';
 import { backendUrl, siteUrl } from '../../utils/seo.js';
 import {
+    breadcrumbListJsonLd,
     blogPostingJsonLd,
     jsonLdString,
     organizationJsonLd,
@@ -49,6 +50,7 @@ export default function ArticleDetail() {
             activeLang === 'en' ? t?.display_name?.en : t?.display_name?.it
         )
         .filter(Boolean);
+    const resourcesLabel = activeLang === 'en' ? 'Resources' : 'Risorse';
 
     useEffect(() => {
         fetchArticle();
@@ -169,6 +171,26 @@ export default function ArticleDetail() {
                             keywords: jsonLdKeywords,
                             siteUrl: jsonLdSiteUrl,
                             publisherLogoUrl: jsonLdPublisherLogoUrl,
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        breadcrumbListJsonLd({
+                            lang: jsonLdLang,
+                            items: [
+                                { name: 'Home', url: siteUrl('/') },
+                                {
+                                    name: resourcesLabel,
+                                    url: siteUrl('/articles/'),
+                                },
+                                {
+                                    name:
+                                        localizedMetaTitle ||
+                                        localizedArticleTitle,
+                                    url: pageUrl,
+                                },
+                            ],
                         })
                     )}
                 </script>

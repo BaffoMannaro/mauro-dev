@@ -81,6 +81,35 @@ export function webPageJsonLd({ url, name, description, lang, image }) {
     return json;
 }
 
+export function breadcrumbListJsonLd({ items, lang }) {
+    const list = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: (items || []).map((it, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            name: it.name,
+            item: it.url,
+        })),
+    };
+    if (lang) list.inLanguage = lang;
+    return list;
+}
+
+export function siteNavigationJsonLd({ items, lang }) {
+    const list = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: (items || []).map((it) => ({
+            '@type': 'SiteNavigationElement',
+            name: it.name,
+            url: it.url,
+        })),
+    };
+    if (lang) list.inLanguage = lang;
+    return list;
+}
+
 export function blogPostingJsonLd({
     url,
     headline,

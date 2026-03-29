@@ -23,8 +23,10 @@ import Navbar from '../Molecules/Navbar';
 import { siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import {
+    breadcrumbListJsonLd,
     jsonLdString,
     organizationJsonLdWithDetails,
+    siteNavigationJsonLd,
     websiteJsonLd,
     webPageJsonLd,
 } from '../../utils/jsonld.js';
@@ -124,6 +126,41 @@ export default function Landing() {
                                 'SUPERO – AI-Driven Robotic Surface Finishing Systems',
                             description: pageDescription,
                             lang: 'en',
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        siteNavigationJsonLd({
+                            items: [
+                                {
+                                    name: 'Resources',
+                                    url: siteUrl('/articles/'),
+                                },
+                                {
+                                    name: 'Supero Finish',
+                                    url: siteUrl('/supero-finish/'),
+                                },
+                                {
+                                    name: 'Get a demo',
+                                    url: `${siteUrl('/')}#landing-form`,
+                                },
+                                {
+                                    name: 'Privacy Policy',
+                                    url: 'https://www.iubenda.com/privacy-policy/23263641',
+                                },
+                                {
+                                    name: 'Cookie Policy',
+                                    url: 'https://www.iubenda.com/privacy-policy/23263641/cookie-policy',
+                                },
+                            ],
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        breadcrumbListJsonLd({
+                            items: [{ name: 'Home', url: siteUrl('/') }],
                         })
                     )}
                 </script>

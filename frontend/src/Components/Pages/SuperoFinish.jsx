@@ -40,7 +40,7 @@ export default function SuperoFinish() {
     const pageTitle = 'SUPERO Finish';
     const pageDescription =
         'Discover the SUPERO Finish, a revolutionary approach to surface finishing technology and industrial automation.';
-    const [step, setStep] = useState(3);
+    const [step, setStep] = useState(0);
     const [playingVideo, setPlayingVideo] = useState(1);
 
     const containerRef = useRef(null);
@@ -279,7 +279,7 @@ export default function SuperoFinish() {
                                     : step >= 1 && step <= 3
                                       ? {
                                             transform:
-                                                'scale(1.2) translate(10%, 20%)',
+                                                'scale(1.5) translate(30%, 30%)',
                                         }
                                       : {}
                             }
@@ -296,7 +296,7 @@ export default function SuperoFinish() {
                                 step >= 1 && step <= 3
                                     ? {
                                           transform:
-                                              'scale(1.2) translate(10%, 20%)',
+                                              'scale(1.5) translate(30%, 30%)',
                                       }
                                     : {}
                             }
@@ -312,7 +312,7 @@ export default function SuperoFinish() {
                                 step >= 1 && step <= 3
                                     ? {
                                           transform:
-                                              'scale(1.2) translate(10%, 20%)',
+                                              'scale(1.5) translate(30%, 30%)',
                                       }
                                     : {}
                             }
@@ -328,7 +328,7 @@ export default function SuperoFinish() {
                                 step >= 1 && step <= 3
                                     ? {
                                           transform:
-                                              'scale(1.2) translate(10%, 20%)',
+                                              'scale(1.5) translate(30%, 30%)',
                                       }
                                     : {}
                             }

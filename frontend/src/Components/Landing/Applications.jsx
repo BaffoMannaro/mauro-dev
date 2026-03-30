@@ -24,7 +24,7 @@ export default function Applications() {
                         {' '}
                         <img src={car} alt="Car" className="w-full h-48" />
                     </div>
-                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2">
+                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2 text-center">
                         Automotive
                     </p>
                 </div>
@@ -38,7 +38,7 @@ export default function Applications() {
                             className="w-full h-48"
                         />
                     </div>
-                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2">
+                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2 text-center ">
                         Marine
                     </p>
                 </div>
@@ -48,7 +48,7 @@ export default function Applications() {
                         {' '}
                         <img src={space} alt="Space" className="w-full h-48" />
                     </div>
-                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2">
+                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2 text-center ">
                         Aerospace
                     </p>
                 </div>
@@ -62,7 +62,7 @@ export default function Applications() {
                             className="w-full h-48"
                         />
                     </div>
-                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2">
+                    <p className="text-white text-body-m font-medium uppercase border border-white px-4 py-2 text-center ">
                         Additive <br />
                         Manufacturing
                     </p>

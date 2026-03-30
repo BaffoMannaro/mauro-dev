@@ -32,13 +32,15 @@ import {
     webPageJsonLd,
 } from '../../utils/jsonld.js';
 
+import dataSheet from '../../assets/datasheet.pdf';
+
 export default function SuperoFinish() {
     const location = useLocation();
     const pageUrl = siteUrl(location.pathname);
     const pageTitle = 'SUPERO Finish';
     const pageDescription =
         'Discover the SUPERO Finish, a revolutionary approach to surface finishing technology and industrial automation.';
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(3);
     const [playingVideo, setPlayingVideo] = useState(1);
 
     const containerRef = useRef(null);
@@ -200,7 +202,8 @@ export default function SuperoFinish() {
                         </a>
 
                         <a
-                            href="#"
+                            href={dataSheet}
+                            download
                             className="mb-4 xl:mb-0 xl:me-4 group relative overflow-hidden bg-white hover:bg-transparent border border-white hover:border-supero-green text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between"
                         >
                             <span className="relative z-10">
@@ -250,12 +253,13 @@ export default function SuperoFinish() {
                 </h3>
 
                 <div className="flex items-center flex-col xl:flex-row min-h-screen ">
-                    <div className="w-full xl:w-1/2 order-2 xl:order-1 relative h-[500px] xl:h-[800px]">
+                    <div className="w-full xl:w-1/2 order-2 xl:order-1 relative h-[500px] xl:h-[800px] overflow-hidden">
+                        {/* yellow ballon  */}
                         <img
                             src={superoos}
                             alt=""
                             className={
-                                'max-h-full absolute top-[60px] -right-4 xl:right-0 transition-opacity duration-500 scale-50 xl:scale-100 ' +
+                                'max-h-full absolute top-[60px] z-30 -right-4 xl:right-0 transition-all duration-500 scale-50 xl:scale-100 ' +
                                 (step === 0 ? 'opacity-100' : 'opacity-0')
                             }
                         />
@@ -263,8 +267,21 @@ export default function SuperoFinish() {
                             src={step0}
                             alt=""
                             className={
-                                'max-h-full absolute bottom-0 right-0 transition-opacity duration-500 ' +
+                                'max-h-full absolute bottom-0 right-0 transition-all duration-500 ' +
                                 (step === 0 ? 'opacity-100' : 'opacity-20')
+                            }
+                            style={
+                                step === 4
+                                    ? {
+                                          transform:
+                                              'scale(2) translate(-20%, -30%) ',
+                                      }
+                                    : step >= 1 && step <= 3
+                                      ? {
+                                            transform:
+                                                'scale(1.2) translate(10%, 20%)',
+                                        }
+                                      : {}
                             }
                         />
 
@@ -272,33 +289,60 @@ export default function SuperoFinish() {
                             src={step1}
                             alt=""
                             className={
-                                'max-h-full absolute bottom-0 right-0 transition-opacity duration-500  ' +
+                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
                                 (step === 1 ? 'opacity-100' : 'opacity-0')
+                            }
+                            style={
+                                step >= 1 && step <= 3
+                                    ? {
+                                          transform:
+                                              'scale(1.2) translate(10%, 20%)',
+                                      }
+                                    : {}
                             }
                         />
                         <img
                             src={step2}
                             alt=""
                             className={
-                                'max-h-full absolute bottom-0 right-0 transition-opacity duration-500  ' +
+                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
                                 (step === 2 ? 'opacity-100' : 'opacity-0')
+                            }
+                            style={
+                                step >= 1 && step <= 3
+                                    ? {
+                                          transform:
+                                              'scale(1.2) translate(10%, 20%)',
+                                      }
+                                    : {}
                             }
                         />
                         <img
                             src={step3}
                             alt=""
                             className={
-                                'max-h-full absolute bottom-0 right-0 transition-opacity duration-500  ' +
+                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
                                 (step === 3 ? 'opacity-100' : 'opacity-0')
+                            }
+                            style={
+                                step >= 1 && step <= 3
+                                    ? {
+                                          transform:
+                                              'scale(1.2) translate(10%, 20%)',
+                                      }
+                                    : {}
                             }
                         />
                         <img
                             src={step4}
                             alt=""
                             className={
-                                'max-h-full absolute bottom-0 right-0 transition-opacity duration-500  ' +
+                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
                                 (step === 4 ? 'opacity-100' : 'opacity-0')
                             }
+                            style={{
+                                transform: 'scale(2) translate(-20%, -30%) ',
+                            }}
                         />
                     </div>
                     <div className="w-full xl:w-1/2 order-1 xl:order-2 h-[500px] xl:h-[800px] flex flex-col justify-center ">

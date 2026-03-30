@@ -15,6 +15,8 @@ import {
     organizationJsonLd,
     websiteJsonLd,
 } from '../../utils/jsonld.js';
+import GetInTouch from '../Landing/GetInTouch.jsx';
+import LandingForm from '../Landing/LandingForm.jsx';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
@@ -124,14 +126,8 @@ export default function ArticleDetail() {
         <>
             <Helmet>
                 <title>{pageTitle}</title>
-                <link
-                    rel="canonical"
-                    href={pageUrl}
-                />
-                <meta
-                    name="description"
-                    content={localizedMetaDescription}
-                />
+                <link rel="canonical" href={pageUrl} />
+                <meta name="description" content={localizedMetaDescription} />
                 <meta
                     property="og:title"
                     content={localizedMetaTitle || localizedArticleTitle}
@@ -140,16 +136,10 @@ export default function ArticleDetail() {
                     property="og:description"
                     content={localizedMetaDescription}
                 />
-                <meta
-                    property="og:url"
-                    content={pageUrl}
-                />
+                <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="article" />
                 {article.main_image && (
-                    <meta
-                        property="og:image"
-                        content={jsonLdImage}
-                    />
+                    <meta property="og:image" content={jsonLdImage} />
                 )}
                 <script type="application/ld+json">
                     {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
@@ -310,7 +300,8 @@ export default function ArticleDetail() {
             {/* related articles */}
 
             <SuggestedArticles categoryId={article.category?.id} />
-
+            <LandingForm />
+            <GetInTouch />
             <Footer />
         </>
     );

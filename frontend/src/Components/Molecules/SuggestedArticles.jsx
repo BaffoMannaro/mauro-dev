@@ -105,7 +105,10 @@ export default function SuggestedArticles({ categoryId, excludeSlug }) {
                                 <div className="overflow-hidden group block max-w-[320px] mx-auto">
                                     {/* Article Image */}
                                     {article.main_image && (
-                                        <div className="h-[200px]  w-full overflow-hidden relative">
+                                        <Link
+                                            to={`/articles/${article.slug}`}
+                                            className="h-[200px]  w-full overflow-hidden relative"
+                                        >
                                             <img
                                                 src={`${import.meta.env.VITE_BACKEND_URL}${article.main_image}`}
                                                 alt={
@@ -117,10 +120,7 @@ export default function SuggestedArticles({ categoryId, excludeSlug }) {
                                             />
 
                                             <div className="absolute bottom-0 right-0 bg-supero-green h-12 w-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                <Link
-                                                    to={`/articles/${article.slug}`}
-                                                    className="relative w-6 h-6 overflow-hidden transform rotate-90"
-                                                >
+                                                <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
                                                     <svg
                                                         width="24"
                                                         height="24"
@@ -147,9 +147,9 @@ export default function SuggestedArticles({ categoryId, excludeSlug }) {
                                                             fill="currentColor"
                                                         ></path>
                                                     </svg>
-                                                </Link>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     )}
 
                                     {/* Article Content */}

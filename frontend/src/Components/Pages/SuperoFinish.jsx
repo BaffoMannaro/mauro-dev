@@ -39,7 +39,7 @@ export default function SuperoFinish() {
     const pageDescription =
         'Discover the SUPERO Finish, a revolutionary approach to surface finishing technology and industrial automation.';
     const [step, setStep] = useState(0);
-    const [playingVideo, setPlayingVideo] = useState(null);
+    const [playingVideo, setPlayingVideo] = useState(1);
 
     const containerRef = useRef(null);
     const video1Ref = useRef(null);
@@ -89,23 +89,11 @@ export default function SuperoFinish() {
             `}</style>
             <Helmet>
                 <title>{pageTitle}</title>
-                <link
-                    rel="canonical"
-                    href={pageUrl}
-                />
-                <meta
-                    name="description"
-                    content={pageDescription}
-                />
+                <link rel="canonical" href={pageUrl} />
+                <meta name="description" content={pageDescription} />
                 <meta property="og:title" content={pageTitle} />
-                <meta
-                    property="og:description"
-                    content={pageDescription}
-                />
-                <meta
-                    property="og:url"
-                    content={pageUrl}
-                />
+                <meta property="og:description" content={pageDescription} />
+                <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="website" />
                 <script type="application/ld+json">
                     {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
@@ -356,7 +344,7 @@ export default function SuperoFinish() {
                                         <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_1.title')}
                                         </h2>
-                                        <p className="text-supero-mid-grey text-">
+                                        <p className="text-supero-mid-grey text-[18px]">
                                             {t('steps.step_1.description')}
                                         </p>
                                     </div>
@@ -366,7 +354,7 @@ export default function SuperoFinish() {
                                         <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_2.title')}
                                         </h2>{' '}
-                                        <p className="text-supero-mid-grey text-">
+                                        <p className="text-supero-mid-grey text-[18px]">
                                             {t('steps.step_2.description')}
                                         </p>
                                     </div>
@@ -376,7 +364,7 @@ export default function SuperoFinish() {
                                         <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_3.title')}
                                         </h2>
-                                        <p className="text-supero-mid-grey text-">
+                                        <p className="text-supero-mid-grey text-[18px]">
                                             {t('steps.step_3.description')}
                                         </p>
                                     </div>
@@ -386,7 +374,7 @@ export default function SuperoFinish() {
                                         <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
                                             {t('steps.step_4.title')}
                                         </h2>
-                                        <p className="text-supero-mid-grey text-">
+                                        <p className="text-supero-mid-grey text-[18px]">
                                             {t('steps.step_4.description')}
                                         </p>
                                     </div>
@@ -432,74 +420,14 @@ export default function SuperoFinish() {
                     {t('step_section.title')}
                 </h3>
 
-                <div className="flex flex-wrap mb-12 xl:mb-24">
-                    <div className="w-full xl:w-3/5 relative order-1">
-                        <button
-                            className="absolute left-4 top-4 z-10 h-12 w-12 bg-supero-green rounded-full flex items-center justify-center hover:bg-opacity-80 transition-all"
-                            onClick={() => handleVideoToggle(1)}
-                        >
-                            {playingVideo === 1 ? (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="size-6 text-supero-dark-grey"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15.75 5.25v13.5m-7.5-13.5v13.5"
-                                    />
-                                </svg>
-                            ) : (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="size-6 text-supero-dark-grey"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-                                    />
-                                </svg>
-                            )}
-                        </button>
-                        <video
-                            ref={video1Ref}
-                            className="w-full max-w-[800px] object-contain mb-6 xl:mb-0 clip-top-right"
-                            src={scanVideo}
-                            controlsList="nodownload"
-                            playsInline
-                            onEnded={() => setPlayingVideo(null)}
-                        />
-                    </div>
-                    <div className="w-full xl:w-2/5 order-2 text-left xl:max-w-[400px] xl:mx-auto">
-                        <p className="text-supero-green font-semibold text-sm">
-                            STEP 1
-                        </p>
-                        <p className="text-white text-5xl font-semibold">
-                            Scan
-                        </p>
-
-                        <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-sm">
-                            {t('step_section.scan')}
-                        </p>
-                    </div>
-                </div>
-                <div className="flex flex-wrap mb-12 xl:mb-24">
-                    <div className="w-full xl:w-3/5 relative order-1 xl:order-2">
-                        <div className="relative">
+                <div className="max-w-[1520px] mx-auto">
+                    <div className="flex flex-wrap items-center mb-12 xl:mb-24">
+                        <div className="w-full xl:w-3/5 relative order-1">
                             <button
-                                className="absolute left-4 xl:left-auto xl:right-4 top-4 z-10 h-12 w-12 bg-supero-green rounded-full flex items-center justify-center hover:bg-opacity-80 transition-all"
-                                onClick={() => handleVideoToggle(2)}
+                                className="absolute left-0 top-0 z-10 h-12 w-12 bg-supero-green  flex items-center justify-center hover:bg-opacity-80 transition-all"
+                                onClick={() => handleVideoToggle(1)}
                             >
-                                {playingVideo === 2 ? (
+                                {playingVideo === 1 ? (
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
@@ -532,96 +460,98 @@ export default function SuperoFinish() {
                                 )}
                             </button>
                             <video
-                                ref={video2Ref}
-                                className="w-full max-w-[800px] object-contain mb-6 xl:mb-0 clip-top-right clip-top-left-xl xl:ms-auto"
-                                src={pathVideo}
+                                ref={video1Ref}
+                                className="w-full max-w-[800px] object-contain xl:h-[540px] xl:object-cover mb-6 xl:mb-0 clip-top-right"
+                                src={scanVideo}
                                 controlsList="nodownload"
                                 playsInline
                                 onEnded={() => setPlayingVideo(null)}
+                                autoPlay
+                                muted
                             />
                         </div>
-                    </div>
-                    <div className="w-full xl:w-2/5 order-2 xl:order-1 text-left xl:max-w-[400px] xl:mx-auto">
-                        <p className="text-supero-green font-semibold text-sm">
-                            STEP 2
-                        </p>
-                        <p className="text-white text-5xl font-semibold">
-                            Path
-                        </p>
+                        <div className="w-full xl:w-2/5 order-2 text-left xl:max-w-[400px] xl:mx-auto">
+                            <p className="text-supero-green font-semibold text-sm">
+                                STEP 1
+                            </p>
+                            <p className="text-white text-5xl font-semibold">
+                                Scan
+                            </p>
 
-                        <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-sm">
-                            {t('step_section.path')}
-                        </p>
+                            <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-[18px]">
+                                {t('step_section.scan')}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div className="flex flex-wrap mb-12 xl:mb-24">
-                    <div className="w-full xl:w-3/5 relative order-1">
-                        <button
-                            className="absolute left-4 top-4 z-10 h-12 w-12 bg-supero-green rounded-full flex items-center justify-center hover:bg-opacity-80 transition-all"
-                            onClick={() => handleVideoToggle(3)}
-                        >
-                            {playingVideo === 3 ? (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="size-6 text-supero-dark-grey"
+                    <div className="flex flex-wrap items-center mb-12 xl:mb-24">
+                        <div className="w-full xl:w-3/5 relative order-1 xl:order-2">
+                            <div className="relative">
+                                <button
+                                    className="absolute left-0 xl:left-auto xl:right-0 top-0 z-10 h-12 w-12 bg-supero-green  flex items-center justify-center hover:bg-opacity-80 transition-all"
+                                    onClick={() => handleVideoToggle(2)}
                                 >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M15.75 5.25v13.5m-7.5-13.5v13.5"
-                                    />
-                                </svg>
-                            ) : (
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={1.5}
-                                    stroke="currentColor"
-                                    className="size-6 text-supero-dark-grey"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-                                    />
-                                </svg>
-                            )}
-                        </button>
-                        <video
-                            ref={video3Ref}
-                            className="w-full max-w-[800px] object-contain mb-6 xl:mb-0 clip-top-right"
-                            src={workVideo}
-                            controlsList="nodownload"
-                            playsInline
-                            onEnded={() => setPlayingVideo(null)}
-                        />
-                    </div>
-                    <div className="w-full xl:w-2/5 order-2 text-left xl:max-w-[400px] xl:mx-auto">
-                        <p className="text-supero-green font-semibold text-sm">
-                            STEP 3
-                        </p>
-                        <p className="text-white text-5xl font-semibold">
-                            Let it Work!
-                        </p>
+                                    {playingVideo === 2 ? (
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={1.5}
+                                            stroke="currentColor"
+                                            className="size-6 text-supero-dark-grey"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+                                            />
+                                        </svg>
+                                    ) : (
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={1.5}
+                                            stroke="currentColor"
+                                            className="size-6 text-supero-dark-grey"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+                                            />
+                                        </svg>
+                                    )}
+                                </button>
+                                <video
+                                    ref={video2Ref}
+                                    className="w-full max-w-[800px] object-contain xl:h-[540px] xl:object-cover mb-6 xl:mb-0 clip-top-right clip-top-left-xl xl:ms-auto"
+                                    src={pathVideo}
+                                    controlsList="nodownload"
+                                    playsInline
+                                    onEnded={() => setPlayingVideo(null)}
+                                />
+                            </div>
+                        </div>
+                        <div className="w-full xl:w-2/5 order-2 xl:order-1 text-left xl:max-w-[400px] xl:me-auto">
+                            <p className="text-supero-green font-semibold text-sm">
+                                STEP 2
+                            </p>
+                            <p className="text-white text-5xl font-semibold">
+                                Path
+                            </p>
 
-                        <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-sm">
-                            {t('step_section.let_it_work')}
-                        </p>
+                            <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-[18px]">
+                                {t('step_section.path')}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div className="flex flex-wrap pb-24">
-                    <div className="w-full xl:w-3/5 relative order-1 xl:order-2">
-                        <div className="relative">
+                    <div className="flex flex-wrap items-center mb-12 xl:mb-24">
+                        <div className="w-full xl:w-3/5 relative order-1">
                             <button
-                                className="absolute left-4 xl:left-auto xl:right-4 top-4 z-10 h-12 w-12 bg-supero-green rounded-full flex items-center justify-center hover:bg-opacity-80 transition-all"
-                                onClick={() => handleVideoToggle(4)}
+                                className="absolute left-0 top-0 z-10 h-12 w-12 bg-supero-green  flex items-center justify-center hover:bg-opacity-80 transition-all"
+                                onClick={() => handleVideoToggle(3)}
                             >
-                                {playingVideo === 4 ? (
+                                {playingVideo === 3 ? (
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         fill="none"
@@ -654,25 +584,87 @@ export default function SuperoFinish() {
                                 )}
                             </button>
                             <video
-                                ref={video4Ref}
-                                className="w-full max-w-[800px] object-contain mb-6 xl:mb-0 clip-top-right clip-top-left-xl xl:ms-auto"
-                                src={switchVideo}
+                                ref={video3Ref}
+                                className="w-full max-w-[800px] object-contain xl:h-[540px] xl:object-cover mb-6 xl:mb-0 clip-top-right"
+                                src={workVideo}
                                 controlsList="nodownload"
                                 playsInline
                                 onEnded={() => setPlayingVideo(null)}
                             />
                         </div>
+                        <div className="w-full xl:w-2/5 order-2 text-left xl:max-w-[400px] xl:mx-auto">
+                            <p className="text-supero-green font-semibold text-sm">
+                                STEP 3
+                            </p>
+                            <p className="text-white text-5xl font-semibold">
+                                Let it Work!
+                            </p>
+
+                            <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-[18px]">
+                                {t('step_section.let_it_work')}
+                            </p>
+                        </div>
                     </div>
-                    <div className="w-full xl:w-2/5 order-2 xl:order-1 text-left xl:max-w-[400px] xl:mx-auto">
-                        <p className="text-supero-green font-semibold text-sm">
-                            STEP 4
-                        </p>
-                        <p className="text-white text-5xl font-semibold">
-                            Switch & Repeat
-                        </p>
-                        <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-sm">
-                            {t('step_section.switch_repeat')}
-                        </p>
+                    <div className="flex flex-wrap items-center pb-24">
+                        <div className="w-full xl:w-3/5 relative order-1 xl:order-2">
+                            <div className="relative">
+                                <button
+                                    className="absolute left-0 xl:left-auto xl:right-0 top-0 z-10 h-12 w-12 bg-supero-green  flex items-center justify-center hover:bg-opacity-80 transition-all"
+                                    onClick={() => handleVideoToggle(4)}
+                                >
+                                    {playingVideo === 4 ? (
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={1.5}
+                                            stroke="currentColor"
+                                            className="size-6 text-supero-dark-grey"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+                                            />
+                                        </svg>
+                                    ) : (
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={1.5}
+                                            stroke="currentColor"
+                                            className="size-6 text-supero-dark-grey"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+                                            />
+                                        </svg>
+                                    )}
+                                </button>
+                                <video
+                                    ref={video4Ref}
+                                    className="w-full max-w-[800px] object-contain xl:h-[540px] xl:object-cover mb-6 xl:mb-0 clip-top-right clip-top-left-xl xl:ms-auto"
+                                    src={switchVideo}
+                                    controlsList="nodownload"
+                                    playsInline
+                                    onEnded={() => setPlayingVideo(null)}
+                                />
+                            </div>
+                        </div>
+                        <div className="w-full xl:w-2/5 order-2 xl:order-1 text-left xl:max-w-[400px] xl:me-auto">
+                            <p className="text-supero-green font-semibold text-sm">
+                                STEP 4
+                            </p>
+                            <p className="text-white text-5xl font-semibold">
+                                Switch & Repeat
+                            </p>
+                            <p className="text-supero-mid-grey whitespace-pre-line mt-4 text-[18px]">
+                                {t('step_section.switch_repeat')}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>

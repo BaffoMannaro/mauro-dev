@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import car from '../../assets/finish/car.png';
-import marine from '../../assets/finish/marine.png';
-import space from '../../assets/finish/space.png';
-import manufacture from '../../assets/finish/manufacture.png';
+import car from '../../assets/finish/car.svg';
+import marine from '../../assets/finish/marine.svg';
+import space from '../../assets/finish/space.svg';
+import manufacture from '../../assets/finish/manufacture.svg';
 
 export default function Applications() {
     const { t } = useTranslation();

@@ -17,12 +17,12 @@
     },
     "dependencies": {
         "@amcharts/amcharts5": "^5.8.7",
+        "@ckeditor/ckeditor5-build-classic": "^43.3.1",
         "@ckeditor/ckeditor5-react": "11.0.0",
         "@emotion/react": "^11.14.0",
         "axios": "^1.6.8",
         "axios-retry": "^4.1.0",
         "chroma-js": "^2.4.2",
-        "ckeditor5": "^46",
         "dayjs": "^1.11.10",
         "formik": "^2.4.5",
         "i18n": "^0.15.3",

@@ -5,21 +5,7 @@ import * as Yup from 'yup';
 import { toast } from 'react-hot-toast';
 import useAxios from '../../utils/useAxios';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-import {
-    ClassicEditor,
-    Bold,
-    Essentials,
-    Italic,
-    Paragraph,
-    Undo,
-    List,
-    Alignment,
-    FontColor,
-    FontBackgroundColor,
-    Heading,
-} from 'ckeditor5';
-
-import 'ckeditor5/ckeditor5.css';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 const MAX_UPLOAD_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
@@ -33,6 +19,29 @@ const slugifyValue = (value) => {
         .replace(/['"]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
+};
+
+const editorConfigIt = {
+    toolbar: [
+        'undo',
+        'redo',
+        '|',
+        'heading',
+        '|',
+        'bold',
+        'italic',
+        '|',
+        'bulletedList',
+        'numberedList',
+        '|',
+        'link',
+    ],
+    placeholder: 'Inserisci il contenuto...',
+};
+
+const editorConfigEn = {
+    ...editorConfigIt,
+    placeholder: 'Enter content...',
 };
 
 const getFirstApiErrorMessage = (data) => {
@@ -988,6 +997,14 @@ export default function ArticleForm() {
                                                                         <div className="editor-container__editor text-black prose">
                                                                             <div>
                                                                                 <CKEditor
+                                                                                    data={
+                                                                                        values
+                                                                                            .blocks[
+                                                                                            index
+                                                                                        ]
+                                                                                            ?.content_it ||
+                                                                                        ''
+                                                                                    }
                                                                                     onChange={(
                                                                                         event,
                                                                                         editor
@@ -1003,97 +1020,7 @@ export default function ArticleForm() {
                                                                                         ClassicEditor
                                                                                     }
                                                                                     config={{
-                                                                                        plugins:
-                                                                                            [
-                                                                                                Essentials,
-                                                                                                Bold,
-                                                                                                Italic,
-                                                                                                Paragraph,
-                                                                                                Undo,
-                                                                                                List,
-                                                                                                Alignment,
-                                                                                                FontColor,
-                                                                                                FontBackgroundColor,
-                                                                                                Heading,
-                                                                                            ],
-                                                                                        toolbar:
-                                                                                            [
-                                                                                                'undo',
-                                                                                                'redo',
-                                                                                                '|',
-                                                                                                'heading',
-                                                                                                '|',
-                                                                                                'bold',
-                                                                                                'italic',
-                                                                                                '|',
-                                                                                                'fontColor',
-                                                                                                'fontBackgroundColor',
-                                                                                                '|',
-                                                                                                'bulletedList',
-                                                                                                'numberedList',
-                                                                                                '|',
-                                                                                                'alignment',
-                                                                                            ],
-                                                                                        heading:
-                                                                                            {
-                                                                                                options:
-                                                                                                    [
-                                                                                                        {
-                                                                                                            model: 'paragraph',
-                                                                                                            title: 'Paragraph',
-                                                                                                            class: 'ck-heading_paragraph',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading1',
-                                                                                                            view: 'h1',
-                                                                                                            title: 'Heading 1',
-                                                                                                            class: 'ck-heading_heading1',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading2',
-                                                                                                            view: 'h2',
-                                                                                                            title: 'Heading 2',
-                                                                                                            class: 'ck-heading_heading2',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading3',
-                                                                                                            view: 'h3',
-                                                                                                            title: 'Heading 3',
-                                                                                                            class: 'ck-heading_heading3',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading4',
-                                                                                                            view: 'h4',
-                                                                                                            title: 'Heading 4',
-                                                                                                            class: 'ck-heading_heading4',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading5',
-                                                                                                            view: 'h5',
-                                                                                                            title: 'Heading 5',
-                                                                                                            class: 'ck-heading_heading5',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading6',
-                                                                                                            view: 'h6',
-                                                                                                            title: 'Heading 6',
-                                                                                                            class: 'ck-heading_heading6',
-                                                                                                        },
-                                                                                                    ],
-                                                                                            },
-                                                                                        initialData:
-                                                                                            values
-                                                                                                .blocks[
-                                                                                                index
-                                                                                            ]
-                                                                                                ?.content_it ||
-                                                                                            '',
-                                                                                        placeholder:
-                                                                                            'Inserisci il contenuto HTML...',
-                                                                                        disallowedContent:
-                                                                                            'script; img[onerror]; *[onload]',
-                                                                                        allowedContent:
-                                                                                            'b i strong em ul ol li p',
+                                                                                        ...editorConfigIt,
                                                                                     }}
                                                                                 />
                                                                             </div>
@@ -1115,6 +1042,14 @@ export default function ArticleForm() {
                                                                         <div className="editor-container__editor text-black prose">
                                                                             <div className="">
                                                                                 <CKEditor
+                                                                                    data={
+                                                                                        values
+                                                                                            .blocks[
+                                                                                            index
+                                                                                        ]
+                                                                                            ?.content_en ||
+                                                                                        ''
+                                                                                    }
                                                                                     onChange={(
                                                                                         event,
                                                                                         editor
@@ -1130,97 +1065,7 @@ export default function ArticleForm() {
                                                                                         ClassicEditor
                                                                                     }
                                                                                     config={{
-                                                                                        plugins:
-                                                                                            [
-                                                                                                Essentials,
-                                                                                                Bold,
-                                                                                                Italic,
-                                                                                                Paragraph,
-                                                                                                Undo,
-                                                                                                List,
-                                                                                                Alignment,
-                                                                                                FontColor,
-                                                                                                FontBackgroundColor,
-                                                                                                Heading,
-                                                                                            ],
-                                                                                        toolbar:
-                                                                                            [
-                                                                                                'undo',
-                                                                                                'redo',
-                                                                                                '|',
-                                                                                                'heading',
-                                                                                                '|',
-                                                                                                'bold',
-                                                                                                'italic',
-                                                                                                '|',
-                                                                                                'fontColor',
-                                                                                                'fontBackgroundColor',
-                                                                                                '|',
-                                                                                                'bulletedList',
-                                                                                                'numberedList',
-                                                                                                '|',
-                                                                                                'alignment',
-                                                                                            ],
-                                                                                        heading:
-                                                                                            {
-                                                                                                options:
-                                                                                                    [
-                                                                                                        {
-                                                                                                            model: 'paragraph',
-                                                                                                            title: 'Paragraph',
-                                                                                                            class: 'ck-heading_paragraph',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading1',
-                                                                                                            view: 'h1',
-                                                                                                            title: 'Heading 1',
-                                                                                                            class: 'ck-heading_heading1',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading2',
-                                                                                                            view: 'h2',
-                                                                                                            title: 'Heading 2',
-                                                                                                            class: 'ck-heading_heading2',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading3',
-                                                                                                            view: 'h3',
-                                                                                                            title: 'Heading 3',
-                                                                                                            class: 'ck-heading_heading3',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading4',
-                                                                                                            view: 'h4',
-                                                                                                            title: 'Heading 4',
-                                                                                                            class: 'ck-heading_heading4',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading5',
-                                                                                                            view: 'h5',
-                                                                                                            title: 'Heading 5',
-                                                                                                            class: 'ck-heading_heading5',
-                                                                                                        },
-                                                                                                        {
-                                                                                                            model: 'heading6',
-                                                                                                            view: 'h6',
-                                                                                                            title: 'Heading 6',
-                                                                                                            class: 'ck-heading_heading6',
-                                                                                                        },
-                                                                                                    ],
-                                                                                            },
-                                                                                        initialData:
-                                                                                            values
-                                                                                                .blocks[
-                                                                                                index
-                                                                                            ]
-                                                                                                ?.content_en ||
-                                                                                            '',
-                                                                                        placeholder:
-                                                                                            'Enter HTML content...',
-                                                                                        disallowedContent:
-                                                                                            'script; img[onerror]; *[onload]',
-                                                                                        allowedContent:
-                                                                                            'b i strong em ul ol li p',
+                                                                                        ...editorConfigEn,
                                                                                     }}
                                                                                 />
                                                                             </div>

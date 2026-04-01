@@ -39,7 +39,8 @@ export default function ArticleDetail() {
         activeLang == 'en'
             ? article?.meta_description?.en
             : article?.meta_description?.it;
-    const pageTitle = localizedMetaTitle || `Supero | ${localizedArticleTitle}`;
+    // Prefer SEO fields from DB; fall back to the article title (also from DB).
+    const pageTitle = localizedMetaTitle || localizedArticleTitle;
     const pageUrl = siteUrl(location.pathname);
     const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
     const jsonLdImage = article?.main_image
@@ -127,19 +128,32 @@ export default function ArticleDetail() {
             <Helmet>
                 <title>{pageTitle}</title>
                 <link rel="canonical" href={pageUrl} />
-                <meta name="description" content={localizedMetaDescription} />
+                <meta
+                    name="description"
+                    content={localizedMetaDescription || ''}
+                />
+                <meta property="og:site_name" content="SUPERO" />
                 <meta
                     property="og:title"
-                    content={localizedMetaTitle || localizedArticleTitle}
+                    content={pageTitle}
                 />
                 <meta
                     property="og:description"
-                    content={localizedMetaDescription}
+                    content={localizedMetaDescription || ''}
                 />
                 <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="article" />
                 {article.main_image && (
                     <meta property="og:image" content={jsonLdImage} />
+                )}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta
+                    name="twitter:description"
+                    content={localizedMetaDescription || ''}
+                />
+                {article.main_image && (
+                    <meta name="twitter:image" content={jsonLdImage} />
                 )}
                 <script type="application/ld+json">
                     {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
@@ -151,9 +165,8 @@ export default function ArticleDetail() {
                     {jsonLdString(
                         blogPostingJsonLd({
                             url: pageUrl,
-                            headline:
-                                localizedMetaTitle || localizedArticleTitle,
-                            description: localizedMetaDescription,
+                            headline: pageTitle,
+                            description: localizedMetaDescription || '',
                             image: jsonLdImage,
                             datePublished: article?.published_at || null,
                             dateModified: article?.updated_at || null,

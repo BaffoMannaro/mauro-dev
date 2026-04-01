@@ -20,7 +20,7 @@ import LanguageSwitcher from '../Atoms/LanguageSwitcher';
 import useAuthStore from '../../Stores/useAuthStore';
 import { Link } from 'react-router-dom';
 import Navbar from '../Molecules/Navbar';
-import { getDefaultOgImageUrl, siteUrl } from '../../utils/seo.js';
+import { backendUrl, siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import {
     breadcrumbListJsonLd,
@@ -45,7 +45,7 @@ export default function Landing() {
         activeLang === 'it'
             ? 'Sistemi robotici e software AI per carteggiatura, lucidatura e finitura superficiale. Workflow per mappare, lavorare e validare superfici complesse.'
             : 'AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces.';
-    const ogImageUrl = getDefaultOgImageUrl();
+    const ogImageUrl = backendUrl('/media/blog/images/P1495574.JPG');
 
     const companyEmail = import.meta.env.VITE_COMPANY_EMAIL || '';
     const companyPhone = import.meta.env.VITE_COMPANY_PHONE || '';

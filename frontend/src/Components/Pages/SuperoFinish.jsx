@@ -4,6 +4,7 @@ import Navbar from '../Molecules/Navbar';
 import { siteUrl } from '../../utils/seo.js';
 import VariableProximity from '../Landing/VariableProximity';
 import { useTranslation } from 'react-i18next';
+import step0_all from '../../assets/finish/step-0-all.png';
 import step0 from '../../assets/finish/step-0.png';
 import step1 from '../../assets/finish/step-1.png';
 import step2 from '../../assets/finish/step-2.png';
@@ -243,215 +244,257 @@ export default function SuperoFinish() {
                 </div>
             </div>
 
-            <section className=" bg-supero-dark-grey px-4 xl:px-12 pt-24 xl:text-center">
-                <p className="text-supero-mid-grey uppercase text-body-l mb-6 xl:mb-12">
-                    l'hardware - the body
-                </p>
+            <section className="relative bg-supero-dark-grey px-5 xl:px-12 pt-10 xl:pt-24 min-h-[852px] xl:min-h-screen flex flex-col">
+              <p className="text-supero-mid-grey uppercase text-[16px] mb-4 xl:mb-12 xl:text-body-l xl:text-supero-mid-grey text-center xl:text-center">
+                    hardware - the body
+              </p>
 
-                <h3 className="title" style={{}}>
-                    Tecnologia <br /> d'avanguardia integrata
-                </h3>
+              <h3 className="text-white text-[28px] leading-[0.95] mb-6 xl:mb-0 xl:text-center xl:text-[78px] text-center xl:leading-[0.95] title">
+                {t("technology")} <br /> {t("integrated")}
+              </h3>
 
-                <div className="flex items-center flex-col xl:flex-row min-h-screen ">
-                    <div className="w-full xl:w-1/2 order-2 xl:order-1 relative h-[500px] xl:h-[800px] overflow-hidden">
-                        {/* yellow ballon  */}
-                        <img
-                            src={superoos}
-                            alt=""
-                            className={
-                                'max-h-full absolute top-[60px] z-30 -right-4 xl:right-0 transition-all duration-500 scale-50 xl:scale-100 ' +
-                                (step === 0 ? 'opacity-100' : 'opacity-0')
+              <div className="flex items-center flex-col xl:flex-row flex-1 xl:min-h-screen">
+                <div className="w-full xl:w-1/2 order-2 xl:order-1 relative h-[320px] sm:h-[360px] xl:h-[800px] overflow-hidden mb-6 xl:mb-0">
+                  {/* <img
+                    src={superoos}
+                    alt=""
+                    className={
+                      'max-h-full absolute z-30 top-[-30px] left-32 xl:left-auto w-[72%] max-w-[280px] transition-all scale-50 duration-500 xl:max-h-full xl:w-auto xl:max-w-none xl:top-[60px] xl:right-20 xl:scale-100 ' +
+                      (step === 0 ? 'opacity-100' : 'opacity-0')
+                    }
+                  /> */}
+                  <img
+                    src={step === 0 ? step0_all : step0}
+                    alt=""
+                    className={
+                      'max-h-full absolute bottom-0 right-0 w-auto max-w-none transition-all duration-500 ' +
+                      (step === 0 ? 'opacity-100' : 'opacity-20')
+                    }
+                    style={
+                      step === 4
+                        ? {
+                            transform:
+                             'scale(2.3) translate(-20%, -30%) ',
+                          }
+                        : step >= 1 && step <= 3
+                          ? {
+                              transform:
+                               'scale(2.3) translate(20%, 30%)',
                             }
-                        />
-                        <img
-                            src={step0}
-                            alt=""
-                            className={
-                                'max-h-full absolute bottom-0 right-0 transition-all duration-500 ' +
-                                (step === 0 ? 'opacity-100' : 'opacity-20')
+                          : {
+                              transform: 'translateX(-10%) scale(1)',
                             }
-                            style={
-                                step === 4
-                                    ? {
-                                          transform:
-                                              'scale(2) translate(-20%, -30%) ',
-                                      }
-                                    : step >= 1 && step <= 3
-                                      ? {
-                                            transform:
-                                                'scale(1.5) translate(30%, 30%)',
-                                        }
-                                      : {}
-                            }
-                        />
+                    }
+                  />
 
-                        <img
-                            src={step1}
-                            alt=""
-                            className={
-                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
-                                (step === 1 ? 'opacity-100' : 'opacity-0')
-                            }
-                            style={
-                                step >= 1 && step <= 3
-                                    ? {
-                                          transform:
-                                              'scale(1.5) translate(30%, 30%)',
-                                      }
-                                    : {}
-                            }
-                        />
-                        <img
-                            src={step2}
-                            alt=""
-                            className={
-                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
-                                (step === 2 ? 'opacity-100' : 'opacity-0')
-                            }
-                            style={
-                                step >= 1 && step <= 3
-                                    ? {
-                                          transform:
-                                              'scale(1.5) translate(30%, 30%)',
-                                      }
-                                    : {}
-                            }
-                        />
-                        <img
-                            src={step3}
-                            alt=""
-                            className={
-                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
-                                (step === 3 ? 'opacity-100' : 'opacity-0')
-                            }
-                            style={
-                                step >= 1 && step <= 3
-                                    ? {
-                                          transform:
-                                              'scale(1.5) translate(30%, 30%)',
-                                      }
-                                    : {}
-                            }
-                        />
-                        <img
-                            src={step4}
-                            alt=""
-                            className={
-                                'max-h-full absolute bottom-0 right-0 transition-all duration-500  ' +
-                                (step === 4 ? 'opacity-100' : 'opacity-0')
-                            }
-                            style={{
-                                transform: 'scale(2) translate(-20%, -30%) ',
-                            }}
-                        />
-                    </div>
-                    <div className="w-full xl:w-1/2 order-1 xl:order-2 h-[500px] xl:h-[800px] flex flex-col justify-center ">
-                        <div className="h-24 w-full flex flex-col items-center justify-end">
-                            <button
-                                className={
-                                    step > 0
-                                        ? 'w-32 px-4 py-2 flex justify-center'
-                                        : 'hidden'
-                                }
-                                onClick={() => {
-                                    setStep((prev) => prev - 1);
-                                }}
-                            >
-                                <svg
-                                    width="29"
-                                    height="16"
-                                    viewBox="0 0 29 16"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M0.000442743 12.0708L10.607 1.46416C11.5447 0.526475 12.8165 -0.000309663 14.1426 -0.000309663C15.4687 -0.000309663 16.7404 0.526475 17.6781 1.46416L28.2847 12.0708L24.7492 15.6063L14.1426 4.99969L3.53598 15.6063L0.000442743 12.0708Z"
-                                        fill="white"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
+                  <img
+                    src={step1}
+                    alt=""
+                    className={
+                      "absolute bottom-0 right-0 max-h-full w-auto max-w-none transition-all duration-500 " +
+                      (step === 1 ? 'opacity-100' : 'opacity-0')
+                    }
+                    style={
+                      step >= 1 && step <= 3
+                        ? {
+                            transform: 'scale(2.5) translate(20%, 30%)',
+                          }
+                        : {
+                            transform: 'scale(1.5) translate(20%, 30%)',
+                          }
+                    }
+                  />
 
-                        <div className="xl:max-w-[440px] mx-auto text-left ">
-                            {(step === 0 && (
-                                <div>
-                                    <h2 className="text-white text-3xl font-bold mb-4">
-                                        {t('steps.step_0.title')}
-                                    </h2>
-                                    <p className="text-supero-mid-grey whitespace-pre-line text-">
-                                        {t('steps.step_0.description')}
-                                    </p>
-                                </div>
-                            )) ||
-                                (step === 1 && (
-                                    <div>
-                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
-                                            {t('steps.step_1.title')}
-                                        </h2>
-                                        <p className="text-supero-mid-grey text-[18px]">
-                                            {t('steps.step_1.description')}
-                                        </p>
-                                    </div>
-                                )) ||
-                                (step === 2 && (
-                                    <div>
-                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
-                                            {t('steps.step_2.title')}
-                                        </h2>{' '}
-                                        <p className="text-supero-mid-grey text-[18px]">
-                                            {t('steps.step_2.description')}
-                                        </p>
-                                    </div>
-                                )) ||
-                                (step === 3 && (
-                                    <div>
-                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
-                                            {t('steps.step_3.title')}
-                                        </h2>
-                                        <p className="text-supero-mid-grey text-[18px]">
-                                            {t('steps.step_3.description')}
-                                        </p>
-                                    </div>
-                                )) ||
-                                (step === 4 && (
-                                    <div>
-                                        <h2 className="text-white text-3xl whitespace-pre-line font-bold mt-4 mb-4">
-                                            {t('steps.step_4.title')}
-                                        </h2>
-                                        <p className="text-supero-mid-grey text-[18px]">
-                                            {t('steps.step_4.description')}
-                                        </p>
-                                    </div>
-                                ))}
-                        </div>
+                  <img
+                    src={step2}
+                    alt=""
+                    className={
+                      "absolute bottom-0 right-0 max-h-full w-auto max-w-none transition-all duration-500 " +
+                      (step === 2 ? 'opacity-100' : 'opacity-0')
+                    }
+                    style={
+                      step >= 1 && step <= 3
+                        ? {
+                            transform: "scale(2.3) translate(20%, 30%)",
+                          }
+                        : {
+                            transform: "translateX(-50%) scale(1)",
+                          }
+                    }
+                  />
 
-                        <div className="h-24 w-full flex flex-col items-center justify-end">
-                            <button
-                                className={
-                                    step < 4
-                                        ? 'w-32 px-4 py-2 flex justify-center'
-                                        : 'hidden'
-                                }
-                                onClick={() => {
-                                    setStep((prev) => prev + 1);
-                                }}
-                            >
-                                <svg
-                                    width="29"
-                                    height="16"
-                                    viewBox="0 0 29 16"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M0.000442743 3.53471L10.607 14.1413C11.5447 15.079 12.8165 15.6058 14.1426 15.6058C15.4687 15.6058 16.7404 15.079 17.6781 14.1413L28.2847 3.53471L24.7492 -0.000822362L14.1426 10.6058L3.53598 -0.000822362L0.000442743 3.53471Z"
-                                        fill="white"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+                  <img
+                    src={step3}
+                    alt=""
+                    className={
+                      "absolute bottom-0 right-0 max-h-full w-auto max-w-none transition-all duration-500 " +
+                      (step === 3 ? 'opacity-100' : 'opacity-0')
+                    }
+                    style={
+                      step >= 1 && step <= 3
+                        ? {
+                            transform: "scale(2.3) translate(20%, 30%)",
+                          }
+                        : {
+                            transform: "translateX(-50%) scale(1)",
+                          }
+                    }
+                  />
+
+                  <img
+                    src={step4}
+                    alt=""
+                    className={
+                      "absolute bottom-0 right-0 max-h-full w-auto max-w-none transition-all duration-500 " +
+                      (step === 4 ? 'opacity-100' : 'opacity-0')
+                    }
+                    style={{
+                      transform: "scale(2.3) translate(-20%, -30%)",
+                    }}
+                  />
                 </div>
+
+                {/* TEXT AREA */}
+                <div className="w-full xl:w-1/2 order-2 xl:order-2 flex flex-col xl:h-[800px] xl:justify-center">
+                  {/* desktop prev button */}
+                  <div className="hidden xl:flex h-24 w-full flex-col items-center justify-end">
+                    <button
+                      className={step > 0 ? "w-32 px-4 py-2 flex justify-center" : "hidden"}
+                      onClick={() => setStep((prev) => prev - 1)}
+                    >
+                      <svg
+                        width="29"
+                        height="16"
+                        viewBox="0 0 29 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M0.000442743 12.0708L10.607 1.46416C11.5447 0.526475 12.8165 -0.000309663 14.1426 -0.000309663C15.4687 -0.000309663 16.7404 0.526475 17.6781 1.46416L28.2847 12.0708L24.7492 15.6063L14.1426 4.99969L3.53598 15.6063L0.000442743 12.0708Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+
+                  <div className="xl:max-w-[440px] xl:mx-auto text-left">
+                    {(step === 0 && (
+                      <div>
+                        <h2 className="text-white text-[28px] leading-[1.05] font-semibold mb-3 xl:text-3xl xl:font-bold xl:mb-4">
+                          {t("steps.step_0.title")}
+                        </h2>
+                        <p className="text-supero-mid-grey text-[15px] leading-[1.45] xl:text-[18px] whitespace-pre-line">
+                          {t("steps.step_0.description")}
+                        </p>
+                      </div>
+                    )) ||
+                      (step === 1 && (
+                        <div>
+                          <h2 className="text-white text-[28px] leading-[1.05] font-semibold mb-3 xl:text-3xl xl:font-bold xl:mt-4 xl:mb-4 whitespace-pre-line">
+                            {t("steps.step_1.title")}
+                          </h2>
+                          <p className="text-supero-mid-grey text-[15px] leading-[1.45] xl:text-[18px]">
+                            {t("steps.step_1.description")}
+                          </p>
+                        </div>
+                      )) ||
+                      (step === 2 && (
+                        <div>
+                          <h2 className="text-white text-[28px] leading-[1.05] font-semibold mb-3 xl:text-3xl xl:font-bold xl:mt-4 xl:mb-4 whitespace-pre-line">
+                            {t("steps.step_2.title")}
+                          </h2>
+                          <p className="text-supero-mid-grey text-[15px] leading-[1.45] xl:text-[18px]">
+                            {t("steps.step_2.description")}
+                          </p>
+                        </div>
+                      )) ||
+                      (step === 3 && (
+                        <div>
+                          <h2 className="text-white text-[28px] leading-[1.05] font-semibold mb-3 xl:text-3xl xl:font-bold xl:mt-4 xl:mb-4 whitespace-pre-line">
+                            {t("steps.step_3.title")}
+                          </h2>
+                          <p className="text-supero-mid-grey text-[15px] leading-[1.45] xl:text-[18px]">
+                            {t("steps.step_3.description")}
+                          </p>
+                        </div>
+                      )) ||
+                      (step === 4 && (
+                        <div>
+                          <h2 className="text-white text-[28px] leading-[1.05] font-semibold mb-3 xl:text-3xl xl:font-bold xl:mt-4 xl:mb-4 whitespace-pre-line">
+                            {t("steps.step_4.title")}
+                          </h2>
+                          <p className="text-supero-mid-grey text-[15px] leading-[1.45] xl:text-[18px]">
+                            {t("steps.step_4.description")}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex w-[320px] xl:hidden">
+                      {/* PREV */}
+                      <button
+                        onClick={() => setStep((prev) => prev - 1)}
+                        className={step > 0 ? "flex-1 h-14 flex items-center justify-center border border-white/20 bg-[#2c2c31] hover:bg-[#3a3a40] transition-all disabled:opacity-30" : "flex-1 h-14 invisible"}
+                      >
+                        <svg
+                          className="rotate-90"
+                          width="25"
+                          height="25"
+                          viewBox="0 0 29 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M0.000442743 3.53471L10.607 14.1413C11.5447 15.079 12.8165 15.6058 14.1426 15.6058C15.4687 15.6058 16.7404 15.079 17.6781 14.1413L28.2847 3.53471L24.7492 -0.000822362L14.1426 10.6058L3.53598 -0.000822362L0.000442743 3.53471Z"
+                            fill="white"
+                          />
+                        </svg>
+                      </button>
+
+                      {/* NEXT */}
+                      <button
+                        onClick={() => setStep((prev) => prev + 1)}
+                        className={step < 4 ? "flex-1 h-14 flex items-center justify-center border border-white/20 border-l-0 bg-[#6b6b73] hover:bg-[#7c7c85] transition-all disabled:opacity-30" : "flex-1 h-14 invisible"}
+                      >
+                        <svg
+                          className="-rotate-90"
+                          width="25"
+                          height="25"
+                          viewBox="0 0 29 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M0.000442743 3.53471L10.607 14.1413C11.5447 15.079 12.8165 15.6058 14.1426 15.6058C15.4687 15.6058 16.7404 15.079 17.6781 14.1413L28.2847 3.53471L24.7492 -0.000822362L14.1426 10.6058L3.53598 -0.000822362L0.000442743 3.53471Z"
+                            fill="white"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                  {/* desktop next button */}
+                  <div className="hidden xl:flex h-24 w-full flex-col items-center justify-end">
+                    <button
+                      className={step < 4 ? "w-32 px-4 py-2 flex justify-center" : "hidden"}
+                      onClick={() => setStep((prev) => prev + 1)}
+                    >
+                      <svg
+                        width="29"
+                        height="16"
+                        viewBox="0 0 29 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M0.000442743 3.53471L10.607 14.1413C11.5447 15.079 12.8165 15.6058 14.1426 15.6058C15.4687 15.6058 16.7404 15.079 17.6781 14.1413L28.2847 3.53471L24.7492 -0.000822362L14.1426 10.6058L3.53598 -0.000822362L0.000442743 3.53471Z"
+                          fill="white"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section className=" bg-gradient-to-r from-[#424247] to-[#60606f] px-6 xl:px-24 2xl:px-36 pt-24 xl:text-center">

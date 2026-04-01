@@ -97,5 +97,7 @@
         "path": "With SUPERO OS, the operator selects the work areas directly on the component’s digital twin. The software automatically generates the toolpath for the selected area or, if preferred, for the entire surface, without any manual input. For each pass, the process parameters can be configured: applied force, feed rate and tool rotation speed.\n\nIt is also possible to programme multiple passes with different parameters, combining, for example, an initial roughing pass and a final polishing pass to achieve the desired result.",
         "let_it_work": "Once started, SUPERO Finish manages the entire process autonomously. The tool maintains optimal alignment with the surface and adjusts the applied force in real time.\n\nThe integrated compensation unit ensures constant pressure and uniform contact even on complex geometries, delivering a high-quality finish on every workpiece.",
         "switch_repeat": "Achieve continuous production with zero downtime. When the part is replaced, Supero Finish is able to generate a new 3D surface map and seamlessly resumes processing.\n\nSimply switch the part, the system does the rest."
-    }
+    },
+    "technology": "Integrated",
+    "integrated": "state-of-the-art technology"
 }

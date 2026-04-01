@@ -97,5 +97,7 @@
         "path": "Attraverso SUPERO OS, l'operatore seleziona le aree di lavoro direttamente sul gemello digitale del componente. Il software genera automaticamente il percorso utensile sull'area selezionata o, se preferito, sull'intera superficie, senza alcun input manuale. Per ogni passata è possibile configurare i parametri di processo: forza applicata, velocità di avanzamento e velocità di rotazione dell'utensile.\n\nSi possono inoltre programmare più ripetizioni con parametri diversi, combinando ad esempio una sgrossatura iniziale e una lucidatura finale per ottenere il risultato desiderato.",
         "let_it_work": "Una volta avviato, SUPERO Finish gestisce l'intero processo in autonomia. L'utensile mantiene un orientamento ottimale rispetto alla superficie e regola in tempo reale la forza applicata.\n\nL'unità di compensazione integrata assicura pressione costante e contatto uniforme anche su geometrie complesse, per una finitura di qualità elevata su ogni pezzo.",
         "switch_repeat": "Garantisci una produzione continua senza tempi di fermo. Quando il pezzo viene sostituito, Supero Finish è in grado di generare una nuova mappa 3D della superficie e riprende la lavorazione senza interruzioni.\n\nBasta sostituire il pezzo, al resto ci pensa il sistema."
-    }
+    },
+    "technology": "Tecnologia",
+    "integrated": "d'avanguardia integrata"
 }

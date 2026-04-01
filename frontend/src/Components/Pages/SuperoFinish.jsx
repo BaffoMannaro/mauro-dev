@@ -297,7 +297,7 @@ export default function SuperoFinish() {
                     style={
                       step >= 1 && step <= 3
                         ? {
-                            transform: 'scale(2.5) translate(20%, 30%)',
+                            transform: 'scale(2.3) translate(20%, 30%)',
                           }
                         : {
                             transform: 'scale(1.5) translate(20%, 30%)',

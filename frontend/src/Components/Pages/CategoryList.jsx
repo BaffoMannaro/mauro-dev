@@ -4,11 +4,19 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
-import { siteUrl } from '../../utils/seo.js';
+import { getDefaultOgImageUrl, siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import Footer from '../Landing/Footer';
 import GetInTouch from '../Landing/GetInTouch';
 import useAxios from '../../utils/useAxios';
+import {
+    breadcrumbListJsonLd,
+    itemListJsonLd,
+    jsonLdString,
+    organizationJsonLd,
+    websiteJsonLd,
+    webPageJsonLd,
+} from '../../utils/jsonld.js';
 
 export default function CategoryList() {
     const location = useLocation();
@@ -25,6 +33,12 @@ export default function CategoryList() {
 
     const { i18n, t } = useTranslation();
     const activeLang = i18n.resolvedLanguage;
+    const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
+    const pageUrl = siteUrl(location.pathname);
+    const categoryName = category?.display_name?.[activeLang] || 'Category';
+    const pageTitle = `SUPERO | ${categoryName}`;
+    const pageDescription = `Explore ${categoryName} articles in SUPERO Knowledge Hub`;
+    const ogImageUrl = getDefaultOgImageUrl();
     const api = useAxios();
 
     // Fetch category details and all tags when id changes
@@ -127,31 +141,61 @@ export default function CategoryList() {
     return (
         <>
             <Helmet>
-                <title>
-                    Supero |{' '}
-                    {category?.display_name?.[activeLang] || 'Category'}
-                </title>
-                <link
-                    rel="canonical"
-                    href={siteUrl(location.pathname)}
-                />
-                <meta
-                    name="description"
-                    content={`Explore ${category?.display_name?.[activeLang] || 'category'} articles in SUPERO Knowledge Hub`}
-                />
-                <meta
-                    property="og:title"
-                    content={category?.display_name?.[activeLang] || 'Category'}
-                />
-                <meta
-                    property="og:description"
-                    content={`Explore ${category?.display_name?.[activeLang] || 'category'} articles in SUPERO Knowledge Hub`}
-                />
-                <meta
-                    property="og:url"
-                    content={siteUrl(location.pathname)}
-                />
+                <title>{pageTitle}</title>
+                <link rel="canonical" href={pageUrl} />
+                <meta name="description" content={pageDescription} />
+                <meta property="og:site_name" content="SUPERO" />
+                <meta property="og:title" content={pageTitle} />
+                <meta property="og:description" content={pageDescription} />
+                <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={ogImageUrl} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta name="twitter:description" content={pageDescription} />
+                <meta name="twitter:image" content={ogImageUrl} />
+                <script type="application/ld+json">
+                    {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(websiteJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        webPageJsonLd({
+                            url: pageUrl,
+                            name: pageTitle,
+                            description: pageDescription,
+                            lang: jsonLdLang,
+                            image: ogImageUrl,
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        breadcrumbListJsonLd({
+                            lang: jsonLdLang,
+                            items: [
+                                { name: 'Home', url: siteUrl('/') },
+                                { name: 'Resources', url: siteUrl('/articles/') },
+                                { name: categoryName, url: pageUrl },
+                            ],
+                        })
+                    )}
+                </script>
+                {articles.length > 0 && (
+                    <script type="application/ld+json">
+                        {jsonLdString(
+                            itemListJsonLd({
+                                lang: jsonLdLang,
+                                items: articles.map((a) => ({
+                                    name: a.title?.[activeLang] || a.title || '',
+                                    url: siteUrl(`/articles/${a.slug || ''}/`),
+                                })),
+                            })
+                        )}
+                    </script>
+                )}
             </Helmet>
             <Navbar />
             <div className="min-h-screen pt-32 xl:pt-32 ">

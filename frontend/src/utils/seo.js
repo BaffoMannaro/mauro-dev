@@ -62,3 +62,10 @@ export function backendUrl(pathname = '/') {
     if (!origin) return path;
     return `${origin}${path === '/' ? '/' : path}`;
 }
+
+export function getDefaultOgImageUrl() {
+    const explicit = import.meta.env.VITE_OG_IMAGE_URL || '';
+    if (explicit) return explicit;
+    // Fallback to a small but valid image present in `public/`.
+    return siteUrl('/fav.png');
+}

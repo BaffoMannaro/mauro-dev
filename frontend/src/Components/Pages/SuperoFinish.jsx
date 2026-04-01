@@ -34,13 +34,12 @@ import {
 } from '../../utils/jsonld.js';
 
 import dataSheet from '../../assets/datasheet.pdf';
+import { getDefaultOgImageUrl } from '../../utils/seo.js';
 
 export default function SuperoFinish() {
     const location = useLocation();
     const pageUrl = siteUrl(location.pathname);
-    const pageTitle = 'SUPERO Finish';
-    const pageDescription =
-        'Discover the SUPERO Finish, a revolutionary approach to surface finishing technology and industrial automation.';
+    const ogImageUrl = getDefaultOgImageUrl();
     const [step, setStep] = useState(0);
     const [playingVideo, setPlayingVideo] = useState(1);
 
@@ -54,6 +53,11 @@ export default function SuperoFinish() {
     const activeLang = i18n.resolvedLanguage;
     const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
     const finishLabel = activeLang === 'en' ? 'Supero Finish' : 'Supero Finish';
+    const pageTitle = finishLabel;
+    const pageDescription =
+        activeLang === 'it'
+            ? 'Scopri Supero Finish: un approccio software-driven alla finitura superficiale con robot e automazione industriale.'
+            : 'Discover SUPERO Finish: a software-driven approach to robotic surface finishing and industrial automation.';
 
     const handleVideoToggle = (videoNumber) => {
         const refs = [video1Ref, video2Ref, video3Ref, video4Ref];
@@ -94,10 +98,16 @@ export default function SuperoFinish() {
                 <title>{pageTitle}</title>
                 <link rel="canonical" href={pageUrl} />
                 <meta name="description" content={pageDescription} />
+                <meta property="og:site_name" content="SUPERO" />
                 <meta property="og:title" content={pageTitle} />
                 <meta property="og:description" content={pageDescription} />
                 <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={ogImageUrl} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta name="twitter:description" content={pageDescription} />
+                <meta name="twitter:image" content={ogImageUrl} />
                 <script type="application/ld+json">
                     {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
                 </script>
@@ -110,6 +120,8 @@ export default function SuperoFinish() {
                             url: pageUrl,
                             name: pageTitle,
                             description: pageDescription,
+                            lang: jsonLdLang,
+                            image: ogImageUrl,
                         })
                     )}
                 </script>
@@ -119,6 +131,7 @@ export default function SuperoFinish() {
                             url: pageUrl,
                             name: pageTitle,
                             description: pageDescription,
+                            image: ogImageUrl,
                         })
                     )}
                 </script>

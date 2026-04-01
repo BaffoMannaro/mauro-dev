@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../Molecules/Navbar';
-import { siteUrl } from '../../utils/seo.js';
+import { getDefaultOgImageUrl, siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import {
     breadcrumbListJsonLd,
@@ -21,9 +21,17 @@ import GetInTouch from '../Landing/GetInTouch';
 export default function Articles() {
     const location = useLocation();
     const pageUrl = siteUrl(location.pathname);
-    const pageTitle = 'SUPERO Knowledge Hub – Articles & Insights';
+    const { i18n } = useTranslation();
+    const activeLang = i18n.resolvedLanguage;
+    const pageTitle =
+        activeLang === 'it'
+            ? 'SUPERO Knowledge Hub – Risorse e approfondimenti'
+            : 'SUPERO Knowledge Hub – Articles & Insights';
     const pageDescription =
-        'Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation.';
+        activeLang === 'it'
+            ? 'Esplora risorse e approfondimenti su robotica, finitura superficiale e automazione industriale.'
+            : 'Explore articles and insights about AI-driven robotics, surface finishing technology, and industrial automation innovation.';
+    const ogImageUrl = getDefaultOgImageUrl();
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
@@ -36,9 +44,6 @@ export default function Articles() {
     const isInitialMount = useRef(true);
 
     const { t } = useTranslation();
-
-    const { i18n } = useTranslation();
-    const activeLang = i18n.resolvedLanguage;
     const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
     const resourcesLabel = activeLang === 'en' ? 'Resources' : 'Risorse';
 
@@ -121,6 +126,7 @@ export default function Articles() {
                     name="description"
                     content={pageDescription}
                 />
+                <meta property="og:site_name" content="SUPERO" />
                 <meta
                     property="og:title"
                     content={pageTitle}
@@ -134,6 +140,11 @@ export default function Articles() {
                     content={pageUrl}
                 />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={ogImageUrl} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta name="twitter:description" content={pageDescription} />
+                <meta name="twitter:image" content={ogImageUrl} />
                 <script type="application/ld+json">
                     {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
                 </script>
@@ -146,6 +157,8 @@ export default function Articles() {
                             url: pageUrl,
                             name: pageTitle,
                             description: pageDescription,
+                            lang: jsonLdLang,
+                            image: ogImageUrl,
                         })
                     )}
                 </script>

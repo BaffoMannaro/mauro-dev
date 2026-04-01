@@ -110,6 +110,21 @@ export function siteNavigationJsonLd({ items, lang }) {
     return list;
 }
 
+export function itemListJsonLd({ items, lang }) {
+    const list = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: (items || []).map((it, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            name: it.name,
+            url: it.url,
+        })),
+    };
+    if (lang) list.inLanguage = lang;
+    return list;
+}
+
 export function blogPostingJsonLd({
     url,
     headline,

@@ -1,35 +1,89 @@
 import { Helmet } from 'react-helmet-async';
 import Footer from '../Landing/Footer';
-import { siteUrl } from '../../utils/seo.js';
+import { getDefaultOgImageUrl, siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
+import {
+    blogPostingJsonLd,
+    breadcrumbListJsonLd,
+    jsonLdString,
+    organizationJsonLd,
+    websiteJsonLd,
+    webPageJsonLd,
+} from '../../utils/jsonld.js';
+import { useTranslation } from 'react-i18next';
 
 export default function PressRelease() {
     const location = useLocation();
+    const { i18n } = useTranslation();
+    const activeLang = i18n.resolvedLanguage;
+    const jsonLdLang = activeLang === 'en' ? 'en' : 'it';
+    const pageUrl = siteUrl(location.pathname);
+    const ogImageUrl = getDefaultOgImageUrl();
+    const pageTitle =
+        activeLang === 'it'
+            ? 'SUPERO | Comunicato Stampa Rebranding'
+            : 'SUPERO | Rebranding Press Release';
+    const pageDescription =
+        activeLang === 'it'
+            ? "G-nous Tech diventa SUPERO. Un ecosistema software-driven per l'automazione robotica e il controllo dei processi industriali."
+            : 'G-nous Tech becomes SUPERO: a software-driven ecosystem for robotic automation and industrial process control.';
     return (
         <>
             <Helmet>
-                <title>Supero | Comunicato Stampa Rebranding</title>
-                <link
-                    rel="canonical"
-                    href={siteUrl(location.pathname)}
-                />
-                <meta
-                    name="description"
-                    content="G-nous Tech diventa SUPERO. Un ecosistema software-driven per l'automazione robotica collaborativa e il controllo dei processi industriali."
-                />
-                <meta
-                    property="og:title"
-                    content="Supero | Comunicato Stampa Rebranding"
-                />
-                <meta
-                    property="og:description"
-                    content="G-nous Tech diventa SUPERO. Un ecosistema software-driven per l'automazione robotica collaborativa e il controllo dei processi industriali."
-                />
-                <meta
-                    property="og:url"
-                    content={siteUrl(location.pathname)}
-                />
+                <title>{pageTitle}</title>
+                <link rel="canonical" href={pageUrl} />
+                <meta name="description" content={pageDescription} />
+                <meta property="og:site_name" content="SUPERO" />
+                <meta property="og:title" content={pageTitle} />
+                <meta property="og:description" content={pageDescription} />
+                <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="article" />
+                <meta property="og:image" content={ogImageUrl} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta name="twitter:description" content={pageDescription} />
+                <meta name="twitter:image" content={ogImageUrl} />
+                <script type="application/ld+json">
+                    {jsonLdString(organizationJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(websiteJsonLd({ url: siteUrl('/') }))}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        webPageJsonLd({
+                            url: pageUrl,
+                            name: pageTitle,
+                            description: pageDescription,
+                            lang: jsonLdLang,
+                            image: ogImageUrl,
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        blogPostingJsonLd({
+                            url: pageUrl,
+                            headline: pageTitle,
+                            description: pageDescription,
+                            image: ogImageUrl,
+                            lang: jsonLdLang,
+                            siteUrl: siteUrl('/'),
+                            publisherLogoUrl: siteUrl('/fav.png'),
+                        })
+                    )}
+                </script>
+                <script type="application/ld+json">
+                    {jsonLdString(
+                        breadcrumbListJsonLd({
+                            lang: jsonLdLang,
+                            items: [
+                                { name: 'Home', url: siteUrl('/') },
+                                { name: pageTitle, url: pageUrl },
+                            ],
+                        })
+                    )}
+                </script>
             </Helmet>
             <div className="min-h-screen pt-24 bg-supero-dark-grey flex flex-col items-center justify-center bg-typ">
                 <div className="max-w-[800px] mt-8 px-8 ">

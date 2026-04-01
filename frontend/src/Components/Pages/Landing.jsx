@@ -20,7 +20,7 @@ import LanguageSwitcher from '../Atoms/LanguageSwitcher';
 import useAuthStore from '../../Stores/useAuthStore';
 import { Link } from 'react-router-dom';
 import Navbar from '../Molecules/Navbar';
-import { siteUrl } from '../../utils/seo.js';
+import { getDefaultOgImageUrl, siteUrl } from '../../utils/seo.js';
 import { useLocation } from 'react-router-dom';
 import {
     breadcrumbListJsonLd,
@@ -33,10 +33,19 @@ import {
 
 export default function Landing() {
     const { t } = useTranslation();
+    const { i18n } = useTranslation();
+    const activeLang = i18n.resolvedLanguage;
     const location = useLocation();
     const pageUrl = siteUrl(location.pathname);
+    const pageTitle =
+        activeLang === 'it'
+            ? 'SUPERO – Sistemi robotici e software AI per la finitura superficiale'
+            : 'SUPERO – AI-Driven Robotic Surface Finishing Systems';
     const pageDescription =
-        'AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces.';
+        activeLang === 'it'
+            ? 'Sistemi robotici e software AI per carteggiatura, lucidatura e finitura superficiale. Workflow per mappare, lavorare e validare superfici complesse.'
+            : 'AI-driven robotic systems for sanding, polishing and advanced surface finishing. AI workflows for mapping, processing and validating complex surfaces.';
+    const ogImageUrl = getDefaultOgImageUrl();
 
     const companyEmail = import.meta.env.VITE_COMPANY_EMAIL || '';
     const companyPhone = import.meta.env.VITE_COMPANY_PHONE || '';
@@ -84,24 +93,22 @@ export default function Landing() {
     return (
         <>
             <Helmet>
-                <title>
-                    SUPERO – AI-Driven Robotic Surface Finishing Systems
-                </title>
+                <title>{pageTitle}</title>
                 <link rel="canonical" href={pageUrl} />
-                <meta
-                    name="description"
-                    content={pageDescription}
-                />
-                <meta
-                    property="og:title"
-                    content="SUPERO – AI-Driven Robotic Surface Finishing Systems"
-                />
+                <meta name="description" content={pageDescription} />
+                <meta property="og:site_name" content="SUPERO" />
+                <meta property="og:title" content={pageTitle} />
                 <meta
                     property="og:description"
                     content={pageDescription}
                 />
                 <meta property="og:url" content={pageUrl} />
                 <meta property="og:type" content="website" />
+                <meta property="og:image" content={ogImageUrl} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={pageTitle} />
+                <meta name="twitter:description" content={pageDescription} />
+                <meta name="twitter:image" content={ogImageUrl} />
                 <script type="application/ld+json">
                     {jsonLdString(
                         organizationJsonLdWithDetails({
@@ -122,10 +129,10 @@ export default function Landing() {
                     {jsonLdString(
                         webPageJsonLd({
                             url: pageUrl,
-                            name:
-                                'SUPERO – AI-Driven Robotic Surface Finishing Systems',
+                            name: pageTitle,
                             description: pageDescription,
-                            lang: 'en',
+                            lang: activeLang === 'en' ? 'en' : 'it',
+                            image: ogImageUrl,
                         })
                     )}
                 </script>
@@ -160,6 +167,7 @@ export default function Landing() {
                 <script type="application/ld+json">
                     {jsonLdString(
                         breadcrumbListJsonLd({
+                            lang: activeLang === 'en' ? 'en' : 'it',
                             items: [{ name: 'Home', url: siteUrl('/') }],
                         })
                     )}

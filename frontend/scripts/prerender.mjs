@@ -283,6 +283,16 @@ function localeForLang(lang) {
   return "it-IT";
 }
 
+function shouldRequireSeoTags(routePath) {
+  // Require canonical/description for pages that must be SEO-complete.
+  // Adjust as needed.
+  return (
+    routePath === "/" ||
+    routePath.startsWith("/articles/") ||
+    routePath.startsWith("/category/")
+  );
+}
+
 async function main() {
   let chromium;
   try {
@@ -365,16 +375,83 @@ async function main() {
       });
 
       const page = await context.newPage();
+      page.on("console", (msg) => {
+  const type = msg.type();
+  if (type === "error" || type === "warning") {
+    console.log(`[page console:${type}] ${item.path} [${item.lang}] ${msg.text()}`);
+  }
+});
+
+page.on("pageerror", (err) => {
+  console.log(`[pageerror] ${item.path} [${item.lang}] ${err?.message || err}`);
+});
+
+page.on("requestfailed", (req) => {
+  const failure = req.failure();
+  console.log(
+    `[requestfailed] ${item.path} [${item.lang}] ${req.method()} ${req.url()} :: ${failure?.errorText || "unknown"}`
+  );
+});
+
+page.on("response", async (res) => {
+  try {
+    const url = res.url();
+    // Log backend article fetch failures (adjust pattern if needed)
+    if (/\/blog\/articles\//i.test(url) && res.status() >= 400) {
+      const ct = res.headers()["content-type"] || "";
+      let body = "";
+      if (ct.includes("application/json")) {
+        body = JSON.stringify(await res.json()).slice(0, 500);
+      } else {
+        body = (await res.text()).slice(0, 500);
+      }
+      console.log(
+        `[bad response] ${item.path} [${item.lang}] ${res.status()} ${url} body=${body}`
+      );
+    }
+  } catch {
+    // ignore
+  }
+});
+	
       try {
         const url = `${origin}${item.path}`;
         await page.goto(url, { waitUntil: "networkidle" });
-        await page.waitForTimeout(250);
+        //await page.waitForTimeout(250);
+	await page.goto(url, { waitUntil: "networkidle" });
+
+// Give React effects time to run
+await page.waitForTimeout(200);
+
+// Best-effort: wait for Helmet/meta tags to exist in <head>
+try {
+  await page.waitForFunction(() => {
+    const head = document.head;
+    if (!head) return false;
+    return !!head.querySelector(
+      'link[rel="canonical"], meta[name="description"], meta[property^="og:"], script[type="application/ld+json"]'
+    );
+  }, { timeout: 15000 });
+} catch {
+  // ignore here; we validate below
+}
 
         let html = await page.content();
         html = rewriteCanonicalAndOgUrl(html, siteUrl, item.path);
         html = rewriteJsonLdOrigin(html, siteUrl);
         html = promoteHelmetTitle(html);
         html = forceHtmlLang(html, item.lang);
+	if (shouldRequireSeoTags(item.path)) {
+  const hasCanonical = /<link\b[^>]*\brel=["']canonical["']/i.test(html);
+  const hasDesc = /<meta\b[^>]*\bname=["']description["']/i.test(html);
+  const hasOgTitle = /<meta\b[^>]*\bproperty=["']og:title["']/i.test(html);
+
+  if (!hasCanonical || !hasDesc || !hasOgTitle) {
+    console.log(`--- SEO MISSING for ${item.path} [${item.lang}] ---`);
+    console.log(`hasCanonical=${hasCanonical} hasDesc=${hasDesc} hasOgTitle=${hasOgTitle}`);
+    throw new Error(`Prerender SEO tags missing for ${item.path} (${item.lang})`);
+  }
+}
 
         const outFile = safeRouteToFile(distDir, item.path);
         fs.writeFileSync(outFile, html, "utf8");

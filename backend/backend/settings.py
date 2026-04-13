@@ -54,9 +54,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     #'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -232,3 +233,15 @@ GOOGLE_OAUTH_REDIRECT_URIS = env.list('REDIRECT_URIS', default=[])
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15 * 1024 * 1024  # 15 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 15 * 1024 * 1024  # 15 MB
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:43225",
+    "http://localhost:43225",
+    "https://superotech.ai",
+    "https://www.superotech.ai",
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://127\.0\.0\.1:\d+$",
+    r"^http://localhost:\d+$",
+]

@@ -1,2 +1,11 @@
 .vscode
 node_modules
+.DS_Store
+**/.DS_Store
+
+# Django media files
+media/
+backend/media/
+
+# Generated files
+frontend/public/sitemap.xml

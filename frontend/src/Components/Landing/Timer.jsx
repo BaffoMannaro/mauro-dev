@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 function Timer() {
+    const { t } = useTranslation();
+
     const targetDate = new Date();
-    targetDate.setMonth(10);
-    targetDate.setDate(8);
+    targetDate.setMonth(2);
+    targetDate.setDate(4);
+    targetDate.setFullYear(2026);
     targetDate.setHours(0, 0, 0, 0);
 
-    if (targetDate.getTime() < new Date().getTime()) {
+    /* if (targetDate.getTime() < new Date().getTime()) {
         targetDate.setFullYear(targetDate.getFullYear() + 1);
-    }
+    } */
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
@@ -46,10 +50,10 @@ function Timer() {
     const timerComponents = [];
 
     const labels = {
-        days: 'Days',
-        hours: 'Hours',
-        minutes: 'Minutes',
-        seconds: 'Seconds',
+        days: t('days'),
+        hours: t('hours'),
+        minutes: t('minutes'),
+        seconds: t('seconds'),
     };
 
     Object.keys(timeLeft).forEach((interval) => {
@@ -65,7 +69,7 @@ function Timer() {
                             'linear-gradient(-90deg, rgb(96, 96, 111) 0%, rgb(66, 66, 71) 100%)',
                     }}
                     key={interval}
-                    className="w-full md:w-1/2  lg:w-1/5 flex flex-col items-center  p-4 mb-5"
+                    className="w-full md:w-1/2  lg:w-[320px] flex flex-col items-center  p-4 mb-5 mx-2"
                 >
                     <span className="text-white text-6xl font-extrabold">
                         {timeLeft[interval]}
@@ -78,17 +82,17 @@ function Timer() {
 
     return (
         <div className="w-full  bg-supero-dark-grey pb-32 px-4">
-            <p className="title text-center mb-24">
-                Discover us at{' '}
+            <p className="text-3xl xl:text-6xl font-bold text-white text-center mb-12 xl:mb-24">
+                {t('meet_supero')} {' '}
                 <span className="text-supero-green font-black font-stretch-125  tracking-tight">
                     MecSpe
                 </span>{' '}
-                in
+                Bologna 2026
             </p>
             {timeLeft.expired ? (
                 ''
             ) : (
-                <div className="flex justify-evenly flex-wrap ">
+                <div className="flex justify-center flex-wrap ">
                     {timerComponents.length ? timerComponents : ''}
                 </div>
             )}

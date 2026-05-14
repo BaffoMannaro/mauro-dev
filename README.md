@@ -58,6 +58,42 @@ yarn
 yarn dev
 ```
 
+### 3. Build (static)
+
+Frontend build outputs to `frontend/dist/`.
+
+#### Build without generating sitemap
+
+Use this if your backend is not reachable (or you want to debug the build output without calling the API):
+
+```bash
+cd frontend/
+yarn build:no-sitemap
+```
+
+#### Build + generate sitemap + prerender (recommended for production)
+
+This produces prerendered HTML per route (so `view-source:` contains correct `<title>`, canonical, Open Graph, JSON-LD, etc.).
+
+Prerequisites on the machine that runs prerender:
+
+```bash
+cd frontend/
+yarn
+yarn playwright install chromium
+```
+
+Run:
+
+```bash
+cd frontend/
+SITE_URL=https://test.superotech.ai PRERENDER_SITE_URL=https://test.superotech.ai yarn build:prerender
+```
+
+Notes:
+- `SITE_URL` is used for `public/sitemap.xml` base URLs.
+- `PRERENDER_SITE_URL` is used to rewrite canonical / `og:url` / JSON-LD URLs so they don’t end up as `http://127.0.0.1:<port>/...`.
+
 ### 3. Customize
 
 - to remove theme, remove ThemeSwitcher from Sidebar component

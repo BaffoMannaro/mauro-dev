@@ -2,22 +2,28 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import poly from '../../assets/images/poly.png';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function LandingForm() {
     const navigate = useNavigate();
+
+    const { t } = useTranslation();
 
     const handleSubmit = async (values) => {
         //submit form
         console.log(values);
 
         const response = await fetch(
-            import.meta.env.VITE_BACKEND_URL + 'contact-form/',
+            import.meta.env.VITE_BACKEND_URL + 'marketing/contact-form/',
             {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(values),
+                body: JSON.stringify({
+                    ...values,
+                    recaptcha_token: import.meta.env.VITE_RECAPTCHA_PUBLIC_KEY,
+                }),
             }
         );
 
@@ -31,7 +37,7 @@ export default function LandingForm() {
     return (
         <div
             id="landing-form"
-            className="w-full flex flex-wrap items-center bg-[#434348] px-4 xl:px-12 pb-24"
+            className="w-full flex flex-wrap items-center bg-[#434348] px-4 xl:px-12 pb-24 pt-8"
             style={{
                 backgroundImage: `url(${poly})`,
                 backgroundOrigin: 'border-box',
@@ -41,20 +47,17 @@ export default function LandingForm() {
             <div className="w-full xl:w-2/5">
                 <p className="title mb-6">
                     Does it <br className="hidden xl:block" />{' '}
-                    <span className="font-black">work </span>
+                    <span className="font-black font-stretch-125">work </span>
                     <br className="hidden xl:block" />
                     for you?
                 </p>
 
-                <p className="text-supero-mid-grey text-body-l mt-12">
-                    Want to know more? <br className="hidden xl:block" /> Fill
-                    out the form to find out how we can help{' '}
-                    <br className="hidden xl:block" /> you transform your
-                    business.
+                <p className="text-supero-mid-grey text-body-l mt-12 whitespace-pre-line">
+                    {t('does_it_work')}
                 </p>
             </div>
 
-            <div className="w-full xl:w-3/5 p-4 xl:p-12 text-white">
+            <div className="w-full xl:w-3/5 py-4 xl:p-12 text-white">
                 <Formik
                     initialValues={{
                         companyName: '',
@@ -70,20 +73,18 @@ export default function LandingForm() {
                         marketing: false,
                     }}
                     validationSchema={Yup.object().shape({
-                        companyName: Yup.string().required(
-                            'This field is required'
-                        ),
+                        companyName: Yup.string().required(t('required_field')),
                         email: Yup.string()
-                            .email('Invalid email')
-                            .required('This field is required'),
+                            .email(t('invalid_email'))
+                            .required(t('required_field')),
                         privacy: Yup.boolean().oneOf(
                             [true],
-                            'You must accept the privacy policy'
+                            t('accept_privacy')
                         ),
                         marketing: Yup.boolean(),
                         productTypes: Yup.mixed().test(
                             'has-product-selected',
-                            'Select at least one product type',
+                            t('select_product_type'),
                             function (value) {
                                 const {
                                     sanding,
@@ -104,17 +105,17 @@ export default function LandingForm() {
                 >
                     {({ isSubmitting, values, errors, setFieldValue }) => (
                         <Form className="flex flex-wrap xl:p-8 text-white w-full">
-                            <div className="mb-8 w-full xl:w-1/2 px-2">
+                            <div className="mb-8 w-full xl:w-1/2 xl:px-2">
                                 <label
                                     htmlFor="companyName"
-                                    className="text-[#a6a6ab] text-body-s mb-2 block"
+                                    className="text-[#a6a6ab] text-body-m mb-2 block"
                                 >
-                                    Company Name*
+                                    {t('company_name')}*
                                 </label>
                                 <Field
                                     name="companyName"
                                     type="text"
-                                    placeholder="Insert"
+                                    placeholder={t('insert')}
                                     className="w-full bg-[#121212] py-2 px-4 "
                                 />
                                 <ErrorMessage
@@ -124,17 +125,17 @@ export default function LandingForm() {
                                 />
                             </div>
 
-                            <div className="mb-8 w-full xl:w-1/2 px-2">
+                            <div className="mb-8 w-full xl:w-1/2 xl:px-2">
                                 <label
                                     htmlFor="email"
-                                    className="text-[#a6a6ab] text-body-s mb-2 block"
+                                    className="text-[#a6a6ab] text-body-m mb-2 block"
                                 >
                                     Email*
                                 </label>
                                 <Field
                                     name="email"
                                     type="email"
-                                    placeholder="Email"
+                                    placeholder={t('insert')}
                                     className="w-full bg-[#121212] py-2 px-4 "
                                 />
                                 <ErrorMessage
@@ -146,12 +147,12 @@ export default function LandingForm() {
 
                             <div className="mb-8 w-full px-2">
                                 <label className="text-[#a6a6ab] text-body-m mb-2 block">
-                                    Which application are you interested in?*
+                                    {t('which_product')}
                                 </label>
 
-                                <div className="flex justify-between flex-wrap gap-4">
+                                <div className="flex justify-between flex-wrap ">
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'sanding',
@@ -167,11 +168,11 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Sanding</p>
+                                        <p>{t('sanding')}</p>
                                     </div>
 
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'polishing',
@@ -187,11 +188,11 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Polishing</p>
+                                        <p>{t('polishing')}</p>
                                     </div>
 
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'painting',
@@ -207,11 +208,11 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Painting</p>
+                                        <p>{t('painting')}</p>
                                     </div>
 
                                     <div
-                                        className="flex items-center cursor-pointer"
+                                        className="flex items-center cursor-pointer w-1/2 lg:w-1/4 mb-6"
                                         onClick={() => {
                                             setFieldValue(
                                                 'other',
@@ -227,7 +228,7 @@ export default function LandingForm() {
                                                     : '')
                                             }
                                         ></div>
-                                        <p>Other</p>
+                                        <p>{t('other')}</p>
                                     </div>
                                 </div>
 
@@ -241,15 +242,15 @@ export default function LandingForm() {
                             <div className="mb-8 w-full px-2">
                                 <label
                                     htmlFor="message"
-                                    className="text-[#a6a6ab] text-body-s mb-2 block"
+                                    className="text-[#a6a6ab] text-body-m mb-2 block"
                                 >
-                                    Tell us more
+                                    {t('tell_us')}
                                 </label>
                                 <Field
                                     name="message"
                                     as="textarea"
                                     rows="4"
-                                    placeholder="Write something"
+                                    placeholder={t('write_something')}
                                     className="w-full bg-[#121212] py-2 px-4 resize-none"
                                 />
                             </div>
@@ -276,8 +277,19 @@ export default function LandingForm() {
                                             ></div>
                                         </div>
                                         <p className="text-body-s">
-                                            I declared that I have read the
-                                            privacy policy*.
+                                            {t('privacy_policy_prefix')}
+                                            <a
+                                                href="https://www.iubenda.com/privacy-policy/23263641"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="underline"
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                {t('privacy_policy_link')}
+                                            </a>
+                                            *.
                                         </p>
                                     </div>
 
@@ -307,14 +319,19 @@ export default function LandingForm() {
                                             ></div>
                                         </div>
                                         <p className="text-body-s">
-                                            I consent to the processing of my
-                                            personal data in order to receive
-                                            e-mail communications, including
-                                            newsletters, relating to initiatives
-                                            organised or co-organised by G-nous
-                                            Tech. Personal data may be used for
-                                            the purposes indicated in the
-                                            privacy policy.
+                                            {t('marketing_consent')}
+                                            <a
+                                                href="https://www.iubenda.com/privacy-policy/23263641"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="underline"
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                {t('privacy_policy_link')}
+                                            </a>
+                                            .
                                         </p>
                                     </div>
                                 </div>
@@ -322,11 +339,11 @@ export default function LandingForm() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="mx-auto xl:ml-auto xl:mr-0 group relative overflow-hidden bg-supero-green hover:bg-supero-dark-grey text-supero-dark-grey border border-transparent hover:text-white hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-24 xl:h-full"
+                                        className="mx-auto xl:ml-auto xl:mr-0 group relative overflow-hidden bg-supero-green hover:bg-transparent text-supero-dark-grey border border-transparent hover:text-supero-green hover:border-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex items-center justify-center text-[16px] uppercase tracking-wider min-w-[250px] h-24 xl:h-full"
                                     >
                                         <div className="flex">
                                             <span className="relative z-10">
-                                                send
+                                                {t('send')}
                                             </span>
 
                                             <div className="relative w-6 h-6 overflow-hidden transform rotate-90">
@@ -354,6 +371,7 @@ export default function LandingForm() {
                                                     <path
                                                         d="M7.5 4.49995V5.99995H16.9425L4.5 18.4425L5.5575 19.5L18 7.05745V16.5H19.5V4.49995H7.5Z"
                                                         fill="currentColor"
+                                                        className="group-hover:fill-supero-green"
                                                     />
                                                 </svg>
                                             </div>

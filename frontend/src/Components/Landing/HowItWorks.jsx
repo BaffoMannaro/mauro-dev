@@ -1,16 +1,18 @@
 import { Fade } from 'react-awesome-reveal';
-
+import { useTranslation } from 'react-i18next';
 export default function HowItWorks() {
+    const { t } = useTranslation();
     return (
         <section className="w-full flex flex-wrap bg-[#434348]">
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
                 <p className="title my-6">
-                    How it <span className="font-black">works</span>
+                    {t('how_it')}{' '}
+                    <span className="font-black font-stretch-125">{t('works')}</span>
                 </p>
 
                 <a
                     href="#landing-form"
-                    className="group  relative overflow-hidden bg-[#CCE535] hover:bg-[#2E2E33] text-[#2E2E33] hover:text-white px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
+                    className="group  relative overflow-hidden bg-[#CCE535] hover:bg-transparent border border-supero-green  text-[#2E2E33] hover:text-supero-green px-4 py-2.5 transition-all duration-300 font-extrabold flex xl:inline-flex items-center text-[16px] uppercase tracking-wider min-w-[250px] justify-between mx-auto xl:mx-0"
                 >
                     <span className="relative z-10">start your project</span>
 
@@ -45,75 +47,73 @@ export default function HowItWorks() {
                 </a>
             </div>
             <div className="w-full xl:w-1/2 p-4 xl:p-12">
-                <div className="mb-0  text-white max-w-[512px] relative after:content-[''] after:absolute after:w-[2px] after:h-full after:left-[-4px] xl:after:left-[-40px] after:top-0 after:bg-supero-green">
-                    <Fade direction="up" delay={100} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                <div className="mb-0  text-white max-w-[512px] relative after:content-[''] after:absolute after:w-[2px] after:h-full after:left-[2px] xl:after:left-[-40px] after:top-0 after:bg-supero-green">
+                    <Fade
+                        direction="up"
+                        delay={100}
+                        className="relative mb-12 xl:mb-4"
+                    >
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Problem Analysis</p>
-                            <p className="text-body-m text-[#BABABF]">
-                                We carefully examine your production process to
-                                identify inefficiencies and opportunities for
-                                automation.
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
+                                {t('problem_analysis')}
                             </p>
                         </div>
                     </Fade>
 
-                    <Fade direction="up" delay={200} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                    <Fade
+                        direction="up"
+                        delay={200}
+                        className="relative mb-12 xl:mb-4"
+                    >
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Requirement Collection</p>
-                            <p className="text-body-m text-[#BABABF]">
-                                We collect all the necessary information about
-                                your goals, constraints, and operational needs
-                                to define a tailored solution.
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
+                                {t('requirement_collection')}
                             </p>
                         </div>
                     </Fade>
 
-                    <Fade direction="up" delay={300} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                    <Fade
+                        direction="up"
+                        delay={300}
+                        className="relative mb-12 xl:mb-4"
+                    >
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="title-xs">Solution Design</p>
-                            <p className="text-body-m text-[#BABABF]">
-                                We create a detailed plan that integrates
-                                collaborative robotics, software, and processes
-                                to optimize productivity and safety.
+                            <p className="title-xs">Technology at work</p>
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
+                                {t('tech_r&d')}
                             </p>
                         </div>
                     </Fade>
 
-                    <Fade direction="up" delay={400} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                    <Fade
+                        direction="up"
+                        delay={400}
+                        className="relative mb-12 xl:mb-4"
+                    >
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="title-xs">Tech R&D</p>
-                            <p className="text-body-m text-[#BABABF]">
-                                We experiment and test advanced technologies to
-                                ensure high performance and innovative
-                                solutions.
+                            <p className="title-xs">Deployment & Validation</p>
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
+                                {t('deployment_testing')}
                             </p>
                         </div>
                     </Fade>
 
-                    <Fade direction="up" delay={500} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
-                        <div className="pb-6 ps-3 xl:ps-0">
-                            <p className="title-xs">Deployment & Testing</p>
-                            <p className="text-body-m text-[#BABABF]">
-                                We install and configure the solution,
-                                performing rigorous tests to guarantee flawless
-                                operation in your production environment.
-                            </p>
-                        </div>
-                    </Fade>
-
-                    <Fade direction="up" delay={600} className="relative">
-                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-11px] xl:left-[-47px] -top-1"></div>
+                    <Fade
+                        direction="up"
+                        delay={500}
+                        className="relative mb-12 xl:mb-4"
+                    >
+                        <div className="h-4 w-4 bg-supero-green rounded-full absolute left-[-7px] xl:left-[-47px] -top-1"></div>
                         <div className="pb-6 ps-3 xl:ps-0">
                             <p className="title-xs">Business Integration</p>
-                            <p className="text-body-m text-[#BABABF]">
-                                We support your team during adoption, training,
-                                and continuous optimization, turning automation
-                                into a tangible advantage.
+                            <p className="text-body-m text-[#BABABF] whitespace-pre-line">
+                                {t('business_integration')}
                             </p>
                         </div>
                     </Fade>

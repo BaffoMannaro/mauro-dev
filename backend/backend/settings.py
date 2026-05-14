@@ -21,18 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 env = environ.Env()
-environ.Env.read_env()
+environ.Env.read_env(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xmyy56c+#c$!7u^#8#&(egh&2_+or##y4+t)xps)i#zbhlw(5o'
+SECRET_KEY = env('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 
 # Application definition
@@ -47,14 +47,19 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'django_filters',
     'users',
+    'marketing',
+    'blog',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    #'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -127,8 +132,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=0.2),
-    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'UPDATE_LAST_LOGIN': False,
@@ -179,6 +184,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -188,11 +198,50 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+FRONTEND_URL = env('FRONTEND_URL', default='')
+ZAPIER_WEBHOOK_URL = env('ZAPIER_WEBHOOK_URL', default='')
+ZAPIER_WEBHOOK_CONTACT_FORM_URL = env('ZAPIER_WEBHOOK_CONTACT_FORM_URL', default=ZAPIER_WEBHOOK_URL)
+ZAPIER_WEBHOOK_BROCHURE_FORM_URL = env('ZAPIER_WEBHOOK_BROCHURE_FORM_URL', default='')
+ZAPIER_WEBHOOK_URLS = {
+    "contact_form": ZAPIER_WEBHOOK_CONTACT_FORM_URL,
+    "brochure_form": ZAPIER_WEBHOOK_BROCHURE_FORM_URL,
+}
+RECAPTCHA_PUBLIC_KEY = env('RECAPTCHA_PUBLIC_KEY', default='')
+RECAPTCHA_PRIVATE_KEY = env('RECAPTCHA_PRIVATE_KEY', default='')
+GDPR_LEGAL_VERSION = env('GDPR_LEGAL_VERSION', default='v1.0')
+
+SALESFORCE_USERNAME = env('SF_USERNAME', default='')
+SALESFORCE_PASSWORD = env('SF_PASSWORD', default='')
+SALESFORCE_SECURITY_TOKEN = env('SF_SECURITY_TOKEN', default='')
+
+GOOGLE_OAUTH_CLIENT_ID = env('CLIENT_ID', default='')
+GOOGLE_OAUTH_PROJECT_ID = env('PROJECT_ID', default='')
+GOOGLE_OAUTH_AUTH_URI = env('AUTH_URI', default='')
+GOOGLE_OAUTH_TOKEN_URI = env('TOKEN_URI', default='')
+GOOGLE_OAUTH_AUTH_PROVIDER = env('AUTH_PROVIDER', default='')
+GOOGLE_OAUTH_CLIENT_SECRET = env('CLIENT_SECRET', default='')
+GOOGLE_OAUTH_REDIRECT_URIS = env.list('REDIRECT_URIS', default=[])
+
+# Limit upload to 15 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 15 * 1024 * 1024  # 15 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 15 * 1024 * 1024  # 15 MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:43225",
+    "http://localhost:43225",
+    "https://superotech.ai",
+    "https://www.superotech.ai",
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://127\.0\.0\.1:\d+$",
+    r"^http://localhost:\d+$",
+]

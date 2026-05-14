@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const useAxios = () => {
 const instance = axios.create({
-  baseURL: 'http://localhost:8000/',
+  baseURL: import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,9 +21,10 @@ instance.interceptors.request.use(config => {
     ?.split('=')[1];
   
   if (accessToken) {
-    console.log("ok");
-    
+    console.log("Token found, adding to request");
     config.headers.Authorization = `Bearer ${accessToken}`;
+  } else {
+    console.warn("NO TOKEN FOUND in cookies!");
   }
   
   return config;
@@ -35,7 +36,8 @@ instance.interceptors.response.use(
     const originalRequest = error.config;
     console.log("error",error);
     
-    if (error.response.status === 401 && !originalRequest._retry) {
+    // Verifica che error.response esista prima di accedere a .status
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       console.log("retry");
       
@@ -46,8 +48,10 @@ instance.interceptors.response.use(
       
         if (refreshToken) {
             try {
-              const response = await axios.post('http://localhost:8000/api/token/refresh/', { refresh: refreshToken });
-              document.cookie = `accessToken=${response.data.access}; path=/`;
+              console.log("Attempting to refresh token...");
+              const response = await axios.post('http://localhost:8000/users/token/refresh/', { refresh: refreshToken });
+              console.log("Token refreshed successfully");
+              document.cookie = `accessToken=${response.data.access}; path=/; max-age=${60 * 60 * 24}`;
   
               setUser(response.data.access);
               instance.defaults.headers.Authorization = `Bearer ${response.data.access}`;
@@ -55,7 +59,6 @@ instance.interceptors.response.use(
               return instance(originalRequest);  // Riprova la richiesta originale
             } catch (err) {
               console.error("Refresh token scaduto o invalido", err);
-              window.location.href = '/';
               logout();  // Forza il logout se il refresh token è scaduto/invalido
               return Promise.reject(err);  // Rifiuta la promessa e interrompi
             }

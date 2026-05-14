@@ -47,6 +47,9 @@ export const register = async (
 };
 
 export const logout = () => {
+    // Rimuovi con document.cookie per compatibilità con il resto del sistema
+    document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     Cookies.remove('accessToken');
     Cookies.remove('refreshToken');
     useAuthStore.getState().setUser(null);
@@ -54,40 +57,65 @@ export const logout = () => {
 
 export const setUser = async () => {
     // ON PAGE LOAD
-
-    const accessToken = Cookies.get('accessToken');
-    const refreshToken = Cookies.get('refreshToken');
-    if (!refreshToken) {
-        /* useAuthStore.getState().setUser(null); */
+    console.log('=== setUser() chiamato ===');
+    console.log('document.cookie:', document.cookie);
+    
+    // Leggi i token da document.cookie (compatibile con useAuthStore)
+    const accessToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('accessToken='))
+        ?.split('=')[1];
+    
+    const refreshToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('refreshToken='))
+        ?.split('=')[1];
+    
+    console.log('accessToken found:', accessToken ? 'YES' : 'NO');
+    console.log('refreshToken found:', refreshToken ? 'YES' : 'NO');
+    
+    if (!refreshToken || !accessToken) {
+        console.log('No tokens found, setting user to null');
+        useAuthStore.getState().setUser(null);
         return;
     }
 
     if (isAccessTokenExpired(accessToken)) {
-        const response = await getRefreshToken(refreshToken);
-        setAuthUser(response.access, response.refresh);
+        console.log('Access token expired, refreshing...');
+        try {
+            const response = await getRefreshToken(refreshToken);
+            setAuthUser(response.access, response.refresh);
+        } catch (error) {
+            console.error('Failed to refresh token:', error);
+            useAuthStore.getState().setUser(null);
+            return;
+        }
     } else {
+        console.log('Access token valid, setting auth user');
         setAuthUser(accessToken, refreshToken);
     }
     return true;
 };
 
 export const setAuthUser = (accessToken, refreshToken) => {
+    console.log('=== setAuthUser() chiamato ===');
+    // Usa document.cookie per compatibilità con useAxios e useAuthStore
+    document.cookie = `accessToken=${accessToken}; path=/; max-age=${60 * 60 * 24}`; // 1 giorno
+    document.cookie = `refreshToken=${refreshToken}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 giorni
+    console.log('Cookies set, new document.cookie:', document.cookie);
+    
+    // Mantieni anche js-cookie per retrocompatibilità (senza secure su localhost)
     Cookies.set('accessToken', accessToken, {
         expires: 1,
-        secure: true,
     });
 
     Cookies.set('refreshToken', refreshToken, {
         expires: 7,
-        secure: true,
     });
 
-    const user = jwtDecode(accessToken) ?? null;
-
-    if (user) {
-        useAuthStore.getState().setUser(user);
-    }
-    useAuthStore.getState().setLoading(false);
+    // Chiama setUser con l'accessToken (string) che lo store decodificherà internamente
+    useAuthStore.getState().setUser(accessToken);
+    console.log('User set in store');
 };
 
 export const getRefreshToken = async (refreshToken) => {

@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /preventivi
+Disallow: /p/
+Disallow: /api/
+Disallow: /login

@@ -3,13 +3,14 @@ import sql from '@/lib/db';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
+  const { token } = await params;
   const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
   const ua = req.headers.get('user-agent') ?? 'unknown';
 
   const [preventivo] = await sql`
-    SELECT * FROM preventivi WHERE token = ${params.token}
+    SELECT * FROM preventivi WHERE token = ${token}
   `;
 
   if (!preventivo) {
@@ -28,7 +29,7 @@ export async function POST(
       accettato_ip = ${ip},
       accettato_ua = ${ua},
       updated_at = NOW()
-    WHERE token = ${params.token}
+    WHERE token = ${token}
     RETURNING *
   `;
 

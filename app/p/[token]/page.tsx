@@ -5,10 +5,11 @@ import PreventivoCliente from '@/components/PreventivoCliente';
 export default async function PreventivoPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
+  const { token } = await params;
   const [preventivo] = await sql`
-    SELECT * FROM preventivi WHERE token = ${params.token}
+    SELECT * FROM preventivi WHERE token = ${token}
   `;
 
   if (!preventivo) notFound();

@@ -8,13 +8,12 @@ export default async function PreventivoPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const [preventivo] = await sql`
-    SELECT * FROM preventivi WHERE token = ${token}
-  `;
+  const rows = await sql`SELECT * FROM preventivi WHERE token = ${token}`;
+  const preventivo = rows[0];
 
   if (!preventivo) notFound();
 
-  return <PreventivoCliente preventivo={preventivo} />;
+  return <PreventivoCliente preventivo={preventivo as any} />;
 }
 
 export const metadata = {

@@ -16,6 +16,7 @@ export async function GET() {
         scadenza DATE,
         totale DECIMAL(10,2) NOT NULL,
         iva BOOLEAN DEFAULT true,
+        meta JSONB,
         stato TEXT DEFAULT 'inviato',
         accettato_at TIMESTAMPTZ,
         accettato_ip TEXT,
@@ -24,6 +25,11 @@ export async function GET() {
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `;
+
+    await sql`
+      ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS meta JSONB
+    `;
+
     return NextResponse.json({ ok: true, message: 'Database inizializzato' });
   } catch (error) {
     return NextResponse.json({ ok: false, error: String(error) }, { status: 500 });

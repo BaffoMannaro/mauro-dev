@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
+import NuovoPreventivo from './NuovoPreventivo';
 
 interface Voce {
   descrizione: string;
@@ -43,6 +44,7 @@ export default function AdminDashboard({
   const [preventivi, setPreventivi] = useState(initialPreventivi);
   const [filtro, setFiltro] = useState('tutti');
   const [copiato, setCopiato] = useState<string | null>(null);
+  const [nuovoOpen, setNuovoOpen] = useState(false);
 
   const filtrati = filtro === 'tutti'
     ? preventivi
@@ -75,6 +77,8 @@ export default function AdminDashboard({
     }
   };
 
+  { nuovoOpen && <NuovoPreventivo onClose={() => setNuovoOpen(false)} /> }
+  
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <header className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
@@ -91,6 +95,12 @@ export default function AdminDashboard({
             Esci
           </button>
         </div>
+        <button
+          onClick={() => setNuovoOpen(true)}
+          className="text-sm bg-white text-zinc-900 font-medium px-4 py-2 rounded-lg hover:bg-zinc-100 transition-colors"
+        >
+          + Nuovo
+        </button>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">

@@ -143,7 +143,7 @@ export default function AdminDashboard({
             <p className="text-sm mt-1">I preventivi caricati appariranno qui</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filtrati.map((p) => (
               <div
                 key={p.id}

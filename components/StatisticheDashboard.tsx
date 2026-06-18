@@ -88,23 +88,26 @@ export default function StatisticheDashboard({
         .reduce((s, t) => s + Number(p.totale) * t.percentuale / 100, 0);
     }, 0);
 
-    const giorniLavoratiTotali = accettati.reduce((acc, p) => {
-      if (!p.lavoro_inizio || !p.lavoro_fine) return acc;
-      const diff = Math.round(
-        (new Date(p.lavoro_fine).getTime() - new Date(p.lavoro_inizio).getTime()) / (1000 * 60 * 60 * 24)
-      );
-      return acc + Math.max(diff, 0);
-    }, 0);
 
-    const guadagnoAlGiorno = giorniLavoratiTotali > 0 ? totalePagato / giorniLavoratiTotali : 0;
-    const guadagnoAllOra = guadagnoAlGiorno / 8;
-
-    const oggi = new Date();
     // Anno fiscale: ottobre → settembre
     // Troviamo l'ottobre di inizio del periodo corrente
+    const oggi = new Date();
     const annoFiscaleInizio = oggi.getMonth() >= 9
       ? oggi.getFullYear()
       : oggi.getFullYear() - 1;
+
+    // Giorni lavorativi dall'inizio anno fiscale ad oggi
+    const inizioAnnoFiscale = new Date(annoFiscaleInizio, 9, 1);
+    let giorniLavorativiAnno = 0;
+    const cursore = new Date(inizioAnnoFiscale);
+    while (cursore <= oggi) {
+      const giorno = cursore.getDay();
+      if (giorno !== 0 && giorno !== 6) giorniLavorativiAnno++;
+      cursore.setDate(cursore.getDate() + 1);
+    }
+
+    const guadagnoAlGiorno = giorniLavorativiAnno > 0 ? totalePagato / giorniLavorativiAnno : 0;
+    const guadagnoAllOra = guadagnoAlGiorno / 8;
     const mesi = Array.from({ length: 12 }, (_, i) => {
       const d = new Date(annoFiscaleInizio, 9 + i, 1); // 9 = ottobre
       return {
@@ -166,7 +169,7 @@ export default function StatisticheDashboard({
     return {
       accettati, totaleContrattualizzato, inviati, rifiutati,
       tassoAccettazione, totalePagato, totaleNonPagato,
-      guadagnoAlGiorno, guadagnoAllOra,
+      guadagnoAlGiorno, guadagnoAllOra, giorniLavorativiAnno,
       mesi, maxValore, mediaIncassatoMensile, mediaNettoMensile,
       costoAbbMensileCorrente,
     };
@@ -219,14 +222,14 @@ export default function StatisticheDashboard({
             <p className="text-purple-400 text-2xl font-semibold">
               {stats.guadagnoAlGiorno > 0 ? fmt(stats.guadagnoAlGiorno) : '—'}
             </p>
-            <p className="text-zinc-500 text-xs mt-1">incassato ÷ giorni lavorati</p>
+            <p className="text-zinc-500 text-xs mt-1">incassato ÷ giorni lav. anno fiscale</p>
           </div>
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
             <p className="text-zinc-500 text-xs font-mono mb-2">TARIFFA ORARIA</p>
             <p className="text-pink-400 text-2xl font-semibold">
               {stats.guadagnoAllOra > 0 ? `€${Math.round(stats.guadagnoAllOra)}` : '—'}
             </p>
-            <p className="text-zinc-500 text-xs mt-1">su base 8h/giorno</p>
+            <p className="text-zinc-500 text-xs mt-1">{stats.giorniLavorativiAnno} giorni lav. · 8h</p>
           </div>
         </div>
 

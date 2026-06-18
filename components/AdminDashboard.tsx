@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { signOut } from 'next-auth/react';
 import NuovoPreventivo from './NuovoPreventivo';
+import PreventivoDrawer from './PreventivoDrawer';
 
 interface Voce {
   descrizione: string;
@@ -24,7 +24,16 @@ interface Preventivo {
   iva: boolean;
   stato: string;
   accettato_at: string | null;
+  accettato_ip: string | null;
+  accettato_ua: string | null;
+  accettato_nome: string | null;
+  accettato_cognome: string | null;
+  accettato_email: string | null;
+  tranches_stato: any;
+  lavoro_inizio: string | null;
+  lavoro_fine: string | null;
   created_at: string;
+  meta?: any;
 }
 
 const STATI = {
@@ -45,6 +54,41 @@ export default function AdminDashboard({
   const [filtro, setFiltro] = useState('tutti');
   const [copiato, setCopiato] = useState<string | null>(null);
   const [nuovoOpen, setNuovoOpen] = useState(false);
+  const [drawerPreventivo, setDrawerPreventivo] = useState<Preventivo | null>(null);
+
+  const filtrati = filtro === 'tutti'
+    ? preventivi
+    : preventivi.filter((p) => p.stato === filtro);
+
+  const copiaLink = (token: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(`${window.location.origin}/p/${token}`);
+    setCopiato(token);
+    setTimeout(() => setCopiato(null), 2000);
+  };
+
+  const aggiornaStato = async (id: number, stato: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const res = await fetch(`/api/preventivi/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stato }),
+    });
+    if (res.ok) {
+      setPreventivi((prev) => prev.map((p) => (p.id === id ? { ...p, stato } : p)));
+    }
+  };
+
+  const eliminaPreventivo = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm('Sei sicuro di voler eliminare questo preventivo?')) return;
+    const res = await fetch(`/api/preventivi/${id}`, { method: 'DELETE' });
+    if (res.ok) {
+      setPreventivi((prev) => prev.filter((p) => p.id !== id));
+      if (drawerPreventivo?.id === id) setDrawerPreventivo(null);
+    }
+  };
+
   const ricaricaPreventivi = async () => {
     const res = await fetch('/api/preventivi');
     if (res.ok) {
@@ -53,65 +97,26 @@ export default function AdminDashboard({
     }
   };
 
-  const filtrati = filtro === 'tutti'
-    ? preventivi
-    : preventivi.filter((p) => p.stato === filtro);
-
-  const copiaLink = (token: string) => {
-    navigator.clipboard.writeText(`${window.location.origin}/p/${token}`);
-    setCopiato(token);
-    setTimeout(() => setCopiato(null), 2000);
+  const aggiornaPreventivo = (updated: Preventivo) => {
+    setPreventivi((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setDrawerPreventivo(updated);
   };
-
-  const aggiornaStato = async (id: number, stato: string) => {
-    const res = await fetch(`/api/preventivi/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stato }),
-    });
-    if (res.ok) {
-      setPreventivi((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, stato } : p))
-      );
-    }
-  };
-
-  const eliminaPreventivo = async (id: number) => {
-    if (!confirm('Sei sicuro di voler eliminare questo preventivo?')) return;
-    const res = await fetch(`/api/preventivi/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setPreventivi((prev) => prev.filter((p) => p.id !== id));
-    }
-  };
-
-
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      {nuovoOpen && <NuovoPreventivo onClose={() => setNuovoOpen(false)} onSuccess={ricaricaPreventivi} />}
+    <div className="min-h-screen text-white">
+      {/* Header */}
       <header className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <div>
-          <span className="text-zinc-400 text-sm font-mono">maurodev.it</span>
-          <h1 className="text-white font-semibold text-lg">Preventivi</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-zinc-500 text-sm">{session?.user?.email}</span>
-          <button
-            onClick={() => setNuovoOpen(true)}
-            className="text-sm bg-white text-zinc-900 font-medium px-4 py-2 rounded-lg hover:bg-zinc-100 transition-colors"
-          >
-            + Nuovo
-          </button>
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="text-sm text-zinc-400 hover:text-white transition-colors"
-          >
-            Esci
-          </button>
-        </div>
+        <h1 className="text-white font-semibold text-lg">Preventivi</h1>
+        <button
+          onClick={() => setNuovoOpen(true)}
+          className="text-sm bg-white text-zinc-900 font-medium px-4 py-2 rounded-lg hover:bg-zinc-100 transition-colors"
+        >
+          + Nuovo
+        </button>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
+      <div className="px-6 py-8 max-w-5xl mx-auto">
+        {/* Filtri */}
         <div className="flex gap-2 mb-8 flex-wrap">
           {['tutti', 'inviato', 'accettato', 'rifiutato', 'archiviato'].map((f) => (
             <button
@@ -131,60 +136,76 @@ export default function AdminDashboard({
           ))}
         </div>
 
+        {/* Lista */}
         {filtrati.length === 0 ? (
           <div className="text-center py-20 text-zinc-600">
             <p className="text-lg">Nessun preventivo</p>
             <p className="text-sm mt-1">I preventivi caricati appariranno qui</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {filtrati.map((p) => (
-              <div key={p.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+              <div
+                key={p.id}
+                onClick={() => setDrawerPreventivo(p)}
+                className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 cursor-pointer hover:border-zinc-600 transition-colors"
+              >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1 flex-wrap">
-                      <span className="text-zinc-500 text-xs font-mono">#{p.id}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full border ${STATI[p.stato as keyof typeof STATI]?.color}`}>
                         {STATI[p.stato as keyof typeof STATI]?.label}
                       </span>
+                      {/* Indicatore tranches pagate */}
+                      {p.tranches_stato && p.tranches_stato.length > 0 && (
+                        <span className="text-xs text-zinc-500">
+                          {p.tranches_stato.filter((t: any) => t.pagato).length}/{p.tranches_stato.length} pagamenti
+                        </span>
+                      )}
                     </div>
                     <h3 className="text-white font-medium truncate">{p.oggetto}</h3>
-                    <p className="text-zinc-400 text-sm">
-                      {p.cliente_nome}
-                      {p.cliente_azienda && ` · ${p.cliente_azienda}`}
-                    </p>
+                    <p className="text-zinc-400 text-sm">{p.cliente_nome}</p>
                     <p className="text-zinc-500 text-xs mt-1">
                       {new Date(p.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
                       {p.accettato_at && ` · Accettato il ${new Date(p.accettato_at).toLocaleDateString('it-IT')}`}
+                      {p.lavoro_inizio && ` · Lavoro: ${new Date(p.lavoro_inizio).toLocaleDateString('it-IT')}`}
+                      {p.lavoro_fine && ` → ${new Date(p.lavoro_fine).toLocaleDateString('it-IT')}`}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-white font-semibold text-lg">
-                      {`€${(Number(p.totale) * (p.iva ? 1.22 : 1)).toLocaleString('it-IT', { minimumFractionDigits: 2 })}`}
+                      €{Number(p.totale).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
                     </p>
-                    {p.iva && <p className="text-zinc-500 text-xs">IVA inclusa</p>}
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-4 flex-wrap">
+                {/* Azioni */}
+                <div className="flex gap-2 mt-4 flex-wrap" onClick={(e) => e.stopPropagation()}>
                   <button
-                    onClick={() => copiaLink(p.token)}
+                    onClick={(e) => copiaLink(p.token, e)}
                     className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
                   >
                     {copiato === p.token ? '✓ Copiato!' : 'Copia link'}
                   </button>
                   
-                  <a href={`/p/${p.token}`} target="_blank" rel="noopener noreferrer" className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">Visualizza</a>
+                    href={`/p/${p.token}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                  >
+                    Visualizza
+                  </a>
                   {p.stato === 'inviato' && (
                     <>
                       <button
-                        onClick={() => aggiornaStato(p.id, 'rifiutato')}
+                        onClick={(e) => aggiornaStato(p.id, 'rifiutato', e)}
                         className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-red-950 text-red-400 rounded-lg transition-colors"
                       >
                         Segna rifiutato
                       </button>
                       <button
-                        onClick={() => aggiornaStato(p.id, 'archiviato')}
+                        onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
                         className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
                       >
                         Archivia
@@ -193,14 +214,14 @@ export default function AdminDashboard({
                   )}
                   {p.stato === 'accettato' && (
                     <button
-                      onClick={() => aggiornaStato(p.id, 'archiviato')}
+                      onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
                       className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
                     >
                       Archivia
                     </button>
                   )}
                   <button
-                    onClick={() => eliminaPreventivo(p.id)}
+                    onClick={(e) => eliminaPreventivo(p.id, e)}
                     className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-red-950 text-red-400 rounded-lg transition-colors ml-auto"
                   >
                     Elimina
@@ -210,7 +231,22 @@ export default function AdminDashboard({
             ))}
           </div>
         )}
-      </main>
+      </div>
+
+      {/* Modali */}
+      {nuovoOpen && (
+        <NuovoPreventivo
+          onClose={() => setNuovoOpen(false)}
+          onSuccess={ricaricaPreventivi}
+        />
+      )}
+      {drawerPreventivo && (
+        <PreventivoDrawer
+          preventivo={drawerPreventivo}
+          onClose={() => setDrawerPreventivo(null)}
+          onUpdate={aggiornaPreventivo}
+        />
+      )}
     </div>
   );
 }

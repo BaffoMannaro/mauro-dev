@@ -21,14 +21,25 @@ export async function GET() {
         accettato_at TIMESTAMPTZ,
         accettato_ip TEXT,
         accettato_ua TEXT,
+        accettato_nome TEXT,
+        accettato_cognome TEXT,
+        accettato_email TEXT,
+        vuole_email BOOLEAN DEFAULT false,
+        tranches_stato JSONB,
+        lavoro_inizio DATE,
+        lavoro_fine DATE,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `;
-
-    await sql`
-      ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS meta JSONB
-    `;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS meta JSONB`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS accettato_nome TEXT`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS accettato_cognome TEXT`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS accettato_email TEXT`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS vuole_email BOOLEAN DEFAULT false`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS tranches_stato JSONB`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS lavoro_inizio DATE`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS lavoro_fine DATE`;
 
     return NextResponse.json({ ok: true, message: 'Database inizializzato' });
   } catch (error) {

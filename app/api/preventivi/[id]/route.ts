@@ -11,16 +11,23 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await req.json();
-  const { stato } = body;
 
-  const [preventivo] = await sql`
+  const fields: string[] = [];
+  const values: any[] = [];
+
+  const updated = await sql`
     UPDATE preventivi
-    SET stato = ${stato}, updated_at = NOW()
+    SET
+      stato = COALESCE(${body.stato ?? null}, stato),
+      tranches_stato = COALESCE(${body.tranches_stato ? JSON.stringify(body.tranches_stato) : null}::jsonb, tranches_stato),
+      lavoro_inizio = COALESCE(${body.lavoro_inizio ?? null}, lavoro_inizio),
+      lavoro_fine = COALESCE(${body.lavoro_fine ?? null}, lavoro_fine),
+      updated_at = NOW()
     WHERE id = ${id}
     RETURNING *
   `;
 
-  return NextResponse.json(preventivo);
+  return NextResponse.json(updated[0]);
 }
 
 export async function DELETE(

@@ -74,6 +74,11 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
   const [loading, setLoading] = useState(false);
   const [confermato, setConfermato] = useState(false);
   const [checkbox, setCheckbox] = useState(false);
+  const [nome, setNome] = useState('');
+  const [cognome, setCognome] = useState('');
+  const [email, setEmail] = useState('');
+  const [vuoleEmail, setVuoleEmail] = useState(false);
+  const [erroreAccettazione, setErroreAccettazione] = useState('');
   const countdown = useCountdown(preventivo.scadenza);
 
   const meta = preventivo.meta;
@@ -83,12 +88,22 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
   const totaleFinale = imponibile;
 
   const handleAccetta = async () => {
-    if (!checkbox) return;
+    setErroreAccettazione('');
+    if (!nome.trim()) return setErroreAccettazione('Il nome è obbligatorio');
+    if (!cognome.trim()) return setErroreAccettazione('Il cognome è obbligatorio');
+    if (!email.trim() || !email.includes('@')) return setErroreAccettazione('Inserisci un\'email valida');
+    if (!checkbox) return setErroreAccettazione('Devi accettare le condizioni');
     setLoading(true);
-    const res = await fetch(`/api/p/${preventivo.token}/accetta`, { method: 'POST' });
+    const res = await fetch(`/api/p/${preventivo.token}/accetta`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, cognome, email, vuole_email: vuoleEmail }),
+    });
     if (res.ok) {
       setAccettato(true);
       setConfermato(true);
+    } else {
+      setErroreAccettazione('Errore nella registrazione. Riprova.');
     }
     setLoading(false);
   };
@@ -266,6 +281,55 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
         {!accettato ? (
           <div className="border border-zinc-700 rounded-xl p-6 print:hidden">
             <p className="text-zinc-500 text-xs font-mono mb-4">ACCETTAZIONE</p>
+
+            {/* Campi obbligatori */}
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="text-zinc-500 text-xs font-mono block mb-1">NOME *</label>
+                <input
+                  type="text"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Mario"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+                />
+              </div>
+              <div>
+                <label className="text-zinc-500 text-xs font-mono block mb-1">COGNOME *</label>
+                <input
+                  type="text"
+                  value={cognome}
+                  onChange={(e) => setCognome(e.target.value)}
+                  placeholder="Rossi"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+                />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="text-zinc-500 text-xs font-mono block mb-1">EMAIL *</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="mario.rossi@email.it"
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+              />
+            </div>
+
+            {/* Checkbox email recap */}
+            <label className="flex items-start gap-3 cursor-pointer mb-4 p-3 bg-zinc-900 rounded-lg border border-zinc-800">
+              <input
+                type="checkbox"
+                checked={vuoleEmail}
+                onChange={(e) => setVuoleEmail(e.target.checked)}
+                className="mt-0.5 accent-white"
+              />
+              <span className="text-zinc-400 text-sm">
+                Voglio ricevere una copia del preventivo accettato via email
+              </span>
+            </label>
+
+            {/* Checkbox accettazione legale */}
             <label className="flex items-start gap-3 cursor-pointer mb-5">
               <input
                 type="checkbox"
@@ -278,6 +342,11 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
                 L'accettazione verrà registrata con data, ora e indirizzo IP.
               </span>
             </label>
+
+            {erroreAccettazione && (
+              <p className="text-red-400 text-xs mb-3 font-mono">⚠ {erroreAccettazione}</p>
+            )}
+
             <button
               onClick={handleAccetta}
               disabled={!checkbox || loading}

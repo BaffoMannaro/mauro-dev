@@ -6,8 +6,12 @@ interface Preventivo {
   id: number;
   token: string;
   cliente_nome: string;
+  cliente_azienda: string | null;
   cliente_email: string;
   oggetto: string;
+  voci: any[];
+  note: string | null;
+  scadenza: string | null;
   totale: number;
   iva: boolean;
   stato: string;
@@ -20,6 +24,7 @@ interface Preventivo {
   tranches_stato: { descrizione: string; percentuale: number; pagato: boolean }[] | null;
   lavoro_inizio: string | null;
   lavoro_fine: string | null;
+  created_at: string;
   meta?: any;
 }
 

@@ -188,14 +188,7 @@ export default function AdminDashboard({
                     {copiato === p.token ? '✓ Copiato!' : 'Copia link'}
                   </button>
                   
-                    href={`/p/${p.token}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
-                  >
-                    Visualizza
-                  </a>
+                  <a href={`/p/${p.token}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">Visualizza</a>
                   {p.stato === 'inviato' && (
                     <>
                       <button

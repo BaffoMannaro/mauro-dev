@@ -100,8 +100,13 @@ export default function StatisticheDashboard({
     const guadagnoAllOra = guadagnoAlGiorno / 8;
 
     const oggi = new Date();
+    // Anno fiscale: ottobre → settembre
+    // Troviamo l'ottobre di inizio del periodo corrente
+    const annoFiscaleInizio = oggi.getMonth() >= 9
+      ? oggi.getFullYear()
+      : oggi.getFullYear() - 1;
     const mesi = Array.from({ length: 12 }, (_, i) => {
-      const d = new Date(oggi.getFullYear(), oggi.getMonth() - 11 + i, 1);
+      const d = new Date(annoFiscaleInizio, 9 + i, 1); // 9 = ottobre
       return {
         label: d.toLocaleDateString('it-IT', { month: 'short', year: '2-digit' }),
         anno: d.getFullYear(),

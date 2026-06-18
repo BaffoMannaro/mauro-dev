@@ -328,7 +328,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
             <p className="text-sm mt-1">Clicca "+ Nuovo" per aggiungerne uno</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {filtrati.map((ab) => (
               <div
                 key={ab.id}

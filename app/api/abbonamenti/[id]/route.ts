@@ -7,15 +7,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
   const { id } = await params;
   const body = await req.json();
+
   const [ab] = await sql`
     UPDATE abbonamenti SET
-      nome = COALESCE(${body.nome ?? null}, nome),
-      cifra = COALESCE(${body.cifra ?? null}, cifra),
-      cadenza = COALESCE(${body.cadenza ?? null}, cadenza),
-      data_inizio = COALESCE(${body.data_inizio ?? null}, data_inizio),
-      data_fine = COALESCE(${body.data_fine ?? null}, data_fine),
-      attivo = COALESCE(${body.attivo ?? null}, attivo),
-      note = COALESCE(${body.note ?? null}, note)
+      nome = ${body.nome},
+      cifra = ${body.cifra},
+      cadenza = ${body.cadenza},
+      data_inizio = ${body.data_inizio},
+      data_fine = ${body.data_fine || null},
+      attivo = ${body.attivo},
+      note = ${body.note || null},
+      tag = ${body.tag || null}
     WHERE id = ${id}
     RETURNING *
   `;

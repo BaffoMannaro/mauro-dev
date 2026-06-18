@@ -2,32 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import sql from '@/lib/db';
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET() {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
-  const { id } = await params;
-  const body = await req.json();
+  const abbonamenti = await sql`SELECT * FROM abbonamenti ORDER BY created_at DESC`;
+  return NextResponse.json(abbonamenti);
+}
 
+export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
+  const body = await req.json();
   const [ab] = await sql`
-    UPDATE abbonamenti SET
-      nome = ${body.nome},
-      cifra = ${body.cifra},
-      cadenza = ${body.cadenza},
-      data_inizio = ${body.data_inizio},
-      data_fine = ${body.data_fine || null},
-      attivo = ${body.attivo},
-      note = ${body.note || null},
-      tag = ${body.tag || null}
-    WHERE id = ${id}
+    INSERT INTO abbonamenti (nome, cifra, cadenza, data_inizio, data_fine, attivo, note)
+    VALUES (${body.nome}, ${body.cifra}, ${body.cadenza}, ${body.data_inizio}, ${body.data_fine || null}, ${body.attivo !== false}, ${body.note || null})
     RETURNING *
   `;
   return NextResponse.json(ab);
-}
-
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
-  const { id } = await params;
-  await sql`DELETE FROM abbonamenti WHERE id = ${id}`;
-  return NextResponse.json({ ok: true });
 }

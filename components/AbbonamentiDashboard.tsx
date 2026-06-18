@@ -219,7 +219,19 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
     setLoading(false);
   };
 
+  const [formEditInitial, setFormEditInitial] = useState<typeof FORM_DEFAULT | null>(null);
+
   const apriModifica = (ab: Abbonamento) => {
+    setFormEditInitial({
+      nome: ab.nome,
+      cifra: String(ab.cifra),
+      cadenza: ab.cadenza,
+      data_inizio: ab.data_inizio.slice(0, 10),
+      data_fine: ab.data_fine?.slice(0, 10) || '',
+      attivo: ab.attivo,
+      note: ab.note || '',
+      tag: ab.tag || 'Code',
+    });
     setEditId(ab.id);
     setShowForm(true);
     setErrore('');
@@ -244,16 +256,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
   };
 
   const abCorrente = editId !== null ? abbonamenti.find((a) => a.id === editId) : null;
-  const formInitial = abCorrente ? {
-    nome: abCorrente.nome,
-    cifra: String(abCorrente.cifra),
-    cadenza: abCorrente.cadenza,
-    data_inizio: abCorrente.data_inizio.slice(0, 10),
-    data_fine: abCorrente.data_fine?.slice(0, 10) || '',
-    attivo: abCorrente.attivo,
-    note: abCorrente.note || '',
-    tag: abCorrente.tag || 'Code',
-  } : FORM_DEFAULT;
+  const formInitial = editId !== null && formEditInitial ? formEditInitial : FORM_DEFAULT;
 
   return (
     <div className="min-h-screen text-white">

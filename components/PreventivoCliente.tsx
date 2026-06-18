@@ -257,7 +257,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
             <p className="text-zinc-500 text-xs font-mono mb-2">MANUTENZIONE</p>
             <p className="text-zinc-300 text-sm">{sezioni.manutenzione.descrizione}</p>
-            <p className="text-white font-semibold mt-2">€{sezioni.manutenzione.prezzo}/mese</p>
+            <p className="text-white font-semibold mt-2">€{Number(sezioni.manutenzione.prezzo).toLocaleString('it-IT')}/mese</p>
           </div>
         )}
 

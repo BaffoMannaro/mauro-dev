@@ -320,7 +320,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                   <div className="bg-zinc-800 rounded-xl p-4">
                     <p className="text-zinc-500 text-xs font-mono mb-1">MANUTENZIONE</p>
                     <p className="text-zinc-300 text-sm">{preview.sezioni.manutenzione.descrizione}</p>
-                    <p className="text-white text-sm font-medium mt-1">€{preview.sezioni.manutenzione.prezzo}/mese</p>
+                    <p className="text-white text-sm font-medium mt-1">€{Number(preview.sezioni.manutenzione.prezzo).toLocaleString('it-IT')}/mese</p>
                   </div>
                 )}
                 {preview.sezioni.fasi_successive && (

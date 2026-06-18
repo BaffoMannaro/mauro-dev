@@ -227,7 +227,7 @@ export default function StatisticheDashboard({
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
             <p className="text-zinc-500 text-xs font-mono mb-2">TARIFFA ORARIA</p>
             <p className="text-pink-400 text-2xl font-semibold">
-              {stats.guadagnoAllOra > 0 ? `€${Math.round(stats.guadagnoAllOra)}` : '—'}
+              {stats.guadagnoAllOra > 0 ? `€${Math.round(stats.guadagnoAllOra).toLocaleString('it-IT')}` : '—'}
             </p>
             <p className="text-zinc-500 text-xs mt-1">{stats.giorniLavorativiAnno} giorni lav. · 8h</p>
           </div>

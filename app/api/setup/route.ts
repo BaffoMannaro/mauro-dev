@@ -51,9 +51,11 @@ export async function GET() {
         data_fine DATE,
         attivo BOOLEAN DEFAULT true,
         note TEXT,
+        tag TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `;
+    await sql`ALTER TABLE abbonamenti ADD COLUMN IF NOT EXISTS tag TEXT`;
 
     return NextResponse.json({ ok: true, message: 'Database inizializzato' });
   } catch (error) {

@@ -77,10 +77,11 @@ export default function AdminDashboard({
     }
   };
 
-  { nuovoOpen && <NuovoPreventivo onClose={() => setNuovoOpen(false)} /> }
-  
+
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
+      {nuovoOpen && <NuovoPreventivo onClose={() => setNuovoOpen(false)} />}
       <header className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
         <div>
           <span className="text-zinc-400 text-sm font-mono">maurodev.it</span>
@@ -89,18 +90,18 @@ export default function AdminDashboard({
         <div className="flex items-center gap-4">
           <span className="text-zinc-500 text-sm">{session?.user?.email}</span>
           <button
+            onClick={() => setNuovoOpen(true)}
+            className="text-sm bg-white text-zinc-900 font-medium px-4 py-2 rounded-lg hover:bg-zinc-100 transition-colors"
+          >
+            + Nuovo
+          </button>
+          <button
             onClick={() => signOut({ callbackUrl: '/login' })}
             className="text-sm text-zinc-400 hover:text-white transition-colors"
           >
             Esci
           </button>
         </div>
-        <button
-          onClick={() => setNuovoOpen(true)}
-          className="text-sm bg-white text-zinc-900 font-medium px-4 py-2 rounded-lg hover:bg-zinc-100 transition-colors"
-        >
-          + Nuovo
-        </button>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">

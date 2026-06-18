@@ -41,8 +41,11 @@ export default function PreventivoDrawer({
   const metaTranches = preventivo.meta?.sezioni?.tranches || [];
 
   const tranches: { descrizione: string; percentuale: number; pagato: boolean }[] =
-    preventivo.tranches_stato ||
-    metaTranches.map((t: any) => ({ ...t, pagato: false }));
+    preventivo.tranches_stato && preventivo.tranches_stato.length > 0
+      ? preventivo.tranches_stato
+      : metaTranches.length > 0
+        ? metaTranches.map((t: any) => ({ ...t, pagato: false }))
+        : [{ descrizione: 'Pagamento unico', percentuale: 100, pagato: false }];
 
   const [tranchesLocali, setTranchesLocali] = useState(tranches);
   const [inizio, setInizio] = useState(preventivo.lavoro_inizio ? new Date(preventivo.lavoro_inizio).toISOString().slice(0, 10) : '');

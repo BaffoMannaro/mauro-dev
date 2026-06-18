@@ -3,6 +3,53 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const JSON_TEST = {
+  "cliente": {
+    "nome": "Tech Solutions Srl",
+    "piva": "12345678901",
+    "email": "info@techsolutions.it",
+    "telefono": "081 123 4567"
+  },
+  "preventivo": {
+    "oggetto": "Sviluppo Piattaforma E-commerce",
+    "data": "18 Giugno 2026",
+    "scadenza": "2026-07-18",
+    "iva": false,
+    "modalita_pagamento": "Bonifico bancario",
+    "schema_pagamento": "50/50"
+  },
+  "sezioni": {
+    "intro": "Gentile Team Tech Solutions, in seguito alla nostra call del 15 giugno, sono lieto di presentarvi il preventivo per la realizzazione della vostra piattaforma e-commerce.",
+    "descrizione": "Il progetto prevede le seguenti attività:\n\n1. Analisi dei requisiti e architettura del sistema\n2. Design UI/UX con mockup interattivi\n3. Sviluppo frontend Next.js responsive\n4. Integrazione sistema di pagamento (Stripe)\n5. Pannello di gestione prodotti e ordini\n6. Test completi e go-live assistito",
+    "voci": {
+      "modalita": "lista",
+      "items": [
+        { "descrizione": "Design UI/UX", "quantita": 1, "prezzo": 1500 },
+        { "descrizione": "Sviluppo Frontend Next.js", "quantita": 1, "prezzo": 3200 },
+        { "descrizione": "Integrazione Stripe", "quantita": 1, "prezzo": 800 },
+        { "descrizione": "Pannello Admin", "quantita": 1, "prezzo": 1200 }
+      ]
+    },
+    "tranches": [
+      { "descrizione": "Acconto alla firma (50%)", "percentuale": 50 },
+      { "descrizione": "Saldo al go-live (50%)", "percentuale": 50 }
+    ],
+    "tempi": "Consegna stimata: 6 settimane dalla firma del contratto.",
+    "garanzia": "60 giorni di supporto tecnico post-lancio inclusi senza costi aggiuntivi.",
+    "esclusioni": [
+      "Copywriting dei testi e schede prodotto",
+      "Fotografia professionale dei prodotti",
+      "Dominio e hosting (stimati €200/anno)",
+      "Gestione campagne pubblicitarie"
+    ],
+    "manutenzione": {
+      "descrizione": "Aggiornamenti mensili, backup automatici, monitoraggio uptime e supporto tecnico prioritario.",
+      "prezzo": 120
+    },
+    "fasi_successive": "Possibile integrazione con magazzino gestionale nella fase 2 e sviluppo app mobile nella fase 3.",
+    "note": "Il preventivo è comprensivo di riunioni di allineamento settimanali e revisioni illimitate nella fase di design."
+  }
+};
 const JSON_ESEMPIO = {
   "cliente": {
     "nome": "Rossi Srl",
@@ -133,12 +180,20 @@ export default function NuovoPreventivo({ onClose }: { onClose: () => void }) {
           <div className="p-6 border-r border-zinc-800">
             <div className="flex items-center justify-between mb-3">
               <p className="text-zinc-400 text-sm font-mono">JSON PREVENTIVO</p>
-              <button
-                onClick={() => setJson(JSON.stringify(JSON_ESEMPIO, null, 2))}
-                className="text-xs text-zinc-500 hover:text-white transition-colors"
-              >
-                Carica esempio
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { setJson(JSON.stringify(JSON_ESEMPIO, null, 2)); setPreview(null); setErrore(''); }}
+                  className="text-xs text-zinc-500 hover:text-white transition-colors"
+                >
+                  Esempio
+                </button>
+                <button
+                  onClick={() => { setJson(JSON.stringify(JSON_TEST, null, 2)); setPreview(null); setErrore(''); }}
+                  className="text-xs text-amber-600 hover:text-amber-400 transition-colors"
+                >
+                  Test
+                </button>
+              </div>
             </div>
             <textarea
               value={json}

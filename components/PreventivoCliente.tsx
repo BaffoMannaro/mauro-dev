@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Voce {
   descrizione: string;
@@ -22,6 +22,51 @@ interface Preventivo {
   iva: boolean;
   stato: string;
   created_at: string;
+  meta?: {
+    cliente?: { piva?: string; telefono?: string };
+    sezioni?: {
+      intro?: string;
+      descrizione?: string;
+      voci?: { modalita?: string; items?: Voce[] };
+      tranches?: { descrizione: string; percentuale: number }[];
+      tempi?: string;
+      garanzia?: string;
+      esclusioni?: string[];
+      manutenzione?: { descrizione: string; prezzo: number };
+      fasi_successive?: string;
+      note?: string;
+    };
+  };
+}
+
+function useCountdown(scadenza: string | null) {
+  const [countdown, setCountdown] = useState('');
+
+  useEffect(() => {
+    if (!scadenza) return;
+    const target = new Date(scadenza);
+    target.setHours(23, 59, 59, 999);
+
+    const tick = () => {
+      const now = new Date();
+      const diff = target.getTime() - now.getTime();
+      if (diff <= 0) {
+        setCountdown('Scaduto');
+        return;
+      }
+      const giorni = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const ore = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minuti = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secondi = Math.floor((diff % (1000 * 60)) / 1000);
+      setCountdown(`${giorni}g ${ore}h ${minuti}m ${secondi}s`);
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [scadenza]);
+
+  return countdown;
 }
 
 export default function PreventivoCliente({ preventivo }: { preventivo: Preventivo }) {
@@ -29,10 +74,13 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
   const [loading, setLoading] = useState(false);
   const [confermato, setConfermato] = useState(false);
   const [checkbox, setCheckbox] = useState(false);
+  const countdown = useCountdown(preventivo.scadenza);
+
+  const meta = preventivo.meta;
+  const sezioni = meta?.sezioni;
 
   const imponibile = Number(preventivo.totale);
-  const iva = preventivo.iva ? imponibile * 0.22 : 0;
-  const totaleFinale = imponibile + iva;
+  const totaleFinale = imponibile;
 
   const handleAccetta = async () => {
     if (!checkbox) return;
@@ -64,30 +112,68 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-12">
+
         {/* Intestazione preventivo */}
         <div className="mb-10">
-          <p className="text-zinc-500 text-sm font-mono mb-2">PREVENTIVO #{preventivo.id}</p>
-          <h1 className="text-3xl font-semibold text-white mb-1">{preventivo.oggetto}</h1>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-zinc-500 text-sm mb-1">
             Emesso il {new Date(preventivo.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
-            {preventivo.scadenza && (
-              <> · Valido fino al {new Date(preventivo.scadenza).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}</>
-            )}
           </p>
+          <h1 className="text-3xl font-semibold text-white mb-4">{preventivo.oggetto}</h1>
+
+          {/* Valido fino + Countdown */}
+          {preventivo.scadenza && (
+            <div className="flex items-center justify-between">
+              <p className="text-zinc-400 text-sm">
+                Valido fino al{' '}
+                <span className="text-white">
+                  {new Date(preventivo.scadenza).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
+                </span>
+              </p>
+              {/* Countdown — solo web, non nel PDF */}
+              <p className="text-sm font-mono text-zinc-400 print:hidden">
+                <span className={countdown === 'Scaduto' ? 'text-red-400' : 'text-amber-400'}>
+                  {countdown}
+                </span>
+              </p>
+            </div>
+          )}
         </div>
+
+        {/* Intro */}
+        {sezioni?.intro && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-300 text-sm whitespace-pre-wrap">{sezioni.intro}</p>
+          </div>
+        )}
 
         {/* Destinatario */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
           <p className="text-zinc-500 text-xs font-mono mb-3">DESTINATARIO</p>
           <p className="text-white font-medium">{preventivo.cliente_nome}</p>
-          {preventivo.cliente_azienda && <p className="text-zinc-400">{preventivo.cliente_azienda}</p>}
+          {preventivo.cliente_azienda && preventivo.cliente_azienda !== preventivo.cliente_nome && (
+            <p className="text-zinc-400">{preventivo.cliente_azienda}</p>
+          )}
+          {meta?.cliente?.piva && (
+            <p className="text-zinc-400 text-sm">P.IVA {meta.cliente.piva}</p>
+          )}
           <p className="text-zinc-400 text-sm">{preventivo.cliente_email}</p>
+          {meta?.cliente?.telefono && (
+            <p className="text-zinc-400 text-sm">{meta.cliente.telefono}</p>
+          )}
         </div>
 
-        {/* Voci */}
+        {/* Descrizione — attività senza costi */}
+        {sezioni?.descrizione && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-500 text-xs font-mono mb-3">DESCRIZIONE</p>
+            <p className="text-zinc-300 text-sm whitespace-pre-wrap">{sezioni.descrizione}</p>
+          </div>
+        )}
+
+        {/* Riepilogo (ex Voci) */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden mb-6">
           <div className="grid grid-cols-12 px-6 py-3 border-b border-zinc-800">
-            <span className="col-span-6 text-zinc-500 text-xs font-mono">DESCRIZIONE</span>
+            <span className="col-span-6 text-zinc-500 text-xs font-mono">RIEPILOGO</span>
             <span className="col-span-2 text-zinc-500 text-xs font-mono text-center">QTÀ</span>
             <span className="col-span-2 text-zinc-500 text-xs font-mono text-right">PREZZO</span>
             <span className="col-span-2 text-zinc-500 text-xs font-mono text-right">TOTALE</span>
@@ -102,29 +188,77 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
           ))}
         </div>
 
-        {/* Totali */}
+        {/* Totale */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
-          <div className="flex justify-between text-zinc-400 text-sm mb-2">
-            <span>Imponibile</span>
-            <span>€{imponibile.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
-          </div>
-          {preventivo.iva && (
-            <div className="flex justify-between text-zinc-400 text-sm mb-3">
-              <span>IVA 22%</span>
-              <span>€{iva.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
-            </div>
-          )}
-          <div className="flex justify-between text-white font-semibold text-lg border-t border-zinc-800 pt-3">
+          <div className="flex justify-between text-white font-semibold text-lg">
             <span>Totale</span>
             <span>€{totaleFinale.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
           </div>
         </div>
 
+        {/* Tranches */}
+        {sezioni?.tranches && sezioni.tranches.length > 0 && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-500 text-xs font-mono mb-3">MODALITÀ DI PAGAMENTO</p>
+            {sezioni.tranches.map((t, i) => (
+              <div key={i} className="flex justify-between text-sm py-1.5 border-b border-zinc-800/50 last:border-0">
+                <span className="text-zinc-300">{t.descrizione}</span>
+                <span className="text-white font-medium">
+                  €{Math.round(totaleFinale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Tempi */}
+        {sezioni?.tempi && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-500 text-xs font-mono mb-2">TEMPI DI CONSEGNA</p>
+            <p className="text-zinc-300 text-sm">{sezioni.tempi}</p>
+          </div>
+        )}
+
+        {/* Garanzia */}
+        {sezioni?.garanzia && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-500 text-xs font-mono mb-2">GARANZIA</p>
+            <p className="text-zinc-300 text-sm">{sezioni.garanzia}</p>
+          </div>
+        )}
+
+        {/* Non incluso */}
+        {sezioni?.esclusioni && sezioni.esclusioni.length > 0 && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-500 text-xs font-mono mb-3">NON INCLUSO</p>
+            {sezioni.esclusioni.map((e, i) => (
+              <p key={i} className="text-zinc-300 text-sm py-0.5">· {e}</p>
+            ))}
+          </div>
+        )}
+
+        {/* Manutenzione */}
+        {sezioni?.manutenzione && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-500 text-xs font-mono mb-2">MANUTENZIONE</p>
+            <p className="text-zinc-300 text-sm">{sezioni.manutenzione.descrizione}</p>
+            <p className="text-white font-semibold mt-2">€{sezioni.manutenzione.prezzo}/mese</p>
+          </div>
+        )}
+
+        {/* Sviluppi futuri */}
+        {sezioni?.fasi_successive && (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6">
+            <p className="text-zinc-500 text-xs font-mono mb-2">SVILUPPI FUTURI</p>
+            <p className="text-zinc-300 text-sm">{sezioni.fasi_successive}</p>
+          </div>
+        )}
+
         {/* Note */}
-        {preventivo.note && (
+        {sezioni?.note && (
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-8">
             <p className="text-zinc-500 text-xs font-mono mb-2">NOTE</p>
-            <p className="text-zinc-300 text-sm whitespace-pre-wrap">{preventivo.note}</p>
+            <p className="text-zinc-300 text-sm whitespace-pre-wrap">{sezioni.note}</p>
           </div>
         )}
 
@@ -140,7 +274,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
                 className="mt-1 accent-white"
               />
               <span className="text-zinc-300 text-sm">
-                Dichiaro di aver letto e compreso il preventivo e accetto le condizioni indicate. 
+                Dichiaro di aver letto e compreso il preventivo e accetto le condizioni indicate.
                 L'accettazione verrà registrata con data, ora e indirizzo IP.
               </span>
             </label>
@@ -153,13 +287,28 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
             </button>
           </div>
         ) : (
-          <div className="border border-green-800 bg-green-950/30 rounded-xl p-6 text-center">
+          <div className="border border-green-800 bg-green-950/30 rounded-xl p-6 text-center print:hidden">
             <p className="text-green-400 font-medium">
               {confermato ? '✓ Preventivo accettato con successo' : '✓ Preventivo già accettato'}
             </p>
             <p className="text-zinc-500 text-sm mt-1">L'accettazione è stata registrata</p>
           </div>
         )}
+
+        {/* Firma PDF — solo nel PDF */}
+        <div className="hidden print:block mt-12 pt-8 border-t border-zinc-300">
+          <div className="flex justify-between text-sm text-zinc-600">
+            <div>
+              <p className="font-medium text-zinc-800">Mauro Altamura</p>
+              <p>maurodev.it</p>
+            </div>
+            <div className="text-right">
+              <p>Firma per accettazione</p>
+              <div className="mt-6 border-b border-zinc-400 w-48"></div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   );

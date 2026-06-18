@@ -45,6 +45,13 @@ export default function AdminDashboard({
   const [filtro, setFiltro] = useState('tutti');
   const [copiato, setCopiato] = useState<string | null>(null);
   const [nuovoOpen, setNuovoOpen] = useState(false);
+  const ricaricaPreventivi = async () => {
+    const res = await fetch('/api/preventivi');
+    if (res.ok) {
+      const data = await res.json();
+      setPreventivi(data);
+    }
+  };
 
   const filtrati = filtro === 'tutti'
     ? preventivi
@@ -81,7 +88,7 @@ export default function AdminDashboard({
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {nuovoOpen && <NuovoPreventivo onClose={() => setNuovoOpen(false)} />}
+      {nuovoOpen && <NuovoPreventivo onClose={() => setNuovoOpen(false)} onSuccess={ricaricaPreventivi} />}
       <header className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
         <div>
           <span className="text-zinc-400 text-sm font-mono">maurodev.it</span>

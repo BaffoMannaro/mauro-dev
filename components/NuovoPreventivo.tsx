@@ -87,7 +87,7 @@ const JSON_ESEMPIO = {
   }
 };
 
-export default function NuovoPreventivo({ onClose }: { onClose: () => void }) {
+export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () => void; onSuccess?: () => Promise<void> }) {
   const router = useRouter();
   const [json, setJson] = useState('');
   const [errore, setErrore] = useState('');
@@ -152,8 +152,8 @@ export default function NuovoPreventivo({ onClose }: { onClose: () => void }) {
       });
 
       if (!res.ok) throw new Error('Errore nel caricamento');
-      const data = await res.json();
-      router.refresh();
+      await res.json();
+      if (onSuccess) await onSuccess();
       onClose();
     } catch (e: any) {
       setErrore(e.message);

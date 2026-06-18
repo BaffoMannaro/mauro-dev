@@ -45,8 +45,8 @@ export default function PreventivoDrawer({
     metaTranches.map((t: any) => ({ ...t, pagato: false }));
 
   const [tranchesLocali, setTranchesLocali] = useState(tranches);
-  const [inizio, setInizio] = useState(preventivo.lavoro_inizio?.slice(0, 10) || '');
-  const [fine, setFine] = useState(preventivo.lavoro_fine?.slice(0, 10) || '');
+  const [inizio, setInizio] = useState(preventivo.lavoro_inizio ? new Date(preventivo.lavoro_inizio).toISOString().slice(0, 10) : '');
+  const [fine, setFine] = useState(preventivo.lavoro_fine ? new Date(preventivo.lavoro_fine).toISOString().slice(0, 10) : '');
   const [salvato, setSalvato] = useState(false);
 
   const toggleTranche = (i: number) => {

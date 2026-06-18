@@ -159,12 +159,7 @@ export default function StatisticheDashboard({ preventivi }: { preventivi: Preve
         </div>
 
         {/* KPI riga 2 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-            <p className="text-zinc-500 text-xs font-mono mb-2">GIORNI LAVORATI</p>
-            <p className="text-blue-400 text-2xl font-semibold">{stats.giorniLavoratiTotali}g</p>
-            <p className="text-zinc-500 text-xs mt-1">giorni tracciati</p>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
             <p className="text-zinc-500 text-xs font-mono mb-2">MEDIA MENSILE</p>
             <p className="text-white text-2xl font-semibold">{`€${fmt(Math.round(stats.mediaIncassatoMensile))}`}</p>

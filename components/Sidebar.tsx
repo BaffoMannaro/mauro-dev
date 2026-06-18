@@ -15,6 +15,11 @@ const NAV = [
     label: 'Statistiche',
     icon: 'chart',
   },
+  {
+    href: '/preventivi/abbonamenti',
+    label: 'Abbonamenti',
+    icon: 'sub',
+  },
 ];
 
 export default function Sidebar({ session }: { session: any }) {
@@ -39,7 +44,6 @@ export default function Sidebar({ session }: { session: any }) {
                   : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
               }`}
             >
-              <span className="text-base">{item.icon === 'docs' ? '📄' : '📊'}</span>
               {item.label}
             </Link>
           );

@@ -127,9 +127,20 @@ export default function StatisticheDashboard({
       m.contrattualizzato += Number(p.totale);
       m.count++;
       if (p.tranches_stato && p.tranches_stato.length > 0) {
-        m.incassato += p.tranches_stato
-          .filter((t) => t.pagato)
-          .reduce((s, t) => s + Number(p.totale) * t.percentuale / 100, 0);
+        p.tranches_stato
+          .filter((t: any) => t.pagato)
+          .forEach((t: any) => {
+            // Usa data_pagamento se presente, altrimenti accettato_at
+            const dataPag = t.data_pagamento
+              ? new Date(t.data_pagamento)
+              : new Date(p.accettato_at || p.created_at);
+            const mPag = mesi.find(
+              (m) => m.anno === dataPag.getFullYear() && m.mese === dataPag.getMonth()
+            );
+            if (mPag) {
+              mPag.incassato += Number(p.totale) * t.percentuale / 100;
+            }
+          });
       }
     });
 

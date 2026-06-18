@@ -40,7 +40,7 @@ export default function PreventivoDrawer({
   const totale = Number(preventivo.totale);
   const metaTranches = preventivo.meta?.sezioni?.tranches || [];
 
-  const tranches: { descrizione: string; percentuale: number; pagato: boolean }[] =
+  const tranches: { descrizione: string; percentuale: number; pagato: boolean; data_pagamento?: string }[] =
     preventivo.tranches_stato && preventivo.tranches_stato.length > 0
       ? preventivo.tranches_stato
       : metaTranches.length > 0
@@ -54,7 +54,24 @@ export default function PreventivoDrawer({
 
   const toggleTranche = (i: number) => {
     setTranchesLocali((prev) =>
-      prev.map((t, idx) => (idx === i ? { ...t, pagato: !t.pagato } : t))
+      prev.map((t, idx) => {
+        if (idx !== i) return t;
+        const nuovoPagato = !t.pagato;
+        return {
+          ...t,
+          pagato: nuovoPagato,
+          data_pagamento: nuovoPagato
+            ? (t.data_pagamento || new Date().toISOString().slice(0, 10))
+            : '',
+        };
+      })
+    );
+    setSalvato(false);
+  };
+
+  const aggiornaTranche = (i: number, data: string) => {
+    setTranchesLocali((prev) =>
+      prev.map((t, idx) => (idx === i ? { ...t, data_pagamento: data } : t))
     );
     setSalvato(false);
   };
@@ -147,30 +164,42 @@ export default function PreventivoDrawer({
                 {tranchesLocali.map((t, i) => (
                   <div
                     key={i}
-                    className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
-                      t.pagato
+                    className={`flex flex-col p-4 rounded-xl border transition-colors ${t.pagato
                         ? 'bg-green-950/30 border-green-800'
                         : 'bg-zinc-800 border-zinc-700'
-                    }`}
+                      }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={t.pagato}
-                        onChange={() => toggleTranche(i)}
-                        className="accent-green-400 w-4 h-4 cursor-pointer"
-                      />
-                      <div>
-                        <p className={`text-sm font-medium ${t.pagato ? 'text-green-400' : 'text-white'}`}>
-                          {t.descrizione}
-                        </p>
-                        <p className="text-zinc-400 text-xs">
-                          €{Math.round(totale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                        </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={t.pagato}
+                          onChange={() => toggleTranche(i)}
+                          className="accent-green-400 w-4 h-4 cursor-pointer"
+                        />
+                        <div>
+                          <p className={`text-sm font-medium ${t.pagato ? 'text-green-400' : 'text-white'}`}>
+                            {t.descrizione}
+                          </p>
+                          <p className="text-zinc-400 text-xs">
+                            {`€${Math.round(totale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}`}
+                          </p>
+                        </div>
                       </div>
+                      {t.pagato && (
+                        <span className="text-green-400 text-xs font-mono">✓ Pagato</span>
+                      )}
                     </div>
                     {t.pagato && (
-                      <span className="text-green-400 text-xs font-mono">✓ Pagato</span>
+                      <div className="mt-3 flex items-center gap-2">
+                        <label className="text-zinc-500 text-xs font-mono shrink-0">DATA PAGAMENTO</label>
+                        <input
+                          type="date"
+                          value={t.data_pagamento || ''}
+                          onChange={(e) => aggiornaTranche(i, e.target.value)}
+                          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-zinc-500"
+                        />
+                      </div>
                     )}
                   </div>
                 ))}

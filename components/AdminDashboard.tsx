@@ -163,8 +163,8 @@ export default function AdminDashboard({
                         </span>
                       )}
                     </div>
-                    <h3 className="text-white font-medium truncate">{p.oggetto}</h3>
-                    <p className="text-zinc-400 text-sm">{p.cliente_nome}</p>
+                    <h3 className=" text-white font-medium truncate">{p.cliente_nome}</h3>
+                    <p className="text-zinc-400 text-sm">{p.oggetto}</p>
                     <p className="text-zinc-500 text-xs mt-1">
                       {new Date(p.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
                       {p.accettato_at && ` · Accettato il ${new Date(p.accettato_at).toLocaleDateString('it-IT')}`}

@@ -241,7 +241,16 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
     const res = await fetch(`/api/abbonamenti/${ab.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ attivo: !ab.attivo }),
+      body: JSON.stringify({
+        nome: ab.nome,
+        cifra: ab.cifra,
+        cadenza: ab.cadenza,
+        data_inizio: new Date(ab.data_inizio).toISOString().slice(0, 10),
+        data_fine: ab.data_fine ? new Date(ab.data_fine).toISOString().slice(0, 10) : null,
+        attivo: !ab.attivo,
+        note: ab.note,
+        tag: ab.tag,
+      }),
     });
     if (res.ok) {
       const data = await res.json();

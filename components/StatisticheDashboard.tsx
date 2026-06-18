@@ -336,30 +336,32 @@ export default function StatisticheDashboard({
               const percPagato = Math.round((pagato / Number(p.totale)) * 100);
 
               return (
-                <div key={p.id} className="px-6 py-4 border-b border-zinc-800/50 last:border-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium truncate">{p.oggetto}</p>
-                      <p className="text-zinc-400 text-xs">{p.cliente_nome}</p>
-                      <div className="flex gap-4 mt-1 flex-wrap">
-                        {durata !== null && <p className="text-blue-400 text-xs">{durata} giorni</p>}
-                        {tariffa !== null && <p className="text-purple-400 text-xs">{`€${Math.round(tariffa).toLocaleString('it-IT')}/giorno`}</p>}
-                        {nonPagato > 0 && <p className="text-amber-400 text-xs">{`€${Math.round(nonPagato).toLocaleString('it-IT')} da incassare`}</p>}
+                <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                  <div key={p.id} className="px-6 py-4 border-b border-zinc-800/50 last:border-0">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-medium truncate">{p.oggetto}</p>
+                        <p className="text-zinc-400 text-xs">{p.cliente_nome}</p>
+                        <div className="flex gap-4 mt-1 flex-wrap">
+                          {durata !== null && <p className="text-blue-400 text-xs">{durata} giorni</p>}
+                          {tariffa !== null && <p className="text-purple-400 text-xs">{`€${Math.round(tariffa).toLocaleString('it-IT')}/giorno`}</p>}
+                          {nonPagato > 0 && <p className="text-amber-400 text-xs">{`€${Math.round(nonPagato).toLocaleString('it-IT')} da incassare`}</p>}
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-white text-sm font-semibold">{`€${Number(p.totale).toLocaleString('it-IT')}`}</p>
+                        {pagato > 0 && <p className="text-green-400 text-xs">{`€${Math.round(pagato).toLocaleString('it-IT')} incassati`}</p>}
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-white text-sm font-semibold">{`€${Number(p.totale).toLocaleString('it-IT')}`}</p>
-                      {pagato > 0 && <p className="text-green-400 text-xs">{`€${Math.round(pagato).toLocaleString('it-IT')} incassati`}</p>}
-                    </div>
+                    {p.tranches_stato && p.tranches_stato.length > 0 && (
+                      <div className="mt-2 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-green-400 rounded-full transition-all"
+                          style={{ width: `${percPagato}%` }}
+                        />
+                      </div>
+                    )}
                   </div>
-                  {p.tranches_stato && p.tranches_stato.length > 0 && (
-                    <div className="mt-2 h-1 bg-zinc-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-400 rounded-full transition-all"
-                        style={{ width: `${percPagato}%` }}
-                      />
-                    </div>
-                  )}
                 </div>
               );
             })

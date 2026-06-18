@@ -222,20 +222,67 @@ export default function StatisticheDashboard({ preventivi }: { preventivi: Preve
           </div>
         </div>
 
-        {/* Grafico giorni lavorati */}
+        {/* Grafico tariffe mensili */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-          <p className="text-zinc-500 text-xs font-mono mb-6">GIORNI LAVORATI — ULTIMI 12 MESI</p>
+          <p className="text-zinc-500 text-xs font-mono mb-2">INCASSATO MENSILE — ULTIMI 12 MESI</p>
+          <div className="flex gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-sm bg-green-400"></div>
+              <span className="text-zinc-400 text-xs">Incassato</span>
+            </div>
+          </div>
           <div className="flex items-end gap-2">
-            {stats.mesi.map((m, i) => (
-              <Bar
-                key={i}
-                value={m.giorni}
-                max={stats.maxGiorni}
-                color="bg-blue-400"
-                label={m.giorni > 0 ? `${m.giorni}g` : ''}
-                sub={m.label}
-              />
-            ))}
+            {stats.mesi.map((m, i) => {
+              const giorniLavorativiMese = m.giorni > 0 ? m.giorni : null;
+              const oreGiorno = 8;
+              const eurAlGiorno = giorniLavorativiMese && giorniLavorativiMese > 0 ? m.incassato / giorniLavorativiMese : null;
+              const eurAllOra = eurAlGiorno ? eurAlGiorno / oreGiorno : null;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
+                  {/* Tooltip */}
+                  {m.incassato > 0 && (
+                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 rounded-lg p-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
+                      <p className="text-green-400 font-medium">{`€${Math.round(m.incassato).toLocaleString('it-IT')}`}</p>
+                      {eurAlGiorno && <p className="text-purple-400">{`€${Math.round(eurAlGiorno)}/giorno`}</p>}
+                      {eurAllOra && <p className="text-pink-400">{`€${Math.round(eurAllOra)}/ora`}</p>}
+                    </div>
+                  )}
+                  <p className="text-zinc-500 text-xs h-4">
+                    {m.incassato > 0 ? `€${Math.round(m.incassato / 1000)}k` : ''}
+                  </p>
+                  <div className="w-full flex flex-col justify-end" style={{ height: '140px' }}>
+                    <div
+                      className={`w-full rounded-t-md transition-all ${m.incassato > 0 ? 'bg-green-400' : 'bg-zinc-800'}`}
+                      style={{ height: `${Math.max(m.incassato > 0 ? (m.incassato / stats.maxContrattualizzato) * 140 : 2, m.incassato > 0 ? 4 : 2)}px` }}
+                    />
+                  </div>
+                  <p className="text-zinc-600 text-xs">{m.label}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Riepilogo tariffe sotto il grafico */}
+          <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-zinc-800">
+            <div className="text-center">
+              <p className="text-zinc-500 text-xs font-mono mb-1">MEDIA/MESE</p>
+              <p className="text-white font-semibold">{`€${fmt(Math.round(stats.mediaIncassatoMensile))}`}</p>
+              <p className="text-zinc-600 text-xs mt-0.5">mesi con progetti</p>
+            </div>
+            <div className="text-center">
+              <p className="text-zinc-500 text-xs font-mono mb-1">MEDIA/GIORNO</p>
+              <p className="text-purple-400 font-semibold">
+                {stats.guadagnoAlGiorno > 0 ? `€${fmt(Math.round(stats.guadagnoAlGiorno))}` : '—'}
+              </p>
+              <p className="text-zinc-600 text-xs mt-0.5">lun–ven, giorni tracciati</p>
+            </div>
+            <div className="text-center">
+              <p className="text-zinc-500 text-xs font-mono mb-1">MEDIA/ORA</p>
+              <p className="text-pink-400 font-semibold">
+                {stats.guadagnoAllOra > 0 ? `€${Math.round(stats.guadagnoAllOra)}` : '—'}
+              </p>
+              <p className="text-zinc-600 text-xs mt-0.5">su base 8h/giorno</p>
+            </div>
           </div>
         </div>
 

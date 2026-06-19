@@ -317,7 +317,7 @@ export default function StatisticheDashboard({
         </div>
 
         {/* Lista progetti */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="px-6 py-4 border-b border-zinc-800">
             <p className="text-zinc-500 text-xs font-mono">DETTAGLIO PROGETTI ACCETTATI</p>
           </div>

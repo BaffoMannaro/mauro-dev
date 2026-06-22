@@ -3,15 +3,56 @@ import * as Yup from 'yup';
 import poly from '../../assets/images/poly.png';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import useROIStore from '../../Stores/roiStore';
+
+function formatEur(v) {
+    return new Intl.NumberFormat('it-IT', {
+        style: 'currency',
+        currency: 'EUR',
+        maximumFractionDigits: 0,
+    }).format(v);
+}
+
+function buildROIMessage(roiData, t) {
+    if (!roiData) return '';
+    const modelLabel =
+        roiData.model === 'license' ? t('roi_model_license') : 'SaaS';
+    const paybackMonths = roiData.paybackMonths;
+    const paybackStr =
+        paybackMonths === null
+            ? '—'
+            : paybackMonths < 12
+            ? `${Math.round(paybackMonths)} ${t('roi_months')}`
+            : `${(paybackMonths / 12).toFixed(1)} ${t('roi_years')}`;
+
+    return [
+        `--- ${t('roi_form_summary_title')} ---`,
+        `${t('roi_operators_label')}: ${roiData.operators}`,
+        `${t('roi_cost_label')}: ${formatEur(roiData.costPerOperator)}`,
+        `${t('roi_cells_label')}: ${roiData.cells}`,
+        `${t('roi_software_plan')}: ${modelLabel}`,
+        ``,
+        `${t('roi_result_operators_reduced')}: ${roiData.operatorsReduced.toFixed(1)}`,
+        `${t('roi_result_gross_savings')}: ${formatEur(roiData.grossSavings)}`,
+        `${t('roi_result_payback')}: ${paybackStr}`,
+        ``,
+        `--- ${t('roi_form_message_prompt')} ---`,
+        ``,
+    ].join('\n');
+}
 
 export default function LandingForm() {
     const navigate = useNavigate();
-
     const { t } = useTranslation();
+    const roiData = useROIStore((s) => s.roiData);
+    const clearROIData = useROIStore((s) => s.clearROIData);
 
     const handleSubmit = async (values) => {
-        //submit form
-        console.log(values);
+        const finalMessage = roiData
+            ? buildROIMessage(roiData, t) + values.message
+            : values.message;
+
+        console.log('Form payload:', JSON.stringify({ ...values, message: finalMessage }, null, 2));
 
         const response = await fetch(
             import.meta.env.VITE_BACKEND_URL + 'marketing/contact-form/',
@@ -22,6 +63,7 @@ export default function LandingForm() {
                 },
                 body: JSON.stringify({
                     ...values,
+                    message: finalMessage,
                     recaptcha_token: import.meta.env.VITE_RECAPTCHA_PUBLIC_KEY,
                 }),
             }
@@ -65,7 +107,6 @@ export default function LandingForm() {
                         sanding: false,
                         polishing: false,
                         painting: false,
-
                         other: false,
                         message: '',
                         productTypes: '',
@@ -238,6 +279,75 @@ export default function LandingForm() {
                                     className="text-red-400 text-sm mt-2"
                                 />
                             </div>
+
+                            {roiData && (
+                                <div className="mb-8 w-full border border-supero-green" style={{margin: '8px', padding: '1rem'}}>
+                                    <p className="text-supero-green text-body-s uppercase tracking-wider font-bold mb-3">
+                                        {t('roi_form_summary_title')}
+                                    </p>
+                                    <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 text-body-s">
+                                        <div>
+                                            <p className="text-supero-mid-grey">{t('roi_operators_label')}</p>
+                                            <p className="text-white font-bold">{roiData.operators}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-supero-mid-grey">{t('roi_cells_label')}</p>
+                                            <p className="text-white font-bold">{roiData.cells}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-supero-mid-grey">{t('roi_software_plan')}</p>
+                                            <p className="text-white font-bold">
+                                                {roiData.model === 'license' ? t('roi_model_license') : 'SaaS'}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-supero-mid-grey">{t('roi_result_operators_reduced')}</p>
+                                            <p className="text-supero-green font-bold">{roiData.operatorsReduced.toFixed(1)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-supero-mid-grey">{t('roi_result_gross_savings')}</p>
+                                            <p className="text-supero-green font-bold">{formatEur(roiData.grossSavings)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-supero-mid-grey">{t('roi_result_payback')}</p>
+                                            <p className="text-white font-bold">
+                                                {roiData.paybackMonths === null
+                                                    ? '—'
+                                                    : roiData.paybackMonths < 12
+                                                    ? `${Math.round(roiData.paybackMonths)} ${t('roi_months')}`
+                                                    : `${(roiData.paybackMonths / 12).toFixed(1)} ${t('roi_years')}`}
+                                            </p>
+                                        </div>
+                                        <div className="col-span-2 xl:col-span-3"></div>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-8 flex-wrap gap-3">
+                                        <p className="text-supero-mid-grey text-body-s opacity-70">
+                                            {t('roi_not_sure')}
+                                        </p>
+                                        <div className="flex gap-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    document.getElementById('roi-calculator')?.scrollIntoView({ behavior: 'smooth' });
+                                                }}
+                                                className="text-supero-green text-body-s font-bold uppercase tracking-wider hover:opacity-70 transition-opacity"
+                                            >
+                                                {t('roi_recalculate')} →
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    clearROIData();
+                                                    setFieldValue('message', '');
+                                                }}
+                                                className="text-supero-mid-grey text-body-s font-bold uppercase tracking-wider hover:opacity-70 transition-opacity"
+                                            >
+                                                {t('roi_clear')} →
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="mb-8 w-full px-2">
                                 <label

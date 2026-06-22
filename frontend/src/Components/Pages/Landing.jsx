@@ -784,6 +784,7 @@ export default function Landing() {
                 {/* <Timer /> */}
                 <VideoSection />
 
+                
                 <HowItWorks />
                 <LandingForm />
                 <PartnersSection />

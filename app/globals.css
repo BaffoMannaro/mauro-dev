@@ -52,6 +52,10 @@ html[data-theme="light"] .border-green-800\/60  { border-color: #BBF7D0; }
 html[data-theme="light"] .border-red-950\/50    { border-color: #FECACA; }
 html[data-theme="light"] .border-green-800      { border-color: #BBF7D0; }
 
+/* Neutral button hover in light mode: bg-slate (#4C5760) + text-text (#1A2530) = basso contrasto.
+   Override: usa edge (#CBD2D0) come hover bg → testo scuro su grigio chiaro, contrasto ~5:1 */
+html[data-theme="light"] .hover\:bg-slate:hover { background-color: var(--color-edge); }
+
 /* Logo: bianco su dark, nero su light */
 .logo-adaptive { filter: brightness(0) invert(1); }
 html[data-theme="light"] .logo-adaptive { filter: brightness(0); }

@@ -107,7 +107,7 @@ export default function PreventivoDrawer({
             <p className="text-text font-medium">{preventivo.oggetto}</p>
             <p className="text-dim text-xs">{preventivo.cliente_nome}</p>
           </div>
-          <button onClick={onClose} className="text-muted hover:text-text text-xl transition-colors">✕</button>
+          <button onClick={onClose} className="text-muted hover:text-text text-xl transition-colors cursor-pointer">✕</button>
         </div>
 
         <div className="flex-1 px-6 py-6 flex flex-col gap-6">
@@ -223,7 +223,7 @@ export default function PreventivoDrawer({
           {/* Salva */}
           <button
             onClick={salva}
-            className="w-full bg-accent text-white font-semibold py-3 rounded-xl hover:bg-accent/90 transition-colors"
+            className="w-full bg-accent text-white font-semibold py-3 rounded-xl hover:bg-accent/90 transition-colors cursor-pointer"
           >
             {salvato ? '✓ Salvato!' : 'Salva modifiche'}
           </button>

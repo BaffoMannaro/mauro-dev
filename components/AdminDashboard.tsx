@@ -240,7 +240,7 @@ export default function AdminDashboard({
                 <div className="flex gap-2 mt-4 flex-wrap" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={(e) => copiaLink(p.token, e)}
-                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors cursor-pointer"
                   >
                     {copiato === p.token ? '✓ Copiato!' : 'Copia link'}
                   </button>
@@ -249,7 +249,7 @@ export default function AdminDashboard({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors cursor-pointer"
                   >
                     Visualizza
                   </a>
@@ -257,13 +257,13 @@ export default function AdminDashboard({
                     <>
                       <button
                         onClick={(e) => aggiornaStato(p.id, 'rifiutato', e)}
-                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors"
+                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors cursor-pointer"
                       >
                         Rifiutato
                       </button>
                       <button
                         onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
-                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
+                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors cursor-pointer"
                       >
                         Archivia
                       </button>
@@ -272,7 +272,7 @@ export default function AdminDashboard({
                   {p.stato === 'accettato' && (
                     <button
                       onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
-                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
+                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors cursor-pointer"
                     >
                       Archivia
                     </button>
@@ -280,14 +280,14 @@ export default function AdminDashboard({
                   {p.stato === 'archiviato' && (
                     <button
                       onClick={(e) => aggiornaStato(p.id, 'accettato', e)}
-                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-green-950/50 text-green-400 rounded-lg transition-colors"
+                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-green-950/50 text-green-400 rounded-lg transition-colors cursor-pointer"
                     >
                       Riattiva
                     </button>
                   )}
                   <button
                     onClick={(e) => eliminaPreventivo(p.id, e)}
-                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors ml-auto"
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors cursor-pointer ml-auto"
                   >
                     Elimina
                   </button>

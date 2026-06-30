@@ -2,12 +2,15 @@ import { signIn } from '@/lib/auth';
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-10 flex flex-col items-center gap-6 w-full max-w-sm">
+    <div className="min-h-screen bg-bg flex items-center justify-center">
+      <div className="bg-surface border border-edge rounded-2xl p-10 flex flex-col items-center gap-6 w-full max-w-sm">
         <div className="text-center">
-          <p className="text-zinc-500 text-sm mt-1">maurodev.it</p>
+          <div className="flex items-center justify-center gap-0.5 mb-2">
+            <span className="text-accent font-bold tracking-tight text-xl">mauro</span>
+            <span className="text-muted font-medium text-xl">dev.it</span>
+          </div>
           <h1 className="text-white text-2xl font-semibold mt-4">Accedi</h1>
-          <p className="text-zinc-400 text-sm mt-2">Area riservata gestione preventivi</p>
+          <p className="text-muted text-sm mt-2">Area riservata gestione preventivi</p>
         </div>
         <form
           action={async () => {
@@ -18,7 +21,7 @@ export default function LoginPage() {
         >
           <button
             type="submit"
-            className="w-full bg-white text-zinc-900 font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-3 hover:bg-zinc-100 transition-colors"
+            className="w-full bg-surface2 hover:bg-slate text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-3 border border-edge hover:border-slate transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>

@@ -37,17 +37,14 @@ interface Preventivo {
 }
 
 const STATI = {
-  inviato: { label: 'Inviato', color: 'text-blue-400 bg-blue-950/40 border-blue-800' },
-  accettato: { label: 'Accettato', color: 'text-green-400 bg-green-950/40 border-green-800' },
-  rifiutato: { label: 'Rifiutato', color: 'text-red-400 bg-red-950/40 border-red-800' },
-  archiviato: { label: 'Archiviato', color: 'text-zinc-400 bg-zinc-900 border-zinc-700' },
+  inviato:   { label: 'Inviato',    color: 'text-blue-400 bg-blue-950/40 border-blue-800/60' },
+  accettato: { label: 'Accettato',  color: 'text-green-400 bg-green-950/40 border-green-800/60' },
+  rifiutato: { label: 'Rifiutato',  color: 'text-red-400 bg-red-950/40 border-red-800/60' },
+  archiviato:{ label: 'Archiviato', color: 'text-dim bg-surface2 border-edge' },
 };
 
 const ORDINE_STATI: Record<string, number> = {
-  inviato: 0,
-  accettato: 1,
-  rifiutato: 2,
-  archiviato: 3,
+  inviato: 0, accettato: 1, rifiutato: 2, archiviato: 3,
 };
 
 export default function AdminDashboard({
@@ -101,10 +98,7 @@ export default function AdminDashboard({
 
   const ricaricaPreventivi = async () => {
     const res = await fetch('/api/preventivi');
-    if (res.ok) {
-      const data = await res.json();
-      setPreventivi(data);
-    }
+    if (res.ok) setPreventivi(await res.json());
   };
 
   const aggiornaPreventivo = (updated: Preventivo) => {
@@ -112,30 +106,50 @@ export default function AdminDashboard({
     setDrawerPreventivo(updated);
   };
 
+  /* KPI header */
+  const kpi = [
+    { label: 'Inviati',    count: preventivi.filter(p => p.stato === 'inviato').length,    color: 'text-blue-400' },
+    { label: 'Accettati',  count: preventivi.filter(p => p.stato === 'accettato').length,   color: 'text-green-400' },
+    { label: 'Rifiutati',  count: preventivi.filter(p => p.stato === 'rifiutato').length,   color: 'text-red-400' },
+    { label: 'Archiviati', count: preventivi.filter(p => p.stato === 'archiviato').length,  color: 'text-dim' },
+  ];
+
+  const FILTRI = ['tutti', 'inviato', 'accettato', 'rifiutato', 'archiviato'];
+
   return (
     <div className="min-h-screen text-white">
-      {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-white font-semibold text-lg">Preventivi</h1>
-        <button
-          onClick={() => setNuovoOpen(true)}
-          className="text-sm bg-white text-zinc-900 font-medium px-4 py-2 rounded-lg hover:bg-zinc-100 transition-colors"
-        >
-          + Nuovo
-        </button>
+
+      {/* Header stile Crextio: titolo sx, KPI + CTA dx */}
+      <header className="border-b border-edge px-6 py-5 flex items-center justify-between gap-4">
+        <h1 className="text-xl font-semibold">Preventivi</h1>
+        <div className="flex items-center gap-6">
+          {kpi.map((k) => (
+            <div key={k.label} className="text-center hidden sm:block">
+              <p className={`text-2xl font-bold ${k.color}`}>{k.count}</p>
+              <p className="text-dim text-xs">{k.label}</p>
+            </div>
+          ))}
+          <button
+            onClick={() => setNuovoOpen(true)}
+            className="ml-2 text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+          >
+            + Nuovo
+          </button>
+        </div>
       </header>
 
-      <div className="px-6 py-8 max-w-5xl mx-auto">
+      <div className="px-6 py-6 max-w-6xl mx-auto">
+
         {/* Filtri */}
-        <div className="flex gap-2 mb-8 flex-wrap">
-          {['tutti', 'inviato', 'accettato', 'rifiutato', 'archiviato'].map((f) => (
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {FILTRI.map((f) => (
             <button
               key={f}
               onClick={() => setFiltro(f)}
-              className={`px-4 py-1.5 rounded-full text-sm capitalize transition-colors ${
+              className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
                 filtro === f
-                  ? 'bg-white text-zinc-900 font-medium'
-                  : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white'
+                  ? 'bg-accent text-white'
+                  : 'bg-surface2 text-muted border border-edge hover:text-white hover:border-slate'
               }`}
             >
               {f === 'tutti' ? 'Tutti' : STATI[f as keyof typeof STATI].label}
@@ -148,31 +162,32 @@ export default function AdminDashboard({
 
         {/* Lista */}
         {filtrati.length === 0 ? (
-          <div className="text-center py-20 text-zinc-600">
-            <p className="text-lg">Nessun preventivo</p>
+          <div className="text-center py-24 text-dim">
+            <p className="text-lg font-medium">Nessun preventivo</p>
             <p className="text-sm mt-1">I preventivi caricati appariranno qui</p>
           </div>
         ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filtrati.map((p) => (
               <div
                 key={p.id}
                 onClick={() => setDrawerPreventivo(p)}
-                className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 cursor-pointer hover:border-zinc-600 transition-colors"
+                className="bg-surface border border-edge rounded-xl p-5 cursor-pointer hover:border-slate transition-colors"
               >
+                {/* Top row: badge + totale */}
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                      <span className={`text-xs px-2 py-0.5 rounded-full border ${STATI[p.stato as keyof typeof STATI]?.color}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${STATI[p.stato as keyof typeof STATI]?.color}`}>
                         {STATI[p.stato as keyof typeof STATI]?.label}
                       </span>
                     </div>
-                    <h3 className="text-white font-medium truncate">{p.cliente_nome}</h3>
-                    <p className="text-zinc-400 text-sm">{p.oggetto}</p>
-                    <p className="text-zinc-500 text-xs mt-1">
-                      {new Date(p.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
-                      {p.accettato_at && ` · Accettato il ${new Date(p.accettato_at).toLocaleDateString('it-IT')}`}
-                      {p.lavoro_inizio && ` · Lavoro: ${new Date(p.lavoro_inizio).toLocaleDateString('it-IT')}`}
+                    <h3 className="text-white font-semibold truncate">{p.cliente_nome}</h3>
+                    <p className="text-muted text-sm">{p.oggetto}</p>
+                    <p className="text-dim text-xs mt-1">
+                      {new Date(p.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      {p.accettato_at && ` · Acc. ${new Date(p.accettato_at).toLocaleDateString('it-IT')}`}
+                      {p.lavoro_inizio && ` · ${new Date(p.lavoro_inizio).toLocaleDateString('it-IT')}`}
                       {p.lavoro_fine && ` → ${new Date(p.lavoro_fine).toLocaleDateString('it-IT')}`}
                     </p>
                   </div>
@@ -180,7 +195,7 @@ export default function AdminDashboard({
                     <p className="text-white font-bold text-xl">
                       €{Number(p.totale).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
                     </p>
-                    <p className="text-zinc-600 text-xs mt-0.5">{p.iva ? 'IVA inclusa' : 'Esente IVA'}</p>
+                    <p className="text-dim text-xs mt-0.5">{p.iva ? 'IVA inclusa' : 'Esente IVA'}</p>
                   </div>
                 </div>
 
@@ -195,25 +210,25 @@ export default function AdminDashboard({
                   if (!tranches) return null;
                   const percPagata = tranches.filter((t) => t.pagato).reduce((s, t) => s + t.percentuale, 0);
                   return (
-                    <div className="mt-3 pt-3 border-t border-zinc-800 flex flex-col gap-1.5">
+                    <div className="mt-3 pt-3 border-t border-edge flex flex-col gap-1.5">
                       {tranches.map((t, i) => {
                         const importo = Math.round(Number(p.totale) * t.percentuale / 100);
                         return (
                           <div key={i} className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                              <span className={t.pagato ? 'text-green-400' : 'text-zinc-600'}>
+                              <span className={t.pagato ? 'text-green-400' : 'text-dim'}>
                                 {t.pagato ? '✓' : '○'}
                               </span>
-                              <span className={t.pagato ? 'text-zinc-300' : 'text-zinc-500'}>{t.descrizione}</span>
+                              <span className={t.pagato ? 'text-muted' : 'text-dim'}>{t.descrizione}</span>
                             </div>
-                            <span className={`font-medium ${t.pagato ? 'text-green-400' : 'text-amber-400'}`}>
+                            <span className={`font-medium ${t.pagato ? 'text-green-400' : 'text-accent'}`}>
                               €{importo.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
                             </span>
                           </div>
                         );
                       })}
                       {percPagata > 0 && (
-                        <div className="mt-1 h-0.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div className="mt-1 h-0.5 bg-edge rounded-full overflow-hidden">
                           <div className="h-full bg-green-400 rounded-full transition-all" style={{ width: `${percPagata}%` }} />
                         </div>
                       )}
@@ -225,23 +240,30 @@ export default function AdminDashboard({
                 <div className="flex gap-2 mt-4 flex-wrap" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={(e) => copiaLink(p.token, e)}
-                    className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
                   >
                     {copiato === p.token ? '✓ Copiato!' : 'Copia link'}
                   </button>
-                  
-                  <a href={`/p/${p.token}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">Visualizza</a>
+                  <a
+                    href={`/p/${p.token}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
+                  >
+                    Visualizza
+                  </a>
                   {p.stato === 'inviato' && (
                     <>
                       <button
                         onClick={(e) => aggiornaStato(p.id, 'rifiutato', e)}
-                        className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-red-950 text-red-400 rounded-lg transition-colors"
+                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors"
                       >
-                        Segna rifiutato
+                        Rifiutato
                       </button>
                       <button
                         onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
-                        className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
                       >
                         Archivia
                       </button>
@@ -250,7 +272,7 @@ export default function AdminDashboard({
                   {p.stato === 'accettato' && (
                     <button
                       onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
-                      className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
                     >
                       Archivia
                     </button>
@@ -258,14 +280,14 @@ export default function AdminDashboard({
                   {p.stato === 'archiviato' && (
                     <button
                       onClick={(e) => aggiornaStato(p.id, 'accettato', e)}
-                      className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-green-950 text-green-400 rounded-lg transition-colors"
+                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-green-950/50 text-green-400 rounded-lg transition-colors"
                     >
                       Riattiva
                     </button>
                   )}
                   <button
                     onClick={(e) => eliminaPreventivo(p.id, e)}
-                    className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-red-950 text-red-400 rounded-lg transition-colors ml-auto"
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors ml-auto"
                   >
                     Elimina
                   </button>
@@ -276,12 +298,8 @@ export default function AdminDashboard({
         )}
       </div>
 
-      {/* Modali */}
       {nuovoOpen && (
-        <NuovoPreventivo
-          onClose={() => setNuovoOpen(false)}
-          onSuccess={ricaricaPreventivi}
-        />
+        <NuovoPreventivo onClose={() => setNuovoOpen(false)} onSuccess={ricaricaPreventivi} />
       )}
       {drawerPreventivo && (
         <PreventivoDrawer

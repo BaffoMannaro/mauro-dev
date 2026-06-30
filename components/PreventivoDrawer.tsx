@@ -94,23 +94,20 @@ export default function PreventivoDrawer({
     }
   };
 
+  const inputCls = "w-full bg-surface border border-edge rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-slate";
+
   return (
     <>
-      {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black/60 z-40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-surface border-l border-edge z-50 overflow-y-auto flex flex-col">
 
-      {/* Drawer */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-zinc-900 border-l border-zinc-800 z-50 overflow-y-auto flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 sticky top-0 bg-zinc-900">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-edge sticky top-0 bg-surface">
           <div>
             <p className="text-white font-medium">{preventivo.oggetto}</p>
-            <p className="text-zinc-500 text-xs">{preventivo.cliente_nome}</p>
+            <p className="text-dim text-xs">{preventivo.cliente_nome}</p>
           </div>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white text-xl transition-colors">✕</button>
+          <button onClick={onClose} className="text-muted hover:text-white text-xl transition-colors">✕</button>
         </div>
 
         <div className="flex-1 px-6 py-6 flex flex-col gap-6">
@@ -118,38 +115,36 @@ export default function PreventivoDrawer({
           {/* Accettazione */}
           {preventivo.stato === 'accettato' && (
             <div>
-              <p className="text-zinc-500 text-xs font-mono mb-3">ACCETTAZIONE</p>
-              <div className="bg-zinc-800 rounded-xl p-4 flex flex-col gap-2">
+              <p className="text-dim text-xs font-mono mb-3">ACCETTAZIONE</p>
+              <div className="bg-surface2 rounded-xl p-4 flex flex-col gap-2">
                 {preventivo.accettato_nome && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Nome</span>
+                    <span className="text-muted">Nome</span>
                     <span className="text-white">{preventivo.accettato_nome} {preventivo.accettato_cognome}</span>
                   </div>
                 )}
                 {preventivo.accettato_email && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Email</span>
+                    <span className="text-muted">Email</span>
                     <span className="text-white">{preventivo.accettato_email}</span>
                   </div>
                 )}
                 {preventivo.accettato_at && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">Data</span>
-                    <span className="text-white">
-                      {new Date(preventivo.accettato_at).toLocaleString('it-IT')}
-                    </span>
+                    <span className="text-muted">Data</span>
+                    <span className="text-white">{new Date(preventivo.accettato_at).toLocaleString('it-IT')}</span>
                   </div>
                 )}
                 {preventivo.accettato_ip && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-400">IP</span>
+                    <span className="text-muted">IP</span>
                     <span className="text-white font-mono text-xs">{preventivo.accettato_ip}</span>
                   </div>
                 )}
                 {preventivo.accettato_ua && (
                   <div className="flex flex-col gap-1 text-sm">
-                    <span className="text-zinc-400">Browser</span>
-                    <span className="text-zinc-300 text-xs break-all">{preventivo.accettato_ua}</span>
+                    <span className="text-muted">Browser</span>
+                    <span className="text-dim text-xs break-all">{preventivo.accettato_ua}</span>
                   </div>
                 )}
               </div>
@@ -159,15 +154,16 @@ export default function PreventivoDrawer({
           {/* Tranches */}
           {tranchesLocali.length > 0 && (
             <div>
-              <p className="text-zinc-500 text-xs font-mono mb-3">PAGAMENTI</p>
+              <p className="text-dim text-xs font-mono mb-3">PAGAMENTI</p>
               <div className="flex flex-col gap-2">
                 {tranchesLocali.map((t, i) => (
                   <div
                     key={i}
-                    className={`flex flex-col p-4 rounded-xl border transition-colors ${t.pagato
+                    className={`flex flex-col p-4 rounded-xl border transition-colors ${
+                      t.pagato
                         ? 'bg-green-950/30 border-green-800'
-                        : 'bg-zinc-800 border-zinc-700'
-                      }`}
+                        : 'bg-surface2 border-edge'
+                    }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -181,23 +177,21 @@ export default function PreventivoDrawer({
                           <p className={`text-sm font-medium ${t.pagato ? 'text-green-400' : 'text-white'}`}>
                             {t.descrizione}
                           </p>
-                          <p className="text-zinc-400 text-xs">
+                          <p className="text-muted text-xs">
                             {`€${Math.round(totale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}`}
                           </p>
                         </div>
                       </div>
-                      {t.pagato && (
-                        <span className="text-green-400 text-xs font-mono">✓ Pagato</span>
-                      )}
+                      {t.pagato && <span className="text-green-400 text-xs font-mono">✓ Pagato</span>}
                     </div>
                     {t.pagato && (
                       <div className="mt-3 flex items-center gap-2">
-                        <label className="text-zinc-500 text-xs font-mono shrink-0">DATA PAGAMENTO</label>
+                        <label className="text-dim text-xs font-mono shrink-0">DATA PAGAMENTO</label>
                         <input
                           type="date"
                           value={t.data_pagamento || ''}
                           onChange={(e) => aggiornaTranche(i, e.target.value)}
-                          className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-zinc-500"
+                          className="flex-1 bg-bg border border-edge rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-slate"
                         />
                       </div>
                     )}
@@ -209,25 +203,19 @@ export default function PreventivoDrawer({
 
           {/* Date lavoro */}
           <div>
-            <p className="text-zinc-500 text-xs font-mono mb-3">PERIODO DI LAVORO</p>
+            <p className="text-dim text-xs font-mono mb-3">PERIODO DI LAVORO</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-zinc-500 text-xs block mb-1">Inizio</label>
-                <input
-                  type="date"
-                  value={inizio}
+                <label className="text-dim text-xs block mb-1">Inizio</label>
+                <input type="date" value={inizio}
                   onChange={(e) => { setInizio(e.target.value); setSalvato(false); }}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-zinc-500"
-                />
+                  className={inputCls} />
               </div>
               <div>
-                <label className="text-zinc-500 text-xs block mb-1">Fine</label>
-                <input
-                  type="date"
-                  value={fine}
+                <label className="text-dim text-xs block mb-1">Fine</label>
+                <input type="date" value={fine}
                   onChange={(e) => { setFine(e.target.value); setSalvato(false); }}
-                  className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-zinc-500"
-                />
+                  className={inputCls} />
               </div>
             </div>
           </div>
@@ -235,11 +223,10 @@ export default function PreventivoDrawer({
           {/* Salva */}
           <button
             onClick={salva}
-            className="w-full bg-white text-zinc-900 font-medium py-3 rounded-xl hover:bg-zinc-100 transition-colors"
+            className="w-full bg-accent text-white font-semibold py-3 rounded-xl hover:bg-accent/90 transition-colors"
           >
             {salvato ? '✓ Salvato!' : 'Salva modifiche'}
           </button>
-
         </div>
       </div>
     </>

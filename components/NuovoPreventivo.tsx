@@ -168,28 +168,28 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-4xl">
+      <div className="bg-surface border border-edge rounded-2xl w-full max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
           <h2 className="text-white font-semibold">Nuovo preventivo</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors">✕</button>
+          <button onClick={onClose} className="text-muted hover:text-white transition-colors">✕</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* Editor JSON */}
-          <div className="p-6 border-r border-zinc-800">
+          <div className="p-6 border-r border-edge">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-zinc-400 text-sm font-mono">JSON PREVENTIVO</p>
+              <p className="text-dim text-sm font-mono">JSON PREVENTIVO</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => { setJson(JSON.stringify(JSON_ESEMPIO, null, 2)); setPreview(null); setErrore(''); }}
-                  className="text-xs text-zinc-500 hover:text-white transition-colors"
+                  className="text-xs text-muted hover:text-white transition-colors"
                 >
                   Esempio
                 </button>
                 <button
                   onClick={() => { setJson(JSON.stringify(JSON_TEST, null, 2)); setPreview(null); setErrore(''); }}
-                  className="text-xs text-amber-600 hover:text-amber-400 transition-colors"
+                  className="text-xs text-accent hover:text-accent/80 transition-colors"
                 >
                   Test
                 </button>
@@ -199,7 +199,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
               value={json}
               onChange={(e) => { setJson(e.target.value); setPreview(null); setErrore(''); }}
               placeholder='Incolla qui il JSON generato da Claude...'
-              className="w-full h-96 bg-zinc-950 border border-zinc-700 rounded-xl p-4 text-sm font-mono text-zinc-300 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 resize-none"
+              className="w-full h-96 bg-bg border border-edge rounded-xl p-4 text-sm font-mono text-muted placeholder-dim focus:outline-none focus:border-slate resize-none"
             />
             {errore && (
               <p className="text-red-400 text-xs mt-2 font-mono">⚠ {errore}</p>
@@ -208,14 +208,14 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
               <button
                 onClick={handlePreview}
                 disabled={!json.trim()}
-                className="flex-1 py-2 text-sm bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg disabled:opacity-30 transition-colors"
+                className="flex-1 py-2 text-sm bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg disabled:opacity-30 transition-colors"
               >
                 Anteprima
               </button>
               <button
                 onClick={handleCarica}
                 disabled={!json.trim() || loading}
-                className="flex-1 py-2 text-sm bg-white hover:bg-zinc-100 text-zinc-900 font-medium rounded-lg disabled:opacity-30 transition-colors"
+                className="flex-1 py-2 text-sm bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg disabled:opacity-30 transition-colors"
               >
                 {loading ? 'Caricamento...' : 'Carica preventivo'}
               </button>
@@ -224,59 +224,59 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
 
           {/* Preview */}
           <div className="p-6">
-            <p className="text-zinc-400 text-sm font-mono mb-3">ANTEPRIMA</p>
+            <p className="text-dim text-sm font-mono mb-3">ANTEPRIMA</p>
             {!preview ? (
-              <div className="h-96 flex items-center justify-center text-zinc-600 text-sm">
+              <div className="h-96 flex items-center justify-center text-dim text-sm">
                 Clicca "Anteprima" per vedere il risultato
               </div>
             ) : (
               <div className="space-y-4 overflow-y-auto max-h-[500px] pr-1">
                 {/* Cliente */}
-                <div className="bg-zinc-800 rounded-xl p-4">
-                  <p className="text-zinc-500 text-xs font-mono mb-2">CLIENTE</p>
+                <div className="bg-surface2 rounded-xl p-4">
+                  <p className="text-dim text-xs font-mono mb-2">CLIENTE</p>
                   <p className="text-white font-medium">{preview.cliente.nome}</p>
-                  {preview.cliente.piva && <p className="text-zinc-400 text-sm">P.IVA {preview.cliente.piva}</p>}
-                  <p className="text-zinc-400 text-sm">{preview.cliente.email}</p>
-                  {preview.cliente.telefono && <p className="text-zinc-400 text-sm">{preview.cliente.telefono}</p>}
+                  {preview.cliente.piva && <p className="text-muted text-sm">P.IVA {preview.cliente.piva}</p>}
+                  <p className="text-muted text-sm">{preview.cliente.email}</p>
+                  {preview.cliente.telefono && <p className="text-muted text-sm">{preview.cliente.telefono}</p>}
                 </div>
 
                 {/* Oggetto */}
-                <div className="bg-zinc-800 rounded-xl p-4">
-                  <p className="text-zinc-500 text-xs font-mono mb-1">OGGETTO</p>
+                <div className="bg-surface2 rounded-xl p-4">
+                  <p className="text-dim text-xs font-mono mb-1">OGGETTO</p>
                   <p className="text-white">{preview.preventivo.oggetto}</p>
                   {preview.preventivo.scadenza && (
-                    <p className="text-zinc-400 text-xs mt-1">Scadenza: {new Date(preview.preventivo.scadenza).toLocaleDateString('it-IT')}</p>
+                    <p className="text-muted text-xs mt-1">Scadenza: {new Date(preview.preventivo.scadenza).toLocaleDateString('it-IT')}</p>
                   )}
                 </div>
 
                 {/* Intro */}
                 {preview.sezioni.intro && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-1">INTRODUZIONE</p>
-                    <p className="text-zinc-300 text-sm">{preview.sezioni.intro}</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-1">INTRODUZIONE</p>
+                    <p className="text-muted text-sm">{preview.sezioni.intro}</p>
                   </div>
                 )}
 
                 {/* Voci */}
-                <div className="bg-zinc-800 rounded-xl p-4">
-                  <p className="text-zinc-500 text-xs font-mono mb-2">VOCI</p>
+                <div className="bg-surface2 rounded-xl p-4">
+                  <p className="text-dim text-xs font-mono mb-2">VOCI</p>
                   {preview.sezioni.voci.items.map((v: any, i: number) => (
-                    <div key={i} className="flex justify-between text-sm py-1 border-b border-zinc-700 last:border-0">
-                      <span className="text-zinc-300">{v.descrizione}</span>
+                    <div key={i} className="flex justify-between text-sm py-1 border-b border-edge last:border-0">
+                      <span className="text-muted">{v.descrizione}</span>
                       <span className="text-white">€{(v.quantita * v.prezzo).toLocaleString('it-IT')}</span>
                     </div>
                   ))}
                   <div className="flex justify-between text-sm pt-2 mt-1">
-                    <span className="text-zinc-400">Imponibile</span>
+                    <span className="text-muted">Imponibile</span>
                     <span className="text-white">€{imponibile.toLocaleString('it-IT')}</span>
                   </div>
                   {preview.preventivo.iva !== false && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-zinc-400">IVA 22%</span>
+                      <span className="text-muted">IVA 22%</span>
                       <span className="text-white">€{iva.toLocaleString('it-IT')}</span>
                     </div>
                   )}
-                  <div className="flex justify-between font-semibold pt-2 border-t border-zinc-600 mt-1">
+                  <div className="flex justify-between font-semibold pt-2 border-t border-slate mt-1">
                     <span className="text-white">Totale</span>
                     <span className="text-white">€{(imponibile + iva).toLocaleString('it-IT')}</span>
                   </div>
@@ -284,11 +284,11 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
 
                 {/* Tranches */}
                 {preview.sezioni.tranches?.length > 0 && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-2">PAGAMENTO</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-2">PAGAMENTO</p>
                     {preview.sezioni.tranches.map((t: any, i: number) => (
                       <div key={i} className="flex justify-between text-sm py-1">
-                        <span className="text-zinc-300">{t.descrizione}</span>
+                        <span className="text-muted">{t.descrizione}</span>
                         <span className="text-white">€{Math.round((imponibile + iva) * t.percentuale / 100).toLocaleString('it-IT')}</span>
                       </div>
                     ))}
@@ -297,42 +297,42 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
 
                 {/* Sezioni opzionali */}
                 {preview.sezioni.tempi && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-1">TEMPI</p>
-                    <p className="text-zinc-300 text-sm">{preview.sezioni.tempi}</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-1">TEMPI</p>
+                    <p className="text-muted text-sm">{preview.sezioni.tempi}</p>
                   </div>
                 )}
                 {preview.sezioni.garanzia && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-1">GARANZIA</p>
-                    <p className="text-zinc-300 text-sm">{preview.sezioni.garanzia}</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-1">GARANZIA</p>
+                    <p className="text-muted text-sm">{preview.sezioni.garanzia}</p>
                   </div>
                 )}
                 {preview.sezioni.esclusioni?.length > 0 && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-2">NON INCLUSO</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-2">NON INCLUSO</p>
                     {preview.sezioni.esclusioni.map((e: string, i: number) => (
-                      <p key={i} className="text-zinc-300 text-sm">· {e}</p>
+                      <p key={i} className="text-muted text-sm">· {e}</p>
                     ))}
                   </div>
                 )}
                 {preview.sezioni.manutenzione && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-1">MANUTENZIONE</p>
-                    <p className="text-zinc-300 text-sm">{preview.sezioni.manutenzione.descrizione}</p>
-                    <p className="text-white text-sm font-medium mt-1">€{Number(preview.sezioni.manutenzione.prezzo).toLocaleString('it-IT')}/mese</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-1">MANUTENZIONE</p>
+                    <p className="text-muted text-sm">{preview.sezioni.manutenzione.descrizione}</p>
+                    <p className="text-accent text-sm font-medium mt-1">€{Number(preview.sezioni.manutenzione.prezzo).toLocaleString('it-IT')}/mese</p>
                   </div>
                 )}
                 {preview.sezioni.fasi_successive && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-1">SVILUPPI FUTURI</p>
-                    <p className="text-zinc-300 text-sm">{preview.sezioni.fasi_successive}</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-1">SVILUPPI FUTURI</p>
+                    <p className="text-muted text-sm">{preview.sezioni.fasi_successive}</p>
                   </div>
                 )}
                 {preview.sezioni.note && (
-                  <div className="bg-zinc-800 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs font-mono mb-1">NOTE</p>
-                    <p className="text-zinc-300 text-sm">{preview.sezioni.note}</p>
+                  <div className="bg-surface2 rounded-xl p-4">
+                    <p className="text-dim text-xs font-mono mb-1">NOTE</p>
+                    <p className="text-muted text-sm">{preview.sezioni.note}</p>
                   </div>
                 )}
               </div>

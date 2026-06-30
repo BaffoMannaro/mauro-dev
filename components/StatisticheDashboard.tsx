@@ -149,7 +149,7 @@ export default function StatisticheDashboard({
   const fmt = (n: number) => `€${Math.round(n).toLocaleString('it-IT')}`;
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-text">
 
       {/* Header */}
       <header className="border-b border-edge px-6 py-5">
@@ -161,10 +161,10 @@ export default function StatisticheDashboard({
         {/* KPI riga 1 — numeri grandi stile Crextio */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: 'CONTRATTUALIZZATO', value: fmt(stats.totaleContrattualizzato), sub: `${stats.accettati.length} progetti`, color: 'text-white' },
+            { label: 'CONTRATTUALIZZATO', value: fmt(stats.totaleContrattualizzato), sub: `${stats.accettati.length} progetti`, color: 'text-text' },
             { label: 'INCASSATO',         value: fmt(stats.totalePagato),            sub: 'tranches pagate',      color: 'text-green-400' },
             { label: 'DA INCASSARE',      value: fmt(stats.totaleNonPagato),         sub: 'tranches in attesa',   color: 'text-accent' },
-            { label: 'TASSO ACCETTAZIONE',value: `${stats.tassoAccettazione}%`,      sub: `${stats.rifiutati} rifiutati · ${stats.inviati} in attesa`, color: 'text-white' },
+            { label: 'TASSO ACCETTAZIONE',value: `${stats.tassoAccettazione}%`,      sub: `${stats.rifiutati} rifiutati · ${stats.inviati} in attesa`, color: 'text-text' },
           ].map((k) => (
             <div key={k.label} className="bg-surface border border-edge rounded-xl p-5">
               <p className="text-dim text-xs font-medium mb-3">{k.label}</p>
@@ -177,7 +177,7 @@ export default function StatisticheDashboard({
         {/* KPI riga 2 */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: 'MEDIA NETTO/MESE',   value: fmt(stats.mediaNettoMensile),  sub: 'incassato − abbonamenti', color: stats.mediaNettoMensile >= 0 ? 'text-white' : 'text-red-400' },
+            { label: 'MEDIA NETTO/MESE',   value: fmt(stats.mediaNettoMensile),  sub: 'incassato − abbonamenti', color: stats.mediaNettoMensile >= 0 ? 'text-text' : 'text-red-400' },
             { label: 'TARIFFA GIORNALIERA',value: stats.guadagnoAlGiorno > 0 ? fmt(stats.guadagnoAlGiorno) : '—', sub: `${stats.giorniLavorativiAnno} giorni lav.`, color: 'text-accent' },
             { label: 'TARIFFA ORARIA',     value: stats.guadagnoAllOra > 0 ? `€${Math.round(stats.guadagnoAllOra).toLocaleString('it-IT')}` : '—', sub: '8h/giorno', color: 'text-accent' },
           ].map((k) => (
@@ -212,7 +212,7 @@ export default function StatisticheDashboard({
                   <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-surface2 border border-edge rounded-lg p-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
                     {m.incassato > 0 && <p className="text-green-400">{fmt(m.incassato)} incassato</p>}
                     <p className="text-accent">{fmt(m.costoAbbonamenti)} abbonamenti</p>
-                    <p className={m.netto >= 0 ? 'text-white font-medium' : 'text-red-400 font-medium'}>
+                    <p className={m.netto >= 0 ? 'text-text font-medium' : 'text-red-400 font-medium'}>
                       {fmt(m.netto)} netto
                     </p>
                   </div>
@@ -249,7 +249,7 @@ export default function StatisticheDashboard({
             </div>
             <div className="text-center">
               <p className="text-dim text-xs mb-1">MEDIA NETTO</p>
-              <p className={`font-bold text-lg ${stats.mediaNettoMensile >= 0 ? 'text-white' : 'text-red-400'}`}>
+              <p className={`font-bold text-lg ${stats.mediaNettoMensile >= 0 ? 'text-text' : 'text-red-400'}`}>
                 {fmt(stats.mediaNettoMensile)}
               </p>
               <p className="text-dim text-xs mt-0.5">mesi trascorsi da ott.</p>
@@ -281,7 +281,7 @@ export default function StatisticheDashboard({
                   <div key={p.id} className="px-6 py-4 border-b border-edge/50 last:border-0">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <p className="text-white text-sm font-semibold truncate">{p.oggetto}</p>
+                        <p className="text-text text-sm font-semibold truncate">{p.oggetto}</p>
                         <p className="text-muted text-xs">{p.cliente_nome}</p>
                         <div className="flex gap-3 mt-1 flex-wrap">
                           {durata !== null && <p className="text-blue-400 text-xs">{durata} giorni</p>}
@@ -290,7 +290,7 @@ export default function StatisticheDashboard({
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-white text-sm font-bold">{`€${Number(p.totale).toLocaleString('it-IT')}`}</p>
+                        <p className="text-text text-sm font-bold">{`€${Number(p.totale).toLocaleString('it-IT')}`}</p>
                         {pagato > 0 && <p className="text-green-400 text-xs">{`€${Math.round(pagato).toLocaleString('it-IT')} incassati`}</p>}
                       </div>
                     </div>

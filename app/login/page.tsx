@@ -6,8 +6,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-bg flex items-center justify-center">
       <div className="bg-surface border border-edge rounded-2xl p-10 flex flex-col items-center gap-6 w-full max-w-sm">
         <div className="text-center">
-          <Image src="/Logo.svg" alt="MAURO DEV" width={160} height={52} className="h-10 w-auto brightness-0 invert mx-auto mb-6" />
-          <h1 className="text-white text-2xl font-semibold">Accedi</h1>
+          <Image src="/Logo.svg" alt="MAURO DEV" width={160} height={52} className="h-10 w-auto logo-adaptive mx-auto mb-6" />
+          <h1 className="text-text text-2xl font-semibold">Accedi</h1>
           <p className="text-muted text-sm mt-2">Area riservata gestione preventivi</p>
         </div>
         <form
@@ -19,7 +19,7 @@ export default function LoginPage() {
         >
           <button
             type="submit"
-            className="w-full bg-surface2 hover:bg-slate text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-3 border border-edge hover:border-slate transition-colors"
+            className="w-full bg-surface2 hover:bg-slate text-text font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-3 border border-edge hover:border-slate transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>

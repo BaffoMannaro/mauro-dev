@@ -171,8 +171,8 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
       <div className="bg-surface border border-edge rounded-2xl w-full max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
-          <h2 className="text-white font-semibold">Nuovo preventivo</h2>
-          <button onClick={onClose} className="text-muted hover:text-white transition-colors">✕</button>
+          <h2 className="text-text font-semibold">Nuovo preventivo</h2>
+          <button onClick={onClose} className="text-muted hover:text-text transition-colors">✕</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -183,7 +183,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
               <div className="flex gap-3">
                 <button
                   onClick={() => { setJson(JSON.stringify(JSON_ESEMPIO, null, 2)); setPreview(null); setErrore(''); }}
-                  className="text-xs text-muted hover:text-white transition-colors"
+                  className="text-xs text-muted hover:text-text transition-colors"
                 >
                   Esempio
                 </button>
@@ -208,7 +208,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
               <button
                 onClick={handlePreview}
                 disabled={!json.trim()}
-                className="flex-1 py-2 text-sm bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg disabled:opacity-30 transition-colors"
+                className="flex-1 py-2 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg disabled:opacity-30 transition-colors"
               >
                 Anteprima
               </button>
@@ -234,7 +234,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                 {/* Cliente */}
                 <div className="bg-surface2 rounded-xl p-4">
                   <p className="text-dim text-xs font-mono mb-2">CLIENTE</p>
-                  <p className="text-white font-medium">{preview.cliente.nome}</p>
+                  <p className="text-text font-medium">{preview.cliente.nome}</p>
                   {preview.cliente.piva && <p className="text-muted text-sm">P.IVA {preview.cliente.piva}</p>}
                   <p className="text-muted text-sm">{preview.cliente.email}</p>
                   {preview.cliente.telefono && <p className="text-muted text-sm">{preview.cliente.telefono}</p>}
@@ -243,7 +243,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                 {/* Oggetto */}
                 <div className="bg-surface2 rounded-xl p-4">
                   <p className="text-dim text-xs font-mono mb-1">OGGETTO</p>
-                  <p className="text-white">{preview.preventivo.oggetto}</p>
+                  <p className="text-text">{preview.preventivo.oggetto}</p>
                   {preview.preventivo.scadenza && (
                     <p className="text-muted text-xs mt-1">Scadenza: {new Date(preview.preventivo.scadenza).toLocaleDateString('it-IT')}</p>
                   )}
@@ -263,22 +263,22 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                   {preview.sezioni.voci.items.map((v: any, i: number) => (
                     <div key={i} className="flex justify-between text-sm py-1 border-b border-edge last:border-0">
                       <span className="text-muted">{v.descrizione}</span>
-                      <span className="text-white">€{(v.quantita * v.prezzo).toLocaleString('it-IT')}</span>
+                      <span className="text-text">€{(v.quantita * v.prezzo).toLocaleString('it-IT')}</span>
                     </div>
                   ))}
                   <div className="flex justify-between text-sm pt-2 mt-1">
                     <span className="text-muted">Imponibile</span>
-                    <span className="text-white">€{imponibile.toLocaleString('it-IT')}</span>
+                    <span className="text-text">€{imponibile.toLocaleString('it-IT')}</span>
                   </div>
                   {preview.preventivo.iva !== false && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted">IVA 22%</span>
-                      <span className="text-white">€{iva.toLocaleString('it-IT')}</span>
+                      <span className="text-text">€{iva.toLocaleString('it-IT')}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-semibold pt-2 border-t border-slate mt-1">
-                    <span className="text-white">Totale</span>
-                    <span className="text-white">€{(imponibile + iva).toLocaleString('it-IT')}</span>
+                    <span className="text-text">Totale</span>
+                    <span className="text-text">€{(imponibile + iva).toLocaleString('it-IT')}</span>
                   </div>
                 </div>
 
@@ -289,7 +289,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                     {preview.sezioni.tranches.map((t: any, i: number) => (
                       <div key={i} className="flex justify-between text-sm py-1">
                         <span className="text-muted">{t.descrizione}</span>
-                        <span className="text-white">€{Math.round((imponibile + iva) * t.percentuale / 100).toLocaleString('it-IT')}</span>
+                        <span className="text-text">€{Math.round((imponibile + iva) * t.percentuale / 100).toLocaleString('it-IT')}</span>
                       </div>
                     ))}
                   </div>

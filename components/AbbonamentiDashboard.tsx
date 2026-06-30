@@ -72,7 +72,7 @@ function FormAbbonamento({
   const [form, setForm] = useState(initial);
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
 
-  const inputCls = "w-full bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-white placeholder-dim focus:outline-none focus:border-slate";
+  const inputCls = "w-full bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text placeholder-dim focus:outline-none focus:border-slate";
 
   return (
     <div className="flex flex-col gap-3">
@@ -123,7 +123,7 @@ function FormAbbonamento({
       {errore && <p className="text-red-400 text-xs font-mono">⚠ {errore}</p>}
       <div className="flex gap-2 mt-1">
         <button onClick={onCancel}
-          className="flex-1 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-white rounded-xl transition-colors">
+          className="flex-1 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">
           Annulla
         </button>
         <button onClick={() => onSave(form)} disabled={loading}
@@ -218,7 +218,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
   const formInitial = editId !== null && formEditInitial ? formEditInitial : FORM_DEFAULT;
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-text">
 
       {/* Header */}
       <header className="border-b border-edge px-6 py-5 flex items-center justify-between">
@@ -252,13 +252,13 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
         <div className="flex gap-2">
           <button
             onClick={() => setFiltroTag(null)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filtroTag === null ? 'bg-accent text-white' : 'bg-surface2 text-muted border border-edge hover:text-white hover:border-slate'}`}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filtroTag === null ? 'bg-accent text-white' : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'}`}
           >
             Tutti <span className="ml-1 text-xs opacity-60">{abbonamenti.length}</span>
           </button>
           {TAGS.map((t) => (
             <button key={t} onClick={() => setFiltroTag(filtroTag === t ? null : t)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${filtroTag === t ? TAG_COLOR[t] : 'bg-surface2 text-muted border-edge hover:text-white hover:border-slate'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${filtroTag === t ? TAG_COLOR[t] : 'bg-surface2 text-muted border-edge hover:text-text hover:border-slate'}`}
             >
               {t} <span className="ml-1 text-xs opacity-60">{abbonamenti.filter((a) => a.tag === t).length}</span>
             </button>
@@ -290,7 +290,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
                       {isScaduto(ab) && <span className="text-xs text-red-400 font-medium">Scaduto</span>}
                       {!ab.attivo && !isScaduto(ab) && <span className="text-xs text-dim font-medium">Disattivo</span>}
                     </div>
-                    <p className="text-white font-semibold truncate">{ab.nome}</p>
+                    <p className="text-text font-semibold truncate">{ab.nome}</p>
                     <p className="text-dim text-xs mt-1">
                       Dal {new Date(ab.data_inizio).toLocaleDateString('it-IT')}
                       {ab.data_fine && ` al ${new Date(ab.data_fine).toLocaleDateString('it-IT')}`}
@@ -298,7 +298,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
                     {ab.note && <p className="text-dim text-xs mt-1">{ab.note}</p>}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-white font-bold text-lg">{fmt(Number(ab.cifra))}</p>
+                    <p className="text-text font-bold text-lg">{fmt(Number(ab.cifra))}</p>
                     {ab.cadenza === 'mensile' && (
                       <p className="text-dim text-xs">{fmt(Number(ab.cifra) * 12)}/anno</p>
                     )}
@@ -309,11 +309,11 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => apriModifica(ab)}
-                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors">
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">
                     Modifica
                   </button>
                   <button onClick={() => toggleAttivo(ab)}
-                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors">
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">
                     {ab.attivo ? 'Disattiva' : 'Attiva'}
                   </button>
                   <button onClick={() => elimina(ab.id)}
@@ -332,11 +332,11 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-4">
           <div className="bg-surface border border-edge rounded-2xl w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-white font-semibold">
+              <h2 className="text-text font-semibold">
                 {editId !== null ? 'Modifica abbonamento' : 'Nuovo abbonamento'}
               </h2>
               <button onClick={() => { setShowForm(false); setEditId(null); }}
-                className="text-dim hover:text-white transition-colors">✕</button>
+                className="text-dim hover:text-text transition-colors">✕</button>
             </div>
             <FormAbbonamento
               key={editId ?? 'new'}

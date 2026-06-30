@@ -117,7 +117,7 @@ export default function AdminDashboard({
   const FILTRI = ['tutti', 'inviato', 'accettato', 'rifiutato', 'archiviato'];
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-text">
 
       {/* Header stile Crextio: titolo sx, KPI + CTA dx */}
       <header className="border-b border-edge px-6 py-5 flex items-center justify-between gap-4">
@@ -149,7 +149,7 @@ export default function AdminDashboard({
               className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
                 filtro === f
                   ? 'bg-accent text-white'
-                  : 'bg-surface2 text-muted border border-edge hover:text-white hover:border-slate'
+                  : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'
               }`}
             >
               {f === 'tutti' ? 'Tutti' : STATI[f as keyof typeof STATI].label}
@@ -182,7 +182,7 @@ export default function AdminDashboard({
                         {STATI[p.stato as keyof typeof STATI]?.label}
                       </span>
                     </div>
-                    <h3 className="text-white font-semibold truncate">{p.cliente_nome}</h3>
+                    <h3 className="text-text font-semibold truncate">{p.cliente_nome}</h3>
                     <p className="text-muted text-sm">{p.oggetto}</p>
                     <p className="text-dim text-xs mt-1">
                       {new Date(p.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -192,7 +192,7 @@ export default function AdminDashboard({
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-white font-bold text-xl">
+                    <p className="text-text font-bold text-xl">
                       €{Number(p.totale).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
                     </p>
                     <p className="text-dim text-xs mt-0.5">{p.iva ? 'IVA inclusa' : 'Esente IVA'}</p>
@@ -240,7 +240,7 @@ export default function AdminDashboard({
                 <div className="flex gap-2 mt-4 flex-wrap" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={(e) => copiaLink(p.token, e)}
-                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
                   >
                     {copiato === p.token ? '✓ Copiato!' : 'Copia link'}
                   </button>
@@ -249,7 +249,7 @@ export default function AdminDashboard({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
                   >
                     Visualizza
                   </a>
@@ -263,7 +263,7 @@ export default function AdminDashboard({
                       </button>
                       <button
                         onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
-                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
+                        className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
                       >
                         Archivia
                       </button>
@@ -272,7 +272,7 @@ export default function AdminDashboard({
                   {p.stato === 'accettato' && (
                     <button
                       onClick={(e) => aggiornaStato(p.id, 'archiviato', e)}
-                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-white rounded-lg transition-colors"
+                      className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors"
                     >
                       Archivia
                     </button>

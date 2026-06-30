@@ -94,7 +94,7 @@ export default function PreventivoDrawer({
     }
   };
 
-  const inputCls = "w-full bg-surface border border-edge rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-slate";
+  const inputCls = "w-full bg-surface border border-edge rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-slate";
 
   return (
     <>
@@ -104,10 +104,10 @@ export default function PreventivoDrawer({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-edge sticky top-0 bg-surface">
           <div>
-            <p className="text-white font-medium">{preventivo.oggetto}</p>
+            <p className="text-text font-medium">{preventivo.oggetto}</p>
             <p className="text-dim text-xs">{preventivo.cliente_nome}</p>
           </div>
-          <button onClick={onClose} className="text-muted hover:text-white text-xl transition-colors">✕</button>
+          <button onClick={onClose} className="text-muted hover:text-text text-xl transition-colors">✕</button>
         </div>
 
         <div className="flex-1 px-6 py-6 flex flex-col gap-6">
@@ -120,25 +120,25 @@ export default function PreventivoDrawer({
                 {preventivo.accettato_nome && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Nome</span>
-                    <span className="text-white">{preventivo.accettato_nome} {preventivo.accettato_cognome}</span>
+                    <span className="text-text">{preventivo.accettato_nome} {preventivo.accettato_cognome}</span>
                   </div>
                 )}
                 {preventivo.accettato_email && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Email</span>
-                    <span className="text-white">{preventivo.accettato_email}</span>
+                    <span className="text-text">{preventivo.accettato_email}</span>
                   </div>
                 )}
                 {preventivo.accettato_at && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Data</span>
-                    <span className="text-white">{new Date(preventivo.accettato_at).toLocaleString('it-IT')}</span>
+                    <span className="text-text">{new Date(preventivo.accettato_at).toLocaleString('it-IT')}</span>
                   </div>
                 )}
                 {preventivo.accettato_ip && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">IP</span>
-                    <span className="text-white font-mono text-xs">{preventivo.accettato_ip}</span>
+                    <span className="text-text font-mono text-xs">{preventivo.accettato_ip}</span>
                   </div>
                 )}
                 {preventivo.accettato_ua && (
@@ -174,7 +174,7 @@ export default function PreventivoDrawer({
                           className="accent-green-400 w-4 h-4 cursor-pointer"
                         />
                         <div>
-                          <p className={`text-sm font-medium ${t.pagato ? 'text-green-400' : 'text-white'}`}>
+                          <p className={`text-sm font-medium ${t.pagato ? 'text-green-400' : 'text-text'}`}>
                             {t.descrizione}
                           </p>
                           <p className="text-muted text-xs">
@@ -191,7 +191,7 @@ export default function PreventivoDrawer({
                           type="date"
                           value={t.data_pagamento || ''}
                           onChange={(e) => aggiornaTranche(i, e.target.value)}
-                          className="flex-1 bg-bg border border-edge rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-slate"
+                          className="flex-1 bg-bg border border-edge rounded-lg px-2 py-1 text-xs text-text focus:outline-none focus:border-slate"
                         />
                       </div>
                     )}

@@ -62,11 +62,38 @@ function useCountdown(scadenza: string | null) {
   return countdown;
 }
 
-function SectionTitle({ title }: { title: string }) {
+function AccordionSection({
+  title,
+  children,
+  flush = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  flush?: boolean;
+}) {
+  const [open, setOpen] = useState(true);
   return (
-    <div className="flex items-center gap-3 mb-4">
-      <div className="w-[3px] h-5 bg-accent rounded-sm shrink-0" />
-      <p className="text-muted font-bold text-xs tracking-widest uppercase">{title}</p>
+    <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-surface2/50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-[3px] h-5 bg-accent rounded-sm shrink-0" />
+          <p className="text-muted font-bold text-xs tracking-widest uppercase">{title}</p>
+        </div>
+        <svg
+          className={`w-4 h-4 text-dim transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className={flush ? '' : 'px-5 pb-5'}>
+          {children}
+        </div>
+      )}
     </div>
   );
 }
@@ -110,25 +137,25 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
   return (
     <div className="min-h-screen bg-bg text-text">
 
+      {/* ── Stampa — fixed top-right, outside layout ── */}
+      <button
+        onClick={() => window.print()}
+        className="print:hidden fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-white text-sm font-semibold rounded-xl shadow-lg transition-colors cursor-pointer"
+      >
+        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.056 48.056 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+        </svg>
+        Stampa PDF
+      </button>
+
       {/* ── Header — dark slate + pink line (matches PDF header) ── */}
       <header className="bg-slate relative print:bg-slate">
         <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-accent" />
         <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
           <img src="/Logo.svg" alt="MAURO DEV" className="h-7 w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
-          <div className="flex items-center gap-5">
-            <button
-              onClick={() => window.print()}
-              className="print:hidden text-muted hover:text-white text-sm transition-colors flex items-center gap-1.5 cursor-pointer"
-            >
-              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.056 48.056 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
-              </svg>
-              Stampa
-            </button>
-            <div className="text-right">
-              <p className="text-white font-bold text-sm tracking-[0.15em]">PREVENTIVO</p>
-              <p className="text-muted text-xs mt-0.5">{dataEmissione}</p>
-            </div>
+          <div className="text-right">
+            <p className="text-white font-bold text-sm tracking-[0.15em]">PREVENTIVO</p>
+            <p className="text-muted text-xs mt-0.5">{dataEmissione}</p>
           </div>
         </div>
       </header>
@@ -178,25 +205,24 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
         </div>
 
         {/* ── Oggetto ── */}
-        <div className="bg-surface border border-edge rounded-xl p-5">
-          <SectionTitle title={`Oggetto: ${preventivo.oggetto}`} />
+        <AccordionSection title={`Oggetto: ${preventivo.oggetto}`}>
           {sezioni?.intro && (
             <p className="text-muted text-sm leading-relaxed">{sezioni.intro}</p>
           )}
           {sezioni?.descrizione && (
             <p className="text-muted text-sm leading-relaxed mt-3 whitespace-pre-wrap">{sezioni.descrizione}</p>
           )}
-        </div>
+          {!sezioni?.intro && !sezioni?.descrizione && (
+            <p className="text-dim text-sm italic">Nessuna descrizione aggiuntiva.</p>
+          )}
+        </AccordionSection>
 
-        {/* ── Dettaglio voci (matches PDF lista_block) ── */}
-        <div className="bg-surface border border-edge rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-edge">
-            <SectionTitle title="Dettaglio attività" />
-          </div>
+        {/* ── Dettaglio voci ── */}
+        <AccordionSection title="Dettaglio attività" flush>
           {preventivo.voci.map((voce, i) => (
             <div
               key={i}
-              className={`flex items-center justify-between px-5 py-4 border-b border-edge/40 last:border-0 ${i % 2 === 0 ? 'bg-surface2/50' : 'bg-surface'}`}
+              className={`flex items-center justify-between px-5 py-4 border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''} ${i % 2 === 0 ? 'bg-surface2/50' : 'bg-surface'}`}
             >
               <div className="flex-1 min-w-0">
                 <p className="text-text font-semibold text-sm">{voce.descrizione}</p>
@@ -209,9 +235,9 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
               </p>
             </div>
           ))}
-        </div>
+        </AccordionSection>
 
-        {/* ── Compenso (matches PDF comp_t table) ── */}
+        {/* ── Compenso (FISSO — non collassabile) ── */}
         <div className="bg-surface border border-edge rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 bg-surface2/50 border-b border-edge">
             <p className="text-muted text-sm font-semibold">Compenso totale</p>
@@ -231,15 +257,11 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
           </div>
         </div>
 
-        {/* ── Tranches (matches PDF tr_t table) ── */}
+        {/* ── Tranches ── */}
         {sezioni?.tranches && sezioni.tranches.length > 0 && (
-          <div className="bg-surface border border-edge rounded-xl overflow-hidden">
-            <div className="px-5 pt-4 pb-2">
-              <SectionTitle title="Modalità di pagamento" />
-            </div>
+          <AccordionSection title="Piano di pagamento" flush>
             {sezioni.tranches.map((t, i) => (
               <div key={i} className={`flex items-center border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}>
-                {/* Label col — slate bg like PDF */}
                 <div className="bg-slate px-4 py-3.5 w-28 shrink-0">
                   <p className="text-white text-xs font-bold">{i + 1}ª tranche</p>
                 </div>
@@ -252,29 +274,26 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
                 </div>
               </div>
             ))}
-          </div>
+          </AccordionSection>
         )}
 
         {/* ── Tempi ── */}
         {sezioni?.tempi && (
-          <div className="bg-surface border border-edge rounded-xl p-5">
-            <SectionTitle title="Tempi di consegna" />
+          <AccordionSection title="Tempi di consegna">
             <p className="text-muted text-sm leading-relaxed">{sezioni.tempi}</p>
-          </div>
+          </AccordionSection>
         )}
 
         {/* ── Garanzia ── */}
         {sezioni?.garanzia && (
-          <div className="bg-surface border border-edge rounded-xl p-5">
-            <SectionTitle title="Garanzia post-lancio" />
+          <AccordionSection title="Garanzia post-lancio">
             <p className="text-muted text-sm leading-relaxed">{sezioni.garanzia}</p>
-          </div>
+          </AccordionSection>
         )}
 
-        {/* ── Non incluso (matches PDF bullet with pink —) ── */}
+        {/* ── Non incluso ── */}
         {sezioni?.esclusioni && sezioni.esclusioni.length > 0 && (
-          <div className="bg-surface border border-edge rounded-xl p-5">
-            <SectionTitle title="Cosa non include questo preventivo" />
+          <AccordionSection title="Cosa non include questo preventivo">
             <div className="flex flex-col gap-2">
               {sezioni.esclusioni.map((e, i) => (
                 <div key={i} className="flex items-start gap-2">
@@ -283,42 +302,38 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
                 </div>
               ))}
             </div>
-          </div>
+          </AccordionSection>
         )}
 
-        {/* ── Manutenzione (matches PDF mnt_t table) ── */}
+        {/* ── Manutenzione ── */}
         {sezioni?.manutenzione && (
-          <div className="bg-surface border border-edge rounded-xl p-5">
-            <SectionTitle title="Piano di manutenzione" />
+          <AccordionSection title="Piano di manutenzione">
             <div className="flex items-center justify-between gap-4">
               <p className="text-muted text-sm leading-relaxed flex-1">{sezioni.manutenzione.descrizione}</p>
               <p className="text-accent font-bold text-xl shrink-0">
                 €{Number(sezioni.manutenzione.prezzo).toLocaleString('it-IT')}<span className="text-dim font-normal text-sm">/mese</span>
               </p>
             </div>
-          </div>
+          </AccordionSection>
         )}
 
         {/* ── Fasi successive ── */}
         {sezioni?.fasi_successive && (
-          <div className="bg-surface border border-edge rounded-xl p-5">
-            <SectionTitle title="Fasi successive" />
+          <AccordionSection title="Fasi successive">
             <p className="text-muted text-sm leading-relaxed">{sezioni.fasi_successive}</p>
-          </div>
+          </AccordionSection>
         )}
 
         {/* ── Note ── */}
         {sezioni?.note && (
-          <div className="bg-surface border border-edge rounded-xl p-5">
-            <SectionTitle title="Note" />
+          <AccordionSection title="Note">
             <p className="text-muted text-sm whitespace-pre-wrap leading-relaxed">{sezioni.note}</p>
-          </div>
+          </AccordionSection>
         )}
 
         {/* ── Accettazione / Conferma ── */}
         {!accettato ? (
-          <div className="border border-slate rounded-xl p-6 print:hidden">
-            <SectionTitle title="Accettazione" />
+          <AccordionSection title="Accettazione">
             <p className="text-muted text-sm mb-5 leading-relaxed">
               Compila il modulo sottostante per accettare il preventivo. La tua accettazione verrà registrata con data, ora e indirizzo IP.
             </p>
@@ -339,7 +354,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="mario.rossi@email.it" className={inputCls} />
             </div>
-            <label className="flex items-start gap-3 cursor-pointer mb-4 p-3 bg-surface rounded-lg border border-edge">
+            <label className="flex items-start gap-3 cursor-pointer mb-4 p-3 bg-bg rounded-lg border border-edge">
               <input type="checkbox" checked={vuoleEmail} onChange={(e) => setVuoleEmail(e.target.checked)}
                 className="mt-0.5 accent-accent" />
               <span className="text-muted text-sm">Voglio ricevere una copia del preventivo accettato via email</span>
@@ -361,7 +376,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
             >
               {loading ? 'Registrazione...' : 'Accetto il preventivo'}
             </button>
-          </div>
+          </AccordionSection>
         ) : (
           <div className="border border-green-800 bg-green-950/30 rounded-xl p-6 text-center print:hidden">
             <p className="text-green-400 font-semibold">

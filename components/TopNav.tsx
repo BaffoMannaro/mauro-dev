@@ -11,44 +11,76 @@ const NAV = [
   { href: '/preventivi/abbonamenti', label: 'Abbonamenti' },
 ];
 
-function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+type ThemeMode = 'auto' | 'dark' | 'light';
 
-  useEffect(() => {
-    const stored = localStorage.getItem('theme');
-    if (stored === 'light') {
-      setTheme('light');
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  }, []);
-
-  const toggle = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('theme', next);
-    if (next === 'light') {
+function applyTheme(mode: ThemeMode) {
+  if (mode === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else if (mode === 'dark') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    // auto: follow system
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
       document.documentElement.setAttribute('data-theme', 'light');
     } else {
       document.documentElement.removeAttribute('data-theme');
     }
+  }
+}
+
+function ThemeToggle() {
+  const [mode, setMode] = useState<ThemeMode>('auto');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('theme') as ThemeMode | null;
+    const initial: ThemeMode = stored === 'light' || stored === 'dark' ? stored : 'auto';
+    setMode(initial);
+    applyTheme(initial);
+
+    const mq = window.matchMedia('(prefers-color-scheme: light)');
+    const onSystemChange = () => {
+      if ((localStorage.getItem('theme') ?? 'auto') === 'auto') applyTheme('auto');
+    };
+    mq.addEventListener('change', onSystemChange);
+    return () => mq.removeEventListener('change', onSystemChange);
+  }, []);
+
+  const toggle = () => {
+    const next: ThemeMode = mode === 'auto' ? 'dark' : mode === 'dark' ? 'light' : 'auto';
+    setMode(next);
+    if (next === 'auto') localStorage.removeItem('theme');
+    else localStorage.setItem('theme', next);
+    applyTheme(next);
+  };
+
+  const titles: Record<ThemeMode, string> = {
+    auto:  'Auto (sistema) · click → scuro',
+    dark:  'Scuro · click → chiaro',
+    light: 'Chiaro · click → auto',
   };
 
   return (
     <button
       onClick={toggle}
-      title={theme === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'}
+      title={titles[mode]}
       className="w-8 h-8 flex items-center justify-center rounded-lg text-muted hover:text-text hover:bg-surface2 transition-colors"
     >
-      {theme === 'dark' ? (
+      {mode === 'auto' ? (
+        /* Monitor icon */
+        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path strokeLinecap="round" d="M8 21h8M12 17v4"/>
+        </svg>
+      ) : mode === 'dark' ? (
+        /* Moon icon */
+        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0118 15.75 9.75 9.75 0 018.25 6c0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 12c0 5.385 4.365 9.75 9.75 9.75 4.114 0 7.651-2.55 9.002-6.248z"/>
+        </svg>
+      ) : (
         /* Sun icon */
         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="4"/>
           <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-        </svg>
-      ) : (
-        /* Moon icon */
-        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0118 15.75 9.75 9.75 0 018.25 6c0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 12c0 5.385 4.365 9.75 9.75 9.75 4.114 0 7.651-2.55 9.002-6.248z"/>
         </svg>
       )}
     </button>

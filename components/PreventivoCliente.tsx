@@ -134,7 +134,12 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
             Emesso il {new Date(preventivo.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
           </p>
           <h1 className="text-3xl font-semibold text-text mb-4">{preventivo.oggetto}</h1>
-          {preventivo.scadenza && (
+          {accettato ? (
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-400">
+              <span className="w-2 h-2 rounded-full bg-green-400" />
+              Accettato
+            </span>
+          ) : preventivo.scadenza && (
             <div className="flex items-center justify-between">
               <p className="text-muted text-sm">
                 Valido fino al{' '}

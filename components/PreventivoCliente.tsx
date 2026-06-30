@@ -24,6 +24,7 @@ interface Preventivo {
   created_at: string;
   meta?: {
     cliente?: { piva?: string; telefono?: string };
+    preventivo?: { modalita_pagamento?: string };
     sezioni?: {
       intro?: string;
       descrizione?: string;
@@ -41,32 +42,33 @@ interface Preventivo {
 
 function useCountdown(scadenza: string | null) {
   const [countdown, setCountdown] = useState('');
-
   useEffect(() => {
     if (!scadenza) return;
     const target = new Date(scadenza);
     target.setHours(23, 59, 59, 999);
-
     const tick = () => {
-      const now = new Date();
-      const diff = target.getTime() - now.getTime();
-      if (diff <= 0) {
-        setCountdown('Scaduto');
-        return;
-      }
-      const giorni = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const ore = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minuti = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const secondi = Math.floor((diff % (1000 * 60)) / 1000);
-      setCountdown(`${giorni}g ${ore}h ${minuti}m ${secondi}s`);
+      const diff = target.getTime() - Date.now();
+      if (diff <= 0) { setCountdown('Scaduto'); return; }
+      const g = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setCountdown(`${g}g ${h}h ${m}m ${s}s`);
     };
-
     tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, [scadenza]);
-
   return countdown;
+}
+
+function SectionTitle({ title }: { title: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-[3px] h-5 bg-accent rounded-sm shrink-0" />
+      <p className="text-muted font-bold text-xs tracking-widest uppercase">{title}</p>
+    </div>
+  );
 }
 
 export default function PreventivoCliente({ preventivo }: { preventivo: Preventivo }) {
@@ -79,13 +81,12 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
   const [email, setEmail] = useState('');
   const [vuoleEmail, setVuoleEmail] = useState(false);
   const [erroreAccettazione, setErroreAccettazione] = useState('');
-  const countdown = useCountdown(preventivo.scadenza);
+  const countdown = useCountdown(accettato ? null : preventivo.scadenza);
 
   const meta = preventivo.meta;
   const sezioni = meta?.sezioni;
-
-  const imponibile = Number(preventivo.totale);
-  const totaleFinale = imponibile;
+  const totale = Number(preventivo.totale);
+  const dataEmissione = new Date(preventivo.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
 
   const handleAccetta = async () => {
     setErroreAccettazione('');
@@ -99,12 +100,8 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nome, cognome, email, vuole_email: vuoleEmail }),
     });
-    if (res.ok) {
-      setAccettato(true);
-      setConfermato(true);
-    } else {
-      setErroreAccettazione('Errore nella registrazione. Riprova.');
-    }
+    if (res.ok) { setAccettato(true); setConfermato(true); }
+    else setErroreAccettazione('Errore nella registrazione. Riprova.');
     setLoading(false);
   };
 
@@ -112,174 +109,219 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
 
   return (
     <div className="min-h-screen bg-bg text-text">
-      {/* Header */}
-      <header className="border-b border-edge px-6 py-4 flex items-center justify-between print:hidden">
-        <img src="/Logo.svg" alt="MAURO DEV" className="h-7 w-auto logo-adaptive" />
-        <button
-          onClick={() => window.print()}
-          className="text-sm text-muted hover:text-text transition-colors flex items-center gap-2"
-        >
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.056 48.056 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/>
-          </svg>
-          Scarica PDF
-        </button>
+
+      {/* ── Header — dark slate + pink line (matches PDF header) ── */}
+      <header className="bg-slate relative print:bg-slate">
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-accent" />
+        <div className="max-w-3xl mx-auto px-6 py-5 flex items-center justify-between">
+          <img src="/Logo.svg" alt="MAURO DEV" className="h-7 w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
+          <div className="flex items-center gap-5">
+            <button
+              onClick={() => window.print()}
+              className="print:hidden text-muted hover:text-white text-sm transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.056 48.056 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+              </svg>
+              Stampa
+            </button>
+            <div className="text-right">
+              <p className="text-white font-bold text-sm tracking-[0.15em]">PREVENTIVO</p>
+              <p className="text-muted text-xs mt-0.5">{dataEmissione}</p>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-12">
+      <main className="max-w-3xl mx-auto px-6 py-8 flex flex-col gap-6">
 
-        {/* Intestazione */}
-        <div className="mb-10">
-          <p className="text-dim text-sm mb-1">
-            Emesso il {new Date(preventivo.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
-          </p>
-          <h1 className="text-3xl font-semibold text-text mb-4">{preventivo.oggetto}</h1>
-          {accettato ? (
-            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-400">
-              <span className="w-2 h-2 rounded-full bg-green-400" />
-              Accettato
-            </span>
-          ) : preventivo.scadenza && (
-            <div className="flex items-center justify-between">
-              <p className="text-muted text-sm">
-                Valido fino al{' '}
-                <span className="text-text">
-                  {new Date(preventivo.scadenza).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
-                </span>
-              </p>
-              <p className="text-sm font-mono text-muted print:hidden">
-                <span className={countdown === 'Scaduto' ? 'text-red-400' : 'text-accent'}>
-                  {countdown}
-                </span>
-              </p>
+        {/* ── Destinatario (matches PDF dest_t table) ── */}
+        <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+          <div className="bg-surface2 px-5 py-3 flex justify-between border-b border-edge">
+            <p className="text-accent text-xs font-bold tracking-widest">DESTINATARIO</p>
+            <p className="text-accent text-xs font-bold tracking-widest">
+              {accettato ? 'STATO' : 'VALIDITÀ'}
+            </p>
+          </div>
+          <div className="px-5 py-4 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-text font-bold text-base leading-snug">{preventivo.cliente_nome}</p>
+              {preventivo.cliente_azienda && preventivo.cliente_azienda !== preventivo.cliente_nome && (
+                <p className="text-muted text-sm">{preventivo.cliente_azienda}</p>
+              )}
+              {meta?.cliente?.piva && <p className="text-muted text-sm">P.IVA {meta.cliente.piva}</p>}
+              <p className="text-muted text-sm">{preventivo.cliente_email}</p>
+              {meta?.cliente?.telefono && <p className="text-muted text-sm">{meta.cliente.telefono}</p>}
             </div>
+            <div className="text-right shrink-0">
+              {accettato ? (
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-400">
+                  <span className="w-2 h-2 rounded-full bg-green-400" />
+                  Accettato
+                </span>
+              ) : (
+                <>
+                  <p className="text-muted text-sm">
+                    {preventivo.scadenza
+                      ? new Date(preventivo.scadenza).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })
+                      : '30 giorni'}
+                  </p>
+                  {countdown && (
+                    <p className={`text-xs font-mono mt-1 print:hidden ${countdown === 'Scaduto' ? 'text-red-400' : 'text-accent'}`}>
+                      {countdown}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Oggetto ── */}
+        <div className="bg-surface border border-edge rounded-xl p-5">
+          <SectionTitle title={`Oggetto: ${preventivo.oggetto}`} />
+          {sezioni?.intro && (
+            <p className="text-muted text-sm leading-relaxed">{sezioni.intro}</p>
+          )}
+          {sezioni?.descrizione && (
+            <p className="text-muted text-sm leading-relaxed mt-3 whitespace-pre-wrap">{sezioni.descrizione}</p>
           )}
         </div>
 
-        {/* Intro */}
-        {sezioni?.intro && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-muted text-sm whitespace-pre-wrap">{sezioni.intro}</p>
-          </div>
-        )}
-
-        {/* Destinatario */}
-        <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-          <p className="text-dim text-xs font-mono mb-3">DESTINATARIO</p>
-          <p className="text-text font-medium">{preventivo.cliente_nome}</p>
-          {preventivo.cliente_azienda && preventivo.cliente_azienda !== preventivo.cliente_nome && (
-            <p className="text-muted">{preventivo.cliente_azienda}</p>
-          )}
-          {meta?.cliente?.piva && <p className="text-muted text-sm">P.IVA {meta.cliente.piva}</p>}
-          <p className="text-muted text-sm">{preventivo.cliente_email}</p>
-          {meta?.cliente?.telefono && <p className="text-muted text-sm">{meta.cliente.telefono}</p>}
-        </div>
-
-        {/* Descrizione */}
-        {sezioni?.descrizione && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-dim text-xs font-mono mb-3">DESCRIZIONE</p>
-            <p className="text-muted text-sm whitespace-pre-wrap">{sezioni.descrizione}</p>
-          </div>
-        )}
-
-        {/* Riepilogo voci */}
-        <div className="bg-surface border border-edge rounded-xl overflow-hidden mb-6">
-          <div className="grid grid-cols-12 px-6 py-3 border-b border-edge">
-            <span className="col-span-6 text-dim text-xs font-mono">RIEPILOGO</span>
-            <span className="col-span-2 text-dim text-xs font-mono text-center">QTÀ</span>
-            <span className="col-span-2 text-dim text-xs font-mono text-right">PREZZO</span>
-            <span className="col-span-2 text-dim text-xs font-mono text-right">TOTALE</span>
+        {/* ── Dettaglio voci (matches PDF lista_block) ── */}
+        <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-edge">
+            <SectionTitle title="Dettaglio attività" />
           </div>
           {preventivo.voci.map((voce, i) => (
-            <div key={i} className="grid grid-cols-12 px-6 py-4 border-b border-edge/50 last:border-0">
-              <span className="col-span-6 text-text">{voce.descrizione}</span>
-              <span className="col-span-2 text-muted text-center">{voce.quantita}</span>
-              <span className="col-span-2 text-muted text-right">€{Number(voce.prezzo).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
-              <span className="col-span-2 text-text text-right">€{(voce.quantita * voce.prezzo).toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
+            <div
+              key={i}
+              className={`flex items-center justify-between px-5 py-4 border-b border-edge/40 last:border-0 ${i % 2 === 0 ? 'bg-surface2/50' : 'bg-surface'}`}
+            >
+              <div className="flex-1 min-w-0">
+                <p className="text-text font-semibold text-sm">{voce.descrizione}</p>
+                {voce.quantita > 1 && (
+                  <p className="text-dim text-xs mt-0.5">Qtà: {voce.quantita}</p>
+                )}
+              </div>
+              <p className="text-accent font-bold text-base ml-6 shrink-0">
+                €{(voce.quantita * voce.prezzo).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Totale */}
-        <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-          <div className="flex justify-between text-text font-semibold text-lg">
-            <span>Totale</span>
-            <span>€{totaleFinale.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
+        {/* ── Compenso (matches PDF comp_t table) ── */}
+        <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 bg-surface2/50 border-b border-edge">
+            <p className="text-muted text-sm font-semibold">Compenso totale</p>
+            <p className="text-accent font-bold text-2xl">
+              €{totale.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+            </p>
           </div>
-          <p className="text-dim text-xs mt-1">{preventivo.iva ? 'IVA inclusa' : 'Esente IVA'}</p>
+          <div className="flex items-center justify-between px-5 py-3">
+            <p className="text-muted text-sm">Modalità di pagamento</p>
+            <p className="text-text text-sm">
+              {meta?.preventivo?.modalita_pagamento ?? 'Bonifico bancario'}
+            </p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3 border-t border-edge/40">
+            <p className="text-muted text-sm">IVA</p>
+            <p className="text-text text-sm">{preventivo.iva ? 'Inclusa' : 'Esente / regime forfettario'}</p>
+          </div>
         </div>
 
-        {/* Tranches */}
+        {/* ── Tranches (matches PDF tr_t table) ── */}
         {sezioni?.tranches && sezioni.tranches.length > 0 && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-dim text-xs font-mono mb-3">MODALITÀ DI PAGAMENTO</p>
+          <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+            <div className="px-5 pt-4 pb-2">
+              <SectionTitle title="Modalità di pagamento" />
+            </div>
             {sezioni.tranches.map((t, i) => (
-              <div key={i} className="flex justify-between text-sm py-2 border-b border-edge/50 last:border-0">
-                <span className="text-muted">{t.descrizione}</span>
-                <span className="text-text font-medium">
-                  €{Math.round(totaleFinale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                </span>
+              <div key={i} className={`flex items-center border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}>
+                {/* Label col — slate bg like PDF */}
+                <div className="bg-slate px-4 py-3.5 w-28 shrink-0">
+                  <p className="text-white text-xs font-bold">{i + 1}ª tranche</p>
+                </div>
+                <div className="flex-1 flex items-center justify-between px-5 py-3.5 bg-surface2/40">
+                  <p className="text-muted text-sm">{t.descrizione}</p>
+                  <p className="text-accent font-bold text-sm ml-4 shrink-0">
+                    €{Math.round(totale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                    <span className="text-dim font-normal text-xs ml-1">({t.percentuale}%)</span>
+                  </p>
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Tempi */}
+        {/* ── Tempi ── */}
         {sezioni?.tempi && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-dim text-xs font-mono mb-2">TEMPI DI CONSEGNA</p>
-            <p className="text-muted text-sm">{sezioni.tempi}</p>
+          <div className="bg-surface border border-edge rounded-xl p-5">
+            <SectionTitle title="Tempi di consegna" />
+            <p className="text-muted text-sm leading-relaxed">{sezioni.tempi}</p>
           </div>
         )}
 
-        {/* Garanzia */}
+        {/* ── Garanzia ── */}
         {sezioni?.garanzia && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-dim text-xs font-mono mb-2">GARANZIA</p>
-            <p className="text-muted text-sm">{sezioni.garanzia}</p>
+          <div className="bg-surface border border-edge rounded-xl p-5">
+            <SectionTitle title="Garanzia post-lancio" />
+            <p className="text-muted text-sm leading-relaxed">{sezioni.garanzia}</p>
           </div>
         )}
 
-        {/* Non incluso */}
+        {/* ── Non incluso (matches PDF bullet with pink —) ── */}
         {sezioni?.esclusioni && sezioni.esclusioni.length > 0 && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-dim text-xs font-mono mb-3">NON INCLUSO</p>
-            {sezioni.esclusioni.map((e, i) => (
-              <p key={i} className="text-muted text-sm py-0.5">· {e}</p>
-            ))}
+          <div className="bg-surface border border-edge rounded-xl p-5">
+            <SectionTitle title="Cosa non include questo preventivo" />
+            <div className="flex flex-col gap-2">
+              {sezioni.esclusioni.map((e, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="text-accent font-bold text-sm leading-5 shrink-0">—</span>
+                  <p className="text-muted text-sm leading-5">{e}</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Manutenzione */}
+        {/* ── Manutenzione (matches PDF mnt_t table) ── */}
         {sezioni?.manutenzione && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-dim text-xs font-mono mb-2">MANUTENZIONE</p>
-            <p className="text-muted text-sm">{sezioni.manutenzione.descrizione}</p>
-            <p className="text-accent font-semibold mt-2">€{Number(sezioni.manutenzione.prezzo).toLocaleString('it-IT')}/mese</p>
+          <div className="bg-surface border border-edge rounded-xl p-5">
+            <SectionTitle title="Piano di manutenzione" />
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-muted text-sm leading-relaxed flex-1">{sezioni.manutenzione.descrizione}</p>
+              <p className="text-accent font-bold text-xl shrink-0">
+                €{Number(sezioni.manutenzione.prezzo).toLocaleString('it-IT')}<span className="text-dim font-normal text-sm">/mese</span>
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Sviluppi futuri */}
+        {/* ── Fasi successive ── */}
         {sezioni?.fasi_successive && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-6">
-            <p className="text-dim text-xs font-mono mb-2">SVILUPPI FUTURI</p>
-            <p className="text-muted text-sm">{sezioni.fasi_successive}</p>
+          <div className="bg-surface border border-edge rounded-xl p-5">
+            <SectionTitle title="Fasi successive" />
+            <p className="text-muted text-sm leading-relaxed">{sezioni.fasi_successive}</p>
           </div>
         )}
 
-        {/* Note */}
+        {/* ── Note ── */}
         {sezioni?.note && (
-          <div className="bg-surface border border-edge rounded-xl p-6 mb-8">
-            <p className="text-dim text-xs font-mono mb-2">NOTE</p>
-            <p className="text-muted text-sm whitespace-pre-wrap">{sezioni.note}</p>
+          <div className="bg-surface border border-edge rounded-xl p-5">
+            <SectionTitle title="Note" />
+            <p className="text-muted text-sm whitespace-pre-wrap leading-relaxed">{sezioni.note}</p>
           </div>
         )}
 
-        {/* Accettazione */}
+        {/* ── Accettazione / Conferma ── */}
         {!accettato ? (
           <div className="border border-slate rounded-xl p-6 print:hidden">
-            <p className="text-dim text-xs font-mono mb-5">ACCETTAZIONE</p>
+            <SectionTitle title="Accettazione" />
+            <p className="text-muted text-sm mb-5 leading-relaxed">
+              Compila il modulo sottostante per accettare il preventivo. La tua accettazione verrà registrata con data, ora e indirizzo IP.
+            </p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
                 <label className="text-dim text-xs font-mono block mb-1">NOME *</label>
@@ -300,16 +342,13 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
             <label className="flex items-start gap-3 cursor-pointer mb-4 p-3 bg-surface rounded-lg border border-edge">
               <input type="checkbox" checked={vuoleEmail} onChange={(e) => setVuoleEmail(e.target.checked)}
                 className="mt-0.5 accent-accent" />
-              <span className="text-muted text-sm">
-                Voglio ricevere una copia del preventivo accettato via email
-              </span>
+              <span className="text-muted text-sm">Voglio ricevere una copia del preventivo accettato via email</span>
             </label>
             <label className="flex items-start gap-3 cursor-pointer mb-5">
               <input type="checkbox" checked={checkbox} onChange={(e) => setCheckbox(e.target.checked)}
                 className="mt-1 accent-accent" />
               <span className="text-muted text-sm">
                 Dichiaro di aver letto e compreso il preventivo e accetto le condizioni indicate.
-                L'accettazione verrà registrata con data, ora e indirizzo IP.
               </span>
             </label>
             {erroreAccettazione && (
@@ -318,33 +357,36 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
             <button
               onClick={handleAccetta}
               disabled={!checkbox || loading}
-              className="w-full bg-accent text-white font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 transition-colors"
+              className="w-full bg-accent text-white font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 transition-colors cursor-pointer"
             >
               {loading ? 'Registrazione...' : 'Accetto il preventivo'}
             </button>
           </div>
         ) : (
           <div className="border border-green-800 bg-green-950/30 rounded-xl p-6 text-center print:hidden">
-            <p className="text-green-400 font-medium">
+            <p className="text-green-400 font-semibold">
               {confermato ? '✓ Preventivo accettato con successo' : '✓ Preventivo già accettato'}
             </p>
             <p className="text-dim text-sm mt-1">L'accettazione è stata registrata</p>
           </div>
         )}
 
-        {/* Firma PDF */}
-        <div className="hidden print:block mt-12 pt-8 border-t border-zinc-300">
-          <div className="flex justify-between text-sm text-zinc-600">
+        {/* ── Footer firma (solo stampa) ── */}
+        <div className="hidden print:block mt-8 pt-6 border-t border-edge">
+          <div className="flex justify-between text-sm text-muted">
             <div>
-              <p className="font-medium text-zinc-800">Mauro Altamura</p>
-              <p>maurodev.it</p>
+              <p className="font-bold text-text">Mauro Altamura</p>
+              <p>altamura.mauro@gmail.com · maurodev.it</p>
+              <p className="mt-1">P.IVA IT08250840728</p>
             </div>
             <div className="text-right">
-              <p>Firma per accettazione</p>
-              <div className="mt-6 border-b border-zinc-400 w-48"></div>
+              <p className="text-dim text-xs mb-6">Per accettazione — {preventivo.cliente_nome}</p>
+              <div className="border-b border-muted w-52 mb-1" />
+              <p className="text-dim text-xs">Firma e data</p>
             </div>
           </div>
         </div>
+
       </main>
     </div>
   );

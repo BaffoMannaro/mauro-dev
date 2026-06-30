@@ -53,36 +53,34 @@ function ThemeToggle() {
     applyTheme(next);
   };
 
-  const titles: Record<ThemeMode, string> = {
-    auto:  'Auto (sistema) · click → scuro',
-    dark:  'Scuro · click → chiaro',
-    light: 'Chiaro · click → auto',
+  const labels: Record<ThemeMode, string> = {
+    auto:  'Sincronizzato',
+    dark:  'Scuro',
+    light: 'Chiaro',
   };
 
   return (
     <button
       onClick={toggle}
-      title={titles[mode]}
-      className="w-8 h-8 flex items-center justify-center rounded-lg text-muted hover:text-text hover:bg-surface2 transition-colors"
+      title={`Tema: ${labels[mode]}`}
+      className="flex items-center gap-1.5 px-2 h-8 rounded-lg text-muted hover:text-text hover:bg-surface2 transition-colors"
     >
       {mode === 'auto' ? (
-        /* Monitor icon */
         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
           <rect x="2" y="3" width="20" height="14" rx="2"/>
           <path strokeLinecap="round" d="M8 21h8M12 17v4"/>
         </svg>
       ) : mode === 'dark' ? (
-        /* Moon icon */
         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0118 15.75 9.75 9.75 0 018.25 6c0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 12c0 5.385 4.365 9.75 9.75 9.75 4.114 0 7.651-2.55 9.002-6.248z"/>
         </svg>
       ) : (
-        /* Sun icon */
         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="4"/>
           <path strokeLinecap="round" d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
         </svg>
       )}
+      <span className="text-xs hidden sm:block">{labels[mode]}</span>
     </button>
   );
 }

@@ -170,7 +170,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
           <img src="/Logo.svg" alt="MAURO DEV" className="h-7 w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
           <div className="text-right">
             <p className="text-white font-bold text-sm tracking-[0.15em]">PREVENTIVO</p>
-            <p className="text-muted text-xs mt-0.5">{dataEmissione}</p>
+            <p className="text-white text-xs mt-0.5">{dataEmissione}</p>
           </div>
         </div>
       </header>

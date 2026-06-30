@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 
@@ -16,10 +17,9 @@ export default function TopNav({ session }: { session: any }) {
   return (
     <nav className="h-14 border-b border-edge bg-surface flex items-center px-6 gap-6 shrink-0">
       {/* Brand */}
-      <div className="flex items-center gap-0.5 mr-4">
-        <span className="text-accent font-bold tracking-tight">mauro</span>
-        <span className="text-muted font-medium">dev.it</span>
-      </div>
+      <Link href="/preventivi" className="mr-4 shrink-0 flex items-center">
+        <Image src="/Logo.svg" alt="MAURO DEV" width={120} height={40} className="h-7 w-auto brightness-0 invert" />
+      </Link>
 
       {/* Links */}
       <div className="flex items-center gap-1 flex-1">

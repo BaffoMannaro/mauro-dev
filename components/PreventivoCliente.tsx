@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface Voce {
   descrizione: string;
@@ -114,10 +115,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
     <div className="min-h-screen bg-bg text-white">
       {/* Header */}
       <header className="border-b border-edge px-6 py-4 flex items-center justify-between print:hidden">
-        <div className="flex items-center gap-0.5">
-          <span className="text-accent font-bold tracking-tight">mauro</span>
-          <span className="text-muted font-medium">dev.it</span>
-        </div>
+        <Image src="/Logo.svg" alt="MAURO DEV" width={120} height={40} className="h-7 w-auto brightness-0 invert" />
         <button
           onClick={() => window.print()}
           className="text-sm text-muted hover:text-white transition-colors flex items-center gap-2"

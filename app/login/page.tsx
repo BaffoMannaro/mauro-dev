@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { signIn } from '@/lib/auth';
 
 export default function LoginPage() {
@@ -5,11 +6,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-bg flex items-center justify-center">
       <div className="bg-surface border border-edge rounded-2xl p-10 flex flex-col items-center gap-6 w-full max-w-sm">
         <div className="text-center">
-          <div className="flex items-center justify-center gap-0.5 mb-2">
-            <span className="text-accent font-bold tracking-tight text-xl">mauro</span>
-            <span className="text-muted font-medium text-xl">dev.it</span>
-          </div>
-          <h1 className="text-white text-2xl font-semibold mt-4">Accedi</h1>
+          <Image src="/Logo.svg" alt="MAURO DEV" width={160} height={52} className="h-10 w-auto brightness-0 invert mx-auto mb-6" />
+          <h1 className="text-white text-2xl font-semibold">Accedi</h1>
           <p className="text-muted text-sm mt-2">Area riservata gestione preventivi</p>
         </div>
         <form

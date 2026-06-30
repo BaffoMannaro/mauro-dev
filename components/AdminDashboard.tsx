@@ -43,6 +43,13 @@ const STATI = {
   archiviato: { label: 'Archiviato', color: 'text-zinc-400 bg-zinc-900 border-zinc-700' },
 };
 
+const ORDINE_STATI: Record<string, number> = {
+  inviato: 0,
+  accettato: 1,
+  rifiutato: 2,
+  archiviato: 3,
+};
+
 export default function AdminDashboard({
   preventivi: initialPreventivi,
   session,
@@ -56,9 +63,12 @@ export default function AdminDashboard({
   const [nuovoOpen, setNuovoOpen] = useState(false);
   const [drawerPreventivo, setDrawerPreventivo] = useState<Preventivo | null>(null);
 
-  const filtrati = filtro === 'tutti'
-    ? preventivi
-    : preventivi.filter((p) => p.stato === filtro);
+  const filtrati = [...(filtro === 'tutti' ? preventivi : preventivi.filter((p) => p.stato === filtro))]
+    .sort((a, b) => {
+      const dStato = (ORDINE_STATI[a.stato] ?? 99) - (ORDINE_STATI[b.stato] ?? 99);
+      if (dStato !== 0) return dStato;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 
   const copiaLink = (token: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -243,6 +253,14 @@ export default function AdminDashboard({
                       className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
                     >
                       Archivia
+                    </button>
+                  )}
+                  {p.stato === 'archiviato' && (
+                    <button
+                      onClick={(e) => aggiornaStato(p.id, 'accettato', e)}
+                      className="text-xs px-3 py-1.5 bg-zinc-800 hover:bg-green-950 text-green-400 rounded-lg transition-colors"
+                    >
+                      Riattiva
                     </button>
                   )}
                   <button

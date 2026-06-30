@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Preventivo {
   id: number;
@@ -46,6 +46,12 @@ export default function PreventivoDrawer({
       : metaTranches.length > 0
         ? metaTranches.map((t: any) => ({ ...t, pagato: false }))
         : [{ descrizione: 'Pagamento unico', percentuale: 100, pagato: false }];
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   const [tranchesLocali, setTranchesLocali] = useState(tranches);
   const [inizio, setInizio] = useState(preventivo.lavoro_inizio ? new Date(preventivo.lavoro_inizio).toISOString().slice(0, 10) : '');

@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   title: 'maurodev.it',
   description: 'Mauro Altamura — Sviluppatore Web',
   robots: 'noindex, nofollow',
-  icons: { icon: '/Logo26.png' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

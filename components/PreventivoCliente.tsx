@@ -66,28 +66,44 @@ function AccordionSection({
   title,
   children,
   flush = false,
+  defaultOpen = false,
 }: {
   title: string;
   children: React.ReactNode;
   flush?: boolean;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
+  const [seen, setSeen] = useState(defaultOpen);
+
+  const toggle = () => {
+    setOpen((v) => {
+      if (!v) setSeen(true);
+      return !v;
+    });
+  };
+
   return (
     <div className="bg-surface border border-edge rounded-xl overflow-hidden">
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
         className="w-full flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-surface2/50 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className="w-[3px] h-5 bg-accent rounded-sm shrink-0" />
           <p className="text-muted font-bold text-xs tracking-widest uppercase">{title}</p>
         </div>
-        <svg
-          className={`w-4 h-4 text-dim transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-        </svg>
+        <div className="relative flex items-center">
+          {!seen && (
+            <span className="absolute -top-1.5 -right-1.5 w-2 h-2 rounded-full bg-accent" />
+          )}
+          <svg
+            className={`w-4 h-4 text-dim transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
+        </div>
       </button>
       {open && (
         <div className={flush ? '' : 'px-5 pb-5'}>
@@ -205,7 +221,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
         </div>
 
         {/* ── Oggetto ── */}
-        <AccordionSection title={`Oggetto: ${preventivo.oggetto}`}>
+        <AccordionSection title={`Oggetto: ${preventivo.oggetto}`} defaultOpen>
           {sezioni?.intro && (
             <p className="text-muted text-sm leading-relaxed">{sezioni.intro}</p>
           )}

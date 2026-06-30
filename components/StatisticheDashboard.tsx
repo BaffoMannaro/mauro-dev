@@ -154,11 +154,12 @@ export default function StatisticheDashboard({
     });
 
     const maxValore = Math.max(...mesi.map((m) => Math.max(m.incassato, m.costoAbbonamenti)), 1);
+    const mesiTrascorsi = mesi.filter((m) => new Date(m.anno, m.mese, 1) <= oggi);
     const mesiConDati = mesi.filter((m) => m.incassato > 0);
     const mediaIncassatoMensile = mesiConDati.length > 0
       ? mesiConDati.reduce((s, m) => s + m.incassato, 0) / mesiConDati.length : 0;
-    const mediaNettoMensile = mesiConDati.length > 0
-      ? mesiConDati.reduce((s, m) => s + m.netto, 0) / mesiConDati.length : 0;
+    const mediaNettoMensile = mesiTrascorsi.length > 0
+      ? mesiTrascorsi.reduce((s, m) => s + m.netto, 0) / mesiTrascorsi.length : 0;
 
     // Costo abbonamenti mensile totale attuale
     const meseCorrente = new Date();
@@ -315,7 +316,7 @@ export default function StatisticheDashboard({
             </div>
           </div>
         </div>
-
+        
         {/* Lista progetti */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="px-6 py-4 border-b border-zinc-800">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface Tranche {
   descrizione: string;
@@ -54,6 +54,8 @@ export default function StatisticheDashboard({
   preventivi: Preventivo[];
   abbonamenti: Abbonamento[];
 }) {
+  const [includiDaIncassare, setIncludiDaIncassare] = useState(false);
+
   const stats = useMemo(() => {
     const accettati = preventivi.filter((p) => p.stato === 'accettato' || p.stato === 'archiviato');
     const totaleContrattualizzato = accettati.reduce((acc, p) => acc + Number(p.totale), 0);
@@ -76,6 +78,8 @@ export default function StatisticheDashboard({
         .reduce((s, t) => s + Number(p.totale) * t.percentuale / 100, 0);
     }, 0);
 
+    const totaleIncassatoEffettivo = includiDaIncassare ? totalePagato + totaleNonPagato : totalePagato;
+
     const oggi = new Date();
     const annoFiscaleInizio = oggi.getMonth() >= 9 ? oggi.getFullYear() : oggi.getFullYear() - 1;
     const inizioAnnoFiscale = new Date(annoFiscaleInizio, 9, 1);
@@ -87,7 +91,7 @@ export default function StatisticheDashboard({
       cursore.setDate(cursore.getDate() + 1);
     }
 
-    const guadagnoAlGiorno = giorniLavorativiAnno > 0 ? totalePagato / giorniLavorativiAnno : 0;
+    const guadagnoAlGiorno = giorniLavorativiAnno > 0 ? totaleIncassatoEffettivo / giorniLavorativiAnno : 0;
     const guadagnoAllOra = guadagnoAlGiorno / 8;
 
     const mesi = Array.from({ length: 12 }, (_, i) => {
@@ -106,15 +110,21 @@ export default function StatisticheDashboard({
 
     accettati.forEach((p) => {
       const d = new Date(p.accettato_at || p.created_at);
-      const m = mesi.find((m) => m.anno === d.getFullYear() && m.mese === d.getMonth());
-      if (!m) return;
-      m.contrattualizzato += Number(p.totale);
-      m.count++;
+      const mAccettazione = mesi.find((m) => m.anno === d.getFullYear() && m.mese === d.getMonth());
+      if (!mAccettazione) return;
+      mAccettazione.contrattualizzato += Number(p.totale);
+      mAccettazione.count++;
       if (p.tranches_stato && p.tranches_stato.length > 0) {
-        p.tranches_stato.filter((t: any) => t.pagato).forEach((t: any) => {
-          const dataPag = t.data_pagamento ? new Date(t.data_pagamento) : new Date(p.accettato_at || p.created_at);
-          const mPag = mesi.find((m) => m.anno === dataPag.getFullYear() && m.mese === dataPag.getMonth());
-          if (mPag) mPag.incassato += Number(p.totale) * t.percentuale / 100;
+        p.tranches_stato.forEach((t: any) => {
+          const importo = Number(p.totale) * t.percentuale / 100;
+          if (t.pagato) {
+            const dataPag = t.data_pagamento ? new Date(t.data_pagamento) : new Date(p.accettato_at || p.created_at);
+            const mPag = mesi.find((m) => m.anno === dataPag.getFullYear() && m.mese === dataPag.getMonth());
+            if (mPag) mPag.incassato += importo;
+          } else if (includiDaIncassare) {
+            // tranche non pagata: attribuita al mese di accettazione
+            mAccettazione.incassato += importo;
+          }
         });
       }
     });
@@ -139,12 +149,12 @@ export default function StatisticheDashboard({
 
     return {
       accettati, totaleContrattualizzato, inviati, rifiutati,
-      tassoAccettazione, totalePagato, totaleNonPagato,
+      tassoAccettazione, totalePagato, totaleNonPagato, totaleIncassatoEffettivo,
       guadagnoAlGiorno, guadagnoAllOra, giorniLavorativiAnno,
       mesi, maxValore, mediaIncassatoMensile, mediaNettoMensile,
       costoAbbMensileCorrente,
     };
-  }, [preventivi, abbonamenti]);
+  }, [preventivi, abbonamenti, includiDaIncassare]);
 
   const fmt = (n: number) => `€${Math.round(n).toLocaleString('it-IT')}`;
 
@@ -152,8 +162,19 @@ export default function StatisticheDashboard({
     <div className="min-h-screen text-text">
 
       {/* Header */}
-      <header className="border-b border-edge px-6 py-5">
+      <header className="border-b border-edge px-6 py-5 flex items-center justify-between">
         <h1 className="text-xl font-semibold">Statistiche</h1>
+        <button
+          onClick={() => setIncludiDaIncassare((v) => !v)}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+            includiDaIncassare
+              ? 'bg-accent/10 border-accent text-accent'
+              : 'bg-surface2 border-edge text-muted hover:text-text hover:border-slate'
+          }`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${includiDaIncassare ? 'bg-accent' : 'bg-dim'}`} />
+          {includiDaIncassare ? 'Incluso da incassare' : 'Includi da incassare'}
+        </button>
       </header>
 
       <div className="px-6 py-6 max-w-6xl mx-auto flex flex-col gap-6">
@@ -162,8 +183,8 @@ export default function StatisticheDashboard({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: 'CONTRATTUALIZZATO', value: fmt(stats.totaleContrattualizzato), sub: `${stats.accettati.length} progetti`, color: 'text-text' },
-            { label: 'INCASSATO',         value: fmt(stats.totalePagato),            sub: 'tranches pagate',      color: 'text-green-400' },
-            { label: 'DA INCASSARE',      value: fmt(stats.totaleNonPagato),         sub: 'tranches in attesa',   color: 'text-accent' },
+            { label: 'INCASSATO',         value: fmt(stats.totaleIncassatoEffettivo), sub: includiDaIncassare ? 'pagato + da incassare' : 'tranches pagate', color: 'text-green-400' },
+            { label: 'DA INCASSARE',      value: includiDaIncassare ? '—' : fmt(stats.totaleNonPagato), sub: includiDaIncassare ? 'incluso nel calcolo' : 'tranches in attesa', color: includiDaIncassare ? 'text-dim' : 'text-accent' },
             { label: 'TASSO ACCETTAZIONE',value: `${stats.tassoAccettazione}%`,      sub: `${stats.rifiutati} rifiutati · ${stats.inviati} in attesa`, color: 'text-text' },
           ].map((k) => (
             <div key={k.label} className="bg-surface border border-edge rounded-xl p-5">

@@ -8,7 +8,10 @@ const notoSans = Noto_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'maurodev.it',
+  title: {
+    default: 'maurodev.it',
+    template: '%s — maurodev.it',
+  },
   description: 'Mauro Altamura — Sviluppatore Web',
   robots: 'noindex, nofollow',
 };

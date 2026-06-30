@@ -105,11 +105,9 @@ function AccordionSection({
           </svg>
         </div>
       </button>
-      {open && (
-        <div className={flush ? '' : 'px-5 pb-5'}>
-          {children}
-        </div>
-      )}
+      <div className={`print:block! ${open ? '' : 'hidden'} ${flush ? '' : 'px-5 pb-5'}`}>
+        {children}
+      </div>
     </div>
   );
 }

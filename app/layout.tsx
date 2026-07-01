@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="it">
       <head>
         {/* Anti-flash: apply stored theme before first paint */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');}else if(!t){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}}catch(e){}})();` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var q=new URLSearchParams(window.location.search).get('theme');if(q==='light'){document.documentElement.setAttribute('data-theme','light');return;}if(q==='dark'){return;}var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');}else if(!t){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}}catch(e){}})();` }} />
       </head>
       <body className={notoSans.className}>{children}</body>
     </html>

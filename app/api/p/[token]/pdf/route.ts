@@ -25,7 +25,7 @@ export async function GET(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      source: `${SITE_URL}/p/${token}`,
+      source: `${SITE_URL}/p/${token}?theme=light`,
       use_print: true,
       format: 'A4',
       margin: { top: '12mm', right: '12mm', bottom: '12mm', left: '12mm' },

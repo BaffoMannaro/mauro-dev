@@ -2,6 +2,38 @@
 
 import { useState, useEffect } from 'react';
 
+const IBAN = 'IT31T0103041570000001893771';
+
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
+  return (
+    <button
+      onClick={copy}
+      title={copied ? 'Copiato' : 'Copia IBAN'}
+      aria-label="Copia IBAN"
+      className="print:hidden shrink-0 text-dim hover:text-accent transition-colors cursor-pointer"
+    >
+      {copied ? (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      ) : (
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 interface Voce {
   descrizione: string;
   quantita: number;
@@ -266,6 +298,13 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
               {meta?.preventivo?.modalita_pagamento ?? 'Bonifico bancario'}
             </p>
           </div>
+          <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-edge/40">
+            <p className="text-muted text-sm shrink-0">IBAN</p>
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-text text-sm font-mono tracking-tight truncate">{IBAN}</span>
+              <CopyButton value={IBAN} />
+            </div>
+          </div>
           {meta?.preventivo?.schema_pagamento && (
             <div className="flex items-center justify-between px-5 py-3 border-t border-edge/40">
               <p className="text-muted text-sm">Schema pagamento</p>
@@ -274,7 +313,7 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
           )}
           <div className="flex items-center justify-between px-5 py-3 border-t border-edge/40">
             <p className="text-muted text-sm">IVA</p>
-            <p className="text-text text-sm">{preventivo.iva ? 'Inclusa' : 'Esente / regime forfettario'}</p>
+            <p className="text-text text-sm">Esente</p>
           </div>
         </div>
 

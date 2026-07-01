@@ -28,18 +28,19 @@ Il deliverable di questa skill è **un solo blocco ```json``` valido**, nient'al
 ```jsonc
 {
   "cliente": {
-    "nome": "string",          // OBBLIGATORIO — nome cliente O ragione sociale (vedi nota 1)
+    "nome": "string",          // OBBLIGATORIO — nome mostrato in intestazione (persona o ragione sociale)
     "email": "string",         // OBBLIGATORIO — email valida
+    "azienda": "string",       // opzionale — ragione sociale, mostrata sotto il nome se diversa da esso
     "piva": "string",          // opzionale — P.IVA/C.F., mostrata come "P.IVA ..."
     "telefono": "string"       // opzionale — mostrato sotto l'email
   },
   "preventivo": {
     "oggetto": "string",              // OBBLIGATORIO — titolo del lavoro
     "scadenza": "YYYY-MM-DD",         // opzionale ma consigliata — data ISO
-    "iva": false,                     // opzionale — false = esente/forfettario (DEFAULT), true = IVA 22%
+    "iva": false,                     // SEMPRE false — regime forfettario/esente (vedi nota 6)
     "modalita_pagamento": "Bonifico bancario", // opzionale — mostrato (default "Bonifico bancario")
-    "data": "9 Giugno 2026",          // opzionale — NON mostrato dal sito (vedi nota 3). Includere solo se richiesto
-    "schema_pagamento": "50/50"       // opzionale — NON mostrato dal sito (vedi nota 3). Le tranches guidano il pagamento
+    "schema_pagamento": "50/50",      // opzionale — mostrato nel blocco "Compenso" (es. "50/50", "33/33/34")
+    "data": "9 Giugno 2026"           // opzionale — NON mostrato dal sito (vedi nota 3). Includere solo se richiesto
   },
   "sezioni": {
     "intro": "string",                // opzionale — paragrafo introduttivo
@@ -74,20 +75,20 @@ Il deliverable di questa skill è **un solo blocco ```json``` valido**, nient'al
 
 ## Regole di generazione (IMPORTANTE — derivano dal comportamento reale del sito)
 
-1. **Nome vs azienda.** Il sito NON distingue persona e azienda: `cliente.azienda`
-   viene sempre posto uguale a `cliente.nome`. Metti in `cliente.nome` ciò che deve
-   comparire in grande sull'intestazione (ragione sociale se azienda, altrimenti nome
-   e cognome). Non esiste un campo azienda separato utile.
+1. **Nome e azienda.** In `cliente.nome` va ciò che compare in grande sull'intestazione
+   (nome e cognome, oppure ragione sociale). Se il cliente è una persona che opera per
+   un'azienda, puoi valorizzare anche `cliente.azienda`: viene mostrata come riga
+   secondaria sotto il nome (solo se diversa dal nome). Se coincidono, ometti `azienda`.
 
 2. **Tutto il testo narrativo va dentro `sezioni`.** La pagina cliente legge intro,
    descrizione, tempi, garanzia, esclusioni, manutenzione, fasi_successive e note
    **da `sezioni`** (salvate in `meta`). Non usare un campo `note` di primo livello:
    non verrebbe mostrato.
 
-3. **Campi non mostrati dal sito:** `preventivo.data` e `preventivo.schema_pagamento`
-   sono accettati ma NON compaiono nella pagina cliente (la data emissione è quella di
-   caricamento; il piano pagamenti è guidato solo da `tranches`). Includili solo se
-   l'utente lo chiede espressamente; altrimenti ometterli.
+3. **Campo non mostrato dal sito:** `preventivo.data` è accettato ma NON compare nella
+   pagina cliente (la data emissione è quella di caricamento). Ometterlo salvo richiesta.
+   Invece `preventivo.schema_pagamento` ORA viene mostrato nel blocco "Compenso":
+   valorizzalo se vuoi indicare lo schema sintetico (es. "50/50") oltre alle `tranches`.
 
 4. **Voci sempre in modalità "lista".** Il sito renderizza `sezioni.voci.items` come
    lista piatta. La modalità "fasi" (usata dalla skill PDF) NON è supportata qui:
@@ -97,8 +98,9 @@ Il deliverable di questa skill è **un solo blocco ```json``` valido**, nient'al
    Il totale è calcolato dal sito come somma di `quantita × prezzo`. L'IVA (22%) viene
    aggiunta solo in visualizzazione quando `iva` è `true`.
 
-6. **IVA di default = `false`** (regime forfettario/esente). Imposta `true` solo se
-   l'utente indica esplicitamente che applica l'IVA.
+6. **IVA sempre `false`** (regime forfettario/esente). Mauro opera in forfettario:
+   imposta SEMPRE `"iva": false`. Il sito mostra "Esente / regime forfettario" e non
+   aggiunge il 22%. Non generare mai `iva: true`.
 
 7. **Date in ISO** per `scadenza`: `YYYY-MM-DD` (es. `2026-07-31`). Se l'utente dà una
    data in linguaggio naturale, convertila.

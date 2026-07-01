@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       ${body.note || null},
       ${body.scadenza || null},
       ${totale},
-      ${body.iva !== false},
+      ${body.iva === true},
       ${body.meta ? JSON.stringify(body.meta) : null}
     )
     RETURNING *

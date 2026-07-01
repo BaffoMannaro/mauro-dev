@@ -24,7 +24,7 @@ interface Preventivo {
   created_at: string;
   meta?: {
     cliente?: { piva?: string; telefono?: string };
-    preventivo?: { modalita_pagamento?: string };
+    preventivo?: { modalita_pagamento?: string; schema_pagamento?: string };
     sezioni?: {
       intro?: string;
       descrizione?: string;
@@ -266,6 +266,12 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
               {meta?.preventivo?.modalita_pagamento ?? 'Bonifico bancario'}
             </p>
           </div>
+          {meta?.preventivo?.schema_pagamento && (
+            <div className="flex items-center justify-between px-5 py-3 border-t border-edge/40">
+              <p className="text-muted text-sm">Schema pagamento</p>
+              <p className="text-text text-sm">{meta.preventivo.schema_pagamento}</p>
+            </div>
+          )}
           <div className="flex items-center justify-between px-5 py-3 border-t border-edge/40">
             <p className="text-muted text-sm">IVA</p>
             <p className="text-text text-sm">{preventivo.iva ? 'Inclusa' : 'Esente / regime forfettario'}</p>

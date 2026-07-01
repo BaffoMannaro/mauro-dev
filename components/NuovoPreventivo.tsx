@@ -61,7 +61,7 @@ const JSON_ESEMPIO = {
     "oggetto": "Sviluppo Sito Web Aziendale",
     "data": "18 Giugno 2026",
     "scadenza": "2026-07-31",
-    "iva": true,
+    "iva": false,
     "modalita_pagamento": "Bonifico bancario",
     "schema_pagamento": "50/50"
   },
@@ -131,22 +131,14 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
         body: JSON.stringify({
           cliente: {
             nome: parsed.cliente.nome,
-            azienda: parsed.cliente.nome,
+            azienda: parsed.cliente.azienda || null,
             email: parsed.cliente.email,
           },
           oggetto: parsed.preventivo.oggetto,
           voci,
-          note: [
-            parsed.sezioni.intro,
-            parsed.sezioni.tempi,
-            parsed.sezioni.garanzia,
-            parsed.sezioni.note,
-            parsed.sezioni.fasi_successive,
-            parsed.sezioni.esclusioni ? 'Non incluso: ' + parsed.sezioni.esclusioni.join(', ') : null,
-            parsed.sezioni.manutenzione ? `Manutenzione: ${parsed.sezioni.manutenzione.descrizione} €${parsed.sezioni.manutenzione.prezzo}/mese` : null,
-          ].filter(Boolean).join('\n\n'),
+          note: parsed.sezioni.note || null,
           scadenza: parsed.preventivo.scadenza,
-          iva: parsed.preventivo.iva !== false,
+          iva: parsed.preventivo.iva === true,
           meta: parsed,
         }),
       });
@@ -164,7 +156,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
   const imponibile = preview
     ? preview.sezioni.voci.items.reduce((acc: number, v: any) => acc + v.quantita * v.prezzo, 0)
     : 0;
-  const iva = preview?.preventivo?.iva !== false ? imponibile * 0.22 : 0;
+  const iva = preview?.preventivo?.iva === true ? imponibile * 0.22 : 0;
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
@@ -235,6 +227,9 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                 <div className="bg-surface2 rounded-xl p-4">
                   <p className="text-dim text-xs font-mono mb-2">CLIENTE</p>
                   <p className="text-text font-medium">{preview.cliente.nome}</p>
+                  {preview.cliente.azienda && preview.cliente.azienda !== preview.cliente.nome && (
+                    <p className="text-muted text-sm">{preview.cliente.azienda}</p>
+                  )}
                   {preview.cliente.piva && <p className="text-muted text-sm">P.IVA {preview.cliente.piva}</p>}
                   <p className="text-muted text-sm">{preview.cliente.email}</p>
                   {preview.cliente.telefono && <p className="text-muted text-sm">{preview.cliente.telefono}</p>}
@@ -270,7 +265,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                     <span className="text-muted">Imponibile</span>
                     <span className="text-text">€{imponibile.toLocaleString('it-IT')}</span>
                   </div>
-                  {preview.preventivo.iva !== false && (
+                  {preview.preventivo.iva === true && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted">IVA 22%</span>
                       <span className="text-text">€{iva.toLocaleString('it-IT')}</span>

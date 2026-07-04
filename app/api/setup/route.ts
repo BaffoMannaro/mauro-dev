@@ -57,6 +57,26 @@ export async function GET() {
     `;
     await sql`ALTER TABLE abbonamenti ADD COLUMN IF NOT EXISTS tag TEXT`;
 
+    await sql`
+      CREATE TABLE IF NOT EXISTS clienti (
+        id SERIAL PRIMARY KEY,
+        nome TEXT NOT NULL,
+        azienda TEXT,
+        email TEXT,
+        telefono TEXT,
+        piva TEXT,
+        codice_fiscale TEXT,
+        indirizzo TEXT,
+        pec TEXT,
+        codice_sdi TEXT,
+        note TEXT,
+        data_inizio DATE DEFAULT CURRENT_DATE,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS cliente_id INTEGER`;
+
     return NextResponse.json({ ok: true, message: 'Database inizializzato' });
   } catch (error) {
     return NextResponse.json({ ok: false, error: String(error) }, { status: 500 });

@@ -41,11 +41,17 @@ export default async function ClientePage({
     ORDER BY created_at DESC
   `;
 
+  // Altri clienti (per la funzione "unisci")
+  const altriClienti = await sql`
+    SELECT id, nome, azienda, email FROM clienti WHERE id != ${id} ORDER BY nome ASC
+  `;
+
   return (
     <ClienteDettaglio
       cliente={cliente as any}
       preventivi={preventivi as any}
       nonAssociati={nonAssociati as any}
+      altriClienti={altriClienti as any}
     />
   );
 }

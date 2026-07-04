@@ -44,6 +44,13 @@ interface PrevLibero {
   created_at: string;
 }
 
+interface AltroCliente {
+  id: number;
+  nome: string;
+  azienda: string | null;
+  email: string | null;
+}
+
 const fmt = (n: number) => `€${n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtData = (d: string | null) => (d ? new Date(d).toLocaleDateString('it-IT') : '—');
 
@@ -61,14 +68,17 @@ export default function ClienteDettaglio({
   cliente,
   preventivi,
   nonAssociati,
+  altriClienti,
 }: {
   cliente: Cliente;
   preventivi: Prev[];
   nonAssociati: PrevLibero[];
+  altriClienti: AltroCliente[];
 }) {
   const router = useRouter();
   const [showEdit, setShowEdit] = useState(false);
   const [showAssoc, setShowAssoc] = useState(false);
+  const [showMerge, setShowMerge] = useState(false);
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [form, setForm] = useState({
@@ -134,6 +144,21 @@ export default function ClienteDettaglio({
     if (res.ok) router.push('/preventivi/clienti');
   };
 
+  const unisci = async (sourceId: number, sourceNome: string) => {
+    if (!confirm(`Unire "${sourceNome}" in "${cliente.nome}"? I suoi preventivi passeranno a questo cliente e "${sourceNome}" verrà eliminato.`)) return;
+    setBusyId(sourceId);
+    const res = await fetch(`/api/clienti/${cliente.id}/merge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source_id: sourceId }),
+    });
+    setBusyId(null);
+    if (res.ok) {
+      setShowMerge(false);
+      router.refresh();
+    }
+  };
+
   const Anagrafica = ({ label, value }: { label: string; value: string | null }) =>
     value ? (
       <div>
@@ -157,6 +182,7 @@ export default function ClienteDettaglio({
           </div>
           <div className="flex gap-2 shrink-0">
             <button onClick={() => setShowEdit(true)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Modifica</button>
+            <button onClick={() => setShowMerge(true)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Unisci</button>
             <button onClick={elimina} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors">Elimina</button>
           </div>
         </div>
@@ -375,6 +401,43 @@ export default function ClienteDettaglio({
               </div>
             )}
             <button onClick={() => setShowAssoc(false)} className="w-full mt-5 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">Chiudi</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal unisci cliente */}
+      {showMerge && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-text font-semibold">Unisci un cliente in questo</h2>
+              <button onClick={() => setShowMerge(false)} className="text-dim hover:text-text transition-colors">✕</button>
+            </div>
+            <p className="text-dim text-xs mb-5">
+              Il cliente scelto verrà assorbito in <span className="text-text font-medium">{cliente.nome}</span>: i suoi preventivi passeranno qui, i dati anagrafici mancanti verranno ereditati e il cliente scelto sarà eliminato.
+            </p>
+            {altriClienti.length === 0 ? (
+              <div className="text-center py-12 text-dim text-sm">Nessun altro cliente disponibile.</div>
+            ) : (
+              <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-1">
+                {altriClienti.map((c) => (
+                  <div key={c.id} className="flex items-center justify-between gap-3 bg-surface2 rounded-xl px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-text text-sm font-medium truncate">{c.nome}</p>
+                      <p className="text-dim text-xs truncate">{c.azienda || c.email || 'nessun dato'}</p>
+                    </div>
+                    <button
+                      onClick={() => unisci(c.id, c.nome)}
+                      disabled={busyId === c.id}
+                      className="shrink-0 text-xs px-3 py-1.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
+                    >
+                      {busyId === c.id ? '...' : 'Unisci qui'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button onClick={() => setShowMerge(false)} className="w-full mt-5 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">Chiudi</button>
           </div>
         </div>
       )}

@@ -79,6 +79,7 @@ export default function ClienteDettaglio({
   const [showEdit, setShowEdit] = useState(false);
   const [showAssoc, setShowAssoc] = useState(false);
   const [showMerge, setShowMerge] = useState(false);
+  const [mergeErr, setMergeErr] = useState('');
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [form, setForm] = useState({
@@ -144,18 +145,25 @@ export default function ClienteDettaglio({
     if (res.ok) router.push('/preventivi/clienti');
   };
 
-  const unisci = async (sourceId: number, sourceNome: string) => {
-    if (!confirm(`Unire "${sourceNome}" in "${cliente.nome}"? I suoi preventivi passeranno a questo cliente e "${sourceNome}" verrà eliminato.`)) return;
+  const unisci = async (sourceId: number) => {
     setBusyId(sourceId);
-    const res = await fetch(`/api/clienti/${cliente.id}/merge`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ source_id: sourceId }),
-    });
-    setBusyId(null);
-    if (res.ok) {
+    setMergeErr('');
+    try {
+      const res = await fetch(`/api/clienti/${cliente.id}/merge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source_id: sourceId }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || 'Errore durante l\'unione');
+      }
       setShowMerge(false);
       router.refresh();
+    } catch (e: any) {
+      setMergeErr(e.message || 'Errore durante l\'unione');
+    } finally {
+      setBusyId(null);
     }
   };
 
@@ -182,7 +190,7 @@ export default function ClienteDettaglio({
           </div>
           <div className="flex gap-2 shrink-0">
             <button onClick={() => setShowEdit(true)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Modifica</button>
-            <button onClick={() => setShowMerge(true)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Unisci</button>
+            <button onClick={() => { setMergeErr(''); setShowMerge(true); }} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Unisci</button>
             <button onClick={elimina} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors">Elimina</button>
           </div>
         </div>
@@ -427,7 +435,7 @@ export default function ClienteDettaglio({
                       <p className="text-dim text-xs truncate">{c.azienda || c.email || 'nessun dato'}</p>
                     </div>
                     <button
-                      onClick={() => unisci(c.id, c.nome)}
+                      onClick={() => unisci(c.id)}
                       disabled={busyId === c.id}
                       className="shrink-0 text-xs px-3 py-1.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
                     >
@@ -437,6 +445,7 @@ export default function ClienteDettaglio({
                 ))}
               </div>
             )}
+            {mergeErr && <p className="text-red-400 text-xs font-mono mt-4">⚠ {mergeErr}</p>}
             <button onClick={() => setShowMerge(false)} className="w-full mt-5 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">Chiudi</button>
           </div>
         </div>

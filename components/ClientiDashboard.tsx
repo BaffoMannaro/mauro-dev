@@ -65,6 +65,7 @@ export default function ClientiDashboard({
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [showMerge, setShowMerge] = useState(false);
   const [merging, setMerging] = useState(false);
+  const [mergeErr, setMergeErr] = useState('');
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
 
   const toggleSel = (id: number) => {
@@ -82,20 +83,27 @@ export default function ClientiDashboard({
   const eseguiMerge = async (targetId: number) => {
     const sources = [...selected].filter((id) => id !== targetId);
     if (sources.length === 0) return;
-    const target = clienti.find((c) => c.id === targetId);
-    if (!confirm(`Unire ${sources.length} client${sources.length === 1 ? 'e' : 'i'} in "${target?.nome}"? I loro preventivi passeranno a questo cliente e verranno eliminati.`)) return;
     setMerging(true);
-    for (const s of sources) {
-      const res = await fetch(`/api/clienti/${targetId}/merge`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source_id: s }),
-      });
-      if (!res.ok) break;
+    setMergeErr('');
+    try {
+      for (const s of sources) {
+        const res = await fetch(`/api/clienti/${targetId}/merge`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source_id: s }),
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          throw new Error(j.error || 'Errore durante l\'unione');
+        }
+      }
+      exitSelect();
+      router.refresh();
+    } catch (e: any) {
+      setMergeErr(e.message || 'Errore durante l\'unione');
+    } finally {
+      setMerging(false);
     }
-    setMerging(false);
-    exitSelect();
-    router.refresh();
   };
 
   // Preventivi raggruppati per cliente
@@ -199,7 +207,7 @@ export default function ClientiDashboard({
           <div className="flex items-center gap-2">
             <span className="text-dim text-sm hidden sm:block">{selected.size} selezionat{selected.size === 1 ? 'o' : 'i'}</span>
             <button
-              onClick={() => setShowMerge(true)}
+              onClick={() => { setMergeErr(''); setShowMerge(true); }}
               disabled={selected.size < 2}
               className="text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
             >
@@ -461,6 +469,7 @@ export default function ClientiDashboard({
                 </div>
               ))}
             </div>
+            {mergeErr && <p className="text-red-400 text-xs font-mono mt-4">⚠ {mergeErr}</p>}
             <button onClick={() => setShowMerge(false)} className="w-full mt-5 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">
               Annulla
             </button>

@@ -14,6 +14,13 @@ export default async function ClientiPage() {
     FROM preventivi
     ORDER BY created_at DESC
   `;
+  const [pref] = await sql`SELECT valore FROM impostazioni WHERE chiave = 'clienti_sort'`;
 
-  return <ClientiDashboard clienti={clienti as any} preventivi={preventivi as any} />;
+  return (
+    <ClientiDashboard
+      clienti={clienti as any}
+      preventivi={preventivi as any}
+      initialSort={(pref?.valore as any) ?? null}
+    />
+  );
 }

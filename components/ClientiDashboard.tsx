@@ -47,12 +47,23 @@ const FORM_DEFAULT = {
 const inputCls =
   'w-full bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text placeholder-dim focus:outline-none focus:border-slate';
 
+type SortField = 'nome' | 'valore' | 'data';
+type SortDir = 'asc' | 'desc';
+
+const SORT_LABEL: Record<SortField, string> = {
+  nome: 'Nome',
+  valore: 'Valore contratti',
+  data: 'Data cliente',
+};
+
 export default function ClientiDashboard({
   clienti,
   preventivi,
+  initialSort,
 }: {
   clienti: Cliente[];
   preventivi: Prev[];
+  initialSort: { field: SortField; dir: SortDir } | null;
 }) {
   const router = useRouter();
   const [showNew, setShowNew] = useState(false);
@@ -66,7 +77,25 @@ export default function ClientiDashboard({
   const [showMerge, setShowMerge] = useState(false);
   const [merging, setMerging] = useState(false);
   const [mergeErr, setMergeErr] = useState('');
+  const [query, setQuery] = useState('');
+  const [sortField, setSortField] = useState<SortField>(initialSort?.field ?? 'nome');
+  const [sortDir, setSortDir] = useState<SortDir>(initialSort?.dir ?? 'asc');
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
+
+  // Persiste l'ordinamento come default per tutte le sessioni/dispositivi
+  const persistSort = (field: SortField, dir: SortDir) => {
+    fetch('/api/impostazioni', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chiave: 'clienti_sort', valore: { field, dir } }),
+    }).catch(() => {});
+  };
+  const cambiaCampo = (field: SortField) => { setSortField(field); persistSort(field, sortDir); };
+  const cambiaVerso = () => {
+    const dir: SortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    setSortDir(dir);
+    persistSort(sortField, dir);
+  };
 
   const toggleSel = (id: number) => {
     setSelected((prev) => {
@@ -117,6 +146,36 @@ export default function ClientiDashboard({
     }
     return m;
   }, [preventivi]);
+
+  // Finanza per cliente (riusata per card e ordinamento per valore)
+  const financeById = useMemo(() => {
+    const m = new Map<number, ReturnType<typeof calcFinanza>>();
+    for (const c of clienti) m.set(c.id, calcFinanza(prevByCliente.get(c.id) ?? []));
+    return m;
+  }, [clienti, prevByCliente]);
+
+  // Ricerca + ordinamento
+  const visibili = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const arr = clienti.filter(
+      (c) =>
+        !q ||
+        c.nome.toLowerCase().includes(q) ||
+        (c.azienda || '').toLowerCase().includes(q)
+    );
+    arr.sort((a, b) => {
+      let cmp = 0;
+      if (sortField === 'nome') {
+        cmp = a.nome.localeCompare(b.nome, 'it', { sensitivity: 'base' });
+      } else if (sortField === 'valore') {
+        cmp = (financeById.get(a.id)?.totale ?? 0) - (financeById.get(b.id)?.totale ?? 0);
+      } else {
+        cmp = new Date(a.data_inizio || a.created_at).getTime() - new Date(b.data_inizio || b.created_at).getTime();
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+    return arr;
+  }, [clienti, query, sortField, sortDir, financeById]);
 
   // Candidati all'import: preventivi accettati non associati, raggruppati per email,
   // escludendo email già presenti tra i clienti.
@@ -262,16 +321,63 @@ export default function ClientiDashboard({
           ))}
         </div>
 
+        {/* Toolbar: ricerca + ordinamento */}
+        {clienti.length > 0 && (
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-dim" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7" />
+                <path strokeLinecap="round" d="M21 21l-4.3-4.3" />
+              </svg>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Cerca cliente per nome..."
+                className="w-full bg-bg border border-edge rounded-lg pl-9 pr-3 py-2 text-sm text-text placeholder-dim focus:outline-none focus:border-slate"
+              />
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <select
+                value={sortField}
+                onChange={(e) => cambiaCampo(e.target.value as SortField)}
+                className="bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-slate"
+                aria-label="Ordina per"
+              >
+                {(Object.keys(SORT_LABEL) as SortField[]).map((f) => (
+                  <option key={f} value={f}>{SORT_LABEL[f]}</option>
+                ))}
+              </select>
+              <button
+                onClick={cambiaVerso}
+                title={sortDir === 'asc' ? 'Ascendente' : 'Discendente'}
+                aria-label={sortDir === 'asc' ? 'Ordine ascendente' : 'Ordine discendente'}
+                className="flex items-center gap-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text px-3 py-2 rounded-lg text-sm transition-colors"
+              >
+                <span>{sortDir === 'asc' ? 'Asc' : 'Disc'}</span>
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" className={sortDir === 'asc' ? '' : 'rotate-180'}>
+                  <path d="M12 19V5M5 12l7-7 7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Griglia clienti */}
         {clienti.length === 0 ? (
           <div className="text-center py-20 text-dim">
             <p className="font-medium">Nessun cliente</p>
             <p className="text-sm mt-1">Creane uno nuovo o importalo dallo storico dei preventivi accettati</p>
           </div>
+        ) : visibili.length === 0 ? (
+          <div className="text-center py-20 text-dim">
+            <p className="font-medium">Nessun risultato</p>
+            <p className="text-sm mt-1">Nessun cliente corrisponde a "{query}"</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {clienti.map((c) => {
-              const f = calcFinanza(prevByCliente.get(c.id) ?? []);
+            {visibili.map((c) => {
+              const f = financeById.get(c.id) ?? calcFinanza([]);
               const isSel = selected.has(c.id);
               const inner = (
                 <>

@@ -77,6 +77,14 @@ export async function GET() {
     `;
     await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS cliente_id INTEGER`;
 
+    await sql`
+      CREATE TABLE IF NOT EXISTS impostazioni (
+        chiave TEXT PRIMARY KEY,
+        valore JSONB NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+
     return NextResponse.json({ ok: true, message: 'Database inizializzato' });
   } catch (error) {
     return NextResponse.json({ ok: false, error: String(error) }, { status: 500 });

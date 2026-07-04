@@ -61,7 +61,42 @@ export default function ClientiDashboard({
   const [loading, setLoading] = useState(false);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [errore, setErrore] = useState('');
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [showMerge, setShowMerge] = useState(false);
+  const [merging, setMerging] = useState(false);
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
+
+  const toggleSel = (id: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const exitSelect = () => { setSelectMode(false); setSelected(new Set()); setShowMerge(false); };
+
+  const selezionati = clienti.filter((c) => selected.has(c.id));
+
+  const eseguiMerge = async (targetId: number) => {
+    const sources = [...selected].filter((id) => id !== targetId);
+    if (sources.length === 0) return;
+    const target = clienti.find((c) => c.id === targetId);
+    if (!confirm(`Unire ${sources.length} client${sources.length === 1 ? 'e' : 'i'} in "${target?.nome}"? I loro preventivi passeranno a questo cliente e verranno eliminati.`)) return;
+    setMerging(true);
+    for (const s of sources) {
+      const res = await fetch(`/api/clienti/${targetId}/merge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source_id: s }),
+      });
+      if (!res.ok) break;
+    }
+    setMerging(false);
+    exitSelect();
+    router.refresh();
+  };
 
   // Preventivi raggruppati per cliente
   const prevByCliente = useMemo(() => {
@@ -160,23 +195,47 @@ export default function ClientiDashboard({
       {/* Header */}
       <header className="border-b border-edge px-6 py-5 flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">Clienti</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowImport(true)}
-            className="text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-4 py-2 rounded-lg transition-colors"
-          >
-            Importa da accettati
-            {candidati.length > 0 && (
-              <span className="ml-2 text-xs bg-accent text-white rounded-full px-1.5 py-0.5">{candidati.length}</span>
+        {selectMode ? (
+          <div className="flex items-center gap-2">
+            <span className="text-dim text-sm hidden sm:block">{selected.size} selezionat{selected.size === 1 ? 'o' : 'i'}</span>
+            <button
+              onClick={() => setShowMerge(true)}
+              disabled={selected.size < 2}
+              className="text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
+            >
+              Unisci
+            </button>
+            <button onClick={exitSelect} className="text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-4 py-2 rounded-lg transition-colors">
+              Annulla
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            {clienti.length >= 2 && (
+              <button
+                onClick={() => setSelectMode(true)}
+                className="text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-4 py-2 rounded-lg transition-colors"
+              >
+                Unisci
+              </button>
             )}
-          </button>
-          <button
-            onClick={() => { setForm(FORM_DEFAULT); setErrore(''); setShowNew(true); }}
-            className="text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
-          >
-            + Nuovo cliente
-          </button>
-        </div>
+            <button
+              onClick={() => setShowImport(true)}
+              className="text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-4 py-2 rounded-lg transition-colors"
+            >
+              Importa da accettati
+              {candidati.length > 0 && (
+                <span className="ml-2 text-xs bg-accent text-white rounded-full px-1.5 py-0.5">{candidati.length}</span>
+              )}
+            </button>
+            <button
+              onClick={() => { setForm(FORM_DEFAULT); setErrore(''); setShowNew(true); }}
+              className="text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+            >
+              + Nuovo cliente
+            </button>
+          </div>
+        )}
       </header>
 
       <div className="px-6 py-6 max-w-6xl mx-auto flex flex-col gap-6">
@@ -205,18 +264,20 @@ export default function ClientiDashboard({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {clienti.map((c) => {
               const f = calcFinanza(prevByCliente.get(c.id) ?? []);
-              return (
-                <Link
-                  key={c.id}
-                  href={`/preventivi/clienti/${c.id}`}
-                  className="bg-surface border border-edge rounded-xl p-5 hover:border-slate transition-colors block"
-                >
-                  <div className="mb-3">
-                    <p className="text-text font-semibold truncate">{c.nome}</p>
-                    {c.azienda && c.azienda !== c.nome && (
-                      <p className="text-muted text-sm truncate">{c.azienda}</p>
+              const isSel = selected.has(c.id);
+              const inner = (
+                <>
+                  <div className="mb-3 flex items-start gap-2">
+                    {selectMode && (
+                      <span className={`mt-0.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center text-[10px] ${isSel ? 'bg-accent border-accent text-white' : 'border-edge text-transparent'}`}>✓</span>
                     )}
-                    <p className="text-dim text-xs mt-1">Cliente dal {fmtData(c.data_inizio)}</p>
+                    <div className="min-w-0">
+                      <p className="text-text font-semibold truncate">{c.nome}</p>
+                      {c.azienda && c.azienda !== c.nome && (
+                        <p className="text-muted text-sm truncate">{c.azienda}</p>
+                      )}
+                      <p className="text-dim text-xs mt-1">Cliente dal {fmtData(c.data_inizio)}</p>
+                    </div>
                   </div>
                   <div className="border-t border-edge/60 pt-3 space-y-1.5">
                     <div className="flex justify-between text-sm">
@@ -232,6 +293,24 @@ export default function ClientiDashboard({
                       <span className="text-amber-400 font-medium">{fmt(f.daDare)}</span>
                     </div>
                   </div>
+                </>
+              );
+              return selectMode ? (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => toggleSel(c.id)}
+                  className={`text-left bg-surface border rounded-xl p-5 transition-colors block w-full ${isSel ? 'border-accent' : 'border-edge hover:border-slate'}`}
+                >
+                  {inner}
+                </button>
+              ) : (
+                <Link
+                  key={c.id}
+                  href={`/preventivi/clienti/${c.id}`}
+                  className="bg-surface border border-edge rounded-xl p-5 hover:border-slate transition-colors block"
+                >
+                  {inner}
                 </Link>
               );
             })}
@@ -349,6 +428,41 @@ export default function ClientiDashboard({
             )}
             <button onClick={() => setShowImport(false)} className="w-full mt-5 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">
               Chiudi
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal unisci selezionati: scegli il cliente da tenere */}
+      {showMerge && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-text font-semibold">Unisci clienti</h2>
+              <button onClick={() => setShowMerge(false)} className="text-dim hover:text-text transition-colors">✕</button>
+            </div>
+            <p className="text-dim text-xs mb-5">
+              Scegli il cliente da <span className="text-text font-medium">tenere</span>: gli altri {selezionati.length - 1} verranno assorbiti in esso (preventivi trasferiti, dati mancanti ereditati) ed eliminati.
+            </p>
+            <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-1">
+              {selezionati.map((c) => (
+                <div key={c.id} className="flex items-center justify-between gap-3 bg-surface2 rounded-xl px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="text-text text-sm font-medium truncate">{c.nome}</p>
+                    <p className="text-dim text-xs truncate">{c.azienda || c.email || 'nessun dato'}</p>
+                  </div>
+                  <button
+                    onClick={() => eseguiMerge(c.id)}
+                    disabled={merging}
+                    className="shrink-0 text-xs px-3 py-1.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
+                  >
+                    {merging ? '...' : 'Tieni questo'}
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setShowMerge(false)} className="w-full mt-5 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">
+              Annulla
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import sql from '@/lib/db';
-import { ensureClientiSchema } from '@/lib/schema';
+import { ensureClientiSchema, ensurePortaleSchema } from '@/lib/schema';
 import ClienteDettaglio from '@/components/ClienteDettaglio';
 
 export async function generateMetadata({
@@ -20,10 +20,17 @@ export default async function ClientePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await ensureClientiSchema();
+  await ensurePortaleSchema();
 
   const [cliente] = await sql`SELECT * FROM clienti WHERE id = ${id}`;
   if (!cliente) notFound();
+
+  const fatture = await sql`
+    SELECT id, numero, importo, data, stato, pdf_url, note, created_at
+    FROM fatture
+    WHERE cliente_id = ${id}
+    ORDER BY data DESC NULLS LAST, created_at DESC
+  `;
 
   const preventivi = await sql`
     SELECT id, token, oggetto, totale, stato, tranches_stato,
@@ -52,6 +59,7 @@ export default async function ClientePage({
       preventivi={preventivi as any}
       nonAssociati={nonAssociati as any}
       altriClienti={altriClienti as any}
+      fatture={fatture as any}
     />
   );
 }

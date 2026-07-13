@@ -85,6 +85,26 @@ export async function GET() {
       )
     `;
 
+    // Portale cliente
+    await sql`
+      CREATE TABLE IF NOT EXISTS fatture (
+        id SERIAL PRIMARY KEY,
+        cliente_id INTEGER NOT NULL,
+        preventivo_id INTEGER,
+        numero TEXT,
+        importo DECIMAL(10,2),
+        data DATE,
+        stato TEXT DEFAULT 'da_pagare',
+        pdf_url TEXT,
+        note TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
+    await sql`ALTER TABLE clienti ADD COLUMN IF NOT EXISTS portale_attivo BOOLEAN DEFAULT false`;
+    await sql`ALTER TABLE clienti ADD COLUMN IF NOT EXISTS ultimo_accesso_portale TIMESTAMPTZ`;
+    await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS rifiutato_at TIMESTAMPTZ`;
+
     return NextResponse.json({ ok: true, message: 'Database inizializzato' });
   } catch (error) {
     return NextResponse.json({ ok: false, error: String(error) }, { status: 500 });

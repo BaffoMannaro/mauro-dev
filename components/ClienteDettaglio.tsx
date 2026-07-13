@@ -19,6 +19,19 @@ interface Cliente {
   note: string | null;
   data_inizio: string | null;
   created_at: string;
+  portale_attivo?: boolean;
+  ultimo_accesso_portale?: string | null;
+}
+
+interface Fattura {
+  id: number;
+  numero: string | null;
+  importo: number | string | null;
+  data: string | null;
+  stato: string;
+  pdf_url: string | null;
+  note: string | null;
+  created_at: string;
 }
 
 interface Prev {
@@ -69,11 +82,13 @@ export default function ClienteDettaglio({
   preventivi,
   nonAssociati,
   altriClienti,
+  fatture,
 }: {
   cliente: Cliente;
   preventivi: Prev[];
   nonAssociati: PrevLibero[];
   altriClienti: AltroCliente[];
+  fatture: Fattura[];
 }) {
   const router = useRouter();
   const [showEdit, setShowEdit] = useState(false);
@@ -82,6 +97,77 @@ export default function ClienteDettaglio({
   const [mergeErr, setMergeErr] = useState('');
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
+
+  // Portale cliente
+  const [magicLink, setMagicLink] = useState('');
+  const [invLoading, setInvLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Fatture
+  const [showFattura, setShowFattura] = useState(false);
+  const [fattForm, setFattForm] = useState({
+    numero: '', importo: '', data: '', stato: 'da_pagare', pdf_url: '', note: '',
+  });
+  const [fattLoading, setFattLoading] = useState(false);
+  const setFatt = (k: string, v: any) => setFattForm((f) => ({ ...f, [k]: v }));
+
+  const invita = async () => {
+    setInvLoading(true);
+    setCopied(false);
+    try {
+      const res = await fetch(`/api/clienti/${cliente.id}/invita`, { method: 'POST' });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok && j.url) setMagicLink(j.url);
+    } finally {
+      setInvLoading(false);
+    }
+  };
+
+  const copiaLink = async () => {
+    try {
+      await navigator.clipboard.writeText(magicLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
+
+  const aggiungiFattura = async () => {
+    setFattLoading(true);
+    const res = await fetch(`/api/clienti/${cliente.id}/fatture`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fattForm),
+    });
+    setFattLoading(false);
+    if (res.ok) {
+      setShowFattura(false);
+      setFattForm({ numero: '', importo: '', data: '', stato: 'da_pagare', pdf_url: '', note: '' });
+      router.refresh();
+    }
+  };
+
+  const cambiaStatoFattura = async (fatturaId: number, stato: string) => {
+    setBusyId(fatturaId);
+    const res = await fetch(`/api/clienti/${cliente.id}/fatture`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fattura_id: fatturaId, stato }),
+    });
+    setBusyId(null);
+    if (res.ok) router.refresh();
+  };
+
+  const eliminaFattura = async (fatturaId: number) => {
+    if (!confirm('Eliminare questa fattura?')) return;
+    setBusyId(fatturaId);
+    const res = await fetch(`/api/clienti/${cliente.id}/fatture`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fattura_id: fatturaId }),
+    });
+    setBusyId(null);
+    if (res.ok) router.refresh();
+  };
   const [form, setForm] = useState({
     nome: cliente.nome ?? '',
     azienda: cliente.azienda ?? '',
@@ -295,12 +381,123 @@ export default function ClienteDettaglio({
           </section>
         </div>
 
-        {/* Fatture (placeholder) */}
+        {/* Portale cliente */}
         <section className="bg-surface border border-edge rounded-xl p-5">
-          <h2 className="text-text font-semibold text-sm mb-2">Fatture emesse</h2>
-          <div className="text-dim text-sm border border-dashed border-edge rounded-lg py-8 text-center">
-            Gestione fatture in arrivo — prossimamente.
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <h2 className="text-text font-semibold text-sm">Portale cliente</h2>
+            {cliente.portale_attivo && (
+              <span className="text-xs px-2 py-0.5 rounded-full border text-green-400 border-green-800/60 bg-green-950/30">Attivo</span>
+            )}
           </div>
+          <p className="text-dim text-xs mb-4">
+            Genera un link di accesso personale da inviare al cliente (via email, WhatsApp…).
+            Con quel link entra nella sua area riservata su <span className="text-muted">area.maurodev.it</span>, senza password.
+            {cliente.ultimo_accesso_portale && (
+              <> Ultimo accesso: {fmtData(cliente.ultimo_accesso_portale)}.</>
+            )}
+          </p>
+          {magicLink ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <input
+                  readOnly
+                  value={magicLink}
+                  onFocus={(e) => e.target.select()}
+                  className="flex-1 bg-bg border border-edge rounded-lg px-3 py-2 text-xs text-muted font-mono"
+                />
+                <button onClick={copiaLink} className="shrink-0 text-xs px-3 py-2 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors">
+                  {copied ? 'Copiato ✓' : 'Copia'}
+                </button>
+              </div>
+              <p className="text-dim text-xs">Il link resta valido 7 giorni. Puoi rigenerarne uno nuovo quando vuoi.</p>
+              <button onClick={invita} disabled={invLoading} className="self-start text-xs text-dim hover:text-text transition-colors disabled:opacity-40">
+                {invLoading ? 'Genero…' : '↻ Genera nuovo link'}
+              </button>
+            </div>
+          ) : (
+            <button onClick={invita} disabled={invLoading} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors disabled:opacity-40">
+              {invLoading ? 'Genero…' : cliente.portale_attivo ? 'Genera nuovo link di accesso' : 'Invita al portale'}
+            </button>
+          )}
+        </section>
+
+        {/* Fatture */}
+        <section className="bg-surface border border-edge rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-text font-semibold text-sm">Fatture <span className="text-dim font-normal">({fatture.length})</span></h2>
+            <button onClick={() => setShowFattura((v) => !v)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">
+              {showFattura ? 'Annulla' : '+ Aggiungi fattura'}
+            </button>
+          </div>
+
+          {showFattura && (
+            <div className="bg-surface2 rounded-xl p-4 mb-4 flex flex-col gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <label className="text-dim text-xs font-medium block mb-1">NUMERO</label>
+                  <input type="text" value={fattForm.numero} onChange={(e) => setFatt('numero', e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className="text-dim text-xs font-medium block mb-1">IMPORTO €</label>
+                  <input type="number" step="0.01" value={fattForm.importo} onChange={(e) => setFatt('importo', e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className="text-dim text-xs font-medium block mb-1">DATA</label>
+                  <input type="date" value={fattForm.data} onChange={(e) => setFatt('data', e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className="text-dim text-xs font-medium block mb-1">STATO</label>
+                  <select value={fattForm.stato} onChange={(e) => setFatt('stato', e.target.value)} className={inputCls}>
+                    <option value="da_pagare">Da pagare</option>
+                    <option value="pagata">Pagata</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-dim text-xs font-medium block mb-1">LINK AL PDF (opzionale)</label>
+                <input type="url" placeholder="https://…" value={fattForm.pdf_url} onChange={(e) => setFatt('pdf_url', e.target.value)} className={inputCls} />
+              </div>
+              <button onClick={aggiungiFattura} disabled={fattLoading} className="self-start text-xs px-4 py-2 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-40">
+                {fattLoading ? 'Salvataggio…' : 'Salva fattura'}
+              </button>
+            </div>
+          )}
+
+          {fatture.length === 0 ? (
+            <p className="text-dim text-sm">Nessuna fattura. Aggiungine una per mostrarla al cliente nel portale.</p>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {fatture.map((f) => (
+                <div key={f.id} className="flex flex-wrap items-center justify-between gap-3 bg-surface2 rounded-xl px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="text-text text-sm font-medium">
+                      {f.numero ? `Fattura n. ${f.numero}` : 'Fattura'}
+                      <span className="text-dim font-normal"> · {fmtData(f.data)}</span>
+                    </p>
+                    <p className="text-dim text-xs mt-0.5">{f.importo != null ? fmt(Number(f.importo)) : '—'}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {f.pdf_url && (
+                      <a href={f.pdf_url} target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-surface hover:bg-slate text-muted hover:text-text rounded-lg transition-colors border border-edge">PDF</a>
+                    )}
+                    <button
+                      onClick={() => cambiaStatoFattura(f.id, f.stato === 'pagata' ? 'da_pagare' : 'pagata')}
+                      disabled={busyId === f.id}
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors disabled:opacity-40 ${
+                        f.stato === 'pagata'
+                          ? 'text-green-400 border-green-800/60 bg-green-950/30'
+                          : 'text-amber-400 border-amber-800/60 bg-amber-950/30'
+                      }`}
+                      title="Cambia stato pagamento"
+                    >
+                      {f.stato === 'pagata' ? 'Pagata' : 'Da pagare'}
+                    </button>
+                    <button onClick={() => eliminaFattura(f.id)} disabled={busyId === f.id} className="text-xs px-2 py-1.5 text-dim hover:text-red-400 transition-colors disabled:opacity-30" title="Elimina">✕</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 

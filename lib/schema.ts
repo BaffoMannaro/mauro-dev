@@ -35,3 +35,32 @@ export async function ensureClientiSchema() {
   `;
   ensured = true;
 }
+
+// Schema aggiuntivo per il portale cliente (Fase 1): fatture + flag portale.
+let ensuredPortale = false;
+
+export async function ensurePortaleSchema() {
+  await ensureClientiSchema();
+  if (ensuredPortale) return;
+  await sql`
+    CREATE TABLE IF NOT EXISTS fatture (
+      id SERIAL PRIMARY KEY,
+      cliente_id INTEGER NOT NULL,
+      preventivo_id INTEGER,
+      numero TEXT,
+      importo DECIMAL(10,2),
+      data DATE,
+      stato TEXT DEFAULT 'da_pagare',
+      pdf_url TEXT,
+      note TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  // Flag e tracciamento accessi lato cliente.
+  await sql`ALTER TABLE clienti ADD COLUMN IF NOT EXISTS portale_attivo BOOLEAN DEFAULT false`;
+  await sql`ALTER TABLE clienti ADD COLUMN IF NOT EXISTS ultimo_accesso_portale TIMESTAMPTZ`;
+  // Consente al preventivo di segnare l'eventuale rifiuto dal portale.
+  await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS rifiutato_at TIMESTAMPTZ`;
+  ensuredPortale = true;
+}

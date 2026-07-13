@@ -6,17 +6,17 @@ import { signOut } from 'next-auth/react';
 
 const NAV = [
   {
-    href: '/preventivi',
+    href: '/',
     label: 'Preventivi',
     icon: 'docs',
   },
   {
-    href: '/preventivi/statistiche',
+    href: '/statistiche',
     label: 'Statistiche',
     icon: 'chart',
   },
   {
-    href: '/preventivi/abbonamenti',
+    href: '/abbonamenti',
     label: 'Abbonamenti',
     icon: 'sub',
   },

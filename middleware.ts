@@ -1,58 +1,66 @@
 import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-// Subdominio dedicato al gestionale. Tutto è configurabile via env così non
-// c'è nessun host cablato nel codice.
+// Subdominio dedicato al gestionale e dominio pubblico. Configurabili via env.
 const APP_HOST = process.env.APP_HOST || 'app.maurodev.it';
 const PUBLIC_HOST = process.env.PUBLIC_HOST || 'maurodev.it';
 
-// Interruttore generale: finché è spento il comportamento è identico a prima
-// (il gestionale resta accessibile su qualsiasi host). Si accende solo quando
-// DNS + dominio Vercel + redirect Google sono pronti.
-const SUBDOMAIN_ENABLED = process.env.ENABLE_APP_SUBDOMAIN === 'true';
+// Le pagine del gestionale vivono fisicamente sotto /preventivi, ma sul
+// subdominio (e in generale su ogni host che non è quello pubblico) vengono
+// servite a URL puliti: app.maurodev.it/clienti -> /preventivi/clienti.
+function stripPrefix(pathname: string) {
+  const clean = pathname.replace(/^\/preventivi/, '');
+  return clean === '' ? '/' : clean;
+}
 
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
-  const isAdminRoute = nextUrl.pathname.startsWith('/preventivi');
+  const host = (req.headers.get('host') || '').toLowerCase();
+  const path = nextUrl.pathname;
 
-  if (SUBDOMAIN_ENABLED) {
-    const host = (req.headers.get('host') || '').toLowerCase();
+  const isPublicHost = host === PUBLIC_HOST || host === `www.${PUBLIC_HOST}`;
+  const isPreventiviPath = path === '/preventivi' || path.startsWith('/preventivi/');
 
-    // Sul subdominio (app.maurodev.it) vive il gestionale.
-    if (host === APP_HOST) {
-      // La root del subdominio porta dritti al gestionale, non alla landing.
-      if (nextUrl.pathname === '/') {
-        return NextResponse.redirect(new URL('/preventivi', nextUrl));
-      }
-      // Area riservata: se non loggato → login (sullo stesso subdominio).
-      if (isAdminRoute && !isLoggedIn) {
-        return NextResponse.redirect(new URL('/login', nextUrl));
-      }
-      return NextResponse.next();
-    }
-
-    // Sul dominio pubblico i vecchi link al gestionale rimbalzano al subdominio.
-    // Solo per l'host pubblico reale: preview Vercel e localhost restano
-    // testabili così come sono.
-    if (host === PUBLIC_HOST && isAdminRoute) {
+  // --- Dominio pubblico (maurodev.it) -------------------------------------
+  // Landing e pagine preventivo pubbliche (/p/...) restano qui. I vecchi link
+  // al gestionale rimbalzano al subdominio, già in forma "pulita".
+  if (isPublicHost) {
+    if (isPreventiviPath) {
       const url = new URL(nextUrl);
       url.protocol = 'https:';
       url.host = APP_HOST;
       url.port = '';
+      url.pathname = stripPrefix(path);
       return NextResponse.redirect(url);
     }
+    return NextResponse.next();
   }
 
-  // Default (flag spento, preview, localhost): comportamento storico.
-  if (isAdminRoute && !isLoggedIn) {
+  // --- App del gestionale (app.maurodev.it, preview, localhost) ------------
+  // Lasciamo passare API, login e pagine pubbliche preventivo senza riscrittura.
+  if (path.startsWith('/api') || path === '/login' || path.startsWith('/p/')) {
+    return NextResponse.next();
+  }
+
+  // Canonicalizza gli URL con prefisso al loro equivalente pulito (evita doppioni).
+  if (isPreventiviPath) {
+    return NextResponse.redirect(new URL(stripPrefix(path), nextUrl));
+  }
+
+  // Tutto il resto è area riservata: richiede login.
+  if (!isLoggedIn) {
     return NextResponse.redirect(new URL('/login', nextUrl));
   }
-  return NextResponse.next();
+
+  // Riscrittura interna: URL pulito -> percorso reale sotto /preventivi.
+  const url = nextUrl.clone();
+  url.pathname = path === '/' ? '/preventivi' : `/preventivi${path}`;
+  return NextResponse.rewrite(url);
 });
 
 export const config = {
-  // '/preventivi' esatto va elencato a parte: '/preventivi/:path*' da solo NON
-  // intercetta il path base senza sotto-segmenti, e il redirect non scatterebbe.
-  matcher: ['/', '/preventivi', '/preventivi/:path*'],
+  // Gira su tutto tranne gli asset statici e i file interni di Next
+  // (esclude anche i percorsi con estensione, es. /Logo.svg, /icon.png).
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.).*)'],
 };

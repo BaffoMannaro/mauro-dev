@@ -142,7 +142,7 @@ export default function ClienteDettaglio({
   const elimina = async () => {
     if (!confirm('Eliminare questo cliente? I preventivi collegati verranno scollegati ma non eliminati.')) return;
     const res = await fetch(`/api/clienti/${cliente.id}`, { method: 'DELETE' });
-    if (res.ok) router.push('/preventivi/clienti');
+    if (res.ok) router.push('/clienti');
   };
 
   const unisci = async (sourceId: number) => {
@@ -179,7 +179,7 @@ export default function ClienteDettaglio({
     <div className="min-h-screen text-text">
       {/* Header */}
       <header className="border-b border-edge px-6 py-5">
-        <Link href="/preventivi/clienti" className="text-dim hover:text-text text-sm transition-colors">← Clienti</Link>
+        <Link href="/clienti" className="text-dim hover:text-text text-sm transition-colors">← Clienti</Link>
         <div className="flex items-start justify-between gap-3 mt-2">
           <div className="min-w-0">
             <h1 className="text-xl font-semibold truncate">{cliente.nome}</h1>

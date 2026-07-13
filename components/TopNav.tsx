@@ -6,10 +6,10 @@ import { signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 const NAV = [
-  { href: '/preventivi', label: 'Preventivi' },
-  { href: '/preventivi/clienti', label: 'Clienti' },
-  { href: '/preventivi/statistiche', label: 'Statistiche' },
-  { href: '/preventivi/abbonamenti', label: 'Abbonamenti' },
+  { href: '/', label: 'Preventivi' },
+  { href: '/clienti', label: 'Clienti' },
+  { href: '/statistiche', label: 'Statistiche' },
+  { href: '/abbonamenti', label: 'Abbonamenti' },
 ];
 
 type ThemeMode = 'auto' | 'dark' | 'light';
@@ -94,12 +94,12 @@ export default function TopNav({ session }: { session: any }) {
   useEffect(() => { setOpen(false); }, [pathname]);
 
   const isActive = (href: string) =>
-    href === '/preventivi' ? pathname === href : pathname.startsWith(href);
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
     <nav className="relative h-14 border-b border-edge bg-surface flex items-center px-4 md:px-6 gap-3 md:gap-6 shrink-0">
       {/* Brand */}
-      <Link href="/preventivi" className="shrink-0 flex items-center md:mr-4">
+      <Link href="/" className="shrink-0 flex items-center md:mr-4">
         <img src="/Logo.svg" alt="MAURO DEV" className="h-7 w-auto logo-adaptive" />
       </Link>
 

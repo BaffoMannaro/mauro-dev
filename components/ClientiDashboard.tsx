@@ -421,7 +421,7 @@ export default function ClientiDashboard({
               ) : (
                 <Link
                   key={c.id}
-                  href={`/preventivi/clienti/${c.id}`}
+                  href={`/clienti/${c.id}`}
                   className="bg-surface border border-edge rounded-xl p-5 hover:border-slate transition-colors block"
                 >
                   {inner}

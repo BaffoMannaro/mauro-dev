@@ -52,5 +52,7 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ['/', '/preventivi/:path*'],
+  // '/preventivi' esatto va elencato a parte: '/preventivi/:path*' da solo NON
+  // intercetta il path base senza sotto-segmenti, e il redirect non scatterebbe.
+  matcher: ['/', '/preventivi', '/preventivi/:path*'],
 };

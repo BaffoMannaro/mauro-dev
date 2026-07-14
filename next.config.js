@@ -2,7 +2,7 @@
 const nextConfig = {
   experimental: {
     serverActions: {
-      allowedOrigins: ['maurodev.it', 'www.maurodev.it'],
+      allowedOrigins: ['maurodev.it', 'www.maurodev.it', 'app.maurodev.it', 'area.maurodev.it'],
     },
   },
 };

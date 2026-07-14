@@ -17,6 +17,11 @@ function stripPrefix(pathname: string) {
   return clean === '' ? '/' : clean;
 }
 
+// Percorsi che appartengono SOLO al portale cliente.
+function isClientOnly(path: string) {
+  return path === '/portale' || path === '/entra' || path === '/accedi';
+}
+
 export default auth(async (req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
@@ -25,6 +30,26 @@ export default auth(async (req) => {
 
   const isPublicHost = host === PUBLIC_HOST || host === `www.${PUBLIC_HOST}`;
   const isPreventiviPath = path === '/preventivi' || path.startsWith('/preventivi/');
+
+  // --- Portale cliente (area.maurodev.it) ---------------------------------
+  if (host === CLIENT_HOST) {
+    // Consumo magic link, pagina di accesso e API passano senza gate.
+    if (path === '/entra' || path === '/accedi' || path.startsWith('/api/')) {
+      return NextResponse.next();
+    }
+    // Gate sessione cliente.
+    const token = req.cookies.get(CLIENT_COOKIE)?.value;
+    const session = token ? await verifyClientToken(token) : null;
+    if (!session || session.scope !== 'session') {
+      return NextResponse.redirect(new URL('/accedi', nextUrl));
+    }
+    // La dashboard vive alla URL reale /portale (nessun rewrite): tutto il
+    // resto viene canonicalizzato lì con un redirect sullo stesso host.
+    if (path === '/portale') {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(new URL('/portale', nextUrl));
+  }
 
   // --- Dominio pubblico (maurodev.it) -------------------------------------
   if (isPublicHost) {
@@ -39,25 +64,17 @@ export default auth(async (req) => {
     return NextResponse.next();
   }
 
-  // --- Portale cliente (area.maurodev.it) ---------------------------------
-  if (host === CLIENT_HOST) {
-    // Consumo del magic link, pagina di accesso e API passano senza gate.
-    if (path === '/entra' || path === '/accedi' || path.startsWith('/api/')) {
-      return NextResponse.next();
-    }
-    // Gate sessione cliente.
-    const token = req.cookies.get(CLIENT_COOKIE)?.value;
-    const session = token ? await verifyClientToken(token) : null;
-    if (!session || session.scope !== 'session') {
-      return NextResponse.redirect(new URL('/accedi', nextUrl));
-    }
-    // Dashboard bento unica: tutto viene servito dalla pagina /portale.
-    const url = nextUrl.clone();
-    url.pathname = '/portale';
-    return NextResponse.rewrite(url);
-  }
-
   // --- App del gestionale (app.maurodev.it, preview, localhost) -----------
+  // Difesa: i percorsi del portale non appartengono a questo host. Se ci
+  // finiscono (magari per una cache o un link errato) li mando al portale
+  // invece di rimbalzarli sul login admin (evita loop).
+  if (isClientOnly(path)) {
+    const url = new URL(nextUrl);
+    url.protocol = 'https:';
+    url.host = CLIENT_HOST;
+    url.port = '';
+    return NextResponse.redirect(url);
+  }
   if (path.startsWith('/api') || path === '/login' || path.startsWith('/p/')) {
     return NextResponse.next();
   }

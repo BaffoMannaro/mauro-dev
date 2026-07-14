@@ -25,7 +25,14 @@ export async function GET(req: NextRequest) {
   await sql`UPDATE clienti SET ultimo_accesso_portale = NOW() WHERE id = ${payload.cid}`;
 
   const session = await createSessionToken(payload.cid);
-  const res = NextResponse.redirect(new URL('/', req.nextUrl));
+  // Redirect sullo STESSO host della richiesta (dall'header), per evitare che
+  // il magic link atterri su un host diverso e finisca sul login admin.
+  const host = req.headers.get('host') || req.nextUrl.host;
+  const dest = new URL(req.nextUrl.toString());
+  dest.host = host;
+  dest.pathname = '/portale';
+  dest.search = '';
+  const res = NextResponse.redirect(dest);
   res.cookies.set(CLIENT_COOKIE, session, {
     httpOnly: true,
     secure: true,

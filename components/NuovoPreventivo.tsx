@@ -207,7 +207,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
               <button
                 onClick={handleCarica}
                 disabled={!json.trim() || loading}
-                className="flex-1 py-2 text-sm bg-accent hover:bg-accent/90 text-white font-semibold rounded-lg disabled:opacity-30 transition-colors"
+                className="flex-1 py-2 text-sm bg-accent hover:bg-accent/90 text-on-accent font-semibold rounded-lg disabled:opacity-30 transition-colors"
               >
                 {loading ? 'Caricamento...' : 'Carica preventivo'}
               </button>

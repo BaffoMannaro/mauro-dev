@@ -405,7 +405,7 @@ export default function ClienteDettaglio({
                   onFocus={(e) => e.target.select()}
                   className="flex-1 bg-bg border border-edge rounded-lg px-3 py-2 text-xs text-muted font-mono"
                 />
-                <button onClick={copiaLink} className="shrink-0 text-xs px-3 py-2 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors">
+                <button onClick={copiaLink} className="shrink-0 text-xs px-3 py-2 bg-accent text-on-accent font-semibold rounded-lg hover:bg-accent/90 transition-colors">
                   {copied ? 'Copiato ✓' : 'Copia'}
                 </button>
               </div>
@@ -457,7 +457,7 @@ export default function ClienteDettaglio({
                 <label className="text-dim text-xs font-medium block mb-1">LINK AL PDF (opzionale)</label>
                 <input type="url" placeholder="https://…" value={fattForm.pdf_url} onChange={(e) => setFatt('pdf_url', e.target.value)} className={inputCls} />
               </div>
-              <button onClick={aggiungiFattura} disabled={fattLoading} className="self-start text-xs px-4 py-2 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-40">
+              <button onClick={aggiungiFattura} disabled={fattLoading} className="self-start text-xs px-4 py-2 bg-accent text-on-accent font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-40">
                 {fattLoading ? 'Salvataggio…' : 'Salva fattura'}
               </button>
             </div>
@@ -564,7 +564,7 @@ export default function ClienteDettaglio({
               </div>
               <div className="flex gap-2 mt-1">
                 <button onClick={() => setShowEdit(false)} className="flex-1 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">Annulla</button>
-                <button onClick={salvaAnagrafica} disabled={loading || !form.nome.trim()} className="flex-1 py-2.5 text-sm bg-accent text-white font-semibold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-30">
+                <button onClick={salvaAnagrafica} disabled={loading || !form.nome.trim()} className="flex-1 py-2.5 text-sm bg-accent text-on-accent font-semibold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-30">
                   {loading ? 'Salvataggio...' : 'Salva'}
                 </button>
               </div>
@@ -597,7 +597,7 @@ export default function ClienteDettaglio({
                         </div>
                         <p className="text-dim text-xs mt-1 truncate">{p.cliente_nome} · {fmt(Number(p.totale))}</p>
                       </div>
-                      <button onClick={() => collega(p.id)} disabled={busyId === p.id} className="shrink-0 text-xs px-3 py-1.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30">
+                      <button onClick={() => collega(p.id)} disabled={busyId === p.id} className="shrink-0 text-xs px-3 py-1.5 bg-accent text-on-accent font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30">
                         {busyId === p.id ? '...' : 'Collega'}
                       </button>
                     </div>
@@ -634,7 +634,7 @@ export default function ClienteDettaglio({
                     <button
                       onClick={() => unisci(c.id)}
                       disabled={busyId === c.id}
-                      className="shrink-0 text-xs px-3 py-1.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
+                      className="shrink-0 text-xs px-3 py-1.5 bg-accent text-on-accent font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
                     >
                       {busyId === c.id ? '...' : 'Unisci qui'}
                     </button>

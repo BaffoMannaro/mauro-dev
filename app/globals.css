@@ -1,15 +1,17 @@
 @import "tailwindcss";
 
+/* ─── Identità "Lime": neutri caldi + accento giallo-lime + antracite ─── */
 @theme {
-  --color-bg:       #111A1E;
-  --color-surface:  #1A2530;
-  --color-surface2: #243240;
-  --color-slate:    #4C5760;
-  --color-edge:     #364652;
-  --color-muted:    #CBD2D0;
-  --color-dim:      #6B7D87;
-  --color-accent:   #FF006E;
-  --color-text:     #FFFFFF;
+  --color-bg:        #17181A;
+  --color-surface:   #1F2024;
+  --color-surface2:  #292B2F;
+  --color-slate:     #3A3B33;
+  --color-edge:      #34363B;
+  --color-muted:     #B4B6AD;
+  --color-dim:       #74766D;
+  --color-accent:    #DCF23C;
+  --color-on-accent: #1B1D12;
+  --color-text:      #F4F5EF;
 }
 
 body {
@@ -19,16 +21,23 @@ body {
 
 /* ─── Light theme ──────────────────────────────────────────── */
 html[data-theme="light"] {
-  --color-bg:       #F2F6F7;
-  --color-surface:  #FFFFFF;
-  --color-surface2: #E8EEF1;
-  --color-slate:    #4C5760;
-  --color-edge:     #CBD2D0;
-  --color-muted:    #3D4D57;
-  --color-dim:      #7A8F9A;
-  --color-accent:   #FF006E;
-  --color-text:     #1A2530;
+  --color-bg:        #EAE9E2;
+  --color-surface:   #FBFBF7;
+  --color-surface2:  #E2E1D7;
+  --color-slate:     #33342D;
+  --color-edge:      #D3D2C7;
+  --color-muted:     #4C4D45;
+  --color-dim:       #8B8B80;
+  --color-accent:    #DCF23C;
+  --color-on-accent: #1B1D12;
+  --color-text:      #1B1C18;
 }
+
+/* L'accento giallo non è leggibile come TESTO su sfondo chiaro:
+   sul tema light lo si vira a un verde-oliva scuro (resta "brand" ma leggibile). */
+html[data-theme="light"] .text-accent,
+html[data-theme="light"] .hover\:text-accent:hover,
+html[data-theme="light"] .hover\:text-accent\/80:hover { color: #57650C; }
 
 /* Status colors: più scuri per contrasto WCAG su sfondo chiaro */
 html[data-theme="light"] .text-green-400  { color: #166534; }
@@ -52,8 +61,7 @@ html[data-theme="light"] .border-green-800\/60  { border-color: #BBF7D0; }
 html[data-theme="light"] .border-red-950\/50    { border-color: #FECACA; }
 html[data-theme="light"] .border-green-800      { border-color: #BBF7D0; }
 
-/* Neutral button hover in light mode: bg-slate (#4C5760) + text-text (#1A2530) = basso contrasto.
-   Override: usa edge (#CBD2D0) come hover bg → testo scuro su grigio chiaro, contrasto ~5:1 */
+/* Neutral button hover in light mode */
 html[data-theme="light"] .hover\:bg-slate:hover { background-color: var(--color-edge); }
 
 /* Logo: bianco su dark, nero su light */

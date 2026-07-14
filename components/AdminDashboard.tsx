@@ -131,7 +131,7 @@ export default function AdminDashboard({
           ))}
           <button
             onClick={() => setNuovoOpen(true)}
-            className="ml-2 text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+            className="ml-2 text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
           >
             + Nuovo
           </button>
@@ -148,7 +148,7 @@ export default function AdminDashboard({
               onClick={() => setFiltro(f)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
                 filtro === f
-                  ? 'bg-accent text-white'
+                  ? 'bg-accent text-on-accent'
                   : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'
               }`}
             >

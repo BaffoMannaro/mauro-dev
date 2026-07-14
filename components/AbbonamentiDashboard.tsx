@@ -127,7 +127,7 @@ function FormAbbonamento({
           Annulla
         </button>
         <button onClick={() => onSave(form)} disabled={loading}
-          className="flex-1 py-2.5 text-sm bg-accent text-white font-semibold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-30">
+          className="flex-1 py-2.5 text-sm bg-accent text-on-accent font-semibold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-30">
           {loading ? 'Salvataggio...' : 'Salva'}
         </button>
       </div>
@@ -225,7 +225,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
         <h1 className="text-xl font-semibold">Abbonamenti</h1>
         <button
           onClick={() => { setEditId(null); setShowForm(true); setErrore(''); }}
-          className="text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+          className="text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
         >
           + Nuovo
         </button>
@@ -252,7 +252,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
         <div className="flex gap-2">
           <button
             onClick={() => setFiltroTag(null)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filtroTag === null ? 'bg-accent text-white' : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'}`}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filtroTag === null ? 'bg-accent text-on-accent' : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'}`}
           >
             Tutti <span className="ml-1 text-xs opacity-60">{abbonamenti.length}</span>
           </button>

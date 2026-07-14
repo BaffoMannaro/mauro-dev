@@ -229,7 +229,7 @@ export default function PreventivoDrawer({
           {/* Salva */}
           <button
             onClick={salva}
-            className="w-full bg-accent text-white font-semibold py-3 rounded-xl hover:bg-accent/90 transition-colors cursor-pointer"
+            className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl hover:bg-accent/90 transition-colors cursor-pointer"
           >
             {salvato ? '✓ Salvato!' : 'Salva modifiche'}
           </button>

@@ -268,7 +268,7 @@ export default function ClientiDashboard({
             <button
               onClick={() => { setMergeErr(''); setShowMerge(true); }}
               disabled={selected.size < 2}
-              className="text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
+              className="text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
             >
               Unisci
             </button>
@@ -292,12 +292,12 @@ export default function ClientiDashboard({
             >
               Importa da accettati
               {candidati.length > 0 && (
-                <span className="ml-2 text-xs bg-accent text-white rounded-full px-1.5 py-0.5">{candidati.length}</span>
+                <span className="ml-2 text-xs bg-accent text-on-accent rounded-full px-1.5 py-0.5">{candidati.length}</span>
               )}
             </button>
             <button
               onClick={() => { setForm(FORM_DEFAULT); setErrore(''); setShowNew(true); }}
-              className="text-sm bg-accent text-white font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+              className="text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
             >
               + Nuovo cliente
             </button>
@@ -383,7 +383,7 @@ export default function ClientiDashboard({
                 <>
                   <div className="mb-3 flex items-start gap-2">
                     {selectMode && (
-                      <span className={`mt-0.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center text-[10px] ${isSel ? 'bg-accent border-accent text-white' : 'border-edge text-transparent'}`}>✓</span>
+                      <span className={`mt-0.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center text-[10px] ${isSel ? 'bg-accent border-accent text-on-accent' : 'border-edge text-transparent'}`}>✓</span>
                     )}
                     <div className="min-w-0">
                       <p className="text-text font-semibold truncate">{c.nome}</p>
@@ -496,7 +496,7 @@ export default function ClientiDashboard({
               {errore && <p className="text-red-400 text-xs font-mono">⚠ {errore}</p>}
               <div className="flex gap-2 mt-1">
                 <button onClick={() => setShowNew(false)} className="flex-1 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">Annulla</button>
-                <button onClick={salvaNuovo} disabled={loading} className="flex-1 py-2.5 text-sm bg-accent text-white font-semibold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-30">
+                <button onClick={salvaNuovo} disabled={loading} className="flex-1 py-2.5 text-sm bg-accent text-on-accent font-semibold rounded-xl hover:bg-accent/90 transition-colors disabled:opacity-30">
                   {loading ? 'Salvataggio...' : 'Salva'}
                 </button>
               </div>
@@ -531,7 +531,7 @@ export default function ClientiDashboard({
                       <button
                         onClick={() => importa(c)}
                         disabled={busyKey === key}
-                        className="shrink-0 text-xs px-3 py-1.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
+                        className="shrink-0 text-xs px-3 py-1.5 bg-accent text-on-accent font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
                       >
                         {busyKey === key ? '...' : 'Aggiungi'}
                       </button>
@@ -568,7 +568,7 @@ export default function ClientiDashboard({
                   <button
                     onClick={() => eseguiMerge(c.id)}
                     disabled={merging}
-                    className="shrink-0 text-xs px-3 py-1.5 bg-accent text-white font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
+                    className="shrink-0 text-xs px-3 py-1.5 bg-accent text-on-accent font-semibold rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-30"
                   >
                     {merging ? '...' : 'Tieni questo'}
                   </button>

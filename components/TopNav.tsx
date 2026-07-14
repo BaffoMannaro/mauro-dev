@@ -111,7 +111,7 @@ export default function TopNav({ session }: { session: any }) {
             href={item.href}
             className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               isActive(item.href)
-                ? 'bg-accent text-white'
+                ? 'bg-accent text-on-accent'
                 : 'text-muted hover:text-text hover:bg-surface2'
             }`}
           >
@@ -164,7 +164,7 @@ export default function TopNav({ session }: { session: any }) {
                 onClick={() => setOpen(false)}
                 className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'bg-accent text-white'
+                    ? 'bg-accent text-on-accent'
                     : 'text-muted hover:text-text hover:bg-surface2'
                 }`}
               >

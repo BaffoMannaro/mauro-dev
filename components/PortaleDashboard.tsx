@@ -121,7 +121,7 @@ export default function PortaleDashboard({
             <div className="flex items-center gap-2 mb-3">
               <h2 className="font-semibold">Azioni richieste</h2>
               {nAzioni > 0 && (
-                <span className="text-xs bg-accent text-white rounded-full px-2 py-0.5">{nAzioni}</span>
+                <span className="text-xs bg-accent text-on-accent rounded-full px-2 py-0.5">{nAzioni}</span>
               )}
             </div>
             {nAzioni === 0 ? (
@@ -156,7 +156,7 @@ export default function PortaleDashboard({
                       <button
                         disabled={busyId === p.id}
                         onClick={() => rispondiPreventivo(p.id, 'accetta')}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-on-accent hover:opacity-90 transition-opacity disabled:opacity-50"
                       >
                         Accetta
                       </button>

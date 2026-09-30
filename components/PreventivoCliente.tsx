@@ -142,7 +142,7 @@ function AccordionSection({
           </svg>
         </div>
       </button>
-      <div className={`print:block! ${open ? '' : 'hidden'} ${flush ? '' : 'px-5 pb-5'}`}>
+      <div className={`print:block! border-t border-edge/40 ${open ? '' : 'hidden'} ${flush ? '' : 'px-5 pt-4 pb-5'}`}>
         {children}
       </div>
     </div>

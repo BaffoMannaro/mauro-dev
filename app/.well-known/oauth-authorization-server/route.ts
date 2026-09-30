@@ -14,8 +14,9 @@ export function GET(req: Request) {
       code_challenge_methods_supported: ['S256'],
       token_endpoint_auth_methods_supported: ['none'],
       scopes_supported: [SCOPE],
-      client_id_metadata_document_supported: true,
-      authorization_response_iss_parameter_supported: true,
+      // Registrazione dinamica (DCR): è il percorso che Claude usa in modo più collaudato.
+      // Niente CIMD né parametro "iss" nella risposta: con questi due il collegamento da
+      // claude.ai si fermava dopo il consenso, senza mai chiedere il token.
     },
     { headers: CORS }
   );

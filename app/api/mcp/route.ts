@@ -1,10 +1,20 @@
 import { createMcpHandler, withMcpAuth } from 'mcp-handler';
-import { ADMIN_EMAIL, SCOPE, verifica } from '@/lib/mcp/oauth';
+import { ADMIN_EMAIL, baseApp, SCOPE, verifica } from '@/lib/mcp/oauth';
 import { ISTRUZIONI, registraStrumenti } from '@/lib/mcp/tools';
 
 // Connettore MCP per Claude: https://app.maurodev.it/api/mcp (OAuth con il login Google del gestionale).
+// mcp-handler tipizza serverInfo come { name, version } ma lo passa intero a McpServer,
+// che accetta l'Implementation completa: titolo, sito e icona del connettore in Claude.
+const serverInfo = {
+  name: 'maurodev-gestionale',
+  title: 'Mauro Dev',
+  version: '1.0.0',
+  websiteUrl: 'https://maurodev.it',
+  icons: [{ src: `${baseApp()}/mcp-icon.png`, mimeType: 'image/png', sizes: ['512x512'] }],
+};
+
 const handler = createMcpHandler(registraStrumenti, {
-  serverInfo: { name: 'maurodev-gestionale', version: '1.0.0' },
+  serverInfo: serverInfo as { name: string; version: string },
   instructions: ISTRUZIONI,
 });
 

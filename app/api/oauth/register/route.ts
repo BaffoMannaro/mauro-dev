@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     return erroreOAuth('invalid_redirect_uri', 'redirect_uris non ammessi');
   }
 
+  console.log('[oauth] registrato client', body.client_name ?? '-', uris.join(' '));
   return Response.json(
     {
       client_id: `mcp-${randomUUID()}`,

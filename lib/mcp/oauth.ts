@@ -136,6 +136,7 @@ export const CORS = {
 };
 
 export function erroreOAuth(error: string, description: string, status = 400) {
+  console.warn('[oauth] errore', error, description);
   return Response.json(
     { error, error_description: description },
     { status, headers: { ...CORS, 'Cache-Control': 'no-store' } }

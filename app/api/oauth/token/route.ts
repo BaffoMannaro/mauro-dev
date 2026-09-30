@@ -7,6 +7,7 @@ export async function POST(req: Request) {
     ? await req.json().catch(() => ({}))
     : Object.fromEntries(new URLSearchParams(await req.text()));
 
+  console.log('[oauth] token', p.grant_type, 'client', p.client_id ?? '-');
   if (p.grant_type === 'authorization_code') {
     const code = p.code ? await verifica('code', p.code) : null;
     if (!code) return erroreOAuth('invalid_grant', 'Codice non valido o scaduto');

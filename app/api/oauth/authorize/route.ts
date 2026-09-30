@@ -55,7 +55,7 @@ function pagina(titolo: string, corpo: string, status = 200) {
   );
 }
 
-const errore = (msg: string) => pagina('Autorizzazione non valida', `<h1>Autorizzazione non valida</h1><p>${esc(msg)}</p>`, 400);
+const errore = (msg: string) => (console.warn('[oauth] authorize rifiutato:', msg), pagina('Autorizzazione non valida', `<h1>Autorizzazione non valida</h1><p>${esc(msg)}</p>`, 400));
 
 export async function GET(req: NextRequest) {
   const esito = await leggiRichiesta(req.nextUrl.searchParams);
@@ -106,12 +106,12 @@ export async function POST(req: NextRequest) {
 
   const dest = new URL(esito.r.redirectUri);
   if (esito.state) dest.searchParams.set('state', esito.state);
-  dest.searchParams.set('iss', issuer(req));
 
   if (form.get('decisione') !== 'si') {
     dest.searchParams.set('error', 'access_denied');
   } else {
     dest.searchParams.set('code', await creaCodice(esito.r, session.user.email));
   }
+  console.log('[oauth] consenso', form.get('decisione'), 'client', esito.r.clientId, '→', dest.host);
   return NextResponse.redirect(dest, 303);
 }

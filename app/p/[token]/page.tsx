@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import type { ComponentProps } from 'react';
 import sql from '@/lib/db';
 import PreventivoCliente from '@/components/PreventivoCliente';
 import { isScaduto, scadenzaEffettiva } from '@/lib/scadenza';
@@ -40,7 +41,7 @@ export default async function PreventivoPage({
 
   return (
     <PreventivoCliente
-      preventivo={{ ...pubblico, scadenza: scadenzaEffettiva(preventivo) } as any}
+      preventivo={{ ...pubblico, scadenza: scadenzaEffettiva(preventivo) } as ComponentProps<typeof PreventivoCliente>['preventivo']}
       scadutoAlServer={preventivo.stato === 'inviato' && isScaduto(preventivo)}
       richiestaInviata={inAttesa(richiesta_tardiva)}
       // Il PDF (e ?theme=light) si genera sempre con il tema chiaro, deciso dal server:

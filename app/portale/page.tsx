@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { isScaduto } from '@/lib/scadenza';
 import { redirect } from 'next/navigation';
 import sql from '@/lib/db';
 import { ensurePortaleSchema } from '@/lib/schema';
@@ -36,7 +37,7 @@ export default async function PortalePage() {
   return (
     <PortaleDashboard
       cliente={cliente as any}
-      preventivi={preventivi as any}
+      preventivi={preventivi.map((p) => ({ ...p, scaduto: p.stato === 'inviato' && isScaduto(p) })) as any}
       fatture={fatture as any}
     />
   );

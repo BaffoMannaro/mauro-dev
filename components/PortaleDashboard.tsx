@@ -16,6 +16,7 @@ type Preventivo = {
   lavoro_fine: string | null;
   accettato_at: string | null;
   created_at: string;
+  scaduto?: boolean;
 };
 
 type Fattura = {
@@ -135,7 +136,9 @@ export default function PortaleDashboard({
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{p.oggetto}</p>
-                      <p className="text-xs text-dim">Preventivo da valutare · {eur(Number(p.totale))}</p>
+                      <p className="text-xs text-dim">
+                        {p.scaduto ? 'Preventivo scaduto: aprilo per chiedere un’accettazione tardiva' : 'Preventivo da valutare'} · {eur(Number(p.totale))}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <a
@@ -144,8 +147,9 @@ export default function PortaleDashboard({
                         rel="noreferrer"
                         className="text-xs px-3 py-1.5 rounded-lg border border-edge hover:bg-surface transition-colors"
                       >
-                        Vedi
+                        {p.scaduto ? 'Apri' : 'Vedi'}
                       </a>
+                      {!p.scaduto && (<>
                       <button
                         disabled={busyId === p.id}
                         onClick={() => rispondiPreventivo(p.id, 'rifiuta')}
@@ -160,6 +164,7 @@ export default function PortaleDashboard({
                       >
                         Accetta
                       </button>
+                      </>)}
                     </div>
                   </div>
                 ))}

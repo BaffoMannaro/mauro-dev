@@ -26,6 +26,8 @@ import {
 import { baseApp, baseSito, linkDownloadFattura } from './oauth';
 import { FONTE_IDS, fonteLabel } from '@/lib/fonti';
 import { aperturePerPreventivo, visiteDelPreventivo } from '@/lib/visite';
+import { isScaduto, scadenzaEffettiva, VALIDITA_MAX_GIORNI } from '@/lib/scadenza';
+import { ensureTardivaSchema, gestisciRichiestaTardiva, inAttesa } from '@/lib/tardiva';
 import { calcolaListino, daClassificare } from '@/lib/listino';
 import {
   classificaVoci,
@@ -48,6 +50,7 @@ NUOVO PREVENTIVO: intervista, non inventare.
 FATTURE: l'utente carica in chat l'XML FatturaPA dell'Agenzia delle Entrate; passa il testo XML integrale a importa_fattura. Se la risposta contiene preventivi_suggeriti, proponi il collegamento e chiedi conferma prima di chiamare collega_fattura_preventivo. Un preventivo può avere più fatture, anche di società diverse. I dati fiscali (ragione sociale, P.IVA, indirizzo) vengono dalle fatture, che sono la fonte di verità: il preventivo collegato si aggiorna da solo.
 FONTE DEL CLIENTE (diretto / Astrolancer / Cream): è una divisione INTERNA. Non scriverla mai nei testi del preventivo né in nulla che vede il cliente.
 LISTINO: le voci dei lavori (preventivi e fatture) sono raggruppate in "azioni". Se voci_lavori mostra voci da classificare, raggruppale per tipo di lavoro con classifica_voci (nomi brevi e riutilizzabili, es. "Landing page", "Intervento urgente", "Manutenzione ordinaria") e mostra all'utente la proposta prima di applicarla.
+SCADENZA: ogni preventivo vale al massimo ${VALIDITA_MAX_GIORNI} giorni (predefinito ${VALIDITA_MAX_GIORNI}). Se è scaduto il cliente può chiedere un'accettazione tardiva dalla pagina: la trovi come richiesta_accettazione_tardiva e la gestisci con gestisci_accettazione_tardiva, sempre dopo la conferma dell'utente.
 CLIENTE vs SOCIETÀ: il cliente è la persona/il rapporto; le società (lista_societa) sono i soggetti fiscali che ricevono le fatture. Un cliente può avere più società.
 
 Importi in euro, date YYYY-MM-DD. Rispondi in italiano. Il PDF delle fatture si scarica dal link restituito (valido 24 ore).`;
@@ -77,7 +80,16 @@ function riepilogoPreventivo(p: any) {
     totale: Number(p.totale),
     iva: p.iva,
     stato: p.stato,
-    scadenza: iso(p.scadenza),
+    scadenza: scadenzaEffettiva(p),
+    scaduto: p.stato === 'inviato' && isScaduto(p),
+    ...(inAttesa(p.richiesta_tardiva) && {
+      richiesta_accettazione_tardiva: {
+        nome: `${p.richiesta_tardiva.nome} ${p.richiesta_tardiva.cognome}`,
+        email: p.richiesta_tardiva.email,
+        messaggio: p.richiesta_tardiva.messaggio,
+        inviata_il: p.richiesta_tardiva.inviata_at,
+      },
+    }),
     creato_il: iso(p.created_at),
     accettato_il: iso(p.accettato_at),
     ...linkPreventivo(p.token),
@@ -116,7 +128,7 @@ const clienteSchema = z.object({
 const testataSchema = z.object({
   oggetto: z.string(),
   data: z.string().optional().describe('Data leggibile, es. "30 Settembre 2026"'),
-  scadenza: z.string().optional().describe('YYYY-MM-DD'),
+  scadenza: z.string().optional().describe('YYYY-MM-DD, al massimo 15 giorni da oggi (se manca: oggi + 15)'),
   iva: z.boolean().optional().describe('true = IVA 22% esposta; in forfettario di norma false'),
   modalita_pagamento: z.string().optional(),
   schema_pagamento: z.string().optional(),
@@ -287,6 +299,28 @@ export function registraStrumenti(server: McpServer) {
     }
   );
 
+  server.registerTool(
+    'gestisci_accettazione_tardiva',
+    {
+      title: 'Gestisci accettazione tardiva',
+      description:
+        'Decide su un preventivo scaduto. approva: lo segna accettato con i dati della richiesta del cliente e invia la conferma; ' +
+        `riapri: nuova scadenza a ${VALIDITA_MAX_GIORNI} giorni da oggi (se c'è una richiesta il cliente riceve il link per accettare); ` +
+        'rifiuta: chiude la richiesta senza email. Chiedi sempre conferma all’utente prima di usarlo.',
+      inputSchema: z.object({ id: z.number().int(), azione: z.enum(['approva', 'riapri', 'rifiuta']) }),
+      annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
+    },
+    async ({ id, azione }) => {
+      try {
+        await ensureTardivaSchema();
+        const p = await gestisciRichiestaTardiva(id, azione, (fn) => fn());
+        return testo({ fatto: azione, ...riepilogoPreventivo(p) });
+      } catch (e) {
+        return errore((e as Error).message);
+      }
+    }
+  );
+
   // ── Modello dei preventivi ──
 
   server.registerTool(
@@ -316,7 +350,7 @@ export function registraStrumenti(server: McpServer) {
         'I campi passati sostituiscono quelli attuali; gli altri restano. Leggi prima il modello attuale.',
       inputSchema: z.object({
         linee_guida: z.string().optional(),
-        validita_giorni: z.number().int().min(1).max(365).optional(),
+        validita_giorni: z.number().int().min(1).max(15).optional(),
         campi_richiesti: z
           .array(z.string())
           .optional()

@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import sql from './db';
 import { ensureClientiSchema } from './schema';
+import { limitaScadenza, VALIDITA_MAX_GIORNI } from './scadenza';
 
 // ─── Formato JSON del preventivo (lo stesso del modulo "Nuovo preventivo") ───
 
@@ -63,7 +64,7 @@ export async function inserisciPreventivo(body: NuovoPreventivoInput) {
       ${body.oggetto},
       ${JSON.stringify(voci)},
       ${body.note || null},
-      ${body.scadenza || null},
+      ${limitaScadenza(body.scadenza)},
       ${totale},
       ${body.iva === true},
       ${body.meta ? JSON.stringify(body.meta) : null}
@@ -98,7 +99,7 @@ export const CHIAVE_MODELLO = 'modello_preventivo';
 export interface ModelloPreventivo {
   /** Istruzioni di stile/contenuto che Claude segue quando scrive un preventivo. */
   linee_guida?: string;
-  /** Giorni di validità usati per la scadenza quando non è indicata. */
+  /** Giorni di validità usati per la scadenza quando non è indicata (massimo 15). */
   validita_giorni?: number;
   /** Valori predefiniti di "preventivo" (es. iva, modalita_pagamento, schema_pagamento). */
   preventivo?: Partial<PreventivoJson['preventivo']>;
@@ -132,8 +133,8 @@ export function applicaModello(dati: PreventivoJson, modello: ModelloPreventivo)
     if (vuoto(preventivo[k])) preventivo[k] = v;
   }
   if (vuoto(preventivo.scadenza) && modello.validita_giorni) {
-    const d = new Date(Date.now() + modello.validita_giorni * 86400000);
-    preventivo.scadenza = d.toISOString().slice(0, 10);
+    const giorni = Math.min(modello.validita_giorni, VALIDITA_MAX_GIORNI);
+    preventivo.scadenza = new Date(Date.now() + giorni * 86400000).toISOString().slice(0, 10);
   }
 
   const sezioni = { ...dati.sezioni } as Record<string, unknown>;
@@ -176,7 +177,7 @@ export async function modificaPreventivo(id: number, m: ModificaPreventivo) {
       oggetto = ${nuovo.preventivo.oggetto},
       voci = ${JSON.stringify(voci)},
       note = ${nuovo.sezioni.note || null},
-      scadenza = ${nuovo.preventivo.scadenza || attuale.scadenza || null},
+      scadenza = ${m.preventivo?.scadenza ? limitaScadenza(m.preventivo.scadenza) : attuale.scadenza},
       totale = ${totale},
       iva = ${nuovo.preventivo.iva ?? attuale.iva},
       stato = ${m.stato ?? attuale.stato},
@@ -195,7 +196,6 @@ export const CAMPI_RICHIESTI_DEFAULT = [
   'cliente.nome',
   'cliente.email',
   'preventivo.oggetto',
-  'preventivo.scadenza',
   'sezioni.intro',
   'sezioni.descrizione',
   'sezioni.voci',
@@ -211,7 +211,7 @@ const DOMANDE: Record<string, string> = {
   'cliente.piva': 'Qual è la P.IVA dell’azienda?',
   'cliente.telefono': 'Hai un numero di telefono del referente?',
   'preventivo.oggetto': 'Come intitoliamo il progetto (oggetto del preventivo)?',
-  'preventivo.scadenza': 'Fino a quando deve essere valida l’offerta?',
+  'preventivo.scadenza': 'Fino a quando deve essere valida l’offerta? (massimo 15 giorni, predefinito 15)',
   'preventivo.modalita_pagamento': 'Come pagherà il cliente (bonifico, altro)?',
   'sezioni.intro': 'Com’è nato il contatto (call, email, passaparola) e cosa vuoi dire in apertura al cliente?',
   'sezioni.descrizione': 'Qual è l’obiettivo del progetto e quali attività comprende, passo per passo?',
@@ -274,6 +274,8 @@ export function controllaPreventivo(dati: PreventivoJson, modello: ModelloPreven
   const scad = dati.preventivo?.scadenza;
   if (scad && scad < new Date().toISOString().slice(0, 10)) {
     debole('preventivo.scadenza', `La scadenza ${scad} è già passata.`);
+  } else if (scad && scad > limitaScadenza(null)) {
+    debole('preventivo.scadenza', `La validità massima è ${VALIDITA_MAX_GIORNI} giorni: la scadenza verrà ridotta al ${limitaScadenza(null)}.`);
   }
 
   const descr = dati.sezioni?.descrizione ?? '';

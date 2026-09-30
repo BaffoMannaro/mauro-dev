@@ -80,8 +80,7 @@ function useCountdown(scadenza: string | null) {
   const [countdown, setCountdown] = useState('');
   useEffect(() => {
     if (!scadenza) return;
-    const target = new Date(scadenza);
-    target.setHours(23, 59, 59, 999);
+    const target = new Date(`${scadenza.slice(0, 10)}T23:59:59.999`);
     const tick = () => {
       const diff = target.getTime() - Date.now();
       if (diff <= 0) { setCountdown('Scaduto'); return; }
@@ -150,7 +149,21 @@ function AccordionSection({
   );
 }
 
-export default function PreventivoCliente({ preventivo }: { preventivo: Preventivo }) {
+export default function PreventivoCliente({
+  preventivo,
+  scadutoAlServer = false,
+  richiestaInviata = false,
+  temaChiaro = false,
+}: {
+  preventivo: Preventivo;
+  /** Stato calcolato dal server, per non mostrare il modulo sbagliato prima del countdown. */
+  scadutoAlServer?: boolean;
+  /** Il cliente ha già chiesto un'accettazione tardiva, in attesa di risposta. */
+  richiestaInviata?: boolean;
+  /** Tema chiaro forzato dal server (PDF e ?theme=light). */
+  temaChiaro?: boolean;
+  pdf?: boolean;
+}) {
   const [accettato, setAccettato] = useState(preventivo.stato === 'accettato');
   const [loading, setLoading] = useState(false);
   const [confermato, setConfermato] = useState(false);
@@ -160,7 +173,9 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
   const [email, setEmail] = useState('');
   const [erroreAccettazione, setErroreAccettazione] = useState('');
   const countdown = useCountdown(accettato ? null : preventivo.scadenza);
-  const scaduto = countdown === 'Scaduto';
+  const scaduto = countdown === 'Scaduto' || (countdown === '' && scadutoAlServer);
+  const [tardiva, setTardiva] = useState<'no' | 'invio' | 'inviata'>(richiestaInviata ? 'inviata' : 'no');
+  const [messaggio, setMessaggio] = useState('');
   const traccia = useTracciaVisita(preventivo.token);
 
   const meta = preventivo.meta;
@@ -185,11 +200,29 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
     setLoading(false);
   };
 
+  const handleTardiva = async () => {
+    setErroreAccettazione('');
+    if (!nome.trim()) return setErroreAccettazione('Il nome è obbligatorio');
+    if (!cognome.trim()) return setErroreAccettazione('Il cognome è obbligatorio');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setErroreAccettazione("Inserisci un'email valida");
+    setTardiva('invio');
+    const res = await fetch(`/api/p/${preventivo.token}/richiesta-tardiva`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, cognome, email, messaggio }),
+    });
+    if (res.ok) setTardiva('inviata');
+    else {
+      setTardiva('no');
+      setErroreAccettazione((await res.json().catch(() => null))?.error ?? 'Errore nell’invio. Riprova.');
+    }
+  };
+
   const inputCls = "w-full bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text placeholder-dim focus:outline-none focus:border-slate";
 
   return (
     <SezioneAperta.Provider value={traccia.sezione}>
-    <div className="min-h-screen bg-bg text-text">
+    <div className={`min-h-screen bg-bg text-text ${temaChiaro ? 'tema-chiaro' : ''}`}>
 
       {/* ── Download PDF — fixed top-right, outside layout ── */}
       <a
@@ -203,12 +236,12 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
         </svg>
         Scarica PDF
       </a>
-      {!accettato && !scaduto && (
+      {!accettato && !(scaduto && tardiva === 'inviata') && (
         <a
           href="#accettazione"
           className="print:hidden fixed bottom-4 right-4 z-50 flex items-center gap-2 px-5 py-3 bg-text text-bg text-sm font-semibold rounded-xl shadow-lg hover:opacity-90 transition-opacity"
         >
-          Accetta il preventivo
+          {scaduto ? 'Chiedi di accettarlo' : 'Accetta il preventivo'}
         </a>
       )}
 
@@ -252,11 +285,12 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
                 </span>
               ) : (
                 <>
-                  <p className="text-muted text-sm">
-                    {preventivo.scadenza
-                      ? new Date(preventivo.scadenza).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })
-                      : '30 giorni'}
-                  </p>
+                  {preventivo.scadenza && (
+                    <p className="text-muted text-sm">
+                      {scaduto ? 'Scaduto il ' : 'Fino al '}
+                      {new Date(`${preventivo.scadenza}T12:00:00`).toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    </p>
+                  )}
                   {countdown && (
                     <p className={`text-xs font-mono mt-1 print:hidden ${countdown === 'Scaduto' ? 'text-red-400' : 'text-accent'}`}>
                       {countdown}
@@ -410,14 +444,52 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
 
         {/* ── Accettazione / Conferma ── */}
         {!accettato && scaduto ? (
-          <div className="border border-edge bg-surface rounded-xl p-6 text-center print:hidden">
-            <p className="text-text font-semibold">Questo preventivo è scaduto</p>
-            <p className="text-dim text-sm mt-1">
-              Scrivi a <a href="mailto:altamura.mauro@gmail.com" className="underline">altamura.mauro@gmail.com</a> per riceverne uno aggiornato.
-            </p>
+          <div id="accettazione" className="scroll-mt-6 print:hidden">
+            {tardiva === 'inviata' ? (
+              <div className="border border-edge bg-surface rounded-xl p-6 text-center">
+                <p className="text-text font-semibold">Richiesta inviata</p>
+                <p className="text-dim text-sm mt-1">
+                  Ho ricevuto la tua richiesta di accettare questo preventivo anche se è scaduto: ti rispondo a breve via email.
+                </p>
+              </div>
+            ) : (
+              <AccordionSection title="Preventivo scaduto" defaultOpen>
+                <p className="text-muted text-sm mb-5 leading-relaxed">
+                  Il periodo di validità è terminato, ma puoi ancora chiedermi di accettarlo alle stesse condizioni.
+                  Compila il modulo: mi arriva una email e ti rispondo al più presto.
+                </p>
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label className="text-dim text-xs font-mono block mb-1">NOME *</label>
+                    <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Mario" className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="text-dim text-xs font-mono block mb-1">COGNOME *</label>
+                    <input type="text" value={cognome} onChange={(e) => setCognome(e.target.value)} placeholder="Rossi" className={inputCls} />
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <label className="text-dim text-xs font-mono block mb-1">EMAIL *</label>
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="mario.rossi@email.it" className={inputCls} />
+                </div>
+                <div className="mb-4">
+                  <label className="text-dim text-xs font-mono block mb-1">MESSAGGIO (FACOLTATIVO)</label>
+                  <textarea value={messaggio} onChange={(e) => setMessaggio(e.target.value)} rows={3} maxLength={2000}
+                    placeholder="Es. vorrei partire entro fine mese" className={`${inputCls} resize-y`} />
+                </div>
+                {erroreAccettazione && <p className="text-red-400 text-xs mb-3 font-mono">⚠ {erroreAccettazione}</p>}
+                <button
+                  onClick={handleTardiva}
+                  disabled={tardiva === 'invio'}
+                  className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 transition-colors cursor-pointer"
+                >
+                  {tardiva === 'invio' ? 'Invio...' : 'Chiedi di accettarlo lo stesso'}
+                </button>
+              </AccordionSection>
+            )}
           </div>
         ) : !accettato ? (
-          <div id="accettazione" className="scroll-mt-6">
+          <div id="accettazione" className="scroll-mt-6 print:hidden">
           <AccordionSection title="Accettazione" defaultOpen>
             <p className="text-muted text-sm mb-5 leading-relaxed">
               Compila il modulo per accettare il preventivo. L’accettazione viene registrata con data, ora e indirizzo IP e riceverai subito una email di conferma con il riepilogo.

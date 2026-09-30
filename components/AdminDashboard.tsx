@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { isScaduto } from '@/lib/scadenza';
 import NuovoPreventivo from './NuovoPreventivo';
 import PreventivoDrawer from './PreventivoDrawer';
 
@@ -33,6 +34,7 @@ interface Preventivo {
   lavoro_inizio: string | null;
   lavoro_fine: string | null;
   created_at: string;
+  richiesta_tardiva?: { nome: string; cognome: string; email: string; messaggio: string | null; inviata_at: string; esito?: string } | null;
   meta?: any;
 }
 
@@ -71,6 +73,14 @@ export default function AdminDashboard({
   const [copiato, setCopiato] = useState<string | null>(null);
   const [nuovoOpen, setNuovoOpen] = useState(false);
   const [drawerPreventivo, setDrawerPreventivo] = useState<Preventivo | null>(null);
+
+  // Link dalle email (es. richiesta di accettazione tardiva): /?preventivo=ID apre la scheda.
+  useEffect(() => {
+    const id = Number(new URLSearchParams(window.location.search).get('preventivo'));
+    const p = id ? initialPreventivi.find((x) => x.id === id) : null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (p) setDrawerPreventivo(p);
+  }, [initialPreventivi]);
 
   const filtrati = [...(filtro === 'tutti' ? preventivi : preventivi.filter((p) => p.stato === filtro))]
     .sort((a, b) => {
@@ -193,6 +203,13 @@ export default function AdminDashboard({
                       <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${STATI[p.stato as keyof typeof STATI]?.color}`}>
                         {STATI[p.stato as keyof typeof STATI]?.label}
                       </span>
+                      {p.stato === 'inviato' && p.richiesta_tardiva && !p.richiesta_tardiva.esito ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full border font-medium text-amber-400 bg-amber-950/40 border-amber-800/60">
+                          Chiede accettazione tardiva
+                        </span>
+                      ) : p.stato === 'inviato' && isScaduto(p) ? (
+                        <span className="text-xs px-2 py-0.5 rounded-full border font-medium text-dim bg-surface2 border-edge">Scaduto</span>
+                      ) : null}
                     </div>
                     <h3 className="text-text font-semibold truncate">{p.cliente_nome}</h3>
                     <p className="text-muted text-sm">{p.oggetto}</p>

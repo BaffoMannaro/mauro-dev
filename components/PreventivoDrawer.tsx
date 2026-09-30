@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { isScaduto, scadenzaEffettiva } from '@/lib/scadenza';
 
 interface Preventivo {
   id: number;
@@ -27,6 +28,7 @@ interface Preventivo {
   created_at: string;
   conferma_email_at?: string | null;
   conferma_email_errore?: string | null;
+  richiesta_tardiva?: { nome: string; cognome: string; email: string; messaggio: string | null; inviata_at: string; esito?: string } | null;
   meta?: any;
 }
 
@@ -137,6 +139,33 @@ export default function PreventivoDrawer({
     }
   };
 
+  // Validità e accettazione tardiva
+  const scadenza = scadenzaEffettiva(preventivo);
+  const scaduto = preventivo.stato === 'inviato' && isScaduto(preventivo);
+  const richiesta = preventivo.richiesta_tardiva && !preventivo.richiesta_tardiva.esito ? preventivo.richiesta_tardiva : null;
+  const [tardivaBusy, setTardivaBusy] = useState(false);
+  const [tardivaErrore, setTardivaErrore] = useState('');
+  const gestisciTardiva = async (azione: 'approva' | 'riapri' | 'rifiuta') => {
+    const conferme = {
+      approva: 'Confermi? Il preventivo risulterà accettato e il cliente riceverà la email di conferma.',
+      riapri: 'Riapro il preventivo per altri 15 giorni? Se c’è una richiesta, il cliente riceve una email con il link.',
+      rifiuta: 'Rifiuti la richiesta? Il cliente non riceve nessuna email.',
+    };
+    if (!confirm(conferme[azione])) return;
+    setTardivaBusy(true);
+    setTardivaErrore('');
+    const res = await fetch(`/api/preventivi/${preventivo.id}/tardiva`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ azione }),
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok) onUpdate(data);
+    else setTardivaErrore(data?.error ?? 'Errore');
+    setTardivaBusy(false);
+  };
+  const dataLunga = (g: string) => new Date(`${g}T12:00:00`).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+
   const inputCls = "w-full bg-surface border border-edge rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-slate";
 
   return (
@@ -157,6 +186,49 @@ export default function PreventivoDrawer({
         </div>
 
         <div className="flex-1 px-6 py-6 flex flex-col gap-6">
+
+          {/* Validità / accettazione tardiva */}
+          {preventivo.stato === 'inviato' && (
+            <div>
+              <p className="text-dim text-xs font-mono mb-3">VALIDITÀ</p>
+              <div className={`rounded-xl p-4 flex flex-col gap-3 ${richiesta ? 'bg-amber-950/30 border border-amber-800/60' : 'bg-surface2'}`}>
+                <p className="text-sm">
+                  <span className={scaduto ? 'text-red-400' : 'text-text'}>
+                    {scaduto ? 'Scaduto il ' : 'Accettabile fino al '}{dataLunga(scadenza)}
+                  </span>
+                </p>
+                {richiesta && (
+                  <div className="flex flex-col gap-1.5 text-sm">
+                    <p className="text-amber-400 font-medium">Richiesta di accettazione tardiva</p>
+                    <p className="text-text">{richiesta.nome} {richiesta.cognome} · <span className="text-muted">{richiesta.email}</span></p>
+                    <p className="text-dim text-xs">Inviata {new Date(richiesta.inviata_at).toLocaleString('it-IT')}</p>
+                    {richiesta.messaggio && <p className="text-muted whitespace-pre-wrap bg-surface rounded-lg px-3 py-2 mt-1">{richiesta.messaggio}</p>}
+                  </div>
+                )}
+                {(richiesta || scaduto) && (
+                  <div className="flex flex-wrap gap-2">
+                    {richiesta && (
+                      <button disabled={tardivaBusy} onClick={() => gestisciTardiva('approva')}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-on-accent font-semibold disabled:opacity-50 cursor-pointer">
+                        Approva accettazione
+                      </button>
+                    )}
+                    <button disabled={tardivaBusy} onClick={() => gestisciTardiva('riapri')}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-surface border border-edge text-text disabled:opacity-50 cursor-pointer">
+                      Riapri per 15 giorni
+                    </button>
+                    {richiesta && (
+                      <button disabled={tardivaBusy} onClick={() => gestisciTardiva('rifiuta')}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-surface border border-edge text-red-400 disabled:opacity-50 cursor-pointer">
+                        Rifiuta
+                      </button>
+                    )}
+                  </div>
+                )}
+                {tardivaErrore && <p className="text-red-400 text-xs">{tardivaErrore}</p>}
+              </div>
+            </div>
+          )}
 
           {/* Accettazione */}
           {preventivo.stato === 'accettato' && (

@@ -20,7 +20,8 @@ body {
 }
 
 /* ─── Light theme ──────────────────────────────────────────── */
-html[data-theme="light"] {
+/* Attivo con data-theme="light" (scelta dell'utente) o con .tema-chiaro renderizzato dal server (PDF). */
+:is(html[data-theme="light"], html:has(.tema-chiaro)) {
   --color-bg:        #EAE9E2;
   --color-surface:   #FBFBF7;
   --color-surface2:  #E2E1D7;
@@ -35,38 +36,42 @@ html[data-theme="light"] {
 
 /* L'accento giallo non è leggibile come TESTO su sfondo chiaro:
    sul tema light lo si vira a un verde-oliva scuro (resta "brand" ma leggibile). */
-html[data-theme="light"] .text-accent,
-html[data-theme="light"] .hover\:text-accent:hover,
-html[data-theme="light"] .hover\:text-accent\/80:hover { color: #57650C; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .text-accent,
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .hover\:text-accent:hover,
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .hover\:text-accent\/80:hover { color: #57650C; }
 
 /* Status colors: più scuri per contrasto WCAG su sfondo chiaro */
-html[data-theme="light"] .text-green-400  { color: #166534; }
-html[data-theme="light"] .text-blue-400   { color: #1D4ED8; }
-html[data-theme="light"] .text-red-400    { color: #B91C1C; }
-html[data-theme="light"] .text-amber-400  { color: #B45309; }
-html[data-theme="light"] .text-purple-400 { color: #7E22CE; }
-html[data-theme="light"] .text-pink-400   { color: #BE185D; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .text-green-400  { color: #166534; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .text-blue-400   { color: #1D4ED8; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .text-red-400    { color: #B91C1C; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .text-amber-400  { color: #B45309; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .text-purple-400 { color: #7E22CE; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .text-pink-400   { color: #BE185D; }
 
 /* Badge backgrounds: tinte più chiare su sfondo bianco */
-html[data-theme="light"] .bg-blue-950\/40   { background-color: #EFF6FF; }
-html[data-theme="light"] .bg-green-950\/40  { background-color: #F0FDF4; }
-html[data-theme="light"] .bg-green-950\/30  { background-color: #F0FDF4; }
-html[data-theme="light"] .bg-red-950\/40    { background-color: #FEF2F2; }
-html[data-theme="light"] .bg-red-950\/50    { background-color: #FEF2F2; }
-html[data-theme="light"] .bg-pink-950\/30   { background-color: #FDF2F8; }
-html[data-theme="light"] .bg-purple-950\/30 { background-color: #FAF5FF; }
-html[data-theme="light"] .bg-blue-800\/60   { border-color: #BFDBFE; }
-html[data-theme="light"] .border-blue-800\/60   { border-color: #BFDBFE; }
-html[data-theme="light"] .border-green-800\/60  { border-color: #BBF7D0; }
-html[data-theme="light"] .border-red-950\/50    { border-color: #FECACA; }
-html[data-theme="light"] .border-green-800      { border-color: #BBF7D0; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-blue-950\/40   { background-color: #EFF6FF; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-green-950\/40  { background-color: #F0FDF4; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-green-950\/30  { background-color: #F0FDF4; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-red-950\/40    { background-color: #FEF2F2; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-red-950\/50    { background-color: #FEF2F2; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-pink-950\/30   { background-color: #FDF2F8; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-purple-950\/30 { background-color: #FAF5FF; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-blue-800\/60   { border-color: #BFDBFE; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .border-blue-800\/60   { border-color: #BFDBFE; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .border-green-800\/60  { border-color: #BBF7D0; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .border-red-950\/50    { border-color: #FECACA; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .border-green-800      { border-color: #BBF7D0; }
+
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-amber-950\/30,
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .bg-amber-950\/40 { background-color: #FFFBEB; }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .border-amber-800\/60 { border-color: #FDE68A; }
 
 /* Neutral button hover in light mode */
-html[data-theme="light"] .hover\:bg-slate:hover { background-color: var(--color-edge); }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .hover\:bg-slate:hover { background-color: var(--color-edge); }
 
 /* Logo: bianco su dark, nero su light */
 .logo-adaptive { filter: brightness(0) invert(1); }
-html[data-theme="light"] .logo-adaptive { filter: brightness(0); }
+:is(html[data-theme="light"], html:has(.tema-chiaro)) .logo-adaptive { filter: brightness(0); }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

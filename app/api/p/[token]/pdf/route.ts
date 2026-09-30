@@ -29,7 +29,8 @@ export async function GET(
       source: `${SITE_URL}/p/${token}?theme=light&pdf=1`,
       use_print: true,
       format: 'A4',
-      margin: { top: '12mm', right: '12mm', bottom: '12mm', left: '12mm' },
+      // A tutta pagina: nessun margine bianco, lo sfondo del tema chiaro arriva ai bordi.
+      margin: { top: '0', right: '0', bottom: '0', left: '0' },
     }),
   });
 

@@ -25,17 +25,28 @@ import {
 } from '@/lib/preventivi';
 import { baseApp, baseSito, linkDownloadFattura } from './oauth';
 import { FONTE_IDS, fonteLabel } from '@/lib/fonti';
+import { calcolaListino, daClassificare } from '@/lib/listino';
+import {
+  classificaVoci,
+  creaAzione,
+  leggiAzioni,
+  modificaAzione,
+  raccogliOsservazioni,
+} from '@/lib/listino-db';
 
 export const ISTRUZIONI = `Gestionale di Mauro Altamura (Mauro Dev, sviluppatore web in regime forfettario).
 
 NUOVO PREVENTIVO: intervista, non inventare.
-1. Chiama leggi_modello_preventivo e segui le sue linee_guida.
+1. Chiama leggi_modello_preventivo e segui le sue linee_guida. Individua il cliente (lista_clienti) e la sua fonte.
 2. Raccogli le informazioni facendo domande all'utente, poche alla volta (2-4 per messaggio, raggruppate per argomento). Non inventare mai prezzi, date, dati del cliente o attività: se manca qualcosa, chiedilo. Se le risposte sono vaghe, approfondisci (obiettivo, pagine/funzionalità, cosa fornisce il cliente, vincoli, scadenze).
+   Per i prezzi consulta listino filtrando per la fonte del cliente: proponi cifre coerenti con la media dei lavori svolti, dicendo su quanti lavori si basa; il prezzo finale lo decide l'utente.
 3. Chiama controlla_preventivo con quello che hai: ti dice cosa manca o è debole e quali domande fare. Ripeti finché risulta completo.
 4. Mostra all'utente un riepilogo (voci, totale, tranches, tempi, scadenza) e chiedi conferma. Solo dopo chiama crea_preventivo.
 5. Mostra il link pubblico e il link PDF restituiti.
 
 FATTURE: l'utente carica in chat l'XML FatturaPA dell'Agenzia delle Entrate; passa il testo XML integrale a importa_fattura. Se la risposta contiene preventivi_suggeriti, proponi il collegamento e chiedi conferma prima di chiamare collega_fattura_preventivo. Un preventivo può avere più fatture, anche di società diverse. I dati fiscali (ragione sociale, P.IVA, indirizzo) vengono dalle fatture, che sono la fonte di verità: il preventivo collegato si aggiorna da solo.
+FONTE DEL CLIENTE (diretto / Astrolancer / Cream): è una divisione INTERNA. Non scriverla mai nei testi del preventivo né in nulla che vede il cliente.
+LISTINO: le voci dei lavori (preventivi e fatture) sono raggruppate in "azioni". Se voci_lavori mostra voci da classificare, raggruppale per tipo di lavoro con classifica_voci (nomi brevi e riutilizzabili, es. "Landing page", "Intervento urgente", "Manutenzione ordinaria") e mostra all'utente la proposta prima di applicarla.
 CLIENTE vs SOCIETÀ: il cliente è la persona/il rapporto; le società (lista_societa) sono i soggetti fiscali che ricevono le fatture. Un cliente può avere più società.
 
 Importi in euro, date YYYY-MM-DD. Rispondi in italiano. Il PDF delle fatture si scarica dal link restituito (valido 24 ore).`;
@@ -580,6 +591,13 @@ export function registraStrumenti(server: McpServer) {
       const per = Object.fromEntries(prev.map((r) => [r.stato, { n: r.n, totale: r.totale }]));
       const decisi = (per.accettato?.n ?? 0) + (per.rifiutato?.n ?? 0);
 
+      const perFonte = await sql`
+        SELECT c.fonte, count(*)::int AS lavori, COALESCE(sum(p.totale), 0)::float8 AS valore
+        FROM preventivi p LEFT JOIN clienti c ON c.id = p.cliente_id
+        WHERE p.stato IN ('accettato', 'archiviato') AND extract(year FROM p.created_at) = ${a}
+        GROUP BY c.fonte ORDER BY valore DESC
+      `;
+
       const [abb] = await sql`
         SELECT coalesce(sum(CASE WHEN cadenza = 'mensile' THEN cifra WHEN cadenza = 'annuale' THEN cifra / 12 ELSE 0 END), 0)::float8 AS mensile
         FROM abbonamenti WHERE attivo = true
@@ -612,6 +630,7 @@ export function registraStrumenti(server: McpServer) {
           per_stato: per,
           tasso_accettazione_percentuale: decisi ? Math.round(((per.accettato?.n ?? 0) / decisi) * 100) : null,
           valore_in_attesa: per.inviato?.totale ?? 0,
+          lavori_acquisiti_per_fonte: perFonte.map((r) => ({ fonte: fonteLabel(r.fonte), lavori: r.lavori, valore: r.valore })),
         },
         abbonamenti_costo_mensile: abb.mensile,
         gestionale: `${baseApp()}/statistiche`,
@@ -661,6 +680,140 @@ export function registraStrumenti(server: McpServer) {
       await preparaArchivio();
       const rows = await sql`UPDATE clienti SET fonte = ${fonte}, updated_at = NOW() WHERE id = ${cliente_id} RETURNING nome`;
       return rows.length ? testo({ cliente: rows[0].nome, fonte: fonteLabel(fonte) }) : errore(`Cliente ${cliente_id} non trovato`);
+    }
+  );
+
+  // ── Listino ──
+
+  server.registerTool(
+    'listino',
+    {
+      title: 'Listino per azione e fonte',
+      description:
+        'Prezzo medio, mediana, min/max e ultimo prezzo di ogni azione (tipo di lavoro), in totale e per fonte del ' +
+        'cliente. Da usare per orientarsi nei nuovi preventivi. Prezzi come pagati dal cliente (rivalsa INPS inclusa).',
+      inputSchema: z.object({
+        fonte: z.enum(FONTE_IDS as [string, ...string[]]).optional().describe('Mostra solo questa fonte (oltre al totale)'),
+        cerca: z.string().optional().describe('Filtra per nome azione o categoria'),
+        solo_svolti: z.boolean().default(true).describe('true = solo preventivi accettati/archiviati e fatture'),
+      }),
+      annotations: sola,
+    },
+    async ({ fonte, cerca, solo_svolti }) => {
+      const [oss, azioni] = [await raccogliOsservazioni(), await leggiAzioni()];
+      const q = cerca?.toLowerCase();
+      const righe = calcolaListino(oss, azioni, { soloSvolti: solo_svolti, fonti: [...FONTE_IDS] })
+        .filter((r) => !q || r.azione.nome.toLowerCase().includes(q) || (r.azione.categoria ?? '').toLowerCase().includes(q))
+        .map((r) => ({
+          azione_id: r.azione.id,
+          azione: r.azione.nome,
+          categoria: r.azione.categoria,
+          unita: r.azione.unita,
+          ...(fonte
+            ? { [fonteLabel(fonte)]: r.per_fonte[fonte], tutte: r.per_fonte.tutte }
+            : Object.fromEntries(Object.entries(r.per_fonte).map(([k, v]) => [k === 'tutte' || k === 'nessuna' ? k : fonteLabel(k), v]))),
+        }));
+      const libere = daClassificare(oss).length;
+      return testo({ azioni: righe, voci_da_classificare: libere, gestionale: `${baseApp()}/listino` });
+    }
+  );
+
+  server.registerTool(
+    'voci_lavori',
+    {
+      title: 'Voci dei lavori',
+      description:
+        'Elenca le singole voci di lavoro (da preventivi e fatture) con prezzo, cliente, fonte e azione. ' +
+        'Con da_classificare=true restituisce le descrizioni ancora senza azione, raggruppate.',
+      inputSchema: z.object({
+        da_classificare: z.boolean().default(false),
+        azione_id: z.number().int().optional(),
+        fonte: z.enum(FONTE_IDS as [string, ...string[]]).optional(),
+        cerca: z.string().optional().describe('Testo nella descrizione o nel cliente'),
+        limite: z.number().int().min(1).max(500).default(100),
+      }),
+      annotations: sola,
+    },
+    async ({ da_classificare, azione_id, fonte, cerca, limite }) => {
+      const oss = await raccogliOsservazioni();
+      if (da_classificare) {
+        const libere = daClassificare(oss);
+        return testo({ totale: libere.length, voci: libere.slice(0, limite), azioni_esistenti: await leggiAzioni() });
+      }
+      const q = cerca?.toLowerCase();
+      const azioni = new Map((await leggiAzioni()).map((a) => [a.id, a.nome]));
+      const righe = oss
+        .filter((o) => (azione_id == null || o.azione_id === azione_id) && (!fonte || o.fonte === fonte))
+        .filter((o) => !q || o.descrizione.toLowerCase().includes(q) || o.cliente.toLowerCase().includes(q))
+        .slice(0, limite)
+        .map((o) => ({
+          data: o.data,
+          descrizione: o.descrizione,
+          prezzo: o.prezzo,
+          quantita: o.quantita,
+          cliente: o.cliente,
+          fonte: fonteLabel(o.fonte),
+          origine: o.origine === 'preventivo' ? `preventivo ${o.rif_id}: ${o.rif}` : o.rif,
+          svolto: o.svolto,
+          azione: o.azione_id ? azioni.get(o.azione_id) : null,
+        }));
+      return testo(righe);
+    }
+  );
+
+  server.registerTool(
+    'classifica_voci',
+    {
+      title: 'Classifica voci nel listino',
+      description:
+        'Assegna una o più voci (descrizioni esatte, come restituite da voci_lavori) a un’azione. Indica azione_id ' +
+        'di un’azione esistente oppure azione_nome: se non esiste viene creata. azione_id null = rimetti da classificare.',
+      inputSchema: z.object({
+        descrizioni: z.array(z.string()).min(1),
+        azione_id: z.number().int().nullable().optional(),
+        azione_nome: z.string().optional(),
+        categoria: z.string().optional().describe('Solo per azioni nuove, es. "Siti web", "Grafica", "Assistenza"'),
+        unita: z.string().optional().describe('Solo per azioni nuove, es. "a progetto", "a pagina", "mensile", "a intervento"'),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    async ({ descrizioni, azione_id, azione_nome, categoria, unita }) => {
+      try {
+        let id = azione_id ?? null;
+        if (azione_id === undefined) {
+          if (!azione_nome) return errore('Indica azione_id oppure azione_nome');
+          id = (await creaAzione({ nome: azione_nome, categoria, unita })).id;
+        }
+        const n = await classificaVoci(descrizioni, id);
+        return testo({ classificate: n, azione_id: id });
+      } catch (e) {
+        return errore((e as Error).message);
+      }
+    }
+  );
+
+  server.registerTool(
+    'modifica_azione',
+    {
+      title: 'Modifica azione del listino',
+      description: 'Rinomina un’azione, cambia categoria/unità/note, oppure la unisce in un’altra (unisci_in).',
+      inputSchema: z.object({
+        id: z.number().int(),
+        nome: z.string().optional(),
+        categoria: z.string().nullable().optional(),
+        unita: z.string().nullable().optional(),
+        note: z.string().nullable().optional(),
+        unisci_in: z.number().int().optional(),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    async ({ id, ...a }) => {
+      try {
+        const r = await modificaAzione(id, a);
+        return testo(r ?? { unita_in: a.unisci_in });
+      } catch (e) {
+        return errore((e as Error).message);
+      }
     }
   );
 

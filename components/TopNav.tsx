@@ -11,6 +11,7 @@ const NAV = [
   { href: '/statistiche', label: 'Statistiche' },
   { href: '/abbonamenti', label: 'Abbonamenti' },
   { href: '/fatture', label: 'Fatture' },
+  { href: '/listino', label: 'Listino' },
 ];
 
 type ThemeMode = 'auto' | 'dark' | 'light';

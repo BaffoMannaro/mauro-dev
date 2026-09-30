@@ -28,6 +28,13 @@ interface Preventivo {
   meta?: any;
 }
 
+interface FattureCollegate {
+  fatture: { id: number; numero: string | null; data: string | null; importo: number; stato: string; intestatario: string | null; piva: string | null }[];
+  riepilogo: { totale_preventivo: number; fatturato: number; incassato: number; da_fatturare: number; da_incassare: number; societa: string[] };
+}
+
+const euro = (n: number) => `€${n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+
 export default function PreventivoDrawer({
   preventivo,
   onClose,
@@ -57,6 +64,17 @@ export default function PreventivoDrawer({
   const [inizio, setInizio] = useState(preventivo.lavoro_inizio ? new Date(preventivo.lavoro_inizio).toISOString().slice(0, 10) : '');
   const [fine, setFine] = useState(preventivo.lavoro_fine ? new Date(preventivo.lavoro_fine).toISOString().slice(0, 10) : '');
   const [salvato, setSalvato] = useState(false);
+
+  // Fatture collegate (dalla sezione Fatture o da Claude): le società vengono da lì.
+  const [fatture, setFatture] = useState<FattureCollegate | null>(null);
+  useEffect(() => {
+    let attivo = true;
+    fetch(`/api/preventivi/${preventivo.id}/fatture`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (attivo) setFatture(d); })
+      .catch(() => {});
+    return () => { attivo = false; };
+  }, [preventivo.id]);
 
   const toggleTranche = (i: number) => {
     setTranchesLocali((prev) =>
@@ -111,7 +129,10 @@ export default function PreventivoDrawer({
         <div className="flex items-center justify-between px-6 py-4 border-b border-edge sticky top-0 bg-surface">
           <div>
             <p className="text-text font-medium">{preventivo.oggetto}</p>
-            <p className="text-dim text-xs">{preventivo.cliente_nome}</p>
+            <p className="text-dim text-xs">
+              {preventivo.cliente_nome}
+              {preventivo.cliente_azienda && preventivo.cliente_azienda !== preventivo.cliente_nome && ` · ${preventivo.cliente_azienda}`}
+            </p>
           </div>
           <button onClick={onClose} className="text-muted hover:text-text text-xl transition-colors cursor-pointer">✕</button>
         </div>
@@ -204,6 +225,51 @@ export default function PreventivoDrawer({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Fatture collegate */}
+          {fatture && (
+            <div>
+              <p className="text-dim text-xs font-mono mb-3">FATTURE</p>
+              {fatture.fatture.length === 0 ? (
+                <p className="text-dim text-sm">Nessuna fattura collegata. Collegala dalla sezione Fatture o chiedilo a Claude.</p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { k: 'Fatturato', v: fatture.riepilogo.fatturato },
+                      { k: 'Incassato', v: fatture.riepilogo.incassato },
+                      { k: 'Da fatturare', v: fatture.riepilogo.da_fatturare },
+                    ].map((x) => (
+                      <div key={x.k} className="bg-surface2 rounded-xl p-3">
+                        <p className="text-dim text-xs">{x.k}</p>
+                        <p className="text-text text-sm font-semibold mt-0.5">{euro(x.v)}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="h-1.5 bg-surface2 rounded-full overflow-hidden flex">
+                    <div className="h-full bg-accent" style={{ width: `${Math.min(100, (fatture.riepilogo.incassato / (fatture.riepilogo.totale_preventivo || 1)) * 100)}%` }} />
+                    <div className="h-full bg-muted" style={{ width: `${Math.min(100, (fatture.riepilogo.da_incassare / (fatture.riepilogo.totale_preventivo || 1)) * 100)}%` }} />
+                  </div>
+                  {fatture.fatture.map((f) => (
+                    <div key={f.id} className="flex items-center justify-between gap-3 bg-surface2 rounded-xl px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-text text-sm font-medium truncate">{f.intestatario ?? '—'}</p>
+                        <p className="text-dim text-xs">
+                          n. {f.numero ?? '—'}{f.data && ` · ${f.data.split('-').reverse().join('/')}`}{f.piva && ` · ${f.piva}`}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-text text-sm font-semibold">{euro(f.importo)}</p>
+                        <p className={`text-xs ${f.stato === 'pagata' ? 'text-green-400' : 'text-amber-400'}`}>
+                          {f.stato === 'pagata' ? 'Pagata' : 'Da pagare'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

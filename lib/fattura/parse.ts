@@ -52,6 +52,9 @@ export interface Fattura {
   causale: string[];
   prestatore: Soggetto;
   committente: Soggetto;
+  /** Recapito SdI del committente (codice destinatario o PEC). */
+  codiceDestinatario: string | null;
+  pecDestinatario: string | null;
   linee: Linea[];
   casse: Cassa[];
   riepiloghi: Riepilogo[];
@@ -264,6 +267,11 @@ export function parseFattura(xml: string): Fattura {
     causale: (doc.Causale ?? []).map(String),
     prestatore: soggetto(header.CedentePrestatore),
     committente: soggetto(header.CessionarioCommittente),
+    codiceDestinatario: (() => {
+      const c = str(header.DatiTrasmissione?.CodiceDestinatario);
+      return c && !/^0+$/.test(c) ? c : null; // "0000000" = nessun codice
+    })(),
+    pecDestinatario: str(header.DatiTrasmissione?.PECDestinatario),
     linee,
     casse,
     riepiloghi,

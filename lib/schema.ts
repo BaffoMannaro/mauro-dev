@@ -86,5 +86,25 @@ export async function ensureFattureXmlSchema() {
     CREATE UNIQUE INDEX IF NOT EXISTS fatture_xml_numero_anno
     ON fatture (numero, anno) WHERE xml IS NOT NULL
   `;
+  // Società / dati fiscali degli intestatari delle fatture (fonte di verità: l'ultima fattura).
+  // Separati dal "cliente" (persona/rapporto): un cliente può fatturare con più società.
+  await sql`
+    CREATE TABLE IF NOT EXISTS intestatari (
+      id SERIAL PRIMARY KEY,
+      chiave TEXT UNIQUE NOT NULL,
+      denominazione TEXT NOT NULL,
+      piva TEXT,
+      codice_fiscale TEXT,
+      indirizzo TEXT,
+      localita TEXT,
+      codice_destinatario TEXT,
+      pec TEXT,
+      cliente_id INTEGER,
+      dati_al DATE,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS intestatario_id INTEGER`;
   ensuredFattureXml = true;
 }

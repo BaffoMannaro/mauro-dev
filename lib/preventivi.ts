@@ -104,6 +104,8 @@ export interface ModelloPreventivo {
   preventivo?: Partial<PreventivoJson['preventivo']>;
   /** Sezioni predefinite (es. tranches, garanzia, esclusioni, tempi, manutenzione). */
   sezioni?: Partial<Sezioni>;
+  /** Campi da compilare prima di creare un preventivo (percorsi, es. "sezioni.tempi"). */
+  campi_richiesti?: string[];
 }
 
 export async function leggiModello(): Promise<ModelloPreventivo> {
@@ -184,4 +186,100 @@ export async function modificaPreventivo(id: number, m: ModificaPreventivo) {
     RETURNING *
   `;
   return row;
+}
+
+// ─── Controllo di completezza (guida l'intervista di Claude) ───
+
+/** Campi richiesti se il modello non ne definisce altri. */
+export const CAMPI_RICHIESTI_DEFAULT = [
+  'cliente.nome',
+  'cliente.email',
+  'preventivo.oggetto',
+  'preventivo.scadenza',
+  'sezioni.intro',
+  'sezioni.descrizione',
+  'sezioni.voci',
+  'sezioni.tranches',
+  'sezioni.tempi',
+  'sezioni.esclusioni',
+];
+
+const DOMANDE: Record<string, string> = {
+  'cliente.nome': 'Chi è il referente del cliente (nome e cognome)?',
+  'cliente.email': 'A quale email mando il preventivo?',
+  'cliente.azienda': 'Per quale azienda è il preventivo (ragione sociale)?',
+  'cliente.piva': 'Qual è la P.IVA dell’azienda?',
+  'cliente.telefono': 'Hai un numero di telefono del referente?',
+  'preventivo.oggetto': 'Come intitoliamo il progetto (oggetto del preventivo)?',
+  'preventivo.scadenza': 'Fino a quando deve essere valida l’offerta?',
+  'preventivo.modalita_pagamento': 'Come pagherà il cliente (bonifico, altro)?',
+  'sezioni.intro': 'Com’è nato il contatto (call, email, passaparola) e cosa vuoi dire in apertura al cliente?',
+  'sezioni.descrizione': 'Qual è l’obiettivo del progetto e quali attività comprende, passo per passo?',
+  'sezioni.voci': 'Quali sono le voci di costo, con quantità e prezzo di ciascuna?',
+  'sezioni.tranches': 'Come dividiamo il pagamento (es. 50% alla firma e 50% alla consegna)?',
+  'sezioni.tempi': 'In quanto tempo consegni e da quando partono i tempi?',
+  'sezioni.garanzia': 'Che garanzia o supporto post-lancio includi?',
+  'sezioni.esclusioni': 'Cosa NON è incluso (testi, foto, hosting, dominio, campagne…)?',
+  'sezioni.manutenzione': 'Vuoi proporre un piano di manutenzione mensile? Con quale canone?',
+  'sezioni.fasi_successive': 'Ci sono fasi successive o sviluppi futuri da anticipare?',
+};
+
+export interface EsitoControllo {
+  completo: boolean;
+  mancanti: { campo: string; domanda: string }[];
+  da_migliorare: { campo: string; problema: string; domanda: string }[];
+  totale: number;
+  dati: PreventivoJson;
+}
+
+function valore(dati: PreventivoJson, percorso: string): unknown {
+  const v = percorso.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], dati);
+  if (percorso === 'sezioni.voci') return (v as Sezioni['voci'])?.items;
+  return v;
+}
+
+/**
+ * Verifica che il preventivo (già completato con il modello) abbia tutto ciò che serve.
+ * Restituisce i campi mancanti e quelli deboli, ciascuno con la domanda da fare all'utente.
+ */
+export function controllaPreventivo(dati: PreventivoJson, modello: ModelloPreventivo): EsitoControllo {
+  const richiesti = modello.campi_richiesti?.length ? modello.campi_richiesti : CAMPI_RICHIESTI_DEFAULT;
+  const domanda = (c: string) => DOMANDE[c] ?? `Mi dai il valore di "${c}"?`;
+
+  const mancanti = richiesti.filter((c) => vuoto(valore(dati, c))).map((campo) => ({ campo, domanda: domanda(campo) }));
+  const da_migliorare: EsitoControllo['da_migliorare'] = [];
+  const debole = (campo: string, problema: string, d = domanda(campo)) => da_migliorare.push({ campo, problema, domanda: d });
+
+  const email = dati.cliente?.email ?? '';
+  if (email && (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || /da_?compilare|example|test@/i.test(email))) {
+    debole('cliente.email', `L’email "${email}" non sembra reale.`);
+  }
+
+  const voci = dati.sezioni?.voci?.items ?? [];
+  voci.forEach((v, i) => {
+    if (!v.prezzo || v.prezzo <= 0) debole(`sezioni.voci[${i}]`, `La voce "${v.descrizione}" non ha un prezzo.`, `Quanto costa "${v.descrizione}"?`);
+    if ((v.descrizione ?? '').trim().length < 8) debole(`sezioni.voci[${i}]`, `La voce "${v.descrizione}" è troppo generica.`, 'Puoi descrivere meglio questa voce (cosa include)?');
+  });
+  const totale = voci.reduce((t, v) => t + (v.quantita || 0) * (v.prezzo || 0), 0);
+  if (voci.length === 1 && totale >= 3000) {
+    debole('sezioni.voci', 'Un’unica voce per un importo alto è poco leggibile per il cliente.', 'Possiamo dividere il lavoro in più voci (es. design, sviluppo, contenuti, messa online)?');
+  }
+
+  const tranches = dati.sezioni?.tranches ?? [];
+  const somma = tranches.reduce((t, x) => t + (x.percentuale || 0), 0);
+  if (tranches.length && Math.round(somma) !== 100) {
+    debole('sezioni.tranches', `Le tranches sommano al ${somma}% invece che al 100%.`, 'Come correggiamo le percentuali delle tranches?');
+  }
+
+  const scad = dati.preventivo?.scadenza;
+  if (scad && scad < new Date().toISOString().slice(0, 10)) {
+    debole('preventivo.scadenza', `La scadenza ${scad} è già passata.`);
+  }
+
+  const descr = dati.sezioni?.descrizione ?? '';
+  if (descr && descr.length < 120) {
+    debole('sezioni.descrizione', 'La descrizione del progetto è molto breve.', 'Mi racconti meglio il progetto: obiettivo, pagine/funzionalità, cosa ti fornisce il cliente?');
+  }
+
+  return { completo: mancanti.length === 0 && da_migliorare.length === 0, mancanti, da_migliorare, totale, dati };
 }

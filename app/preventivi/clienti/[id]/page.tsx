@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import sql from '@/lib/db';
-import { ensureClientiSchema, ensurePortaleSchema } from '@/lib/schema';
+import { ensureClientiSchema } from '@/lib/schema';
+import { preparaArchivio } from '@/lib/fattura/server';
 import ClienteDettaglio from '@/components/ClienteDettaglio';
 
 export async function generateMetadata({
@@ -20,7 +21,7 @@ export default async function ClientePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await ensurePortaleSchema();
+  await preparaArchivio();
 
   const [cliente] = await sql`SELECT * FROM clienti WHERE id = ${id}`;
   if (!cliente) notFound();
@@ -38,6 +39,16 @@ export default async function ClientePage({
     FROM preventivi
     WHERE cliente_id = ${id}
     ORDER BY created_at DESC
+  `;
+
+  // Società / dati fiscali con cui il cliente è stato fatturato (dalle fatture XML).
+  const societa = await sql`
+    SELECT i.id, i.denominazione, i.piva, i.codice_fiscale, i.indirizzo, i.localita,
+           i.codice_destinatario, i.pec, to_char(i.dati_al, 'YYYY-MM-DD') AS dati_al,
+           count(f.id)::int AS fatture, COALESCE(sum(f.importo), 0)::float8 AS fatturato
+    FROM intestatari i LEFT JOIN fatture f ON f.intestatario_id = i.id
+    WHERE i.cliente_id = ${id}
+    GROUP BY i.id ORDER BY fatturato DESC
   `;
 
   // Preventivi non ancora associati ad alcun cliente (per la funzione "collega")
@@ -60,6 +71,7 @@ export default async function ClientePage({
       nonAssociati={nonAssociati as any}
       altriClienti={altriClienti as any}
       fatture={fatture as any}
+      societa={societa as any}
     />
   );
 }

@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { ensureFattureXmlSchema } from '@/lib/schema';
 import { parseFattura } from '@/lib/fattura/parse';
-import { salvaFattura } from '@/lib/fattura/server';
+import { preparaArchivio, salvaFattura } from '@/lib/fattura/server';
 
 // Salva (o aggiorna, se numero+anno esistono già) una fattura XML nell'archivio.
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
 
-  await ensureFattureXmlSchema();
-  const { xml, con_logo } = await req.json().catch(() => ({}));
+  await preparaArchivio();
+  const { xml, con_logo, preventivo_id } = await req.json().catch(() => ({}));
 
   let f;
   try {
@@ -19,6 +18,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }
 
-  const salvata = await salvaFattura(f, String(xml), con_logo !== false);
+  const salvata = await salvaFattura(
+    f, String(xml), con_logo !== false,
+    preventivo_id === undefined ? undefined : preventivo_id === null ? null : Number(preventivo_id)
+  );
   return NextResponse.json(salvata);
 }

@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { extractXml, parseFattura, TIPO_DOCUMENTO, type Fattura } from '@/lib/fattura/parse';
 import { renderFatturaHtml, nomeFilePdf, dataLunga, eur } from '@/lib/fattura/html';
 import FattureAnalisi from './FattureAnalisi';
+import FatturaCollegamento from './FatturaCollegamento';
+import type { PreventivoCollegabile } from '@/lib/fattura/collegamenti';
 
 /** Riga dell'archivio (tabella fatture, solo quelle importate da XML). */
 export interface FatturaSalvata {
@@ -20,6 +22,9 @@ export interface FatturaSalvata {
   cliente_piva: string | null;
   con_logo: boolean;
   xml: string;
+  preventivo_id: number | null;
+  intestatario_id: number | null;
+  preventivo_oggetto: string | null;
 }
 
 interface Caricata {
@@ -77,9 +82,16 @@ const btnIcon = 'w-7 h-7 flex items-center justify-center rounded-lg text-dim ho
 const btnGhost = 'flex items-center gap-1.5 px-2.5 py-1.5 border border-edge text-muted hover:text-text hover:border-slate text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors cursor-pointer';
 const btnAccent = 'flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent/90 text-on-accent text-xs font-semibold rounded-lg disabled:opacity-50 transition-colors cursor-pointer';
 
-export default function FattureDashboard({ archivio: iniziale }: { archivio: FatturaSalvata[] }) {
+export default function FattureDashboard({
+  archivio: iniziale,
+  preventivi: preventiviIniziali,
+}: {
+  archivio: FatturaSalvata[];
+  preventivi: PreventivoCollegabile[];
+}) {
   const [items, setItems] = useState<Caricata[]>([]);
   const [archivio, setArchivio] = useState<FatturaSalvata[]>(iniziale);
+  const [preventivi, setPreventivi] = useState<PreventivoCollegabile[]>(preventiviIniziali);
   const [sel, setSel] = useState<Selezione>(null);
   const [logoDefault, setLogoDefault] = useState(true);
   const [dragging, setDragging] = useState(false);
@@ -208,6 +220,33 @@ export default function FattureDashboard({ archivio: iniziale }: { archivio: Fat
     for (const item of items.filter((i) => i.fattura)) {
       if (!(await salva(item))) break;
     }
+  };
+
+  const collega = async (r: FatturaSalvata, preventivoId: number | null) => {
+    setErrore('');
+    const res = await fetch(`/api/fatture/${r.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ preventivo_id: preventivoId }),
+    });
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({ error: 'Collegamento non riuscito' }));
+      return setErrore(error);
+    }
+    const nuovo = preventivi.find((p) => p.id === preventivoId);
+    setArchivio((prev) =>
+      prev.map((x) => (x.id === r.id ? { ...x, preventivo_id: preventivoId, preventivo_oggetto: nuovo?.oggetto ?? null } : x))
+    );
+    // Aggiorna il "già fatturato" dei preventivi coinvolti e lo stato (fatturato ⇒ accettato).
+    setPreventivi((prev) =>
+      prev.map((p) => {
+        if (p.id === r.preventivo_id && p.id !== preventivoId) return { ...p, fatturato: p.fatturato - r.importo };
+        if (p.id === preventivoId && p.id !== r.preventivo_id) {
+          return { ...p, fatturato: p.fatturato + r.importo, stato: p.stato === 'inviato' ? 'accettato' : p.stato };
+        }
+        return p;
+      })
+    );
   };
 
   const cambiaStato = (r: FatturaSalvata) => {
@@ -400,6 +439,9 @@ export default function FattureDashboard({ archivio: iniziale }: { archivio: Fat
                         <div className="min-w-0 flex-1">
                           <p className="text-dim text-xs">n. {r.numero} · {r.data.split('-').reverse().join('/')}</p>
                           <p className="text-text text-sm font-medium truncate">{r.cliente_nome}</p>
+                          {r.preventivo_oggetto && (
+                            <p className="text-dim text-xs truncate" title="Preventivo collegato">↳ {r.preventivo_oggetto}</p>
+                          )}
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-sm font-semibold">{eur(r.importo)}</p>
@@ -434,6 +476,14 @@ export default function FattureDashboard({ archivio: iniziale }: { archivio: Fat
 
           {/* ── Colonna destra: anteprima ── */}
           <div className="min-w-0 lg:sticky lg:top-6">
+            {salvataSel && fatturaSel && (
+              <FatturaCollegamento
+                riga={salvataSel}
+                fattura={fatturaSel}
+                preventivi={preventivi}
+                onCollega={(id) => collega(salvataSel, id)}
+              />
+            )}
             {fatturaSel ? (
               <Anteprima html={renderFatturaHtml(fatturaSel, { logo: conLogo })} />
             ) : (

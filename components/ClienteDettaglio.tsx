@@ -57,6 +57,20 @@ interface PrevLibero {
   created_at: string;
 }
 
+interface Societa {
+  id: number;
+  denominazione: string;
+  piva: string | null;
+  codice_fiscale: string | null;
+  indirizzo: string | null;
+  localita: string | null;
+  codice_destinatario: string | null;
+  pec: string | null;
+  dati_al: string | null;
+  fatture: number;
+  fatturato: number;
+}
+
 interface AltroCliente {
   id: number;
   nome: string;
@@ -83,12 +97,14 @@ export default function ClienteDettaglio({
   nonAssociati,
   altriClienti,
   fatture,
+  societa = [],
 }: {
   cliente: Cliente;
   preventivi: Prev[];
   nonAssociati: PrevLibero[];
   altriClienti: AltroCliente[];
   fatture: Fattura[];
+  societa?: Societa[];
 }) {
   const router = useRouter();
   const [showEdit, setShowEdit] = useState(false);
@@ -314,6 +330,34 @@ export default function ClienteDettaglio({
             <p className="text-dim text-sm">Nessun dato anagrafico. Clicca "Modifica" per aggiungerne.</p>
           )}
         </section>
+
+        {/* Società / dati fiscali (dalle fatture: fonte di verità) */}
+        {societa.length > 0 && (
+          <section className="bg-surface border border-edge rounded-xl p-5">
+            <h2 className="text-text font-semibold text-sm mb-1">Società / dati fiscali <span className="text-dim font-normal">({societa.length})</span></h2>
+            <p className="text-dim text-xs mb-4">Aggiornati automaticamente dall’ultima fattura di ciascuna società.</p>
+            <div className="flex flex-col gap-2">
+              {societa.map((s) => (
+                <div key={s.id} className="bg-surface2 rounded-lg px-4 py-3 flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-text text-sm font-medium">{s.denominazione}</p>
+                    <p className="text-muted text-xs mt-0.5">
+                      {[s.piva && `P.IVA ${s.piva}`, s.codice_fiscale && s.codice_fiscale !== s.piva?.slice(2) && `C.F. ${s.codice_fiscale}`].filter(Boolean).join(' · ')}
+                    </p>
+                    {(s.indirizzo || s.localita) && <p className="text-dim text-xs">{[s.indirizzo, s.localita].filter(Boolean).join(', ')}</p>}
+                    {(s.codice_destinatario || s.pec) && (
+                      <p className="text-dim text-xs">{[s.codice_destinatario && `SDI ${s.codice_destinatario}`, s.pec && `PEC ${s.pec}`].filter(Boolean).join(' · ')}</p>
+                    )}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-text text-sm font-semibold">€{Math.round(s.fatturato).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</p>
+                    <p className="text-dim text-xs">{s.fatture} {s.fatture === 1 ? 'fattura' : 'fatture'}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Preventivi */}
         <section className="bg-surface border border-edge rounded-xl p-5">

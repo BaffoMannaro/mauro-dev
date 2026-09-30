@@ -25,6 +25,7 @@ import {
 } from '@/lib/preventivi';
 import { baseApp, baseSito, linkDownloadFattura } from './oauth';
 import { FONTE_IDS, fonteLabel } from '@/lib/fonti';
+import { aperturePerPreventivo, visiteDelPreventivo } from '@/lib/visite';
 import { calcolaListino, daClassificare } from '@/lib/listino';
 import {
   classificaVoci,
@@ -132,7 +133,9 @@ export function registraStrumenti(server: McpServer) {
     'lista_preventivi',
     {
       title: 'Elenca preventivi',
-      description: 'Elenca i preventivi, dal più recente. Filtri opzionali per stato e testo (cliente o oggetto).',
+      description:
+        'Elenca i preventivi, dal più recente, con quante volte il cliente ha aperto il link e quando. ' +
+        'Filtri opzionali per stato e testo (cliente o oggetto).',
       inputSchema: z.object({
         stato: z.enum(['inviato', 'accettato', 'rifiutato', 'archiviato']).optional(),
         cerca: z.string().optional(),
@@ -148,7 +151,14 @@ export function registraStrumenti(server: McpServer) {
           AND (${q}::text IS NULL OR cliente_nome ILIKE ${q} OR cliente_azienda ILIKE ${q} OR oggetto ILIKE ${q})
         ORDER BY created_at DESC LIMIT ${limite}
       `;
-      return testo(rows.map(riepilogoPreventivo));
+      const aperture = await aperturePerPreventivo();
+      return testo(
+        rows.map((p) => ({
+          ...riepilogoPreventivo(p),
+          aperture_link: aperture[p.id]?.aperture ?? 0,
+          ultima_apertura: aperture[p.id]?.ultima ?? null,
+        }))
+      );
     }
   );
 
@@ -156,7 +166,9 @@ export function registraStrumenti(server: McpServer) {
     'leggi_preventivo',
     {
       title: 'Leggi preventivo',
-      description: 'Restituisce un preventivo completo (tutte le sezioni in formato JSON) per id.',
+      description:
+        'Restituisce un preventivo completo (tutte le sezioni in JSON), le fatture collegate e le aperture del link ' +
+        '(quando, per quanto tempo, da che dispositivo/città, sezioni lette, PDF scaricato).',
       inputSchema: z.object({ id: z.number().int() }),
       annotations: sola,
     },
@@ -171,6 +183,7 @@ export function registraStrumenti(server: McpServer) {
         tranches_stato: p.tranches_stato,
         fatture: fatture.map((f) => ({ id: f.id, numero: f.numero, data: f.data, societa: f.intestatario, piva: f.piva, importo: f.importo, stato: f.stato })),
         fatturazione: riepilogo,
+        aperture_link: await visiteDelPreventivo(id, 10),
       });
     }
   );

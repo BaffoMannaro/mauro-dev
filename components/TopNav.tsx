@@ -92,6 +92,14 @@ export default function TopNav({ session }: { session: any }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  // Segna questo browser come "interno": le sue aperture dei preventivi pubblici
+  // (su maurodev.it) non vengono contate come visite del cliente.
+  useEffect(() => {
+    const dominio = location.hostname.endsWith('maurodev.it') ? '; domain=.maurodev.it' : '';
+    const sicuro = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `md_interno=1; path=/; max-age=31536000; SameSite=Lax${dominio}${sicuro}`;
+  }, []);
+
   // Chiudi il menu mobile quando cambia pagina
   useEffect(() => { setOpen(false); }, [pathname]);
 

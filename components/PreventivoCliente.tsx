@@ -1,6 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
+import { useTracciaVisita } from './useTracciaVisita';
+
+// Notifica il tracciamento quando il cliente apre una sezione.
+const SezioneAperta = createContext<(titolo: string) => void>(() => {});
 
 const IBAN = 'IT31T0103041570000001893771';
 
@@ -107,8 +111,10 @@ function AccordionSection({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const [seen, setSeen] = useState(defaultOpen);
+  const traccia = useContext(SezioneAperta);
 
   const toggle = () => {
+    if (!open) traccia(title.split(':')[0]);
     setOpen((v) => {
       if (!v) setSeen(true);
       return !v;
@@ -152,9 +158,10 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
   const [nome, setNome] = useState('');
   const [cognome, setCognome] = useState('');
   const [email, setEmail] = useState('');
-  const [vuoleEmail, setVuoleEmail] = useState(false);
   const [erroreAccettazione, setErroreAccettazione] = useState('');
   const countdown = useCountdown(accettato ? null : preventivo.scadenza);
+  const scaduto = countdown === 'Scaduto';
+  const traccia = useTracciaVisita(preventivo.token);
 
   const meta = preventivo.meta;
   const sezioni = meta?.sezioni;
@@ -165,28 +172,30 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
     setErroreAccettazione('');
     if (!nome.trim()) return setErroreAccettazione('Il nome è obbligatorio');
     if (!cognome.trim()) return setErroreAccettazione('Il cognome è obbligatorio');
-    if (!email.trim() || !email.includes('@')) return setErroreAccettazione("Inserisci un'email valida");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) return setErroreAccettazione("Inserisci un'email valida");
     if (!checkbox) return setErroreAccettazione('Devi accettare le condizioni');
     setLoading(true);
     const res = await fetch(`/api/p/${preventivo.token}/accetta`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, cognome, email, vuole_email: vuoleEmail }),
+      body: JSON.stringify({ nome, cognome, email }),
     });
     if (res.ok) { setAccettato(true); setConfermato(true); }
-    else setErroreAccettazione('Errore nella registrazione. Riprova.');
+    else setErroreAccettazione((await res.json().catch(() => null))?.error ?? 'Errore nella registrazione. Riprova.');
     setLoading(false);
   };
 
   const inputCls = "w-full bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text placeholder-dim focus:outline-none focus:border-slate";
 
   return (
+    <SezioneAperta.Provider value={traccia.sezione}>
     <div className="min-h-screen bg-bg text-text">
 
       {/* ── Download PDF — fixed top-right, outside layout ── */}
       <a
         href={`/api/p/${preventivo.token}/pdf`}
         download
+        onClick={traccia.pdf}
         className="print:hidden fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-on-accent text-sm font-semibold rounded-xl shadow-lg transition-colors cursor-pointer"
       >
         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -194,6 +203,14 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
         </svg>
         Scarica PDF
       </a>
+      {!accettato && !scaduto && (
+        <a
+          href="#accettazione"
+          className="print:hidden fixed bottom-4 right-4 z-50 flex items-center gap-2 px-5 py-3 bg-text text-bg text-sm font-semibold rounded-xl shadow-lg hover:opacity-90 transition-opacity"
+        >
+          Accetta il preventivo
+        </a>
+      )}
 
       {/* ── Header — dark slate + pink line (matches PDF header) ── */}
       <header className="bg-slate relative print:bg-slate">
@@ -392,10 +409,18 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
         )}
 
         {/* ── Accettazione / Conferma ── */}
-        {!accettato ? (
-          <AccordionSection title="Accettazione">
+        {!accettato && scaduto ? (
+          <div className="border border-edge bg-surface rounded-xl p-6 text-center print:hidden">
+            <p className="text-text font-semibold">Questo preventivo è scaduto</p>
+            <p className="text-dim text-sm mt-1">
+              Scrivi a <a href="mailto:altamura.mauro@gmail.com" className="underline">altamura.mauro@gmail.com</a> per riceverne uno aggiornato.
+            </p>
+          </div>
+        ) : !accettato ? (
+          <div id="accettazione" className="scroll-mt-6">
+          <AccordionSection title="Accettazione" defaultOpen>
             <p className="text-muted text-sm mb-5 leading-relaxed">
-              Compila il modulo sottostante per accettare il preventivo. La tua accettazione verrà registrata con data, ora e indirizzo IP.
+              Compila il modulo per accettare il preventivo. L’accettazione viene registrata con data, ora e indirizzo IP e riceverai subito una email di conferma con il riepilogo.
             </p>
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
@@ -414,11 +439,6 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="mario.rossi@email.it" className={inputCls} />
             </div>
-            <label className="flex items-start gap-3 cursor-pointer mb-4 p-3 bg-bg rounded-lg border border-edge">
-              <input type="checkbox" checked={vuoleEmail} onChange={(e) => setVuoleEmail(e.target.checked)}
-                className="mt-0.5 accent-accent" />
-              <span className="text-muted text-sm">Voglio ricevere una copia del preventivo accettato via email</span>
-            </label>
             <label className="flex items-start gap-3 cursor-pointer mb-5">
               <input type="checkbox" checked={checkbox} onChange={(e) => setCheckbox(e.target.checked)}
                 className="mt-1 accent-accent" />
@@ -437,12 +457,15 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
               {loading ? 'Registrazione...' : 'Accetto il preventivo'}
             </button>
           </AccordionSection>
+          </div>
         ) : (
           <div className="border border-green-800 bg-green-950/30 rounded-xl p-6 text-center print:hidden">
             <p className="text-green-400 font-semibold">
               {confermato ? '✓ Preventivo accettato con successo' : '✓ Preventivo già accettato'}
             </p>
-            <p className="text-dim text-sm mt-1">L'accettazione è stata registrata</p>
+            <p className="text-dim text-sm mt-1">
+              {confermato ? 'Ti ho inviato una email di conferma con il riepilogo.' : "L'accettazione è stata registrata"}
+            </p>
           </div>
         )}
 
@@ -464,5 +487,6 @@ export default function PreventivoCliente({ preventivo }: { preventivo: Preventi
 
       </main>
     </div>
+    </SezioneAperta.Provider>
   );
 }

@@ -25,6 +25,8 @@ interface Preventivo {
   lavoro_inizio: string | null;
   lavoro_fine: string | null;
   created_at: string;
+  conferma_email_at?: string | null;
+  conferma_email_errore?: string | null;
   meta?: any;
 }
 
@@ -32,6 +34,14 @@ interface FattureCollegate {
   fatture: { id: number; numero: string | null; data: string | null; importo: number; stato: string; intestatario: string | null; piva: string | null }[];
   riepilogo: { totale_preventivo: number; fatturato: number; incassato: number; da_fatturare: number; da_incassare: number; societa: string[] };
 }
+
+interface VisiteLink {
+  riepilogo: { aperture: number; dispositivi: number; prima: string | null; ultima: string | null; tempo_totale_s: number; pdf_scaricati: number; sezioni_lette: string[] };
+  visite: { id: number; iniziata_at: string; durata_s: number; sezioni: string[]; pdf: boolean; dispositivo: string | null; browser: string | null; sistema: string | null; citta: string | null; paese: string | null }[];
+}
+
+const durata = (s: number) => (s < 60 ? `${s}s` : s < 3600 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`);
+const quando = (iso: string) => new Date(iso).toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 const euro = (n: number) => `€${n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 
@@ -67,6 +77,15 @@ export default function PreventivoDrawer({
 
   // Fatture collegate (dalla sezione Fatture o da Claude): le società vengono da lì.
   const [fatture, setFatture] = useState<FattureCollegate | null>(null);
+  const [visite, setVisite] = useState<VisiteLink | null>(null);
+  useEffect(() => {
+    let attivo = true;
+    fetch(`/api/preventivi/${preventivo.id}/visite`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (attivo) setVisite(d); })
+      .catch(() => {});
+    return () => { attivo = false; };
+  }, [preventivo.id]);
   useEffect(() => {
     let attivo = true;
     fetch(`/api/preventivi/${preventivo.id}/fatture`)
@@ -162,6 +181,16 @@ export default function PreventivoDrawer({
                     <span className="text-text">{new Date(preventivo.accettato_at).toLocaleString('it-IT')}</span>
                   </div>
                 )}
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-muted shrink-0">Email conferma</span>
+                  {preventivo.conferma_email_at ? (
+                    <span className="text-green-400 text-right">Inviata {new Date(preventivo.conferma_email_at).toLocaleString('it-IT')}</span>
+                  ) : preventivo.conferma_email_errore ? (
+                    <span className="text-red-400 text-xs text-right break-all">{preventivo.conferma_email_errore}</span>
+                  ) : (
+                    <span className="text-dim">—</span>
+                  )}
+                </div>
                 {preventivo.accettato_ip && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">IP</span>
@@ -225,6 +254,50 @@ export default function PreventivoDrawer({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Aperture del link pubblico */}
+          {visite && (
+            <div>
+              <p className="text-dim text-xs font-mono mb-3">APERTURE DEL LINK</p>
+              {visite.riepilogo.aperture === 0 ? (
+                <p className="text-dim text-sm">Il cliente non ha ancora aperto il preventivo.</p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { k: 'Aperture', v: String(visite.riepilogo.aperture) },
+                      { k: 'Tempo totale', v: durata(visite.riepilogo.tempo_totale_s) },
+                      { k: 'PDF scaricato', v: visite.riepilogo.pdf_scaricati ? `${visite.riepilogo.pdf_scaricati}×` : 'No' },
+                    ].map((x) => (
+                      <div key={x.k} className="bg-surface2 rounded-xl p-3">
+                        <p className="text-dim text-xs">{x.k}</p>
+                        <p className="text-text text-sm font-semibold mt-0.5">{x.v}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-dim text-xs">
+                    Prima apertura {quando(visite.riepilogo.prima!)} · ultima {quando(visite.riepilogo.ultima!)}
+                    {visite.riepilogo.dispositivi > 1 && ` · da ${visite.riepilogo.dispositivi} dispositivi diversi`}
+                  </p>
+                  <div className="flex flex-col gap-1.5">
+                    {visite.visite.slice(0, 8).map((v) => (
+                      <div key={v.id} className="bg-surface2 rounded-xl px-4 py-2.5">
+                        <div className="flex items-center justify-between gap-3 text-sm">
+                          <span className="text-text">{quando(v.iniziata_at)}</span>
+                          <span className="text-muted text-xs">{durata(v.durata_s)}{v.pdf && ' · PDF'}</span>
+                        </div>
+                        <p className="text-dim text-xs mt-0.5 truncate">
+                          {[v.dispositivo, v.sistema, v.browser].filter(Boolean).join(' · ')}
+                          {v.citta && ` · ${v.citta}`}
+                          {v.sezioni.length > 0 && ` · ha aperto: ${v.sezioni.join(', ')}`}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

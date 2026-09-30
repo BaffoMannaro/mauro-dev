@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
+import { inviaEmailAccettazione } from '@/lib/email-accettazione';
 import sql from '@/lib/db';
 import { ensurePortaleSchema } from '@/lib/schema';
 import { clienteDallaRichiesta } from '@/lib/portale-session';
@@ -36,5 +37,6 @@ export async function POST(req: NextRequest) {
         updated_at = NOW()
     WHERE id = ${preventivo_id}
   `;
+  after(() => inviaEmailAccettazione(Number(preventivo_id)));
   return NextResponse.json({ ok: true });
 }

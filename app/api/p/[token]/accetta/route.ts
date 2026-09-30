@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import sql from '@/lib/db';
+import { inviaEmailAccettazione } from '@/lib/email-accettazione';
 
 export async function POST(
   req: NextRequest,
@@ -9,7 +10,10 @@ export async function POST(
   const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
   const ua = req.headers.get('user-agent') ?? 'unknown';
   const body = await req.json().catch(() => ({}));
-  const { nome, cognome, email, vuole_email } = body;
+  const { nome, cognome, email } = body;
+  if (!nome?.trim() || !cognome?.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email ?? '')) {
+    return NextResponse.json({ error: 'Nome, cognome ed email validi sono obbligatori' }, { status: 400 });
+  }
 
   const rows = await sql`SELECT * FROM preventivi WHERE token = ${token}`;
   const preventivo = rows[0];
@@ -20,6 +24,12 @@ export async function POST(
 
   if (preventivo.stato !== 'inviato') {
     return NextResponse.json({ error: 'Preventivo già processato' }, { status: 400 });
+  }
+  // Scaduto: valido fino alle 23:59 del giorno di scadenza (ora italiana).
+  const oggi = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' });
+  const scadenza = preventivo.scadenza ? new Date(preventivo.scadenza).toISOString().slice(0, 10) : null;
+  if (scadenza && scadenza < oggi) {
+    return NextResponse.json({ error: 'Il preventivo è scaduto: chiedine uno aggiornato.' }, { status: 400 });
   }
 
   await sql`
@@ -40,11 +50,13 @@ export async function POST(
       accettato_nome = ${nome || null},
       accettato_cognome = ${cognome || null},
       accettato_email = ${email || null},
-      vuole_email = ${vuole_email || false},
+      vuole_email = true,
       updated_at = NOW()
     WHERE token = ${token}
-    RETURNING *
+    RETURNING id
   `;
 
-  return NextResponse.json(updated[0]);
+  // Conferma al cliente + notifica a Mauro, dopo aver risposto alla pagina.
+  after(() => inviaEmailAccettazione(updated[0].id));
+  return NextResponse.json({ ok: true });
 }

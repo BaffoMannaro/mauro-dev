@@ -47,12 +47,24 @@ const ORDINE_STATI: Record<string, number> = {
   inviato: 0, accettato: 1, rifiutato: 2, archiviato: 3,
 };
 
+/** "3 min fa", "2 h fa", "ieri", "4 g fa" */
+function tempoFa(iso: string) {
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 60) return `${Math.max(1, min)} min fa`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `${h} h fa`;
+  const g = Math.round(h / 24);
+  return g === 1 ? 'ieri' : `${g} g fa`;
+}
+
 export default function AdminDashboard({
   preventivi: initialPreventivi,
   session,
+  aperture = {},
 }: {
   preventivi: Preventivo[];
   session: any;
+  aperture?: Record<number, { aperture: number; ultima: string }>;
 }) {
   const [preventivi, setPreventivi] = useState(initialPreventivi);
   const [filtro, setFiltro] = useState('tutti');
@@ -189,6 +201,15 @@ export default function AdminDashboard({
                       {p.accettato_at && ` · Acc. ${new Date(p.accettato_at).toLocaleDateString('it-IT')}`}
                       {p.lavoro_inizio && ` · ${new Date(p.lavoro_inizio).toLocaleDateString('it-IT')}`}
                       {p.lavoro_fine && ` → ${new Date(p.lavoro_fine).toLocaleDateString('it-IT')}`}
+                    </p>
+                    <p className={`text-xs mt-1 flex items-center gap-1.5 ${aperture[p.id] ? 'text-muted' : 'text-dim'}`}>
+                      <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      {aperture[p.id]
+                        ? `Aperto ${aperture[p.id].aperture} ${aperture[p.id].aperture === 1 ? 'volta' : 'volte'} · ultima ${tempoFa(aperture[p.id].ultima)}`
+                        : 'Mai aperto dal cliente'}
                     </p>
                   </div>
                   <div className="text-right shrink-0">

@@ -316,11 +316,11 @@ export default function PreventivoCliente({
         </AccordionSection>
 
         {/* ── Dettaglio voci ── */}
-        <AccordionSection title="Dettaglio attività" flush>
+        <AccordionSection title="Dettaglio attività" flush defaultOpen>
           {preventivo.voci.map((voce, i) => (
             <div
               key={i}
-              className={`flex items-center justify-between px-5 py-4 border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''} ${i % 2 === 0 ? 'bg-surface2/50' : 'bg-surface'}`}
+              className={`flex items-center justify-between px-5 py-4 border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}
             >
               <div className="flex-1 min-w-0">
                 <p className="text-text font-semibold text-sm">{voce.descrizione}</p>
@@ -370,7 +370,7 @@ export default function PreventivoCliente({
 
         {/* ── Tranches ── */}
         {sezioni?.tranches && sezioni.tranches.length > 0 && (
-          <AccordionSection title="Piano di pagamento" flush>
+          <AccordionSection title="Piano di pagamento" flush defaultOpen>
             {sezioni.tranches.map((t, i) => (
               <div key={i} className={`flex items-center border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}>
                 <div className="bg-slate px-4 py-3.5 w-28 shrink-0">

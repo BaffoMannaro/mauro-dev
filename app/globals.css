@@ -78,3 +78,17 @@ body {
 ::-webkit-scrollbar-track { background: var(--color-bg); }
 ::-webkit-scrollbar-thumb { background: var(--color-edge); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-slate); }
+
+/* ─── PDF / stampa ─────────────────────────────────────────── */
+/* Pagina senza margini (lo sfondo arriva ai bordi) ma con respiro in alto e in basso su OGNI
+   pagina: il padding di .pdf-pagine viene ripetuto su ogni frammento (box-decoration-break). */
+@page { margin: 0; }
+@media print {
+  html, body { background: var(--color-bg); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pdf-pagine {
+    padding-top: 10mm !important;
+    padding-bottom: 10mm !important;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+}

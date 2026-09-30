@@ -8,6 +8,16 @@ const SezioneAperta = createContext<(titolo: string) => void>(() => {});
 
 const IBAN = 'IT31T0103041570000001893771';
 
+/** €2.400,00 — raggruppa anche le migliaia a 4 cifre (toLocaleString it-IT non lo fa). */
+const eur = (n: number) => `€${n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+const perc = (n: number) => `${Number(n).toLocaleString('it-IT', { maximumFractionDigits: 1 })}%`;
+
+const IconaDownload = () => (
+  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+  </svg>
+);
+
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
@@ -124,19 +134,20 @@ function AccordionSection({
     <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
       <button
         onClick={toggle}
-        className="w-full flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-surface2/50 transition-colors"
+        aria-expanded={open}
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left cursor-pointer hover:bg-surface2/50 transition-colors"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="w-[3px] h-5 bg-accent rounded-sm shrink-0" />
-          <p className="text-muted font-bold text-xs tracking-widest uppercase">{title}</p>
+          <p className="text-muted font-bold text-xs tracking-widest uppercase leading-snug">{title}</p>
         </div>
-        <div className="relative flex items-center">
+        <div className="relative flex items-center shrink-0">
           {!seen && (
             <span className="absolute -top-1.5 -right-1.5 w-2 h-2 rounded-full bg-accent" />
           )}
           <svg
             className={`w-4 h-4 text-dim transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-            fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
           </svg>
@@ -224,60 +235,79 @@ export default function PreventivoCliente({
     <SezioneAperta.Provider value={traccia.sezione}>
     <div className={`min-h-screen bg-bg text-text ${temaChiaro ? 'tema-chiaro' : ''}`}>
 
-      {/* ── Download PDF — fixed top-right, outside layout ── */}
+      {/* ── Desktop: PDF fisso in alto a destra, Accetta in basso a destra ── */}
       <a
         href={`/api/p/${preventivo.token}/pdf`}
         download
         onClick={traccia.pdf}
-        className="print:hidden fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-on-accent text-sm font-semibold rounded-xl shadow-lg transition-colors cursor-pointer"
+        className="print:hidden hidden lg:flex fixed top-4 right-4 z-50 items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-on-accent text-sm font-semibold rounded-xl shadow-lg transition-colors cursor-pointer"
       >
-        <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-        </svg>
+        <IconaDownload />
         Scarica PDF
       </a>
       {!accettato && !(scaduto && tardiva === 'inviata') && (
         <a
           href="#accettazione"
-          className="print:hidden fixed bottom-4 right-4 z-50 flex items-center gap-2 px-5 py-3 bg-text text-bg text-sm font-semibold rounded-xl shadow-lg hover:opacity-90 transition-opacity"
+          className="print:hidden hidden lg:flex fixed bottom-4 right-4 z-50 items-center gap-2 px-5 py-3 bg-text text-bg text-sm font-semibold rounded-xl shadow-lg hover:opacity-90 transition-opacity"
         >
           {scaduto ? 'Chiedi di accettarlo' : 'Accetta il preventivo'}
         </a>
       )}
 
+      {/* ── Mobile/tablet: barra in basso con PDF e Accetta, non copre l'intestazione ── */}
+      <div className="print:hidden lg:hidden fixed bottom-0 inset-x-0 z-50 flex gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-bg/90 backdrop-blur border-t border-edge">
+        <a
+          href={`/api/p/${preventivo.token}/pdf`}
+          download
+          onClick={traccia.pdf}
+          className={`flex items-center justify-center gap-2 px-4 py-3 bg-accent text-on-accent text-sm font-semibold rounded-xl ${!accettato && !(scaduto && tardiva === 'inviata') ? '' : 'flex-1'}`}
+        >
+          <IconaDownload />
+          PDF
+        </a>
+        {!accettato && !(scaduto && tardiva === 'inviata') && (
+          <a href="#accettazione" className="flex-1 flex items-center justify-center px-4 py-3 bg-text text-bg text-sm font-semibold rounded-xl">
+            {scaduto ? 'Chiedi di accettarlo' : 'Accetta il preventivo'}
+          </a>
+        )}
+      </div>
+
       {/* ── Header — dark slate + pink line (matches PDF header) ── */}
       <header className="bg-slate relative print:bg-slate">
         <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-accent" />
-        <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
-          <img src="/Logo.svg" alt="MAURO DEV" className="h-7 w-auto" style={{ filter: 'brightness(0) invert(1)' }} />
-          <div className="text-right">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between gap-4">
+          <img src="/Logo.svg" alt="MAURO DEV" width={96} height={28} className="h-7 w-auto shrink-0" style={{ filter: 'brightness(0) invert(1)' }} />
+          <div className="text-right min-w-0">
             <p className="text-white font-bold text-sm tracking-[0.15em]">PREVENTIVO</p>
             <p className="text-white text-xs mt-0.5">{dataEmissione}</p>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8 flex flex-col gap-6">
+      <main className="pdf-pagine max-w-4xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-28 lg:pb-8 flex flex-col gap-6">
 
         {/* ── Destinatario (matches PDF dest_t table) ── */}
         <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
           <div className="bg-surface2 px-5 py-3 flex justify-between border-b border-edge">
             <p className="text-accent text-xs font-bold tracking-widest">DESTINATARIO</p>
-            <p className="text-accent text-xs font-bold tracking-widest">
+            <p className="hidden sm:block print:block text-accent text-xs font-bold tracking-widest">
               {accettato ? 'STATO' : 'VALIDITÀ'}
             </p>
           </div>
-          <div className="px-5 py-4 flex items-start justify-between gap-4">
-            <div>
+          <div className="px-5 py-4 flex flex-col sm:flex-row print:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+            <div className="min-w-0">
               <p className="text-text font-bold text-base leading-snug">{preventivo.cliente_nome}</p>
               {preventivo.cliente_azienda && preventivo.cliente_azienda !== preventivo.cliente_nome && (
                 <p className="text-muted text-sm">{preventivo.cliente_azienda}</p>
               )}
               {meta?.cliente?.piva && <p className="text-muted text-sm">P.IVA {meta.cliente.piva}</p>}
-              <p className="text-muted text-sm">{preventivo.cliente_email}</p>
+              <p className="text-muted text-sm break-all">{preventivo.cliente_email}</p>
               {meta?.cliente?.telefono && <p className="text-muted text-sm">{meta.cliente.telefono}</p>}
             </div>
-            <div className="text-right shrink-0">
+            <div className="sm:text-right print:text-right sm:shrink-0 border-t border-edge/40 pt-3 sm:border-0 sm:pt-0 print:border-0 print:pt-0">
+              <p className="sm:hidden print:hidden text-accent text-xs font-bold tracking-widest mb-1">
+                {accettato ? 'STATO' : 'VALIDITÀ'}
+              </p>
               {accettato ? (
                 <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-400">
                   <span className="w-2 h-2 rounded-full bg-green-400" />
@@ -320,7 +350,7 @@ export default function PreventivoCliente({
           {preventivo.voci.map((voce, i) => (
             <div
               key={i}
-              className={`flex items-center justify-between px-5 py-4 border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}
+              className={`flex items-center justify-between gap-4 px-5 py-4 border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}
             >
               <div className="flex-1 min-w-0">
                 <p className="text-text font-semibold text-sm">{voce.descrizione}</p>
@@ -328,8 +358,8 @@ export default function PreventivoCliente({
                   <p className="text-dim text-xs mt-0.5">Qtà: {voce.quantita}</p>
                 )}
               </div>
-              <p className="text-accent font-bold text-base ml-6 shrink-0">
-                €{(voce.quantita * voce.prezzo).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+              <p className="text-accent font-bold text-base shrink-0 tabular-nums whitespace-nowrap">
+                {eur(voce.quantita * voce.prezzo)}
               </p>
             </div>
           ))}
@@ -337,29 +367,27 @@ export default function PreventivoCliente({
 
         {/* ── Compenso (FISSO — non collassabile) ── */}
         <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
-          <div className="flex items-center justify-between px-5 py-4 bg-surface2/50 border-b border-edge">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-4 bg-surface2/50 border-b border-edge">
             <p className="text-muted text-sm font-semibold">Compenso totale</p>
-            <p className="text-accent font-bold text-2xl">
-              €{totale.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-            </p>
+            <p className="text-accent font-bold text-2xl tabular-nums whitespace-nowrap">{eur(totale)}</p>
           </div>
-          <div className="flex items-center justify-between px-5 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3">
             <p className="text-muted text-sm">Modalità di pagamento</p>
-            <p className="text-text text-sm">
+            <p className="text-text text-sm text-right">
               {meta?.preventivo?.modalita_pagamento ?? 'Bonifico bancario'}
             </p>
           </div>
-          <div className="flex items-center justify-between gap-3 px-5 py-3 border-t border-edge/40">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3 border-t border-edge/40">
             <p className="text-muted text-sm shrink-0">IBAN</p>
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-text text-sm font-mono tracking-tight truncate">{IBAN}</span>
+            <div className="flex items-center gap-2 min-w-0 ml-auto">
+              <span className="text-text text-sm font-mono tracking-tight break-all">{IBAN}</span>
               <CopyButton value={IBAN} />
             </div>
           </div>
           {meta?.preventivo?.schema_pagamento && (
-            <div className="flex items-center justify-between px-5 py-3 border-t border-edge/40">
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-3 border-t border-edge/40">
               <p className="text-muted text-sm">Schema pagamento</p>
-              <p className="text-text text-sm">{meta.preventivo.schema_pagamento}</p>
+              <p className="text-text text-sm text-right">{meta.preventivo.schema_pagamento}</p>
             </div>
           )}
           <div className="flex items-center justify-between px-5 py-3 border-t border-edge/40">
@@ -372,17 +400,16 @@ export default function PreventivoCliente({
         {sezioni?.tranches && sezioni.tranches.length > 0 && (
           <AccordionSection title="Piano di pagamento" flush defaultOpen>
             {sezioni.tranches.map((t, i) => (
-              <div key={i} className={`flex items-center border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}>
-                <div className="bg-slate px-4 py-3.5 w-28 shrink-0">
-                  <p className="text-white text-xs font-bold">{i + 1}ª tranche</p>
-                </div>
-                <div className="flex-1 flex items-center justify-between px-5 py-3.5 bg-surface2/40">
-                  <p className="text-muted text-sm">{t.descrizione}</p>
-                  <p className="text-accent font-bold text-sm ml-4 shrink-0">
-                    €{Math.round(totale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                    <span className="text-dim font-normal text-xs ml-1">({t.percentuale}%)</span>
-                  </p>
-                </div>
+              <div
+                key={i}
+                className={`flex flex-wrap sm:flex-nowrap items-center gap-x-4 gap-y-2 px-5 py-4 border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}
+              >
+                <span className="order-1 shrink-0 bg-slate text-white text-xs font-bold px-2.5 py-1 rounded-md">{i + 1}ª tranche</span>
+                <p className="order-3 basis-full sm:order-2 sm:basis-auto sm:flex-1 min-w-0 text-muted text-sm">{t.descrizione}</p>
+                <p className="order-2 ml-auto sm:order-3 sm:ml-0 shrink-0 text-accent font-bold text-sm tabular-nums whitespace-nowrap">
+                  {eur(Math.round((totale * t.percentuale) / 100))}
+                  <span className="text-dim font-normal text-xs ml-1">({perc(t.percentuale)})</span>
+                </p>
               </div>
             ))}
           </AccordionSection>
@@ -419,10 +446,10 @@ export default function PreventivoCliente({
         {/* ── Manutenzione ── */}
         {sezioni?.manutenzione && (
           <AccordionSection title="Piano di manutenzione">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
               <p className="text-muted text-sm leading-relaxed flex-1">{sezioni.manutenzione.descrizione}</p>
-              <p className="text-accent font-bold text-xl shrink-0">
-                €{Number(sezioni.manutenzione.prezzo).toLocaleString('it-IT')}<span className="text-dim font-normal text-sm">/mese</span>
+              <p className="text-accent font-bold text-xl shrink-0 tabular-nums whitespace-nowrap">
+                {eur(Number(sezioni.manutenzione.prezzo))}<span className="text-dim font-normal text-sm">/mese</span>
               </p>
             </div>
           </AccordionSection>
@@ -458,24 +485,20 @@ export default function PreventivoCliente({
                   Il periodo di validità è terminato, ma puoi ancora chiedermi di accettarlo alle stesse condizioni.
                   Compila il modulo: mi arriva una email e ti rispondo al più presto.
                 </p>
-                <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3 mb-3">
                   <div>
-                    <label className="text-dim text-xs font-mono block mb-1">NOME *</label>
-                    <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Mario" className={inputCls} />
+                    <input type="text" name="given-name" autoComplete="given-name" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome *" aria-label="Nome" required className={inputCls} />
                   </div>
                   <div>
-                    <label className="text-dim text-xs font-mono block mb-1">COGNOME *</label>
-                    <input type="text" value={cognome} onChange={(e) => setCognome(e.target.value)} placeholder="Rossi" className={inputCls} />
+                    <input type="text" name="family-name" autoComplete="family-name" value={cognome} onChange={(e) => setCognome(e.target.value)} placeholder="Cognome *" aria-label="Cognome" required className={inputCls} />
                   </div>
                 </div>
                 <div className="mb-3">
-                  <label className="text-dim text-xs font-mono block mb-1">EMAIL *</label>
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="mario.rossi@email.it" className={inputCls} />
+                  <input type="email" name="email" autoComplete="email" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email *" aria-label="Email" required className={inputCls} />
                 </div>
                 <div className="mb-4">
-                  <label className="text-dim text-xs font-mono block mb-1">MESSAGGIO (FACOLTATIVO)</label>
                   <textarea value={messaggio} onChange={(e) => setMessaggio(e.target.value)} rows={3} maxLength={2000}
-                    placeholder="Es. vorrei partire entro fine mese" className={`${inputCls} resize-y`} />
+                    placeholder="Messaggio (facoltativo)" aria-label="Messaggio" className={`${inputCls} resize-y`} />
                 </div>
                 {erroreAccettazione && <p className="text-red-400 text-xs mb-3 font-mono">⚠ {erroreAccettazione}</p>}
                 <button
@@ -483,7 +506,7 @@ export default function PreventivoCliente({
                   disabled={tardiva === 'invio'}
                   className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 transition-colors cursor-pointer"
                 >
-                  {tardiva === 'invio' ? 'Invio...' : 'Chiedi di accettarlo lo stesso'}
+                  {tardiva === 'invio' ? 'Invio…' : 'Chiedi di accettarlo lo stesso'}
                 </button>
               </AccordionSection>
             )}
@@ -494,26 +517,23 @@ export default function PreventivoCliente({
             <p className="text-muted text-sm mb-5 leading-relaxed">
               Compila il modulo per accettare il preventivo. L’accettazione viene registrata con data, ora e indirizzo IP e riceverai subito una email di conferma con il riepilogo.
             </p>
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="text-dim text-xs font-mono block mb-1">NOME *</label>
-                <input type="text" value={nome} onChange={(e) => setNome(e.target.value)}
-                  placeholder="Mario" className={inputCls} />
+                <input type="text" name="given-name" autoComplete="given-name" value={nome} onChange={(e) => setNome(e.target.value)}
+                  placeholder="Nome *" aria-label="Nome" required className={inputCls} />
               </div>
               <div>
-                <label className="text-dim text-xs font-mono block mb-1">COGNOME *</label>
-                <input type="text" value={cognome} onChange={(e) => setCognome(e.target.value)}
-                  placeholder="Rossi" className={inputCls} />
+                <input type="text" name="family-name" autoComplete="family-name" value={cognome} onChange={(e) => setCognome(e.target.value)}
+                  placeholder="Cognome *" aria-label="Cognome" required className={inputCls} />
               </div>
             </div>
             <div className="mb-4">
-              <label className="text-dim text-xs font-mono block mb-1">EMAIL *</label>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder="mario.rossi@email.it" className={inputCls} />
+              <input type="email" name="email" autoComplete="email" spellCheck={false} value={email} onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email *" aria-label="Email" required className={inputCls} />
             </div>
             <label className="flex items-start gap-3 cursor-pointer mb-5">
               <input type="checkbox" checked={checkbox} onChange={(e) => setCheckbox(e.target.checked)}
-                className="mt-1 accent-accent" />
+                className="mt-1 accent-accent shrink-0" />
               <span className="text-muted text-sm">
                 Dichiaro di aver letto e compreso il preventivo e accetto le condizioni indicate.
               </span>
@@ -526,7 +546,7 @@ export default function PreventivoCliente({
               disabled={!checkbox || loading}
               className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 transition-colors cursor-pointer"
             >
-              {loading ? 'Registrazione...' : 'Accetto il preventivo'}
+              {loading ? 'Registrazione…' : 'Accetto il preventivo'}
             </button>
           </AccordionSection>
           </div>

@@ -24,6 +24,7 @@ import {
   type PreventivoJson,
 } from '@/lib/preventivi';
 import { baseApp, baseSito, linkDownloadFattura } from './oauth';
+import { FONTE_IDS, fonteLabel } from '@/lib/fonti';
 
 export const ISTRUZIONI = `Gestionale di Mauro Altamura (Mauro Dev, sviluppatore web in regime forfettario).
 
@@ -622,7 +623,8 @@ export function registraStrumenti(server: McpServer) {
     'lista_clienti',
     {
       title: 'Elenca clienti',
-      description: 'Elenca i clienti in anagrafica con numero di preventivi e fatture.',
+      description:
+        'Elenca i clienti in anagrafica con fonte (interna: diretto/agenzia), numero di preventivi e fatture.',
       inputSchema: z.object({ cerca: z.string().optional() }),
       annotations: sola,
     },
@@ -630,7 +632,7 @@ export function registraStrumenti(server: McpServer) {
       await preparaArchivio();
       const q = cerca ? `%${cerca}%` : null;
       const rows = await sql`
-        SELECT c.id, c.nome, c.azienda, c.email, c.telefono, c.piva, c.portale_attivo,
+        SELECT c.id, c.nome, c.azienda, c.email, c.telefono, c.piva, c.portale_attivo, c.fonte,
           (SELECT count(*)::int FROM preventivi p WHERE p.cliente_id = c.id) AS preventivi,
           (SELECT count(*)::int FROM fatture f WHERE f.cliente_id = c.id) AS fatture,
           (SELECT coalesce(sum(f.importo), 0)::float8 FROM fatture f WHERE f.cliente_id = c.id) AS fatturato
@@ -638,7 +640,27 @@ export function registraStrumenti(server: McpServer) {
         WHERE ${q}::text IS NULL OR c.nome ILIKE ${q} OR c.azienda ILIKE ${q} OR c.email ILIKE ${q}
         ORDER BY c.nome
       `;
-      return testo(rows);
+      return testo(rows.map((r) => ({ ...r, fonte_label: fonteLabel(r.fonte) })));
+    }
+  );
+
+  server.registerTool(
+    'imposta_fonte_cliente',
+    {
+      title: 'Imposta fonte cliente',
+      description:
+        `Imposta da dove arriva il cliente (${FONTE_IDS.join(', ')}) oppure null per "da assegnare". ` +
+        'È una divisione interna: non compare mai nei preventivi né al cliente.',
+      inputSchema: z.object({
+        cliente_id: z.number().int(),
+        fonte: z.enum(FONTE_IDS as [string, ...string[]]).nullable(),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    async ({ cliente_id, fonte }) => {
+      await preparaArchivio();
+      const rows = await sql`UPDATE clienti SET fonte = ${fonte}, updated_at = NOW() WHERE id = ${cliente_id} RETURNING nome`;
+      return rows.length ? testo({ cliente: rows[0].nome, fonte: fonteLabel(fonte) }) : errore(`Cliente ${cliente_id} non trovato`);
     }
   );
 

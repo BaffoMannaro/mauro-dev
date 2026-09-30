@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
+import { FONTI } from '@/lib/fonti';
 
 interface Cliente {
   id: number;
@@ -16,6 +17,7 @@ interface Cliente {
   indirizzo: string | null;
   pec: string | null;
   codice_sdi: string | null;
+  fonte: string | null;
   note: string | null;
   data_inizio: string | null;
   created_at: string;
@@ -241,6 +243,15 @@ export default function ClienteDettaglio({
     if (res.ok) router.refresh();
   };
 
+  const cambiaFonte = async (fonte: string) => {
+    const res = await fetch(`/api/clienti/${cliente.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fonte }),
+    });
+    if (res.ok) router.refresh();
+  };
+
   const elimina = async () => {
     if (!confirm('Eliminare questo cliente? I preventivi collegati verranno scollegati ma non eliminati.')) return;
     const res = await fetch(`/api/clienti/${cliente.id}`, { method: 'DELETE' });
@@ -290,7 +301,17 @@ export default function ClienteDettaglio({
             )}
             <p className="text-dim text-xs mt-1">Cliente dal {fmtData(cliente.data_inizio)}</p>
           </div>
-          <div className="flex gap-2 shrink-0">
+          <div className="flex gap-2 shrink-0 items-center">
+            <select
+              value={cliente.fonte ?? ''}
+              onChange={(e) => cambiaFonte(e.target.value)}
+              title="Fonte del cliente (interna, non visibile nei preventivi)"
+              aria-label="Fonte del cliente"
+              className={`text-xs px-2 py-1.5 bg-surface2 border rounded-lg focus:outline-none cursor-pointer ${cliente.fonte ? 'border-edge text-muted' : 'border-amber-400/50 text-amber-400'}`}
+            >
+              <option value="">Fonte: da assegnare</option>
+              {FONTI.map((f) => <option key={f.id} value={f.id}>Fonte: {f.label}</option>)}
+            </select>
             <button onClick={() => setShowEdit(true)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Modifica</button>
             <button onClick={() => { setMergeErr(''); setShowMerge(true); }} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Unisci</button>
             <button onClick={elimina} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors">Elimina</button>

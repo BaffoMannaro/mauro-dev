@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import sql from '@/lib/db';
 import { ensureClientiSchema } from '@/lib/schema';
+import { fonteValida } from '@/lib/fonti';
 
 export async function GET() {
   const session = await auth();
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
   const [cliente] = await sql`
     INSERT INTO clienti (
       nome, azienda, email, telefono, piva, codice_fiscale,
-      indirizzo, pec, codice_sdi, note, data_inizio
+      indirizzo, pec, codice_sdi, note, data_inizio, fonte
     ) VALUES (
       ${b.nome},
       ${b.azienda || null},
@@ -36,7 +37,8 @@ export async function POST(req: NextRequest) {
       ${b.pec || null},
       ${b.codice_sdi || null},
       ${b.note || null},
-      COALESCE(${b.data_inizio || null}::date, CURRENT_DATE)
+      COALESCE(${b.data_inizio || null}::date, CURRENT_DATE),
+      ${fonteValida(b.fonte)}
     )
     RETURNING *
   `;

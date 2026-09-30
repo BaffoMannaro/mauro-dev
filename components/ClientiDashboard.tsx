@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
+import { FONTI, FONTE_BADGE, fonteLabel } from '@/lib/fonti';
 
 interface Cliente {
   id: number;
@@ -19,6 +20,7 @@ interface Cliente {
   note: string | null;
   data_inizio: string | null;
   created_at: string;
+  fonte: string | null;
 }
 
 interface Prev {
@@ -40,7 +42,7 @@ const fmtData = (d: string | null) => (d ? new Date(d).toLocaleDateString('it-IT
 
 const FORM_DEFAULT = {
   nome: '', azienda: '', email: '', telefono: '', piva: '',
-  codice_fiscale: '', indirizzo: '', pec: '', codice_sdi: '', note: '',
+  codice_fiscale: '', indirizzo: '', pec: '', codice_sdi: '', note: '', fonte: '',
   data_inizio: new Date().toISOString().slice(0, 10),
 };
 
@@ -78,6 +80,7 @@ export default function ClientiDashboard({
   const [merging, setMerging] = useState(false);
   const [mergeErr, setMergeErr] = useState('');
   const [query, setQuery] = useState('');
+  const [filtroFonte, setFiltroFonte] = useState<string>('tutte');
   const [sortField, setSortField] = useState<SortField>(initialSort?.field ?? 'nome');
   const [sortDir, setSortDir] = useState<SortDir>(initialSort?.dir ?? 'asc');
   const set = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
@@ -159,9 +162,10 @@ export default function ClientiDashboard({
     const q = query.trim().toLowerCase();
     const arr = clienti.filter(
       (c) =>
-        !q ||
-        c.nome.toLowerCase().includes(q) ||
-        (c.azienda || '').toLowerCase().includes(q)
+        (filtroFonte === 'tutte' || (c.fonte ?? 'nessuna') === filtroFonte) &&
+        (!q ||
+          c.nome.toLowerCase().includes(q) ||
+          (c.azienda || '').toLowerCase().includes(q))
     );
     arr.sort((a, b) => {
       let cmp = 0;
@@ -363,6 +367,29 @@ export default function ClientiDashboard({
           </div>
         )}
 
+        {/* Filtro per fonte (divisione interna) */}
+        {clienti.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { id: 'tutte', label: 'Tutte', n: clienti.length },
+              ...FONTI.map((f) => ({ id: f.id as string, label: f.label, n: clienti.filter((c) => c.fonte === f.id).length })),
+              { id: 'nessuna', label: 'Da assegnare', n: clienti.filter((c) => !c.fonte).length },
+            ]
+              .filter((f) => f.id === 'tutte' || f.n > 0 || f.id !== 'nessuna')
+              .map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setFiltroFonte(f.id)}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                    filtroFonte === f.id ? 'bg-accent text-on-accent' : 'text-muted hover:text-text hover:bg-surface2'
+                  } ${f.id === 'nessuna' && f.n > 0 && filtroFonte !== f.id ? 'text-amber-400' : ''}`}
+                >
+                  {f.label} <span className="opacity-60">{f.n}</span>
+                </button>
+              ))}
+          </div>
+        )}
+
         {/* Griglia clienti */}
         {clienti.length === 0 ? (
           <div className="text-center py-20 text-dim">
@@ -386,7 +413,12 @@ export default function ClientiDashboard({
                       <span className={`mt-0.5 shrink-0 w-4 h-4 rounded border flex items-center justify-center text-[10px] ${isSel ? 'bg-accent border-accent text-on-accent' : 'border-edge text-transparent'}`}>✓</span>
                     )}
                     <div className="min-w-0">
-                      <p className="text-text font-semibold truncate">{c.nome}</p>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="text-text font-semibold truncate">{c.nome}</p>
+                        <span className={`shrink-0 text-[10px] font-medium px-1.5 py-0.5 rounded border ${c.fonte ? FONTE_BADGE[c.fonte] : 'text-amber-400 border-amber-400/40'}`}>
+                          {fonteLabel(c.fonte)}
+                        </span>
+                      </div>
                       {c.azienda && c.azienda !== c.nome && (
                         <p className="text-muted text-sm truncate">{c.azienda}</p>
                       )}
@@ -441,9 +473,18 @@ export default function ClientiDashboard({
               <button onClick={() => setShowNew(false)} className="text-dim hover:text-text transition-colors">✕</button>
             </div>
             <div className="flex flex-col gap-3">
-              <div>
-                <label className="text-dim text-xs font-medium block mb-1">NOME *</label>
-                <input type="text" value={form.nome} onChange={(e) => set('nome', e.target.value)} placeholder="Nome cliente o referente" className={inputCls} />
+              <div className="grid grid-cols-[1fr_140px] gap-3">
+                <div>
+                  <label className="text-dim text-xs font-medium block mb-1">NOME *</label>
+                  <input type="text" value={form.nome} onChange={(e) => set('nome', e.target.value)} placeholder="Nome cliente o referente" className={inputCls} />
+                </div>
+                <div>
+                  <label className="text-dim text-xs font-medium block mb-1">FONTE</label>
+                  <select value={form.fonte} onChange={(e) => set('fonte', e.target.value)} className={inputCls}>
+                    <option value="">Da assegnare</option>
+                    {FONTI.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
+                  </select>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import sql from '@/lib/db';
 import { ensureClientiSchema } from '@/lib/schema';
+import { fonteValida } from '@/lib/fonti';
 
 export async function GET(
   _req: NextRequest,
@@ -45,6 +46,7 @@ export async function PATCH(
       codice_sdi     = COALESCE(${b.codice_sdi ?? null}, codice_sdi),
       note           = COALESCE(${b.note ?? null}, note),
       data_inizio    = COALESCE(${b.data_inizio ?? null}::date, data_inizio),
+      fonte          = CASE WHEN ${b.fonte === undefined}::boolean THEN fonte ELSE ${fonteValida(b.fonte)}::text END,
       updated_at     = NOW()
     WHERE id = ${id}
     RETURNING *

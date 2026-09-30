@@ -26,6 +26,8 @@ export async function ensureClientiSchema() {
     )
   `;
   await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS cliente_id INTEGER`;
+  // Fonte del cliente (diretto / agenzia): divisione interna, mai mostrata al cliente.
+  await sql`ALTER TABLE clienti ADD COLUMN IF NOT EXISTS fonte TEXT`;
   await sql`
     CREATE TABLE IF NOT EXISTS impostazioni (
       chiave TEXT PRIMARY KEY,

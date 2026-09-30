@@ -10,6 +10,7 @@ const NAV = [
   { href: '/clienti', label: 'Clienti' },
   { href: '/statistiche', label: 'Statistiche' },
   { href: '/abbonamenti', label: 'Abbonamenti' },
+  { href: '/fatture', label: 'Fatture' },
 ];
 
 type ThemeMode = 'auto' | 'dark' | 'light';

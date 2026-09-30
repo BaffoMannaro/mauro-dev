@@ -50,6 +50,7 @@ export default function FattureDashboard() {
   const [dragging, setDragging] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
   const [erroreDownload, setErroreDownload] = useState('');
+  const [conLogo, setConLogo] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const carica = async (files: FileList | File[]) => {
@@ -74,7 +75,7 @@ export default function FattureDashboard() {
     setDownloading(item.id);
     setErroreDownload('');
     try {
-      const res = await fetch('/api/fatture/pdf', {
+      const res = await fetch(`/api/fatture/pdf${conLogo ? '' : '?logo=0'}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/xml' },
         body: item.xml,
@@ -110,6 +111,20 @@ export default function FattureDashboard() {
           <h1 className="text-xl font-semibold">Fatture</h1>
           <p className="text-dim text-sm mt-0.5">Carica l’XML dell’Agenzia delle Entrate e scarica la copia di cortesia brandizzata.</p>
         </div>
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <span className="text-sm text-muted">Logo nel PDF</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={conLogo}
+            onClick={() => setConLogo((v) => !v)}
+            className={`relative w-10 h-6 rounded-full transition-colors cursor-pointer ${conLogo ? 'bg-accent' : 'bg-edge'}`}
+          >
+            <span
+              className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform ${conLogo ? 'translate-x-4' : ''}`}
+            />
+          </button>
+        </label>
       </header>
 
       <div className="px-6 py-6 max-w-7xl mx-auto grid gap-6 lg:grid-cols-[360px_1fr] items-start">
@@ -217,7 +232,7 @@ export default function FattureDashboard() {
         {/* ── Colonna destra: anteprima ── */}
         <div className="min-w-0">
           {selected?.fattura ? (
-            <Anteprima html={renderFatturaHtml(selected.fattura)} />
+            <Anteprima html={renderFatturaHtml(selected.fattura, { logo: conLogo })} />
           ) : (
             <div className="border border-edge rounded-xl bg-surface flex items-center justify-center text-dim text-sm aspect-[210/297] max-h-[70vh] mx-auto">
               L’anteprima della fattura apparirà qui

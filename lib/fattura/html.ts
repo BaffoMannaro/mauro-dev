@@ -84,7 +84,12 @@ export function nomeFilePdf(f: Fattura): string {
     .concat('.pdf');
 }
 
-export function renderFatturaHtml(f: Fattura): string {
+export interface OpzioniPdf {
+  /** false = niente fascia col logo, intestazione compatta su una riga */
+  logo?: boolean;
+}
+
+export function renderFatturaHtml(f: Fattura, { logo = true }: OpzioniPdf = {}): string {
   const tipoLabel = TIPO_DOCUMENTO[f.tipoDocumento] ?? 'Fattura';
   const forfettario = f.prestatore.regimeFiscale === 'RF19';
 
@@ -163,13 +168,21 @@ export function renderFatturaHtml(f: Fattura): string {
   }
   .page { width: 210mm; min-height: 297mm; position: relative; display: flex; flex-direction: column; }
 
-  header { background: var(--slate); color: #fff; padding: 11mm 14mm 9mm; display: flex; justify-content: space-between; align-items: flex-end; position: relative; }
-  header::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--accent); }
-  header svg { height: 11mm; width: auto; fill: #fff; display: block; }
+  /* Con logo: fascia ardesia, logo e blocco documento centrati sullo stesso asse */
+  header.brand { background: var(--slate); color: #fff; padding: 9mm 14mm; display: flex; justify-content: space-between; align-items: center; position: relative; }
+  header.brand::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--accent); }
+  header.brand svg { height: 14mm; width: auto; fill: #fff; display: block; }
   .doc { text-align: right; }
-  .doc .kind { font-size: 8pt; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; opacity: .85; }
-  .doc .num { font-size: 24pt; font-weight: 700; line-height: 1.1; letter-spacing: -.01em; }
-  .doc .date { font-size: 9pt; opacity: .85; }
+  .doc .kind { font-size: 8pt; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; opacity: .85; line-height: 1.2; }
+  .doc .num { font-size: 24pt; font-weight: 700; line-height: 1.05; letter-spacing: -.01em; }
+  .doc .date { font-size: 9pt; opacity: .85; line-height: 1.3; }
+
+  /* Senza logo: nessuna fascia, solo filetto rosa e titolo su una riga */
+  header.plain { border-top: 3px solid var(--accent); margin: 0 14mm; padding: 8mm 0 4mm; border-bottom: 1px solid var(--edge); display: flex; justify-content: space-between; align-items: baseline; }
+  header.plain h1 { font-size: 16pt; font-weight: 700; letter-spacing: -.01em; }
+  header.plain h1 span { color: var(--accent); }
+  header.plain .date { color: var(--muted); font-size: 9pt; }
+  header.plain .date strong { color: var(--ink); font-weight: 600; }
 
   main { padding: 10mm 14mm 0; flex: 1; display: flex; flex-direction: column; gap: 8mm; }
 
@@ -221,14 +234,17 @@ export function renderFatturaHtml(f: Fattura): string {
 </head>
 <body>
 <div class="page">
-  <header>
+  ${logo ? `<header class="brand">
     <svg viewBox="0 0 448.88 147.03" aria-label="Mauro Dev">${LOGO_PATHS}</svg>
     <div class="doc">
       <p class="kind">${esc(tipoLabel)}</p>
       <p class="num">N. ${esc(f.numero)}</p>
       <p class="date">${dataLunga(f.data)}</p>
     </div>
-  </header>
+  </header>` : `<header class="plain">
+    <h1>${esc(tipoLabel)} <span>n. ${esc(f.numero)}</span></h1>
+    <p class="date">Emessa il <strong>${dataLunga(f.data)}</strong></p>
+  </header>`}
 
   <main>
     <section class="parties">

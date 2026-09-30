@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      source: renderFatturaHtml(fattura),
+      source: renderFatturaHtml(fattura, { logo: req.nextUrl.searchParams.get('logo') !== '0' }),
       format: 'A4',
       margin: '0',
     }),

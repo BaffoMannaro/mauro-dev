@@ -64,3 +64,27 @@ export async function ensurePortaleSchema() {
   await sql`ALTER TABLE preventivi ADD COLUMN IF NOT EXISTS rifiutato_at TIMESTAMPTZ`;
   ensuredPortale = true;
 }
+
+// Archivio fatture da XML FatturaPA (sezione Fatture): stessa tabella del
+// portale, così una fattura salvata compare anche nella scheda del cliente.
+let ensuredFattureXml = false;
+
+export async function ensureFattureXmlSchema() {
+  await ensurePortaleSchema();
+  if (ensuredFattureXml) return;
+  // Una fattura importata può non avere (ancora) un cliente in anagrafica.
+  await sql`ALTER TABLE fatture ALTER COLUMN cliente_id DROP NOT NULL`;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS xml TEXT`;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS anno INTEGER`;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS cliente_nome TEXT`;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS cliente_piva TEXT`;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS imponibile DECIMAL(10,2)`;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS contributo DECIMAL(10,2)`;
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS con_logo BOOLEAN DEFAULT true`;
+  // Numero fattura univoco per anno: ricaricare lo stesso XML aggiorna, non duplica.
+  await sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS fatture_xml_numero_anno
+    ON fatture (numero, anno) WHERE xml IS NOT NULL
+  `;
+  ensuredFattureXml = true;
+}

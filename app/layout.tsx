@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it">
+    <html lang="it" data-scroll-behavior="smooth">
       <head>
         {/* Anti-flash: apply stored theme before first paint */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var q=new URLSearchParams(window.location.search).get('theme');if(q==='light'){document.documentElement.setAttribute('data-theme','light');return;}if(q==='dark'){return;}var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');}else if(!t){if(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.setAttribute('data-theme','light');}}}catch(e){}})();` }} />

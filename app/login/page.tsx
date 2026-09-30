@@ -1,6 +1,10 @@
 import { signIn } from '@/lib/auth';
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  // Ritorno dopo il login (es. collegamento del connettore Claude): solo percorsi interni.
+  const { next } = await searchParams;
+  const redirectTo = next && /^\/(?![/\\])/.test(next) ? next : '/';
+
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center">
       <div className="bg-surface border border-edge rounded-2xl p-10 flex flex-col items-center gap-6 w-full max-w-sm">
@@ -12,7 +16,7 @@ export default function LoginPage() {
         <form
           action={async () => {
             'use server';
-            await signIn('google', { redirectTo: '/' });
+            await signIn('google', { redirectTo });
           }}
           className="w-full"
         >

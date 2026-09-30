@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import sql from '@/lib/db';
-import { nanoid } from 'nanoid';
+import { inserisciPreventivo } from '@/lib/preventivi';
 
 export async function GET() {
   const session = await auth();
@@ -15,33 +15,6 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
 
-  const body = await req.json();
-  const token = nanoid(8);
-
-  const voci = body.voci || [];
-  const totale = voci.reduce((acc: number, v: { quantita: number; prezzo: number }) =>
-    acc + v.quantita * v.prezzo, 0
-  );
-
-  const [preventivo] = await sql`
-    INSERT INTO preventivi (
-      token, cliente_nome, cliente_azienda, cliente_email,
-      oggetto, voci, note, scadenza, totale, iva, meta
-    ) VALUES (
-      ${token},
-      ${body.cliente.nome},
-      ${body.cliente.azienda || null},
-      ${body.cliente.email},
-      ${body.oggetto},
-      ${JSON.stringify(body.voci)},
-      ${body.note || null},
-      ${body.scadenza || null},
-      ${totale},
-      ${body.iva === true},
-      ${body.meta ? JSON.stringify(body.meta) : null}
-    )
-    RETURNING *
-  `;
-
+  const preventivo = await inserisciPreventivo(await req.json());
   return NextResponse.json(preventivo);
 }

@@ -2,10 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { FatturaSalvata } from './FattureDashboard';
-
-// Limite ricavi/compensi del regime forfettario (L. 190/2014, c. 54).
-const SOGLIA_FORFETTARIO = 85000;
-const MESI = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+import { calcolaAnalisi, SOGLIA_FORFETTARIO } from '@/lib/fattura/analisi';
 
 // it-IT non raggruppa sotto le 10.000: raggruppo a mano
 const fmt = (n: number) => `€${Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
@@ -18,43 +15,8 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
   const [annoScelto, setAnnoScelto] = useState<number | null>(null);
   const anno = annoScelto !== null && anni.includes(annoScelto) ? annoScelto : anni[0];
 
-  const s = useMemo(() => {
-    const rows = archivio.filter((f) => f.anno === anno);
-    const prec = archivio.filter((f) => f.anno === anno - 1);
-    const fatturato = rows.reduce((t, f) => t + f.importo, 0);
-    const fatturatoPrec = prec.reduce((t, f) => t + f.importo, 0);
-    const aperte = rows.filter((f) => f.stato !== 'pagata');
-    const daIncassare = aperte.reduce((t, f) => t + f.importo, 0);
-    const contributo = rows.reduce((t, f) => t + (f.contributo ?? 0), 0);
-
-    const mesi = MESI.map((label) => ({ label, pagato: 0, aperto: 0, n: 0 }));
-    rows.forEach((f) => {
-      const m = mesi[Number(f.data.slice(5, 7)) - 1];
-      if (!m) return;
-      m.n++;
-      if (f.stato === 'pagata') m.pagato += f.importo;
-      else m.aperto += f.importo;
-    });
-    const maxMese = Math.max(1, ...mesi.map((m) => m.pagato + m.aperto));
-
-    const perCliente = new Map<string, { nome: string; totale: number; n: number }>();
-    rows.forEach((f) => {
-      const key = f.cliente_piva || f.cliente_nome;
-      const c = perCliente.get(key) ?? { nome: f.cliente_nome, totale: 0, n: 0 };
-      c.totale += f.importo;
-      c.n++;
-      perCliente.set(key, c);
-    });
-    const clienti = [...perCliente.values()].sort((a, b) => b.totale - a.totale);
-
-    return {
-      n: rows.length, fatturato, fatturatoPrec, aperte: aperte.length, daIncassare, contributo,
-      mesi, maxMese, clienti,
-      soglia: Math.min(100, (fatturato / SOGLIA_FORFETTARIO) * 100),
-    };
-  }, [archivio, anno]);
-
-  const delta = s.fatturatoPrec > 0 ? Math.round(((s.fatturato - s.fatturatoPrec) / s.fatturatoPrec) * 100) : null;
+  const s = useMemo(() => calcolaAnalisi(archivio, anno), [archivio, anno]);
+  const { delta } = s;
 
   return (
     <section className="flex flex-col gap-3">

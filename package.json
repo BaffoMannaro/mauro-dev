@@ -10,15 +10,18 @@
   },
   "dependencies": {
     "@auth/pg-adapter": "^1.11.2",
+    "@modelcontextprotocol/server": "^2.2.0",
     "@neondatabase/serverless": "^1.1.0",
     "@types/pg": "^8.20.0",
     "fast-xml-parser": "^5.11.2",
+    "mcp-handler": "^2.2.0",
     "nanoid": "^5.1.11",
     "next": "16.2.9",
     "next-auth": "^5.0.0-beta.31",
     "pg": "^8.21.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

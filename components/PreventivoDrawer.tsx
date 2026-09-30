@@ -164,6 +164,37 @@ export default function PreventivoDrawer({
     else setTardivaErrore(data?.error ?? 'Errore');
     setTardivaBusy(false);
   };
+  // Reset di aperture e accettazione
+  const [resetBusy, setResetBusy] = useState(false);
+  const [resetEsito, setResetEsito] = useState('');
+  const reset = async (cosa: 'aperture' | 'accettazione') => {
+    const conferme = {
+      aperture: 'Cancello tutte le aperture registrate di questo preventivo? Non si può annullare.',
+      accettazione:
+        'Azzero l’accettazione? Il preventivo torna "inviato" e si perdono firma, IP ed esito della email di conferma. ' +
+        'Se è scaduto riparte con 15 giorni di validità. Fatture e pagamenti restano invariati.',
+    };
+    if (!confirm(conferme[cosa])) return;
+    setResetBusy(true);
+    setResetEsito('');
+    const res = await fetch(`/api/preventivi/${preventivo.id}/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [cosa]: true }),
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok) {
+      onUpdate(data.preventivo);
+      if (cosa === 'aperture') {
+        setVisite((v) => (v ? { riepilogo: { ...v.riepilogo, aperture: 0, dispositivi: 0, tempo_totale_s: 0, pdf_scaricati: 0, sezioni_lette: [] }, visite: [] } : v));
+        setResetEsito(`Aperture azzerate (${data.aperture_cancellate} cancellate).`);
+      } else {
+        setResetEsito(`Accettazione azzerata${data.nuova_scadenza ? `: nuova scadenza ${dataLunga(data.nuova_scadenza)}` : ''}.`);
+      }
+    } else setResetEsito(data?.error ?? 'Errore');
+    setResetBusy(false);
+  };
+
   const dataLunga = (g: string) => new Date(`${g}T12:00:00`).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const inputCls = "w-full bg-surface border border-edge rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-slate";
@@ -435,6 +466,22 @@ export default function PreventivoDrawer({
                   className={inputCls} />
               </div>
             </div>
+          </div>
+
+          {/* Reset */}
+          <div>
+            <p className="text-dim text-xs font-mono mb-3">RESET</p>
+            <div className="flex flex-wrap gap-2">
+              <button disabled={resetBusy || !visite?.riepilogo.aperture} onClick={() => reset('aperture')}
+                className="text-xs px-3 py-1.5 rounded-lg bg-surface2 border border-edge text-muted hover:text-text disabled:opacity-40 cursor-pointer disabled:cursor-default">
+                Azzera aperture{visite?.riepilogo.aperture ? ` (${visite.riepilogo.aperture})` : ''}
+              </button>
+              <button disabled={resetBusy || preventivo.stato !== 'accettato'} onClick={() => reset('accettazione')}
+                className="text-xs px-3 py-1.5 rounded-lg bg-surface2 border border-edge text-red-400 disabled:opacity-40 cursor-pointer disabled:cursor-default">
+                Azzera accettazione
+              </button>
+            </div>
+            {resetEsito && <p className="text-dim text-xs mt-2">{resetEsito}</p>}
           </div>
 
           {/* Salva */}

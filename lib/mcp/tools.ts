@@ -28,6 +28,7 @@ import { FONTE_IDS, fonteLabel } from '@/lib/fonti';
 import { aperturePerPreventivo, visiteDelPreventivo } from '@/lib/visite';
 import { isScaduto, scadenzaEffettiva, VALIDITA_MAX_GIORNI } from '@/lib/scadenza';
 import { ensureTardivaSchema, gestisciRichiestaTardiva, inAttesa } from '@/lib/tardiva';
+import { resetPreventivo } from '@/lib/reset-preventivo';
 import { calcolaListino, daClassificare } from '@/lib/listino';
 import {
   classificaVoci,
@@ -293,6 +294,36 @@ export function registraStrumenti(server: McpServer) {
       try {
         const p = await modificaPreventivo(id, modifiche);
         return testo({ aggiornato: true, ...riepilogoPreventivo(p), dati: p.meta });
+      } catch (e) {
+        return errore((e as Error).message);
+      }
+    }
+  );
+
+  server.registerTool(
+    'reset_preventivo',
+    {
+      title: 'Reset aperture / accettazione',
+      description:
+        'Azzera le aperture registrate del link pubblico (aperture=true) e/o l’accettazione (accettazione=true): ' +
+        'il preventivo torna "inviato" senza firma, IP, esito email di conferma e richiesta tardiva; se è scaduto riparte ' +
+        'con 15 giorni di validità. Fatture e pagamenti non vengono toccati. Irreversibile: chiedi conferma all’utente.',
+      inputSchema: z.object({
+        id: z.number().int(),
+        aperture: z.boolean().default(false),
+        accettazione: z.boolean().default(false),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+    },
+    async ({ id, aperture, accettazione }) => {
+      try {
+        const r = await resetPreventivo(id, { aperture, accettazione });
+        return testo({
+          aperture_cancellate: r.aperture_cancellate,
+          accettazione_azzerata: r.accettazione_azzerata,
+          nuova_scadenza: r.nuova_scadenza,
+          ...riepilogoPreventivo(r.preventivo),
+        });
       } catch (e) {
         return errore((e as Error).message);
       }

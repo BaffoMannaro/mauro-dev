@@ -121,7 +121,7 @@ function AccordionSection({
   };
 
   return (
-    <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+    <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
       <button
         onClick={toggle}
         className="w-full flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-surface2/50 transition-colors"
@@ -260,7 +260,7 @@ export default function PreventivoCliente({
       <main className="max-w-4xl mx-auto px-6 py-8 flex flex-col gap-6">
 
         {/* ── Destinatario (matches PDF dest_t table) ── */}
-        <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+        <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
           <div className="bg-surface2 px-5 py-3 flex justify-between border-b border-edge">
             <p className="text-accent text-xs font-bold tracking-widest">DESTINATARIO</p>
             <p className="text-accent text-xs font-bold tracking-widest">
@@ -336,7 +336,7 @@ export default function PreventivoCliente({
         </AccordionSection>
 
         {/* ── Compenso (FISSO — non collassabile) ── */}
-        <div className="bg-surface border border-edge rounded-xl overflow-hidden">
+        <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
           <div className="flex items-center justify-between px-5 py-4 bg-surface2/50 border-b border-edge">
             <p className="text-muted text-sm font-semibold">Compenso totale</p>
             <p className="text-accent font-bold text-2xl">

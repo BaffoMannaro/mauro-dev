@@ -107,16 +107,32 @@ function useCountdown(scadenza: string | null) {
   return countdown;
 }
 
+/** true quando l'elemento con questo id è visibile (es. il modulo di accettazione in fondo). */
+function useVisibile(id: string) {
+  const [visibile, setVisibile] = useState(false);
+  useEffect(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setVisibile(e.isIntersecting), { rootMargin: '0px 0px -15% 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [id]);
+  return visibile;
+}
+
 function AccordionSection({
   title,
   children,
   flush = false,
   defaultOpen = false,
+  animazione = 'anima-rivela',
 }: {
   title: string;
   children: React.ReactNode;
   flush?: boolean;
   defaultOpen?: boolean;
+  /** anima-entrata per le sezioni visibili all'apertura, anima-rivela (allo scroll) per le altre. */
+  animazione?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const [seen, setSeen] = useState(defaultOpen);
@@ -131,7 +147,7 @@ function AccordionSection({
   };
 
   return (
-    <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
+    <div className={`${animazione} bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid`}>
       <button
         onClick={toggle}
         aria-expanded={open}
@@ -143,18 +159,26 @@ function AccordionSection({
         </div>
         <div className="relative flex items-center shrink-0">
           {!seen && (
-            <span className="absolute -top-1.5 -right-1.5 w-2 h-2 rounded-full bg-accent" />
+            <>
+              <span className="absolute -top-1.5 -right-1.5 w-2 h-2 rounded-full bg-accent motion-safe:animate-ping opacity-60" />
+              <span className="absolute -top-1.5 -right-1.5 w-2 h-2 rounded-full bg-accent" />
+            </>
           )}
           <svg
-            className={`w-4 h-4 text-dim transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-dim transition-transform duration-300 ease-out ${open ? 'rotate-180' : ''}`}
             fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" aria-hidden="true"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
           </svg>
         </div>
       </button>
-      <div className={`print:block! border-t border-edge/40 ${open ? '' : 'hidden'} ${flush ? '' : 'px-5 pt-4 pb-5'}`}>
-        {children}
+      {/* Apertura animata: righe della griglia da 0fr a 1fr (altezza automatica senza misure in JS). */}
+      <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'} print:grid-rows-[1fr]`}>
+        <div className="min-h-0 overflow-hidden" inert={!open}>
+          <div className={`border-t border-edge/40 transition-[opacity,translate] duration-300 ease-out ${open ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'} print:opacity-100 print:translate-y-0 ${flush ? '' : 'px-5 pt-4 pb-5'}`}>
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -188,6 +212,9 @@ export default function PreventivoCliente({
   const [tardiva, setTardiva] = useState<'no' | 'invio' | 'inviata'>(richiestaInviata ? 'inviata' : 'no');
   const [messaggio, setMessaggio] = useState('');
   const traccia = useTracciaVisita(preventivo.token);
+  // Arrivati al modulo di accettazione il pulsante flottante non serve più.
+  const moduloVisibile = useVisibile('accettazione');
+  const mostraAccetta = !accettato && !(scaduto && tardiva === 'inviata');
 
   const meta = preventivo.meta;
   const sezioni = meta?.sezioni;
@@ -240,33 +267,37 @@ export default function PreventivoCliente({
         href={`/api/p/${preventivo.token}/pdf`}
         download
         onClick={traccia.pdf}
-        className="print:hidden hidden lg:flex fixed top-4 right-4 z-50 items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-on-accent text-sm font-semibold rounded-xl shadow-lg transition-colors cursor-pointer"
+        className="anima-entrata [--ritardo:400ms] print:hidden hidden lg:flex fixed top-4 right-4 z-50 items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-on-accent text-sm font-semibold rounded-xl shadow-lg transition-[background-color,translate,scale] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] cursor-pointer"
       >
         <IconaDownload />
         Scarica PDF
       </a>
-      {!accettato && !(scaduto && tardiva === 'inviata') && (
+      {mostraAccetta && (
         <a
           href="#accettazione"
-          className="print:hidden hidden lg:flex fixed bottom-4 right-4 z-50 items-center gap-2 px-5 py-3 bg-text text-bg text-sm font-semibold rounded-xl shadow-lg hover:opacity-90 transition-opacity"
+          aria-hidden={moduloVisibile}
+          tabIndex={moduloVisibile ? -1 : undefined}
+          className={`print:hidden hidden lg:flex fixed bottom-4 right-4 z-50 items-center gap-2 px-5 py-3 bg-text text-bg text-sm font-semibold rounded-xl shadow-lg transition-[opacity,translate,scale] duration-300 ease-out hover:-translate-y-0.5 active:scale-[0.98] ${
+            moduloVisibile ? 'opacity-0 translate-y-4 pointer-events-none' : 'opacity-100 translate-y-0'
+          }`}
         >
           {scaduto ? 'Chiedi di accettarlo' : 'Accetta il preventivo'}
         </a>
       )}
 
       {/* ── Mobile/tablet: barra in basso con PDF e Accetta, non copre l'intestazione ── */}
-      <div className="print:hidden lg:hidden fixed bottom-0 inset-x-0 z-50 flex gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-bg/90 backdrop-blur border-t border-edge">
+      <div className="anima-barra print:hidden lg:hidden fixed bottom-0 inset-x-0 z-50 flex gap-2 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-bg/90 backdrop-blur border-t border-edge">
         <a
           href={`/api/p/${preventivo.token}/pdf`}
           download
           onClick={traccia.pdf}
-          className={`flex items-center justify-center gap-2 px-4 py-3 bg-accent text-on-accent text-sm font-semibold rounded-xl ${!accettato && !(scaduto && tardiva === 'inviata') ? '' : 'flex-1'}`}
+          className={`flex items-center justify-center gap-2 px-4 py-3 bg-accent text-on-accent text-sm font-semibold rounded-xl transition-[flex-grow,scale] duration-300 ease-out active:scale-[0.98] ${mostraAccetta && !moduloVisibile ? 'grow-0' : 'grow'}`}
         >
           <IconaDownload />
           PDF
         </a>
-        {!accettato && !(scaduto && tardiva === 'inviata') && (
-          <a href="#accettazione" className="flex-1 flex items-center justify-center px-4 py-3 bg-text text-bg text-sm font-semibold rounded-xl">
+        {mostraAccetta && !moduloVisibile && (
+          <a href="#accettazione" className="anima-comparsa flex-1 flex items-center justify-center px-4 py-3 bg-text text-bg text-sm font-semibold rounded-xl active:scale-[0.98] transition-[scale]">
             {scaduto ? 'Chiedi di accettarlo' : 'Accetta il preventivo'}
           </a>
         )}
@@ -274,10 +305,10 @@ export default function PreventivoCliente({
 
       {/* ── Header — dark slate + pink line (matches PDF header) ── */}
       <header className="bg-slate relative print:bg-slate">
-        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-accent" />
+        <div className="anima-linea absolute bottom-0 left-0 right-0 h-[3px] bg-accent" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between gap-4">
-          <img src="/Logo.svg" alt="MAURO DEV" width={96} height={28} className="h-7 w-auto shrink-0" style={{ filter: 'brightness(0) invert(1)' }} />
-          <div className="text-right min-w-0">
+          <img src="/Logo.svg" alt="MAURO DEV" width={96} height={28} className="anima-entrata h-7 w-auto shrink-0" style={{ filter: 'brightness(0) invert(1)' }} />
+          <div className="anima-entrata [--ritardo:120ms] text-right min-w-0">
             <p className="text-white font-bold text-sm tracking-[0.15em]">PREVENTIVO</p>
             <p className="text-white text-xs mt-0.5">{dataEmissione}</p>
           </div>
@@ -287,7 +318,7 @@ export default function PreventivoCliente({
       <main className="pdf-pagine max-w-4xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-28 lg:pb-8 flex flex-col gap-6">
 
         {/* ── Destinatario (matches PDF dest_t table) ── */}
-        <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
+        <div className="anima-entrata [--ritardo:200ms] bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
           <div className="bg-surface2 px-5 py-3 flex justify-between border-b border-edge">
             <p className="text-accent text-xs font-bold tracking-widest">DESTINATARIO</p>
             <p className="hidden sm:block print:block text-accent text-xs font-bold tracking-widest">
@@ -333,7 +364,7 @@ export default function PreventivoCliente({
         </div>
 
         {/* ── Oggetto ── */}
-        <AccordionSection title={`Oggetto: ${preventivo.oggetto}`} defaultOpen>
+        <AccordionSection title={`Oggetto: ${preventivo.oggetto}`} defaultOpen animazione="anima-entrata [--ritardo:300ms]">
           {sezioni?.intro && (
             <p className="text-muted text-sm leading-relaxed">{sezioni.intro}</p>
           )}
@@ -350,7 +381,7 @@ export default function PreventivoCliente({
           {preventivo.voci.map((voce, i) => (
             <div
               key={i}
-              className={`flex items-center justify-between gap-4 px-5 py-4 border-t border-edge/40 ${i === 0 ? 'border-t-0' : ''}`}
+              className={`flex items-center justify-between gap-4 px-5 py-4 border-t border-edge/40 transition-colors hover:bg-surface2/40 ${i === 0 ? 'border-t-0' : ''}`}
             >
               <div className="flex-1 min-w-0">
                 <p className="text-text font-semibold text-sm">{voce.descrizione}</p>
@@ -366,7 +397,7 @@ export default function PreventivoCliente({
         </AccordionSection>
 
         {/* ── Compenso (FISSO — non collassabile) ── */}
-        <div className="bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
+        <div className="anima-rivela bg-surface border border-edge rounded-xl overflow-hidden print:break-inside-avoid">
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-5 py-4 bg-surface2/50 border-b border-edge">
             <p className="text-muted text-sm font-semibold">Compenso totale</p>
             <p className="text-accent font-bold text-2xl tabular-nums whitespace-nowrap">{eur(totale)}</p>
@@ -504,7 +535,7 @@ export default function PreventivoCliente({
                 <button
                   onClick={handleTardiva}
                   disabled={tardiva === 'invio'}
-                  className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 transition-colors cursor-pointer"
+                  className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 enabled:hover:-translate-y-0.5 enabled:active:scale-[0.99] transition-[background-color,opacity,translate,scale] duration-200 cursor-pointer"
                 >
                   {tardiva === 'invio' ? 'Invio…' : 'Chiedi di accettarlo lo stesso'}
                 </button>
@@ -544,14 +575,14 @@ export default function PreventivoCliente({
             <button
               onClick={handleAccetta}
               disabled={!checkbox || loading}
-              className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 transition-colors cursor-pointer"
+              className="w-full bg-accent text-on-accent font-semibold py-3 rounded-xl disabled:opacity-30 hover:bg-accent/90 enabled:hover:-translate-y-0.5 enabled:active:scale-[0.99] transition-[background-color,opacity,translate,scale] duration-200 cursor-pointer"
             >
               {loading ? 'Registrazione…' : 'Accetto il preventivo'}
             </button>
           </AccordionSection>
           </div>
         ) : (
-          <div className="border border-green-800 bg-green-950/30 rounded-xl p-6 text-center print:hidden">
+          <div className="anima-successo border border-green-800 bg-green-950/30 rounded-xl p-6 text-center print:hidden">
             <p className="text-green-400 font-semibold">
               {confermato ? '✓ Preventivo accettato con successo' : '✓ Preventivo già accettato'}
             </p>

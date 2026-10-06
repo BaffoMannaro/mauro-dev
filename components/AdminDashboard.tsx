@@ -49,6 +49,11 @@ const ORDINE_STATI: Record<string, number> = {
   inviato: 0, accettato: 1, rifiutato: 2, archiviato: 3,
 };
 
+/** Minuscolo e senza accenti, per confronti di ricerca. */
+function normalizza(s: string | null | undefined) {
+  return (s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 /** "3 min fa", "2 h fa", "ieri", "4 g fa" */
 function tempoFa(iso: string) {
   const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -70,6 +75,7 @@ export default function AdminDashboard({
 }) {
   const [preventivi, setPreventivi] = useState(initialPreventivi);
   const [filtro, setFiltro] = useState('tutti');
+  const [cerca, setCerca] = useState('');
   const [copiato, setCopiato] = useState<string | null>(null);
   const [nuovoOpen, setNuovoOpen] = useState(false);
   const [drawerPreventivo, setDrawerPreventivo] = useState<Preventivo | null>(null);
@@ -82,7 +88,16 @@ export default function AdminDashboard({
     if (p) setDrawerPreventivo(p);
   }, [initialPreventivi]);
 
-  const filtrati = [...(filtro === 'tutti' ? preventivi : preventivi.filter((p) => p.stato === filtro))]
+  // Ricerca su cliente, azienda e oggetto: ogni parola digitata deve comparire in almeno uno dei campi.
+  const parole = normalizza(cerca).split(/\s+/).filter(Boolean);
+  const cercati = parole.length === 0
+    ? preventivi
+    : preventivi.filter((p) => {
+        const testo = normalizza(`${p.cliente_nome} ${p.cliente_azienda ?? ''} ${p.oggetto}`);
+        return parole.every((w) => testo.includes(w));
+      });
+
+  const filtrati = [...(filtro === 'tutti' ? cercati : cercati.filter((p) => p.stato === filtro))]
     .sort((a, b) => {
       const dStato = (ORDINE_STATI[a.stato] ?? 99) - (ORDINE_STATI[b.stato] ?? 99);
       if (dStato !== 0) return dStato;
@@ -162,6 +177,16 @@ export default function AdminDashboard({
 
       <div className="px-6 py-6 max-w-6xl mx-auto">
 
+        {/* Ricerca */}
+        <input
+          type="search"
+          value={cerca}
+          onChange={(e) => setCerca(e.target.value)}
+          placeholder="Cerca per cliente, azienda o oggetto…"
+          aria-label="Cerca preventivi"
+          className="w-full mb-4 bg-surface border border-edge rounded-lg px-4 py-2.5 text-sm text-text placeholder-dim focus:outline-none focus:border-slate"
+        />
+
         {/* Filtri */}
         <div className="flex gap-2 mb-6 flex-wrap">
           {FILTRI.map((f) => (
@@ -176,7 +201,7 @@ export default function AdminDashboard({
             >
               {f === 'tutti' ? 'Tutti' : STATI[f as keyof typeof STATI].label}
               <span className="ml-2 text-xs opacity-60">
-                {f === 'tutti' ? preventivi.length : preventivi.filter((p) => p.stato === f).length}
+                {f === 'tutti' ? cercati.length : cercati.filter((p) => p.stato === f).length}
               </span>
             </button>
           ))}
@@ -186,7 +211,9 @@ export default function AdminDashboard({
         {filtrati.length === 0 ? (
           <div className="text-center py-24 text-dim">
             <p className="text-lg font-medium">Nessun preventivo</p>
-            <p className="text-sm mt-1">I preventivi caricati appariranno qui</p>
+            <p className="text-sm mt-1">
+              {parole.length > 0 ? `Nessun risultato per “${cerca.trim()}”` : 'I preventivi caricati appariranno qui'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

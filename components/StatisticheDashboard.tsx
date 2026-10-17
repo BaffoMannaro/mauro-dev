@@ -2,11 +2,13 @@
 
 import { useMemo, useState } from 'react';
 import { euro as fmt } from '@/lib/formato';
+import { accettato, calcolaIncassi, type FatturaIncasso } from '@/lib/incassi';
 
 interface Tranche {
   descrizione: string;
   percentuale: number;
   pagato: boolean;
+  data_pagamento?: string | null;
 }
 
 interface Preventivo {
@@ -51,111 +53,94 @@ function costoMensileAbbonamento(ab: Abbonamento, anno: number, mese: number): n
 export default function StatisticheDashboard({
   preventivi,
   abbonamenti,
+  fatture,
 }: {
   preventivi: Preventivo[];
   abbonamenti: Abbonamento[];
+  fatture: FatturaIncasso[];
 }) {
   const [includiDaIncassare, setIncludiDaIncassare] = useState(false);
 
   const stats = useMemo(() => {
-    const accettati = preventivi.filter((p) => p.stato === 'accettato' || p.stato === 'archiviato');
+    const accettati = preventivi.filter(accettato);
     const totaleContrattualizzato = accettati.reduce((acc, p) => acc + Number(p.totale), 0);
     const inviati = preventivi.filter((p) => p.stato === 'inviato').length;
     const rifiutati = preventivi.filter((p) => p.stato === 'rifiutato').length;
     const tassoAccettazione = preventivi.length > 0
       ? Math.round((accettati.length / preventivi.length) * 100) : 0;
 
-    const totalePagato = accettati.reduce((acc, p) => {
-      if (!p.tranches_stato || p.tranches_stato.length === 0) return acc;
-      return acc + p.tranches_stato
-        .filter((t) => t.pagato)
-        .reduce((s, t) => s + Number(p.totale) * t.percentuale / 100, 0);
-    }, 0);
+    // Incassato: fatture pagate e tranche spuntate (vedi lib/incassi.ts).
+    const { incassi, perPreventivo } = calcolaIncassi(preventivi, fatture);
+    const totalePagato = incassi.reduce((s, x) => s + x.importo, 0);
+    const residuo = (p: Preventivo) => Math.max(0, Number(p.totale) - (perPreventivo.get(p.id) ?? 0));
+    const totaleNonPagato = accettati.reduce((s, p) => s + residuo(p), 0);
 
-    const totaleNonPagato = accettati.reduce((acc, p) => {
-      if (!p.tranches_stato || p.tranches_stato.length === 0) return acc + Number(p.totale);
-      return acc + p.tranches_stato
-        .filter((t) => !t.pagato)
-        .reduce((s, t) => s + Number(p.totale) * t.percentuale / 100, 0);
-    }, 0);
-
-    const totaleIncassatoEffettivo = includiDaIncassare ? totalePagato + totaleNonPagato : totalePagato;
-
+    // Ultimi 12 mesi, dal mese di un anno fa a quello in corso.
     const oggi = new Date();
-    const annoFiscaleInizio = oggi.getMonth() >= 9 ? oggi.getFullYear() : oggi.getFullYear() - 1;
-    const inizioAnnoFiscale = new Date(annoFiscaleInizio, 9, 1);
-    let giorniLavorativiAnno = 0;
-    const cursore = new Date(inizioAnnoFiscale);
-    while (cursore <= oggi) {
-      const giorno = cursore.getDay();
-      if (giorno !== 0 && giorno !== 6) giorniLavorativiAnno++;
-      cursore.setDate(cursore.getDate() + 1);
-    }
-
-    const guadagnoAlGiorno = giorniLavorativiAnno > 0 ? totaleIncassatoEffettivo / giorniLavorativiAnno : 0;
-    const guadagnoAllOra = guadagnoAlGiorno / 8;
-
     const mesi = Array.from({ length: 12 }, (_, i) => {
-      const d = new Date(annoFiscaleInizio, 9 + i, 1);
+      const d = new Date(oggi.getFullYear(), oggi.getMonth() - 11 + i, 1);
       return {
         label: d.toLocaleDateString('it-IT', { month: 'short' }),
         anno: d.getFullYear(),
         mese: d.getMonth(),
-        contrattualizzato: 0,
         incassato: 0,
         costoAbbonamenti: 0,
         netto: 0,
-        count: 0,
       };
     });
+    const meseDi = (iso: string) => {
+      const [a, m] = iso.slice(0, 7).split('-').map(Number);
+      return mesi.find((x) => x.anno === a && x.mese === m - 1);
+    };
 
-    accettati.forEach((p) => {
-      const d = new Date(p.accettato_at || p.created_at);
-      const mAccettazione = mesi.find((m) => m.anno === d.getFullYear() && m.mese === d.getMonth());
-      if (!mAccettazione) return;
-      mAccettazione.contrattualizzato += Number(p.totale);
-      mAccettazione.count++;
-      if (p.tranches_stato && p.tranches_stato.length > 0) {
-        p.tranches_stato.forEach((t: any) => {
-          const importo = Number(p.totale) * t.percentuale / 100;
-          if (t.pagato) {
-            const dataPag = t.data_pagamento ? new Date(t.data_pagamento) : new Date(p.accettato_at || p.created_at);
-            const mPag = mesi.find((m) => m.anno === dataPag.getFullYear() && m.mese === dataPag.getMonth());
-            if (mPag) mPag.incassato += importo;
-          } else if (includiDaIncassare) {
-            // tranche non pagata: attribuita al mese di accettazione
-            mAccettazione.incassato += importo;
-          }
-        });
-      }
+    incassi.forEach((x) => {
+      const m = meseDi(x.data);
+      if (m) m.incassato += x.importo;
     });
+    if (includiDaIncassare) {
+      // Quello che resta da incassare va nel mese di accettazione del preventivo.
+      accettati.forEach((p) => {
+        const m = meseDi(new Date(p.accettato_at || p.created_at).toISOString());
+        if (m) m.incassato += residuo(p);
+      });
+    }
 
     mesi.forEach((m) => {
       m.costoAbbonamenti = abbonamenti.reduce((s, ab) => s + costoMensileAbbonamento(ab, m.anno, m.mese), 0);
       m.netto = m.incassato - m.costoAbbonamenti;
     });
 
-    const maxValore = Math.max(...mesi.map((m) => Math.max(m.incassato, m.costoAbbonamenti)), 1);
-    const mesiTrascorsi = mesi.filter((m) => new Date(m.anno, m.mese, 1) <= oggi);
+    // Tariffe: incassato degli ultimi 12 mesi diviso i giorni lavorativi dello stesso periodo.
+    const incassatoPeriodo = mesi.reduce((s, m) => s + m.incassato, 0);
+    let giorniLavorativiAnno = 0;
+    const cursore = new Date(mesi[0].anno, mesi[0].mese, 1);
+    while (cursore <= oggi) {
+      const giorno = cursore.getDay();
+      if (giorno !== 0 && giorno !== 6) giorniLavorativiAnno++;
+      cursore.setDate(cursore.getDate() + 1);
+    }
+    const guadagnoAlGiorno = giorniLavorativiAnno > 0 ? incassatoPeriodo / giorniLavorativiAnno : 0;
+    const guadagnoAllOra = guadagnoAlGiorno / 8;
+    const totaleIncassatoEffettivo = includiDaIncassare ? totalePagato + totaleNonPagato : totalePagato;
+
+    const maxValore = Math.max(...mesi.map((m) => Math.max(m.incassato, m.costoAbbonamenti, Math.abs(m.netto))), 1);
     const mesiConDati = mesi.filter((m) => m.incassato > 0);
     const mediaIncassatoMensile = mesiConDati.length > 0
       ? mesiConDati.reduce((s, m) => s + m.incassato, 0) / mesiConDati.length : 0;
-    const mediaNettoMensile = mesiTrascorsi.length > 0
-      ? mesiTrascorsi.reduce((s, m) => s + m.netto, 0) / mesiTrascorsi.length : 0;
+    const mediaNettoMensile = mesi.reduce((s, m) => s + m.netto, 0) / mesi.length;
 
-    const meseCorrente = new Date();
     const costoAbbMensileCorrente = abbonamenti.reduce(
-      (s, ab) => s + costoMensileAbbonamento(ab, meseCorrente.getFullYear(), meseCorrente.getMonth()), 0
+      (s, ab) => s + costoMensileAbbonamento(ab, oggi.getFullYear(), oggi.getMonth()), 0
     );
 
     return {
       accettati, totaleContrattualizzato, inviati, rifiutati,
       tassoAccettazione, totalePagato, totaleNonPagato, totaleIncassatoEffettivo,
-      guadagnoAlGiorno, guadagnoAllOra, giorniLavorativiAnno,
+      guadagnoAlGiorno, guadagnoAllOra, giorniLavorativiAnno, perPreventivo,
       mesi, maxValore, mediaIncassatoMensile, mediaNettoMensile,
       costoAbbMensileCorrente,
     };
-  }, [preventivi, abbonamenti, includiDaIncassare]);
+  }, [preventivi, abbonamenti, fatture, includiDaIncassare]);
 
   return (
     <div className="min-h-screen text-text">
@@ -182,8 +167,8 @@ export default function StatisticheDashboard({
         <div className="kpi-griglia md:grid-cols-4">
           {[
             { label: 'CONTRATTUALIZZATO', value: fmt(stats.totaleContrattualizzato), sub: `${stats.accettati.length} progetti`, color: 'text-text' },
-            { label: 'INCASSATO',         value: fmt(stats.totaleIncassatoEffettivo), sub: includiDaIncassare ? 'pagato + da incassare' : 'tranches pagate', color: 'text-green-400' },
-            { label: 'DA INCASSARE',      value: includiDaIncassare ? '—' : fmt(stats.totaleNonPagato), sub: includiDaIncassare ? 'incluso nel calcolo' : 'tranches in attesa', color: includiDaIncassare ? 'text-dim' : 'text-accent' },
+            { label: 'INCASSATO',         value: fmt(stats.totaleIncassatoEffettivo), sub: includiDaIncassare ? 'pagato + da incassare' : 'fatture pagate e tranche', color: 'text-green-400' },
+            { label: 'DA INCASSARE',      value: includiDaIncassare ? '—' : fmt(stats.totaleNonPagato), sub: includiDaIncassare ? 'incluso nel calcolo' : 'residuo dei lavori accettati', color: includiDaIncassare ? 'text-dim' : 'text-accent' },
             { label: 'TASSO ACCETTAZIONE',value: `${stats.tassoAccettazione}%`,      sub: `${stats.rifiutati} rifiutati · ${stats.inviati} in attesa`, color: 'text-text' },
           ].map((k) => (
             <div key={k.label} className="kpi">
@@ -198,7 +183,7 @@ export default function StatisticheDashboard({
         <div className="kpi-griglia sm:grid-cols-3">
           {[
             { label: 'MEDIA NETTO/MESE',   value: fmt(stats.mediaNettoMensile),  sub: 'incassato − abbonamenti', color: stats.mediaNettoMensile >= 0 ? 'text-text' : 'text-red-400' },
-            { label: 'TARIFFA GIORNALIERA',value: stats.guadagnoAlGiorno > 0 ? fmt(stats.guadagnoAlGiorno) : '—', sub: `${stats.giorniLavorativiAnno} giorni lav.`, color: 'text-accent' },
+            { label: 'TARIFFA GIORNALIERA',value: stats.guadagnoAlGiorno > 0 ? fmt(stats.guadagnoAlGiorno) : '—', sub: `${stats.giorniLavorativiAnno} giorni lav. in 12 mesi`, color: 'text-accent' },
             { label: 'TARIFFA ORARIA',     value: stats.guadagnoAllOra > 0 ? fmt(stats.guadagnoAllOra) : '—', sub: '8h/giorno', color: 'text-accent' },
           ].map((k) => (
             <div key={k.label} className="kpi">
@@ -272,7 +257,7 @@ export default function StatisticheDashboard({
               <p className={`font-bold text-base sm:text-lg tabular-nums ${stats.mediaNettoMensile >= 0 ? 'text-text' : 'text-red-400'}`}>
                 {fmt(stats.mediaNettoMensile)}
               </p>
-              <p className="text-dim text-xs mt-0.5">mesi trascorsi da ott.</p>
+              <p className="text-dim text-xs mt-0.5">ultimi 12 mesi</p>
             </div>
           </div>
         </div>
@@ -287,15 +272,13 @@ export default function StatisticheDashboard({
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2">
               {stats.accettati.map((p) => {
-                const pagato = p.tranches_stato && p.tranches_stato.length > 0
-                  ? p.tranches_stato.filter((t) => t.pagato).reduce((s, t) => s + Number(p.totale) * t.percentuale / 100, 0)
-                  : 0;
-                const nonPagato = Number(p.totale) - pagato;
+                const pagato = stats.perPreventivo.get(p.id) ?? 0;
+                const nonPagato = Math.max(0, Number(p.totale) - pagato);
                 const durata = p.lavoro_inizio && p.lavoro_fine
-                  ? Math.round((new Date(p.lavoro_fine).getTime() - new Date(p.lavoro_inizio).getTime()) / (1000 * 60 * 60 * 24))
+                  ? Math.round((new Date(p.lavoro_fine).getTime() - new Date(p.lavoro_inizio).getTime()) / (1000 * 60 * 60 * 24)) + 1 // inizio e fine inclusi
                   : null;
                 const tariffa = durata && durata > 0 ? pagato / durata : null;
-                const percPagato = Math.round((pagato / Number(p.totale)) * 100);
+                const percPagato = Math.min(100, Math.round((pagato / (Number(p.totale) || 1)) * 100));
 
                 return (
                   <div key={p.id} className="px-4 sm:px-5 py-4 border-b border-edge/50 last:border-0">
@@ -304,7 +287,7 @@ export default function StatisticheDashboard({
                         <p className="text-text text-sm font-semibold truncate">{p.oggetto}</p>
                         <p className="text-muted text-xs">{p.cliente_nome}</p>
                         <div className="flex gap-3 mt-1 flex-wrap">
-                          {durata !== null && <p className="text-blue-400 text-xs">{durata} giorni</p>}
+                          {durata !== null && <p className="text-blue-400 text-xs">{durata} {durata === 1 ? 'giorno' : 'giorni'}</p>}
                           {tariffa !== null && <p className="text-accent text-xs">{`${fmt(tariffa)}/g`}</p>}
                           {nonPagato > 0 && <p className="text-amber-400 text-xs">{`${fmt(nonPagato)} da incassare`}</p>}
                         </div>
@@ -314,7 +297,7 @@ export default function StatisticheDashboard({
                         {pagato > 0 && <p className="text-green-400 text-xs">{`${fmt(pagato)} incassati`}</p>}
                       </div>
                     </div>
-                    {p.tranches_stato && p.tranches_stato.length > 0 && (
+                    {pagato > 0 && (
                       <div className="mt-2 h-1 bg-edge rounded-full overflow-hidden">
                         <div className="h-full bg-green-400 rounded-full transition-all" style={{ width: `${percPagato}%` }} />
                       </div>

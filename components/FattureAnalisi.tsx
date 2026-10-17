@@ -3,9 +3,7 @@
 import { useMemo, useState } from 'react';
 import type { FatturaSalvata } from './FattureDashboard';
 import { calcolaAnalisi, SOGLIA_FORFETTARIO } from '@/lib/fattura/analisi';
-
-// it-IT non raggruppa sotto le 10.000: raggruppo a mano
-const fmt = (n: number) => `€${Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+import { euro as fmt } from '@/lib/formato';
 
 export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[] }) {
   const anni = useMemo(
@@ -20,9 +18,9 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
 
   return (
     <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-dim text-xs font-medium">ANALISI</p>
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto">
           {anni.map((a) => (
             <button
               key={a}
@@ -37,44 +35,44 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-surface border border-edge rounded-xl p-5">
-          <p className="text-dim text-xs font-medium mb-3">FATTURATO {anno}</p>
-          <p className="text-3xl font-bold">{fmt(s.fatturato)}</p>
-          <p className="text-dim text-xs mt-2">
+      <div className="kpi-griglia md:grid-cols-4">
+        <div className="kpi">
+          <p className="kpi-etichetta">FATTURATO {anno}</p>
+          <p className="kpi-valore">{fmt(s.fatturato)}</p>
+          <p className="kpi-nota">
             {delta !== null
               ? <><span className={delta >= 0 ? 'text-green-400' : 'text-red-400'}>{delta >= 0 ? '+' : ''}{delta}%</span> vs {anno - 1}</>
               : `di cui ${fmt(s.contributo)} rivalsa INPS`}
           </p>
         </div>
-        <div className="bg-surface border border-edge rounded-xl p-5">
-          <p className="text-dim text-xs font-medium mb-3">FATTURE EMESSE</p>
-          <p className="text-3xl font-bold">{s.n}</p>
-          <p className="text-dim text-xs mt-2">media {fmt(s.n ? s.fatturato / s.n : 0)} a fattura</p>
+        <div className="kpi">
+          <p className="kpi-etichetta">FATTURE EMESSE</p>
+          <p className="kpi-valore">{s.n}</p>
+          <p className="kpi-nota">media {fmt(s.n ? s.fatturato / s.n : 0)} a fattura</p>
         </div>
-        <div className="bg-surface border border-edge rounded-xl p-5">
-          <p className="text-dim text-xs font-medium mb-3">DA INCASSARE</p>
-          <p className={`text-3xl font-bold ${s.daIncassare > 0 ? '' : 'text-accent'}`}>{fmt(s.daIncassare)}</p>
-          <p className="text-dim text-xs mt-2">{s.aperte ? `${s.aperte} fatture aperte` : 'tutto incassato'}</p>
+        <div className="kpi">
+          <p className="kpi-etichetta">DA INCASSARE</p>
+          <p className={`kpi-valore ${s.daIncassare > 0 ? '' : 'text-accent'}`}>{fmt(s.daIncassare)}</p>
+          <p className="kpi-nota">{s.aperte ? `${s.aperte} ${s.aperte === 1 ? 'fattura aperta' : 'fatture aperte'}` : 'tutto incassato'}</p>
         </div>
-        <div className="bg-surface border border-edge rounded-xl p-5">
-          <p className="text-dim text-xs font-medium mb-3">SOGLIA FORFETTARIO</p>
-          <p className={`text-3xl font-bold ${s.soglia >= 90 ? 'text-red-400' : ''}`}>{Math.round(s.soglia)}%</p>
+        <div className="kpi">
+          <p className="kpi-etichetta">SOGLIA FORFETTARIO</p>
+          <p className={`kpi-valore ${s.soglia >= 90 ? 'text-red-400' : ''}`}>{Math.round(s.soglia)}%</p>
           <div className="h-1.5 bg-surface2 rounded-full mt-3 overflow-hidden">
             <div
               className={`h-full rounded-full ${s.soglia >= 90 ? 'bg-red-400' : 'bg-accent'}`}
               style={{ width: `${s.soglia}%` }}
             />
           </div>
-          <p className="text-dim text-xs mt-2">
+          <p className="kpi-nota">
             {fmt(Math.max(0, SOGLIA_FORFETTARIO - s.fatturato))} residui su {fmt(SOGLIA_FORFETTARIO)}
           </p>
         </div>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Andamento mensile */}
-        <div className="bg-surface border border-edge rounded-xl p-6">
+        <div className="scheda">
           <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
             <p className="text-dim text-xs font-medium">FATTURATO MENSILE {anno}</p>
             <div className="flex gap-4">
@@ -89,13 +87,13 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
               ))}
             </div>
           </div>
-          <div className="flex items-end gap-1.5">
-            {s.mesi.map((m) => {
+          <div className="flex items-end gap-1 sm:gap-1.5">
+            {s.mesi.map((m, i) => {
               const tot = m.pagato + m.aperto;
               return (
                 <div key={m.label} className="flex-1 flex flex-col items-center gap-1 group relative">
                   {tot > 0 && (
-                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-surface2 border border-edge rounded-lg p-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
+                    <div className={`absolute bottom-full mb-2 ${i < 3 ? 'left-0' : i > 8 ? 'right-0' : 'left-1/2 -translate-x-1/2'} bg-surface2 border border-edge rounded-lg p-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none`}>
                       <p className="text-text font-medium">{fmt(tot)} · {m.n} {m.n === 1 ? 'fattura' : 'fatture'}</p>
                       {m.aperto > 0 && <p className="text-muted">{fmt(m.aperto)} da incassare</p>}
                     </div>
@@ -109,7 +107,7 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
                       style={{ height: tot === 0 ? 2 : (m.pagato / s.maxMese) * 120 }}
                     />
                   </div>
-                  <p className="text-dim text-xs">{m.label}</p>
+                  <p className="text-dim text-[10px] sm:text-xs">{m.label}</p>
                 </div>
               );
             })}
@@ -117,7 +115,7 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
         </div>
 
         {/* Clienti */}
-        <div className="bg-surface border border-edge rounded-xl p-6">
+        <div className="scheda">
           <p className="text-dim text-xs font-medium mb-4">CLIENTI {anno}</p>
           <div className="flex flex-col gap-3.5">
             {s.clienti.slice(0, 6).map((c) => (
@@ -130,7 +128,7 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
                   <div className="flex-1 h-1 bg-surface2 rounded-full overflow-hidden">
                     <div className="h-full bg-accent rounded-full" style={{ width: `${(c.totale / s.fatturato) * 100}%` }} />
                   </div>
-                  <p className="text-dim text-xs w-16 text-right">{Math.round((c.totale / s.fatturato) * 100)}% · {c.n}</p>
+                  <p className="text-dim text-xs w-16 text-right tabular-nums">{Math.round((c.totale / s.fatturato) * 100)}% · {c.n}</p>
                 </div>
               </div>
             ))}

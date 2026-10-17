@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { Fattura } from '@/lib/fattura/parse';
-import { eur } from '@/lib/fattura/html';
+import { euroCent as eur } from '@/lib/formato';
 import { suggerisciPreventivi, type PreventivoCollegabile } from '@/lib/fattura/collegamenti';
 import type { FatturaSalvata } from './FattureDashboard';
 

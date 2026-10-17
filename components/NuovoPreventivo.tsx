@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { euroCent } from '@/lib/formato';
 
 const JSON_TEST = {
   "cliente": {
@@ -159,17 +160,17 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
   const iva = preview?.preventivo?.iva === true ? imponibile * 0.22 : 0;
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-4 sm:py-8 px-4">
       <div className="bg-surface border border-edge rounded-2xl w-full max-w-4xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-edge">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-edge">
           <h2 className="text-text font-semibold">Nuovo preventivo</h2>
           <button onClick={onClose} className="text-muted hover:text-text transition-colors">✕</button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* Editor JSON */}
-          <div className="p-6 border-r border-edge">
+          <div className="p-4 sm:p-6 md:border-r border-b md:border-b-0 border-edge min-w-0">
             <div className="flex items-center justify-between mb-3">
               <p className="text-dim text-sm font-mono">JSON PREVENTIVO</p>
               <div className="flex gap-3">
@@ -215,7 +216,7 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
           </div>
 
           {/* Preview */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6 min-w-0">
             <p className="text-dim text-sm font-mono mb-3">ANTEPRIMA</p>
             {!preview ? (
               <div className="h-96 flex items-center justify-center text-dim text-sm">
@@ -258,22 +259,22 @@ export default function NuovoPreventivo({ onClose, onSuccess }: { onClose: () =>
                   {preview.sezioni.voci.items.map((v: any, i: number) => (
                     <div key={i} className="flex justify-between text-sm py-1 border-b border-edge last:border-0">
                       <span className="text-muted">{v.descrizione}</span>
-                      <span className="text-text">€{(v.quantita * v.prezzo).toLocaleString('it-IT')}</span>
+                      <span className="text-text">{euroCent((v.quantita * v.prezzo))}</span>
                     </div>
                   ))}
                   <div className="flex justify-between text-sm pt-2 mt-1">
                     <span className="text-muted">Imponibile</span>
-                    <span className="text-text">€{imponibile.toLocaleString('it-IT')}</span>
+                    <span className="text-text">{euroCent(imponibile)}</span>
                   </div>
                   {preview.preventivo.iva === true && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted">IVA 22%</span>
-                      <span className="text-text">€{iva.toLocaleString('it-IT')}</span>
+                      <span className="text-text">{euroCent(iva)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-semibold pt-2 border-t border-slate mt-1">
                     <span className="text-text">Totale</span>
-                    <span className="text-text">€{(imponibile + iva).toLocaleString('it-IT')}</span>
+                    <span className="text-text">{euroCent((imponibile + iva))}</span>
                   </div>
                 </div>
 

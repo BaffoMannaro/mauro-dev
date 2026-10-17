@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
 import { FONTI } from '@/lib/fonti';
+import { euro, euroCent } from '@/lib/formato';
 
 interface Cliente {
   id: number;
@@ -80,7 +81,7 @@ interface AltroCliente {
   email: string | null;
 }
 
-const fmt = (n: number) => `€${n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = euroCent;
 const fmtData = (d: string | null) => (d ? new Date(d).toLocaleDateString('it-IT') : '—');
 
 const STATO: Record<string, { label: string; cls: string }> = {
@@ -291,53 +292,53 @@ export default function ClienteDettaglio({
   return (
     <div className="min-h-screen text-text">
       {/* Header */}
-      <header className="border-b border-edge px-6 py-5">
+      <header className="border-b border-edge px-4 py-4 sm:px-6 sm:py-5">
         <Link href="/clienti" className="text-dim hover:text-text text-sm transition-colors">← Clienti</Link>
-        <div className="flex items-start justify-between gap-3 mt-2">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mt-2">
           <div className="min-w-0">
-            <h1 className="text-xl font-semibold truncate">{cliente.nome}</h1>
+            <h1 className="titolo-pagina">{cliente.nome}</h1>
             {cliente.azienda && cliente.azienda !== cliente.nome && (
               <p className="text-muted text-sm">{cliente.azienda}</p>
             )}
             <p className="text-dim text-xs mt-1">Cliente dal {fmtData(cliente.data_inizio)}</p>
           </div>
-          <div className="flex gap-2 shrink-0 items-center">
+          <div className="flex flex-wrap gap-2 shrink-0 items-center">
             <select
               value={cliente.fonte ?? ''}
               onChange={(e) => cambiaFonte(e.target.value)}
               title="Fonte del cliente (interna, non visibile nei preventivi)"
               aria-label="Fonte del cliente"
-              className={`text-xs px-2 py-1.5 bg-surface2 border rounded-lg focus:outline-none cursor-pointer ${cliente.fonte ? 'border-edge text-muted' : 'border-amber-400/50 text-amber-400'}`}
+              className={`max-sm:w-full text-xs px-2 py-1.5 bg-surface2 border rounded-lg focus:outline-none cursor-pointer ${cliente.fonte ? 'border-edge text-muted' : 'border-amber-400/50 text-amber-400'}`}
             >
               <option value="">Fonte: da assegnare</option>
               {FONTI.map((f) => <option key={f.id} value={f.id}>Fonte: {f.label}</option>)}
             </select>
-            <button onClick={() => setShowEdit(true)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Modifica</button>
-            <button onClick={() => { setMergeErr(''); setShowMerge(true); }} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Unisci</button>
-            <button onClick={elimina} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors">Elimina</button>
+            <button onClick={() => setShowEdit(true)} className="max-sm:flex-1 text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Modifica</button>
+            <button onClick={() => { setMergeErr(''); setShowMerge(true); }} className="max-sm:flex-1 text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">Unisci</button>
+            <button onClick={elimina} className="max-sm:flex-1 text-xs px-3 py-1.5 bg-surface2 hover:bg-red-950/50 text-red-400 rounded-lg transition-colors">Elimina</button>
           </div>
         </div>
       </header>
 
-      <div className="px-6 py-6 max-w-5xl mx-auto flex flex-col gap-6">
+      <div className="corpo max-w-5xl">
         {/* Recap importi */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="kpi-griglia sm:grid-cols-3">
           {[
-            { label: 'TOTALE', value: fmt(finanza.totale), color: 'text-text' },
-            { label: 'RICEVUTI', value: fmt(finanza.ricevuto), color: 'text-green-400' },
-            { label: 'DA RICEVERE', value: fmt(finanza.daDare), color: 'text-amber-400' },
+            { label: 'TOTALE', value: euro(finanza.totale), color: 'text-text' },
+            { label: 'RICEVUTI', value: euro(finanza.ricevuto), color: 'text-green-400' },
+            { label: 'DA RICEVERE', value: euro(finanza.daDare), color: 'text-amber-400' },
           ].map((k) => (
-            <div key={k.label} className="bg-surface border border-edge rounded-xl p-5">
-              <p className="text-dim text-xs font-medium mb-2">{k.label}</p>
-              <p className={`text-xl md:text-2xl font-bold ${k.color}`}>{k.value}</p>
+            <div key={k.label} className="kpi">
+              <p className="kpi-etichetta">{k.label}</p>
+              <p className={`kpi-valore ${k.color}`}>{k.value}</p>
             </div>
           ))}
         </div>
 
         {/* Anagrafica */}
-        <section className="bg-surface border border-edge rounded-xl p-5">
+        <section className="scheda">
           <h2 className="text-text font-semibold text-sm mb-4">Anagrafica</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 [&_p]:break-words">
             <Anagrafica label="Email" value={cliente.email} />
             <Anagrafica label="Telefono" value={cliente.telefono} />
             <Anagrafica label="P. IVA" value={cliente.piva} />
@@ -354,7 +355,7 @@ export default function ClienteDettaglio({
 
         {/* Società / dati fiscali (dalle fatture: fonte di verità) */}
         {societa.length > 0 && (
-          <section className="bg-surface border border-edge rounded-xl p-5">
+          <section className="scheda">
             <h2 className="text-text font-semibold text-sm mb-1">Società / dati fiscali <span className="text-dim font-normal">({societa.length})</span></h2>
             <p className="text-dim text-xs mb-4">Aggiornati automaticamente dall’ultima fattura di ciascuna società.</p>
             <div className="flex flex-col gap-2">
@@ -371,7 +372,7 @@ export default function ClienteDettaglio({
                     )}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-text text-sm font-semibold">€{Math.round(s.fatturato).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</p>
+                    <p className="text-text text-sm font-semibold tabular-nums">{euro(s.fatturato)}</p>
                     <p className="text-dim text-xs">{s.fatture} {s.fatture === 1 ? 'fattura' : 'fatture'}</p>
                   </div>
                 </div>
@@ -381,7 +382,7 @@ export default function ClienteDettaglio({
         )}
 
         {/* Preventivi */}
-        <section className="bg-surface border border-edge rounded-xl p-5">
+        <section className="scheda">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-text font-semibold text-sm">Preventivi <span className="text-dim font-normal">({preventivi.length})</span></h2>
             <button onClick={() => setShowAssoc(true)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">+ Collega preventivo</button>
@@ -414,7 +415,7 @@ export default function ClienteDettaglio({
 
         {/* Lavori */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <section className="bg-surface border border-edge rounded-xl p-5">
+          <section className="scheda">
             <h2 className="text-text font-semibold text-sm mb-3">In corso <span className="text-dim font-normal">({inCorso.length})</span></h2>
             {inCorso.length === 0 ? (
               <p className="text-dim text-sm">Nessun lavoro in corso.</p>
@@ -429,7 +430,7 @@ export default function ClienteDettaglio({
               </div>
             )}
           </section>
-          <section className="bg-surface border border-edge rounded-xl p-5">
+          <section className="scheda">
             <h2 className="text-text font-semibold text-sm mb-3">Completati <span className="text-dim font-normal">({completati.length})</span></h2>
             {completati.length === 0 ? (
               <p className="text-dim text-sm">Nessun lavoro completato.</p>
@@ -447,7 +448,7 @@ export default function ClienteDettaglio({
         </div>
 
         {/* Portale cliente */}
-        <section className="bg-surface border border-edge rounded-xl p-5">
+        <section className="scheda">
           <div className="flex items-center justify-between gap-3 mb-2">
             <h2 className="text-text font-semibold text-sm">Portale cliente</h2>
             {cliente.portale_attivo && (
@@ -487,7 +488,7 @@ export default function ClienteDettaglio({
         </section>
 
         {/* Fatture */}
-        <section className="bg-surface border border-edge rounded-xl p-5">
+        <section className="scheda">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-text font-semibold text-sm">Fatture <span className="text-dim font-normal">({fatture.length})</span></h2>
             <button onClick={() => setShowFattura((v) => !v)} className="text-xs px-3 py-1.5 bg-surface2 hover:bg-slate text-muted hover:text-text rounded-lg transition-colors">
@@ -568,8 +569,8 @@ export default function ClienteDettaglio({
 
       {/* Modal modifica anagrafica */}
       {showEdit && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-4 sm:py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-5 sm:p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-text font-semibold">Modifica cliente</h2>
               <button onClick={() => setShowEdit(false)} className="text-dim hover:text-text transition-colors">✕</button>
@@ -579,7 +580,7 @@ export default function ClienteDettaglio({
                 <label className="text-dim text-xs font-medium block mb-1">NOME *</label>
                 <input type="text" value={form.nome} onChange={(e) => set('nome', e.target.value)} className={inputCls} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">AZIENDA</label>
                   <input type="text" value={form.azienda} onChange={(e) => set('azienda', e.target.value)} className={inputCls} />
@@ -589,7 +590,7 @@ export default function ClienteDettaglio({
                   <input type="date" value={form.data_inizio} onChange={(e) => set('data_inizio', e.target.value)} className={inputCls} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">EMAIL</label>
                   <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={inputCls} />
@@ -599,7 +600,7 @@ export default function ClienteDettaglio({
                   <input type="text" value={form.telefono} onChange={(e) => set('telefono', e.target.value)} className={inputCls} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">P. IVA</label>
                   <input type="text" value={form.piva} onChange={(e) => set('piva', e.target.value)} className={inputCls} />
@@ -613,7 +614,7 @@ export default function ClienteDettaglio({
                 <label className="text-dim text-xs font-medium block mb-1">INDIRIZZO</label>
                 <input type="text" value={form.indirizzo} onChange={(e) => set('indirizzo', e.target.value)} className={inputCls} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">PEC</label>
                   <input type="email" value={form.pec} onChange={(e) => set('pec', e.target.value)} className={inputCls} />
@@ -640,8 +641,8 @@ export default function ClienteDettaglio({
 
       {/* Modal associa preventivo */}
       {showAssoc && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-4 sm:py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-5 sm:p-6">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-text font-semibold">Collega un preventivo</h2>
               <button onClick={() => setShowAssoc(false)} className="text-dim hover:text-text transition-colors">✕</button>
@@ -677,8 +678,8 @@ export default function ClienteDettaglio({
 
       {/* Modal unisci cliente */}
       {showMerge && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-4 sm:py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-5 sm:p-6">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-text font-semibold">Unisci un cliente in questo</h2>
               <button onClick={() => setShowMerge(false)} className="text-dim hover:text-text transition-colors">✕</button>

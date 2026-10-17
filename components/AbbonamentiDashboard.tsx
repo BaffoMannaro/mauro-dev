@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { euro, euroCent } from '@/lib/formato';
 
 interface Abbonamento {
   id: number;
@@ -143,7 +144,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
   const [errore, setErrore] = useState('');
   const [filtroTag, setFiltroTag] = useState<string | null>(null);
 
-  const fmt = (n: number) => `€${n.toLocaleString('it-IT', { minimumFractionDigits: 2 })}`;
+  const fmt = euroCent;
 
   const totMensile  = abbonamenti.reduce((s, ab) => s + costoMensile(ab), 0);
   const totAnnuale  = abbonamenti.reduce((s, ab) => s + costoAnnuale(ab), 0);
@@ -221,8 +222,8 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
     <div className="min-h-screen text-text">
 
       {/* Header */}
-      <header className="border-b border-edge px-6 py-5 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Abbonamenti</h1>
+      <header className="testata">
+        <h1 className="titolo-pagina">Abbonamenti</h1>
         <button
           onClick={() => { setEditId(null); setShowForm(true); setErrore(''); }}
           className="text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
@@ -231,34 +232,34 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
         </button>
       </header>
 
-      <div className="px-6 py-6 max-w-6xl mx-auto flex flex-col gap-6">
+      <div className="corpo max-w-6xl">
 
         {/* KPI */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="kpi-griglia sm:grid-cols-3">
           {[
-            { label: 'COSTO MENSILE',  value: fmt(totMensile),  sub: 'abbonamenti attivi',  color: 'text-accent' },
-            { label: 'COSTO ANNUALE',  value: fmt(totAnnuale),  sub: 'proiezione 12 mesi',  color: 'text-amber-400' },
-            { label: 'UNA TANTUM',     value: fmt(totUnaVolta), sub: 'spese singole attive', color: 'text-muted' },
+            { label: 'COSTO MENSILE',  value: euro(totMensile),  sub: 'abbonamenti attivi',  color: 'text-accent' },
+            { label: 'COSTO ANNUALE',  value: euro(totAnnuale),  sub: 'proiezione 12 mesi',  color: 'text-amber-400' },
+            { label: 'UNA TANTUM',     value: euro(totUnaVolta), sub: 'spese singole attive', color: 'text-muted' },
           ].map((k) => (
-            <div key={k.label} className="bg-surface border border-edge rounded-xl p-5">
-              <p className="text-dim text-xs font-medium mb-3">{k.label}</p>
-              <p className={`text-3xl font-bold ${k.color}`}>{k.value}</p>
-              <p className="text-dim text-xs mt-2">{k.sub}</p>
+            <div key={k.label} className="kpi">
+              <p className="kpi-etichetta">{k.label}</p>
+              <p className={`kpi-valore ${k.color}`}>{k.value}</p>
+              <p className="kpi-nota">{k.sub}</p>
             </div>
           ))}
         </div>
 
         {/* Filtri tag */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto sm:flex-wrap scrollbar-nascosta">
           <button
             onClick={() => setFiltroTag(null)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filtroTag === null ? 'bg-accent text-on-accent' : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'}`}
+            className={`shrink-0 whitespace-nowrap px-3.5 sm:px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filtroTag === null ? 'bg-accent text-on-accent' : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'}`}
           >
             Tutti <span className="ml-1 text-xs opacity-60">{abbonamenti.length}</span>
           </button>
           {TAGS.map((t) => (
             <button key={t} onClick={() => setFiltroTag(filtroTag === t ? null : t)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${filtroTag === t ? TAG_COLOR[t] : 'bg-surface2 text-muted border-edge hover:text-text hover:border-slate'}`}
+              className={`shrink-0 whitespace-nowrap px-3.5 sm:px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${filtroTag === t ? TAG_COLOR[t] : 'bg-surface2 text-muted border-edge hover:text-text hover:border-slate'}`}
             >
               {t} <span className="ml-1 text-xs opacity-60">{abbonamenti.filter((a) => a.tag === t).length}</span>
             </button>
@@ -272,11 +273,11 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
             <p className="text-sm mt-1">Clicca "+ Nuovo" per aggiungerne uno</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {filtrati.map((ab) => (
               <div
                 key={ab.id}
-                className={`bg-surface border rounded-xl p-5 transition-colors ${!ab.attivo || isScaduto(ab) ? 'border-edge opacity-50' : 'border-edge hover:border-slate'}`}
+                className={`bg-surface border rounded-xl p-4 sm:p-5 transition-colors ${!ab.attivo || isScaduto(ab) ? 'border-edge opacity-50' : 'border-edge hover:border-slate'}`}
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex-1 min-w-0">
@@ -298,7 +299,7 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
                     {ab.note && <p className="text-dim text-xs mt-1">{ab.note}</p>}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-text font-bold text-lg">{fmt(Number(ab.cifra))}</p>
+                    <p className="text-text font-bold text-lg tabular-nums">{fmt(Number(ab.cifra))}</p>
                     {ab.cadenza === 'mensile' && (
                       <p className="text-dim text-xs">{fmt(Number(ab.cifra) * 12)}/anno</p>
                     )}
@@ -329,8 +330,8 @@ export default function AbbonamentiDashboard({ abbonamenti: initial }: { abbonam
 
       {/* Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center px-4">
-          <div className="bg-surface border border-edge rounded-2xl w-full max-w-md p-6">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start sm:items-center justify-center overflow-y-auto py-4 sm:py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-md p-5 sm:p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-text font-semibold">
                 {editId !== null ? 'Modifica abbonamento' : 'Nuovo abbonamento'}

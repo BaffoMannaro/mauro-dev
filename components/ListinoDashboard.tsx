@@ -4,8 +4,8 @@ import { Fragment, useMemo, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { calcolaListino, daClassificare, type Azione, type Osservazione, type Statistica } from '@/lib/listino';
 import { FONTI, FONTE_BADGE, fonteLabel } from '@/lib/fonti';
+import { euro as fmt } from '@/lib/formato';
 
-const fmt = (n: number) => `€${Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 const dataIt = (d: string) => d.split('-').reverse().join('/');
 const FONTI_IDS = FONTI.map((f) => f.id as string);
 
@@ -16,7 +16,7 @@ function Cella({ s }: { s: Statistica | null }) {
   if (!s) return <span className="text-dim">—</span>;
   return (
     <div>
-      <p className="text-text font-semibold">{fmt(s.media)}</p>
+      <p className="text-text font-semibold tabular-nums">{fmt(s.media)}</p>
       <p className="text-dim text-xs whitespace-nowrap">
         {s.n}× {s.n > 1 && <>· {fmt(s.min)}–{fmt(s.max)}</>}
       </p>
@@ -71,14 +71,14 @@ export default function ListinoDashboard({ osservazioni, azioni }: { osservazion
 
   return (
     <div className="min-h-screen text-text">
-      <header className="border-b border-edge px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-xl font-semibold">Listino</h1>
-          <p className="text-dim text-sm mt-0.5">
+      <header className="testata">
+        <div className="min-w-0 flex-1 basis-64">
+          <h1 className="titolo-pagina">Listino</h1>
+          <p className="text-dim text-sm mt-1">
             Quanto quoti ogni tipo di lavoro, per fonte del cliente. Interno: non compare mai nei preventivi.
           </p>
         </div>
-        <label className="flex items-center gap-3 cursor-pointer select-none">
+        <label className="flex items-center gap-3 cursor-pointer select-none shrink-0">
           <span className="text-sm text-muted">Solo lavori svolti</span>
           <button
             type="button"
@@ -92,20 +92,20 @@ export default function ListinoDashboard({ osservazioni, azioni }: { osservazion
         </label>
       </header>
 
-      <div className={`px-6 py-6 max-w-6xl mx-auto flex flex-col gap-6 ${pending ? 'opacity-60' : ''}`}>
+      <div className={`corpo max-w-6xl ${pending ? 'opacity-60' : ''}`}>
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted">
           <span><strong className="text-text">{classificate}</strong> voci classificate su {osservazioni.length}</span>
           <span><strong className="text-text">{azioni.length}</strong> azioni</span>
           {clientiSenzaFonte > 0 && (
-            <a href="/clienti" className="text-amber-400 hover:underline">{clientiSenzaFonte} clienti senza fonte →</a>
+            <a href="/clienti" className="text-amber-400 hover:underline">{clientiSenzaFonte} {clientiSenzaFonte === 1 ? 'cliente' : 'clienti'} senza fonte →</a>
           )}
         </div>
 
         {errore && <p className="text-red-400 text-xs font-mono">⚠ {errore}</p>}
 
         {/* Listino */}
-        <section className="bg-surface border border-edge rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-edge flex items-center justify-between gap-3 flex-wrap">
+        <section className="bg-surface border border-edge rounded-xl overflow-hidden min-w-0">
+          <div className="px-4 sm:px-5 py-4 border-b border-edge flex items-center justify-between gap-3 flex-wrap">
             <p className="text-dim text-xs font-medium">PREZZO MEDIO PER AZIONE {soloSvolti ? '· lavori accettati o fatturati' : '· tutti i preventivi'}</p>
             <form
               onSubmit={(e) => {
@@ -113,19 +113,64 @@ export default function ListinoDashboard({ osservazioni, azioni }: { osservazion
                 if (!nuovaAzione.trim()) return;
                 esegui(() => api('/api/listino/azioni', 'POST', { nome: nuovaAzione })).then(() => setNuovaAzione(''));
               }}
-              className="flex gap-2"
+              className="flex gap-2 max-sm:w-full"
             >
-              <input value={nuovaAzione} onChange={(e) => setNuovaAzione(e.target.value)} placeholder="Nuova azione…" className={`${inputCls} w-44`} />
+              <input value={nuovaAzione} onChange={(e) => setNuovaAzione(e.target.value)} placeholder="Nuova azione…" className={`${inputCls} min-w-0 flex-1 sm:flex-none sm:w-44`} />
               <button className="px-3 py-1.5 bg-accent text-on-accent text-xs font-semibold rounded-lg cursor-pointer">Aggiungi</button>
             </form>
           </div>
 
           {righe.length === 0 ? (
-            <p className="text-dim text-sm px-5 py-6">
+            <p className="text-dim text-sm px-4 sm:px-5 py-6">
               Nessuna azione ancora. Creane una o chiedi a Claude: <em>“classifica le voci del listino”</em>.
             </p>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            {/* Mobile: una scheda per azione, con i prezzi per fonte in griglia */}
+            <div className="sm:hidden">
+              {righe.map((r, i) => {
+                const prevCat = i > 0 ? righe[i - 1].azione.categoria : undefined;
+                const voci = osservazioni.filter((o) => o.azione_id === r.azione.id && (!soloSvolti || o.svolto));
+                const colonne = [
+                  ...FONTI.map((f) => ({ id: f.id as string, label: f.label, s: r.per_fonte[f.id], cls: '' })),
+                  ...(conSenzaFonte ? [{ id: 'nessuna', label: 'Senza fonte', s: r.per_fonte.nessuna, cls: 'text-amber-400' }] : []),
+                ];
+                return (
+                  <Fragment key={r.azione.id}>
+                    {r.azione.categoria && r.azione.categoria !== prevCat && (
+                      <p className="px-4 pt-4 pb-1 text-dim text-xs font-medium uppercase tracking-wider">{r.azione.categoria}</p>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setAperta(aperta === r.azione.id ? null : r.azione.id)}
+                      className={`w-full text-left px-4 py-3 border-t border-edge/60 text-sm transition-colors cursor-pointer ${aperta === r.azione.id ? 'bg-surface2' : ''}`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-medium">{r.azione.nome}</p>
+                          {r.azione.unita && <p className="text-dim text-xs">{r.azione.unita}</p>}
+                        </div>
+                        <div className="text-right shrink-0"><Cella s={r.per_fonte.tutte} /></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2.5 pt-2.5 border-t border-edge/40">
+                        {colonne.map((c) => (
+                          <div key={c.id} className="min-w-0">
+                            <p className={`text-[11px] font-medium mb-0.5 ${c.cls || 'text-dim'}`}>{c.label}</p>
+                            <Cella s={c.s} />
+                          </div>
+                        ))}
+                      </div>
+                    </button>
+                    {aperta === r.azione.id && (
+                      <div className="bg-surface2/60 px-4 pb-4">
+                        <DettaglioAzione azione={r.azione} voci={voci} azioni={azioni} esegui={esegui} />
+                      </div>
+                    )}
+                  </Fragment>
+                );
+              })}
+            </div>
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-dim text-xs text-left">
@@ -173,13 +218,14 @@ export default function ListinoDashboard({ osservazioni, azioni }: { osservazion
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </section>
 
         {/* Da classificare */}
         {libere.length > 0 && (
-          <section className="bg-surface border border-edge rounded-xl overflow-hidden">
-            <div className="px-5 py-4 border-b border-edge">
+          <section className="bg-surface border border-edge rounded-xl overflow-hidden min-w-0">
+            <div className="px-4 sm:px-5 py-4 border-b border-edge">
               <p className="text-dim text-xs font-medium">DA CLASSIFICARE ({libere.length})</p>
               <p className="text-dim text-xs mt-1">
                 Assegna ogni voce a un’azione: le stesse descrizioni in futuro verranno riconosciute da sole. Più veloce: chiedi a Claude
@@ -187,7 +233,7 @@ export default function ListinoDashboard({ osservazioni, azioni }: { osservazion
               </p>
             </div>
             {libere.map((g) => (
-              <div key={g.chiave} className="px-5 py-3 border-t border-edge/60 first:border-t-0 flex items-center gap-4 flex-wrap sm:flex-nowrap">
+              <div key={g.chiave} className="px-4 sm:px-5 py-3 border-t border-edge/60 first:border-t-0 flex items-center gap-x-4 gap-y-2 flex-wrap sm:flex-nowrap">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm truncate" title={g.descrizione}>{g.descrizione}</p>
                   <p className="text-dim text-xs truncate">
@@ -230,9 +276,9 @@ function DettaglioAzione({
   return (
     <div className="flex flex-col gap-3 pt-1">
       <div className="flex flex-wrap gap-2 items-center">
-        <input value={nome} onChange={(e) => setNome(e.target.value)} className={`${inputCls} w-52`} aria-label="Nome azione" />
-        <input value={categoria} onChange={(e) => setCategoria(e.target.value)} placeholder="Categoria (es. Siti web)" className={`${inputCls} w-44`} />
-        <input value={unita} onChange={(e) => setUnita(e.target.value)} placeholder="Unità (es. a pagina)" className={`${inputCls} w-36`} />
+        <input value={nome} onChange={(e) => setNome(e.target.value)} className={`${inputCls} w-full sm:w-52`} aria-label="Nome azione" />
+        <input value={categoria} onChange={(e) => setCategoria(e.target.value)} placeholder="Categoria (es. Siti web)" className={`${inputCls} min-w-0 flex-1 sm:flex-none sm:w-44`} />
+        <input value={unita} onChange={(e) => setUnita(e.target.value)} placeholder="Unità (es. a pagina)" className={`${inputCls} min-w-0 flex-1 sm:flex-none sm:w-36`} />
         <button
           onClick={() => esegui(() => api(`/api/listino/azioni/${azione.id}`, 'PATCH', { nome, categoria, unita }))}
           className="px-3 py-1.5 bg-accent text-on-accent text-xs font-semibold rounded-lg cursor-pointer"
@@ -246,7 +292,7 @@ function DettaglioAzione({
             confirm(`Unire "${azione.nome}" nell’azione scelta?`) &&
             esegui(() => api(`/api/listino/azioni/${azione.id}`, 'PATCH', { unisci_in: Number(e.target.value) }))
           }
-          className={`${inputCls} w-44`}
+          className={`${inputCls} min-w-0 flex-1 sm:flex-none sm:w-44`}
         >
           <option value="" disabled>Unisci in…</option>
           {azioni.filter((a) => a.id !== azione.id).map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
@@ -267,18 +313,19 @@ function DettaglioAzione({
       ) : (
         <div className="flex flex-col divide-y divide-edge/60 bg-surface rounded-lg border border-edge">
           {voci.map((v, i) => (
-            <div key={`${v.origine}-${v.rif_id}-${i}`} className="px-4 py-2.5 flex items-center gap-4 text-sm">
+            <div key={`${v.origine}-${v.rif_id}-${i}`} className="px-3 sm:px-4 py-2.5 flex items-center gap-2 sm:gap-4 text-sm">
               <div className="min-w-0 flex-1">
                 <p className="truncate" title={v.descrizione}>{v.descrizione}</p>
                 <p className="text-dim text-xs truncate">
                   {dataIt(v.data)} · {v.cliente} · {v.origine === 'preventivo' ? `Preventivo: ${v.rif}` : v.rif}
                   {!v.svolto && ` · ${v.stato}`}
+                  <span className="sm:hidden"> · {fonteLabel(v.fonte)}</span>
                 </p>
               </div>
-              <span className={`shrink-0 text-[10px] px-1.5 py-0.5 rounded border ${v.fonte ? FONTE_BADGE[v.fonte] : 'text-amber-400 border-amber-400/40'}`}>
+              <span className={`max-sm:hidden shrink-0 text-[10px] px-1.5 py-0.5 rounded border ${v.fonte ? FONTE_BADGE[v.fonte] : 'text-amber-400 border-amber-400/40'}`}>
                 {fonteLabel(v.fonte)}
               </span>
-              <p className="shrink-0 font-semibold w-24 text-right">
+              <p className="shrink-0 font-semibold sm:w-24 text-right tabular-nums">
                 {v.quantita !== 1 && <span className="text-dim font-normal text-xs">{v.quantita}× </span>}
                 {fmt(v.prezzo)}
               </p>

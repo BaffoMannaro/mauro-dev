@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { extractXml, parseFattura, TIPO_DOCUMENTO, type Fattura } from '@/lib/fattura/parse';
-import { renderFatturaHtml, nomeFilePdf, dataLunga, eur } from '@/lib/fattura/html';
+import { renderFatturaHtml, nomeFilePdf, dataLunga } from '@/lib/fattura/html';
+import { euroCent as eur } from '@/lib/formato';
 import FattureAnalisi from './FattureAnalisi';
 import FatturaCollegamento from './FatturaCollegamento';
 import type { PreventivoCollegabile } from '@/lib/fattura/collegamenti';
@@ -109,6 +110,14 @@ export default function FattureDashboard({
     try { return parseFattura(salvataSel.xml); } catch { return null; }
   }, [nuovaSel, salvataSel]);
   const conLogo = nuovaSel ? nuovaSel.conLogo : salvataSel ? salvataSel.con_logo : logoDefault;
+
+  // Su mobile l'anteprima copre la pagina: blocco lo scorrimento della lista sotto.
+  const apertaSuMobile = !!fatturaSel;
+  useEffect(() => {
+    if (!apertaSuMobile || window.matchMedia('(min-width: 1024px)').matches) return;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, [apertaSuMobile]);
 
   const inArchivio = (f: Fattura) => archivio.find((r) => r.numero === f.numero && r.anno === Number(f.data.slice(0, 4)));
 
@@ -277,10 +286,10 @@ export default function FattureDashboard({
   return (
     <div className="min-h-screen text-text">
 
-      <header className="border-b border-edge px-6 py-5 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">Fatture</h1>
-          <p className="text-dim text-sm mt-0.5">Carica l’XML dell’Agenzia delle Entrate, salvalo in archivio e scarica la copia di cortesia brandizzata.</p>
+      <header className="testata">
+        <div className="min-w-0 flex-1 basis-64">
+          <h1 className="titolo-pagina">Fatture</h1>
+          <p className="text-dim text-sm mt-1">Carica l’XML dell’Agenzia delle Entrate, salvalo in archivio e scarica la copia di cortesia brandizzata.</p>
         </div>
         <label className="flex items-center gap-3 cursor-pointer select-none shrink-0">
           <span className="text-sm text-muted">Logo nel PDF</span>
@@ -298,14 +307,14 @@ export default function FattureDashboard({
         </label>
       </header>
 
-      <div className="px-6 py-6 max-w-7xl mx-auto flex flex-col gap-8">
+      <div className="corpo max-w-7xl">
 
         {archivio.length > 0 && <FattureAnalisi archivio={archivio} />}
 
-        <div className="grid gap-6 lg:grid-cols-[380px_1fr] items-start">
+        <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[380px_minmax(0,1fr)] items-start">
 
           {/* ── Colonna sinistra: upload, da salvare, archivio ── */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 min-w-0">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
@@ -408,7 +417,7 @@ export default function FattureDashboard({
 
             {/* Archivio */}
             <section className="flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                 <p className="text-dim text-xs font-medium shrink-0">ARCHIVIO ({archivio.length})</p>
                 {archivio.length > 5 && (
                   <input
@@ -416,14 +425,14 @@ export default function FattureDashboard({
                     value={cerca}
                     onChange={(e) => setCerca(e.target.value)}
                     placeholder="Cerca cliente, numero…"
-                    className="w-full max-w-48 bg-bg border border-edge rounded-lg px-2.5 py-1 text-xs text-text placeholder-dim focus:outline-none focus:border-slate"
+                    className="w-full sm:max-w-48 bg-bg border border-edge rounded-lg px-2.5 py-1 text-xs text-text placeholder-dim focus:outline-none focus:border-slate"
                   />
                 )}
               </div>
               {archivio.length === 0 ? (
                 <p className="text-dim text-sm">Nessuna fattura salvata. Caricane una e premi “Salva”.</p>
               ) : (
-                <div className="bg-surface border border-edge rounded-xl overflow-hidden max-h-[560px] overflow-y-auto">
+                <div className="bg-surface border border-edge rounded-xl overflow-hidden lg:max-h-[560px] lg:overflow-y-auto">
                   {archivioFiltrato.map((r, i) => {
                     const active = sel?.tipo === 'salvata' && sel.id === r.id;
                     const pagata = r.stato === 'pagata';
@@ -431,7 +440,7 @@ export default function FattureDashboard({
                       <div
                         key={r.id}
                         onClick={() => setSel({ tipo: 'salvata', id: r.id })}
-                        className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${i ? 'border-t border-edge/60' : ''} ${
+                        className={`flex items-center gap-2.5 sm:gap-3 pl-2 pr-3 sm:px-4 py-3 cursor-pointer transition-colors ${i ? 'border-t border-edge/60' : ''} ${
                           active ? 'bg-surface2' : 'hover:bg-surface2/50'
                         }`}
                       >
@@ -459,7 +468,7 @@ export default function FattureDashboard({
                             onClick={(e) => { e.stopPropagation(); scaricaSalvata(r); }}
                             disabled={busy === `s${r.id}`}
                             title="Scarica PDF"
-                            className={btnGhost}
+                            className={`${btnGhost} max-lg:hidden`}
                           >
                             {busy === `s${r.id}` ? '...' : <IconDownload />}
                           </button>
@@ -474,8 +483,30 @@ export default function FattureDashboard({
             </section>
           </div>
 
-          {/* ── Colonna destra: anteprima ── */}
-          <div className="min-w-0 lg:sticky lg:top-6">
+          {/* ── Colonna destra: anteprima. Su mobile si apre a tutto schermo sopra la lista. ── */}
+          <div
+            className={`min-w-0 lg:sticky lg:top-6 ${
+              fatturaSel ? 'max-lg:fixed max-lg:inset-0 max-lg:z-50 max-lg:bg-bg max-lg:overflow-y-auto' : ''
+            }`}
+          >
+            {fatturaSel && (
+              <div className="lg:hidden sticky top-0 z-10 flex items-center gap-3 px-4 h-14 bg-surface border-b border-edge">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold truncate">{fatturaSel.committente.nome}</p>
+                  <p className="text-dim text-xs">n. {fatturaSel.numero} · {eur(fatturaSel.totaleDocumento)}</p>
+                </div>
+                <button
+                  onClick={() => (nuovaSel ? scaricaNuova(nuovaSel) : salvataSel && scaricaSalvata(salvataSel))}
+                  disabled={busy !== null}
+                  title="Scarica PDF"
+                  className={btnGhost}
+                >
+                  <IconDownload /> PDF
+                </button>
+                <button onClick={() => setSel(null)} aria-label="Chiudi anteprima" className="w-9 h-9 -mr-2 flex items-center justify-center rounded-lg text-muted hover:text-text hover:bg-surface2 text-lg cursor-pointer">×</button>
+              </div>
+            )}
+            <div className="max-lg:p-4">
             {salvataSel && fatturaSel && (
               <FatturaCollegamento
                 riga={salvataSel}
@@ -487,10 +518,11 @@ export default function FattureDashboard({
             {fatturaSel ? (
               <Anteprima html={renderFatturaHtml(fatturaSel, { logo: conLogo })} />
             ) : (
-              <div className="border border-edge rounded-xl bg-surface flex items-center justify-center text-dim text-sm aspect-[210/297] max-h-[70vh] mx-auto">
+              <div className="hidden lg:flex border border-edge rounded-xl bg-surface items-center justify-center text-dim text-sm aspect-[210/297] max-h-[70vh] mx-auto">
                 L’anteprima della fattura apparirà qui
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { isScaduto, scadenzaEffettiva } from '@/lib/scadenza';
+import { euroCent } from '@/lib/formato';
 
 interface Preventivo {
   id: number;
@@ -45,7 +46,7 @@ interface VisiteLink {
 const durata = (s: number) => (s < 60 ? `${s}s` : s < 3600 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`);
 const quando = (iso: string) => new Date(iso).toLocaleString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-const euro = (n: number) => `€${n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+const euro = euroCent;
 
 export default function PreventivoDrawer({
   preventivo,
@@ -205,7 +206,7 @@ export default function PreventivoDrawer({
       <div className="fixed right-0 top-0 h-full w-full max-w-md bg-surface border-l border-edge z-50 overflow-y-auto flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-edge sticky top-0 bg-surface">
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-edge sticky top-0 z-10 bg-surface">
           <div>
             <p className="text-text font-medium">{preventivo.oggetto}</p>
             <p className="text-dim text-xs">
@@ -216,7 +217,7 @@ export default function PreventivoDrawer({
           <button onClick={onClose} className="text-muted hover:text-text text-xl transition-colors cursor-pointer">✕</button>
         </div>
 
-        <div className="flex-1 px-6 py-6 flex flex-col gap-6">
+        <div className="flex-1 px-4 py-5 sm:px-6 sm:py-6 flex flex-col gap-5 sm:gap-6">
 
           {/* Validità / accettazione tardiva */}
           {preventivo.stato === 'inviato' && (
@@ -337,7 +338,7 @@ export default function PreventivoDrawer({
                             {t.descrizione}
                           </p>
                           <p className="text-muted text-xs">
-                            {`€${Math.round(totale * t.percentuale / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}`}
+                            {euro(Math.round(totale * t.percentuale / 100))}
                           </p>
                         </div>
                       </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
 import { FONTI, FONTE_BADGE, fonteLabel } from '@/lib/fonti';
+import { euro, euroCent } from '@/lib/formato';
 
 interface Cliente {
   id: number;
@@ -37,7 +38,7 @@ interface Prev {
   meta?: { cliente?: { piva?: string; telefono?: string } } | null;
 }
 
-const fmt = (n: number) => `€${n.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = euroCent;
 const fmtData = (d: string | null) => (d ? new Date(d).toLocaleDateString('it-IT') : '—');
 
 const FORM_DEFAULT = {
@@ -264,8 +265,8 @@ export default function ClientiDashboard({
   return (
     <div className="min-h-screen text-text">
       {/* Header */}
-      <header className="border-b border-edge px-6 py-5 flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Clienti</h1>
+      <header className="testata">
+        <h1 className="titolo-pagina">Clienti</h1>
         {selectMode ? (
           <div className="flex items-center gap-2">
             <span className="text-dim text-sm hidden sm:block">{selected.size} selezionat{selected.size === 1 ? 'o' : 'i'}</span>
@@ -281,46 +282,46 @@ export default function ClientiDashboard({
             </button>
           </div>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex gap-2 max-sm:w-full">
             {clienti.length >= 2 && (
               <button
                 onClick={() => setSelectMode(true)}
-                className="text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-4 py-2 rounded-lg transition-colors"
+                className="max-sm:flex-1 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-3 sm:px-4 py-2 rounded-lg transition-colors"
               >
                 Unisci
               </button>
             )}
             <button
               onClick={() => setShowImport(true)}
-              className="text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-4 py-2 rounded-lg transition-colors"
+              className="max-sm:flex-1 whitespace-nowrap text-sm bg-surface2 hover:bg-slate text-muted hover:text-text font-medium px-3 sm:px-4 py-2 rounded-lg transition-colors"
             >
-              Importa da accettati
+              Importa<span className="hidden sm:inline"> da accettati</span>
               {candidati.length > 0 && (
                 <span className="ml-2 text-xs bg-accent text-on-accent rounded-full px-1.5 py-0.5">{candidati.length}</span>
               )}
             </button>
             <button
               onClick={() => { setForm(FORM_DEFAULT); setErrore(''); setShowNew(true); }}
-              className="text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+              className="max-sm:flex-1 whitespace-nowrap text-sm bg-accent text-on-accent font-semibold px-3 sm:px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
             >
-              + Nuovo cliente
+              + Nuovo<span className="hidden sm:inline"> cliente</span>
             </button>
           </div>
         )}
       </header>
 
-      <div className="px-6 py-6 max-w-6xl mx-auto flex flex-col gap-6">
+      <div className="corpo max-w-6xl">
         {/* KPI */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="kpi-griglia md:grid-cols-4">
           {[
             { label: 'CLIENTI', value: String(clienti.length), color: 'text-text' },
-            { label: 'CONTRATTUALIZZATO', value: fmt(totali.totale), color: 'text-text' },
-            { label: 'RICEVUTO', value: fmt(totali.ricevuto), color: 'text-green-400' },
-            { label: 'DA RICEVERE', value: fmt(totali.daDare), color: 'text-amber-400' },
+            { label: 'CONTRATTUALIZZATO', value: euro(totali.totale), color: 'text-text' },
+            { label: 'RICEVUTO', value: euro(totali.ricevuto), color: 'text-green-400' },
+            { label: 'DA RICEVERE', value: euro(totali.daDare), color: 'text-amber-400' },
           ].map((k) => (
-            <div key={k.label} className="bg-surface border border-edge rounded-xl p-5">
-              <p className="text-dim text-xs font-medium mb-3">{k.label}</p>
-              <p className={`text-2xl font-bold ${k.color}`}>{k.value}</p>
+            <div key={k.label} className="kpi">
+              <p className="kpi-etichetta">{k.label}</p>
+              <p className={`kpi-valore ${k.color}`}>{k.value}</p>
             </div>
           ))}
         </div>
@@ -345,7 +346,7 @@ export default function ClientiDashboard({
               <select
                 value={sortField}
                 onChange={(e) => cambiaCampo(e.target.value as SortField)}
-                className="bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-slate"
+                className="flex-1 sm:flex-none bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-slate"
                 aria-label="Ordina per"
               >
                 {(Object.keys(SORT_LABEL) as SortField[]).map((f) => (
@@ -369,7 +370,7 @@ export default function ClientiDashboard({
 
         {/* Filtro per fonte (divisione interna) */}
         {clienti.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex gap-1.5 overflow-x-auto sm:flex-wrap scrollbar-nascosta">
             {[
               { id: 'tutte', label: 'Tutte', n: clienti.length },
               ...FONTI.map((f) => ({ id: f.id as string, label: f.label, n: clienti.filter((c) => c.fonte === f.id).length })),
@@ -380,7 +381,7 @@ export default function ClientiDashboard({
                 <button
                   key={f.id}
                   onClick={() => setFiltroFonte(f.id)}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                  className={`shrink-0 whitespace-nowrap px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                     filtroFonte === f.id ? 'bg-accent text-on-accent' : 'text-muted hover:text-text hover:bg-surface2'
                   } ${f.id === 'nessuna' && f.n > 0 && filtroFonte !== f.id ? 'text-amber-400' : ''}`}
                 >
@@ -402,7 +403,7 @@ export default function ClientiDashboard({
             <p className="text-sm mt-1">Nessun cliente corrisponde a "{query}"</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {visibili.map((c) => {
               const f = financeById.get(c.id) ?? calcFinanza([]);
               const isSel = selected.has(c.id);
@@ -428,15 +429,15 @@ export default function ClientiDashboard({
                   <div className="border-t border-edge/60 pt-3 space-y-1.5">
                     <div className="flex justify-between text-sm">
                       <span className="text-dim">Totale</span>
-                      <span className="text-text font-medium">{fmt(f.totale)}</span>
+                      <span className="text-text font-medium tabular-nums">{fmt(f.totale)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-dim">Ricevuti</span>
-                      <span className="text-green-400 font-medium">{fmt(f.ricevuto)}</span>
+                      <span className="text-green-400 font-medium tabular-nums">{fmt(f.ricevuto)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-dim">Da ricevere</span>
-                      <span className="text-amber-400 font-medium">{fmt(f.daDare)}</span>
+                      <span className="text-amber-400 font-medium tabular-nums">{fmt(f.daDare)}</span>
                     </div>
                   </div>
                 </>
@@ -446,7 +447,7 @@ export default function ClientiDashboard({
                   key={c.id}
                   type="button"
                   onClick={() => toggleSel(c.id)}
-                  className={`text-left bg-surface border rounded-xl p-5 transition-colors block w-full ${isSel ? 'border-accent' : 'border-edge hover:border-slate'}`}
+                  className={`text-left bg-surface border rounded-xl p-4 sm:p-5 transition-colors block w-full ${isSel ? 'border-accent' : 'border-edge hover:border-slate'}`}
                 >
                   {inner}
                 </button>
@@ -454,7 +455,7 @@ export default function ClientiDashboard({
                 <Link
                   key={c.id}
                   href={`/clienti/${c.id}`}
-                  className="bg-surface border border-edge rounded-xl p-5 hover:border-slate transition-colors block"
+                  className="scheda hover:border-slate transition-colors block"
                 >
                   {inner}
                 </Link>
@@ -466,14 +467,14 @@ export default function ClientiDashboard({
 
       {/* Modal Nuovo cliente */}
       {showNew && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-4 sm:py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-5 sm:p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-text font-semibold">Nuovo cliente</h2>
               <button onClick={() => setShowNew(false)} className="text-dim hover:text-text transition-colors">✕</button>
             </div>
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-[1fr_140px] gap-3">
+              <div className="grid grid-cols-[minmax(0,1fr)_120px] sm:grid-cols-[minmax(0,1fr)_140px] gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">NOME *</label>
                   <input type="text" value={form.nome} onChange={(e) => set('nome', e.target.value)} placeholder="Nome cliente o referente" className={inputCls} />
@@ -486,7 +487,7 @@ export default function ClientiDashboard({
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">AZIENDA</label>
                   <input type="text" value={form.azienda} onChange={(e) => set('azienda', e.target.value)} placeholder="Ragione sociale" className={inputCls} />
@@ -496,7 +497,7 @@ export default function ClientiDashboard({
                   <input type="date" value={form.data_inizio} onChange={(e) => set('data_inizio', e.target.value)} className={inputCls} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">EMAIL</label>
                   <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="email@cliente.it" className={inputCls} />
@@ -506,7 +507,7 @@ export default function ClientiDashboard({
                   <input type="text" value={form.telefono} onChange={(e) => set('telefono', e.target.value)} className={inputCls} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">P. IVA</label>
                   <input type="text" value={form.piva} onChange={(e) => set('piva', e.target.value)} className={inputCls} />
@@ -520,7 +521,7 @@ export default function ClientiDashboard({
                 <label className="text-dim text-xs font-medium block mb-1">INDIRIZZO</label>
                 <input type="text" value={form.indirizzo} onChange={(e) => set('indirizzo', e.target.value)} className={inputCls} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-dim text-xs font-medium block mb-1">PEC</label>
                   <input type="email" value={form.pec} onChange={(e) => set('pec', e.target.value)} className={inputCls} />
@@ -548,8 +549,8 @@ export default function ClientiDashboard({
 
       {/* Modal Importa da accettati */}
       {showImport && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-4 sm:py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-5 sm:p-6">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-text font-semibold">Importa dallo storico</h2>
               <button onClick={() => setShowImport(false)} className="text-dim hover:text-text transition-colors">✕</button>
@@ -590,8 +591,8 @@ export default function ClientiDashboard({
 
       {/* Modal unisci selezionati: scegli il cliente da tenere */}
       {showMerge && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-8 px-4">
-          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-6">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center overflow-y-auto py-4 sm:py-8 px-4">
+          <div className="bg-surface border border-edge rounded-2xl w-full max-w-lg p-5 sm:p-6">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-text font-semibold">Unisci clienti</h2>
               <button onClick={() => setShowMerge(false)} className="text-dim hover:text-text transition-colors">✕</button>

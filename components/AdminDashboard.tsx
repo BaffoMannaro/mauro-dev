@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { isScaduto } from '@/lib/scadenza';
+import { euroCent } from '@/lib/formato';
 import NuovoPreventivo from './NuovoPreventivo';
 import PreventivoDrawer from './PreventivoDrawer';
 
@@ -157,8 +158,8 @@ export default function AdminDashboard({
     <div className="min-h-screen text-text">
 
       {/* Header stile Crextio: titolo sx, KPI + CTA dx */}
-      <header className="border-b border-edge px-6 py-5 flex items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold">Preventivi</h1>
+      <header className="testata">
+        <h1 className="titolo-pagina">Preventivi</h1>
         <div className="flex items-center gap-6">
           {kpi.map((k) => (
             <div key={k.label} className="text-center hidden sm:block">
@@ -168,14 +169,14 @@ export default function AdminDashboard({
           ))}
           <button
             onClick={() => setNuovoOpen(true)}
-            className="ml-2 text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+            className="sm:ml-2 text-sm bg-accent text-on-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
           >
             + Nuovo
           </button>
         </div>
       </header>
 
-      <div className="px-6 py-6 max-w-6xl mx-auto">
+      <div className="corpo max-w-6xl">
 
         {/* Ricerca */}
         <input
@@ -184,16 +185,16 @@ export default function AdminDashboard({
           onChange={(e) => setCerca(e.target.value)}
           placeholder="Cerca per cliente, azienda o oggetto…"
           aria-label="Cerca preventivi"
-          className="w-full mb-4 bg-surface border border-edge rounded-lg px-4 py-2.5 text-sm text-text placeholder-dim focus:outline-none focus:border-slate"
+          className="w-full bg-surface border border-edge rounded-lg px-4 py-2.5 text-sm text-text placeholder-dim focus:outline-none focus:border-slate"
         />
 
         {/* Filtri */}
-        <div className="flex gap-2 mb-6 flex-wrap">
+        <div className="flex gap-2 overflow-x-auto sm:flex-wrap scrollbar-nascosta">
           {FILTRI.map((f) => (
             <button
               key={f}
               onClick={() => setFiltro(f)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
+              className={`shrink-0 px-3.5 sm:px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
                 filtro === f
                   ? 'bg-accent text-on-accent'
                   : 'bg-surface2 text-muted border border-edge hover:text-text hover:border-slate'
@@ -221,12 +222,12 @@ export default function AdminDashboard({
               <div
                 key={p.id}
                 onClick={() => setDrawerPreventivo(p)}
-                className="bg-surface border border-edge rounded-xl p-5 cursor-pointer hover:border-slate transition-colors"
+                className="scheda cursor-pointer hover:border-slate transition-colors"
               >
                 {/* Top row: badge + totale */}
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start justify-between gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
                       <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${STATI[p.stato as keyof typeof STATI]?.color}`}>
                         {STATI[p.stato as keyof typeof STATI]?.label}
                       </span>
@@ -257,9 +258,7 @@ export default function AdminDashboard({
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-text font-bold text-xl">
-                      €{Number(p.totale).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                    </p>
+                    <p className="text-text font-bold text-lg sm:text-xl tabular-nums">{euroCent(Number(p.totale))}</p>
                     <p className="text-dim text-xs mt-0.5">{p.iva ? 'IVA inclusa' : 'Esente IVA'}</p>
                   </div>
                 </div>
@@ -279,16 +278,14 @@ export default function AdminDashboard({
                       {tranches.map((t, i) => {
                         const importo = Math.round(Number(p.totale) * t.percentuale / 100);
                         return (
-                          <div key={i} className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2">
+                          <div key={i} className="flex items-center justify-between gap-3 text-xs">
+                            <div className="flex items-center gap-2 min-w-0">
                               <span className={t.pagato ? 'text-green-400' : 'text-dim'}>
                                 {t.pagato ? '✓' : '○'}
                               </span>
-                              <span className={t.pagato ? 'text-muted' : 'text-dim'}>{t.descrizione}</span>
+                              <span className={`truncate ${t.pagato ? 'text-muted' : 'text-dim'}`}>{t.descrizione}</span>
                             </div>
-                            <span className={`font-medium ${t.pagato ? 'text-green-400' : 'text-accent'}`}>
-                              €{importo.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                            </span>
+                            <span className={`shrink-0 font-medium tabular-nums ${t.pagato ? 'text-green-400' : 'text-accent'}`}>{euroCent(importo)}</span>
                           </div>
                         );
                       })}

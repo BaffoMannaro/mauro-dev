@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
+import { euroCent } from '@/lib/formato';
 
 type Preventivo = {
   id: number;
@@ -38,8 +39,7 @@ type Cliente = {
   piva: string | null;
 };
 
-const eur = (n: number) =>
-  new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0);
+const eur = euroCent;
 
 const dataIt = (d: string | null) =>
   d ? new Date(d).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
@@ -95,7 +95,7 @@ export default function PortaleDashboard({
     <div className="min-h-screen bg-bg text-text">
       {/* Header */}
       <header className="border-b border-edge bg-surface">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between gap-3">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <img src="/Logo.svg" alt="MAURO DEV" className="h-6 w-auto logo-adaptive" />
           <div className="flex items-center gap-3 min-w-0">
             <span className="text-sm text-muted truncate hidden sm:block">
@@ -111,14 +111,14 @@ export default function PortaleDashboard({
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-        <h1 className="text-2xl font-semibold mb-1">Ciao {cliente.nome} 👋</h1>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
+        <h1 className="text-xl sm:text-2xl font-semibold leading-tight mb-1">Ciao {cliente.nome} 👋</h1>
         <p className="text-muted text-sm mb-6">Questa è la tua area riservata.</p>
 
         {/* Bento grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
           {/* Azioni richieste — hero */}
-          <section className="md:col-span-3 bg-surface border border-edge rounded-2xl p-5">
+          <section className="md:col-span-3 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
             <div className="flex items-center gap-2 mb-3">
               <h2 className="font-semibold">Azioni richieste</h2>
               {nAzioni > 0 && (
@@ -198,26 +198,26 @@ export default function PortaleDashboard({
           </section>
 
           {/* Riepilogo economico */}
-          <section className="bg-surface border border-edge rounded-2xl p-5">
+          <section className="bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
             <h2 className="font-semibold mb-3">Riepilogo</h2>
             <dl className="flex flex-col gap-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted">Totale lavori</dt>
-                <dd className="font-medium">{eur(finanza.totale)}</dd>
+                <dd className="tabular-nums font-medium">{eur(finanza.totale)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Già versato</dt>
-                <dd className="font-medium text-emerald-400">{eur(finanza.ricevuto)}</dd>
+                <dd className="tabular-nums font-medium text-emerald-400">{eur(finanza.ricevuto)}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted">Ancora da versare</dt>
-                <dd className="font-medium">{eur(finanza.daDare)}</dd>
+                <dd className="tabular-nums font-medium">{eur(finanza.daDare)}</dd>
               </div>
             </dl>
           </section>
 
           {/* Avanzamento lavori */}
-          <section className="md:col-span-2 bg-surface border border-edge rounded-2xl p-5">
+          <section className="md:col-span-2 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
             <h2 className="font-semibold mb-3">Avanzamento lavori</h2>
             {accettati.length === 0 ? (
               <p className="text-muted text-sm">Nessun lavoro attivo al momento.</p>
@@ -240,7 +240,7 @@ export default function PortaleDashboard({
           </section>
 
           {/* Preventivi */}
-          <section className="bg-surface border border-edge rounded-2xl p-5">
+          <section className="bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
             <h2 className="font-semibold mb-3">Preventivi</h2>
             {preventivi.length === 0 ? (
               <p className="text-muted text-sm">Nessun preventivo.</p>
@@ -264,7 +264,7 @@ export default function PortaleDashboard({
           </section>
 
           {/* Fatture */}
-          <section className="md:col-span-2 bg-surface border border-edge rounded-2xl p-5">
+          <section className="md:col-span-2 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
             <h2 className="font-semibold mb-3">Fatture</h2>
             {fatture.length === 0 ? (
               <p className="text-muted text-sm">Nessuna fattura disponibile.</p>
@@ -310,7 +310,7 @@ export default function PortaleDashboard({
           </section>
 
           {/* Messaggi (placeholder Fase 3) */}
-          <section className="bg-surface border border-edge rounded-2xl p-5">
+          <section className="bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
             <h2 className="font-semibold mb-3">Messaggi</h2>
             <p className="text-muted text-sm">
               Presto potrai scrivermi da qui e ritrovare tutta la nostra conversazione in un unico posto.
@@ -318,7 +318,7 @@ export default function PortaleDashboard({
           </section>
 
           {/* I tuoi dati */}
-          <section className="md:col-span-3 bg-surface border border-edge rounded-2xl p-5">
+          <section className="md:col-span-3 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
             <h2 className="font-semibold mb-3">I tuoi dati</h2>
             <dl className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>

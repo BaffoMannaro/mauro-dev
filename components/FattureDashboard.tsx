@@ -6,6 +6,8 @@ import { renderFatturaHtml, nomeFilePdf, dataLunga } from '@/lib/fattura/html';
 import { euroCent as eur } from '@/lib/formato';
 import FattureAnalisi from './FattureAnalisi';
 import FatturaCollegamento from './FatturaCollegamento';
+import ConfermaPagamento from './ConfermaPagamento';
+import type { ImpostazioniFisco } from '@/lib/fisco';
 import type { PreventivoCollegabile } from '@/lib/fattura/collegamenti';
 
 /** Riga dell'archivio (tabella fatture, solo quelle importate da XML). */
@@ -18,6 +20,7 @@ export interface FatturaSalvata {
   imponibile: number | null;
   contributo: number | null;
   stato: 'pagata' | 'da_pagare';
+  pagata_il: string | null;
   cliente_id: number | null;
   cliente_nome: string;
   cliente_piva: string | null;
@@ -35,6 +38,8 @@ interface Caricata {
   fattura: Fattura | null;
   errore: string | null;
   conLogo: boolean;
+  /** Già pagata al caricamento: giorno dell'incasso da salvare insieme alla fattura. */
+  pagataIl?: string | null;
 }
 
 type Selezione = { tipo: 'nuova'; id: string } | { tipo: 'salvata'; id: number } | null;
@@ -86,9 +91,11 @@ const btnAccent = 'flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-acce
 export default function FattureDashboard({
   archivio: iniziale,
   preventivi: preventiviIniziali,
+  fisco,
 }: {
   archivio: FatturaSalvata[];
   preventivi: PreventivoCollegabile[];
+  fisco: ImpostazioniFisco;
 }) {
   const [items, setItems] = useState<Caricata[]>([]);
   const [archivio, setArchivio] = useState<FatturaSalvata[]>(iniziale);
@@ -99,6 +106,8 @@ export default function FattureDashboard({
   const [busy, setBusy] = useState<string | null>(null);
   const [errore, setErrore] = useState('');
   const [cerca, setCerca] = useState('');
+  const [daConfermare, setDaConfermare] = useState<FatturaSalvata | null>(null);
+  const [pagamentoNuova, setPagamentoNuova] = useState<Caricata | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // ── Selezione corrente ──
@@ -210,7 +219,16 @@ export default function FattureDashboard({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Salvataggio non riuscito');
-      const row = data as FatturaSalvata;
+      let row = data as FatturaSalvata;
+      if (item.pagataIl) {
+        const pag = await fetch(`/api/fatture/${row.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stato: 'pagata', pagata_il: item.pagataIl }),
+        });
+        if (!pag.ok) throw new Error('Fattura salvata, ma non sono riuscito a segnarla pagata');
+        row = { ...row, stato: 'pagata', pagata_il: item.pagataIl };
+      }
       setArchivio((prev) =>
         [row, ...prev.filter((r) => r.id !== row.id)].sort((a, b) => b.data.localeCompare(a.data) || b.id - a.id)
       );
@@ -258,14 +276,17 @@ export default function FattureDashboard({
     );
   };
 
-  const cambiaStato = (r: FatturaSalvata) => {
-    const stato = r.stato === 'pagata' ? 'da_pagare' : 'pagata';
-    setArchivio((prev) => prev.map((x) => (x.id === r.id ? { ...x, stato } : x)));
-    fetch(`/api/fatture/${r.id}`, {
+  // Il cambio di stato passa sempre dalla conferma (con il giorno dell'incasso).
+  const cambiaStato = async (r: FatturaSalvata, stato: 'pagata' | 'da_pagare', pagataIl: string | null) => {
+    setDaConfermare(null);
+    setErrore('');
+    const res = await fetch(`/api/fatture/${r.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stato }),
+      body: JSON.stringify({ stato, pagata_il: pagataIl }),
     });
+    if (!res.ok) return setErrore('Aggiornamento dello stato non riuscito');
+    setArchivio((prev) => prev.map((x) => (x.id === r.id ? { ...x, stato, pagata_il: pagataIl } : x)));
   };
 
   const eliminaSalvata = async (r: FatturaSalvata) => {
@@ -309,7 +330,7 @@ export default function FattureDashboard({
 
       <div className="corpo max-w-7xl">
 
-        {archivio.length > 0 && <FattureAnalisi archivio={archivio} />}
+        {archivio.length > 0 && <FattureAnalisi archivio={archivio} fisco={fisco} />}
 
         <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[380px_minmax(0,1fr)] items-start">
 
@@ -389,6 +410,13 @@ export default function FattureDashboard({
                           <p className="text-text font-semibold text-sm truncate mt-0.5">{f.committente.nome}</p>
                           <p className="text-sm font-bold mt-1">{eur(f.totaleDocumento)}</p>
                           {esistente && <p className="text-amber-400 text-xs mt-1">Già in archivio: salvando la aggiorni</p>}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setPagamentoNuova(item); }}
+                            className={`text-xs mt-1.5 inline-flex items-center gap-1.5 cursor-pointer ${item.pagataIl ? 'text-green-400' : 'text-dim hover:text-text'}`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${item.pagataIl ? 'bg-green-400' : 'bg-dim'}`} />
+                            {item.pagataIl ? `Pagata il ${item.pagataIl.split('-').reverse().join('/')} · cambia` : 'Già pagata? Indica quando'}
+                          </button>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           <button
@@ -455,12 +483,12 @@ export default function FattureDashboard({
                         <div className="text-right shrink-0">
                           <p className="text-sm font-semibold">{eur(r.importo)}</p>
                           <button
-                            onClick={(e) => { e.stopPropagation(); cambiaStato(r); }}
-                            title="Cambia stato pagamento"
+                            onClick={(e) => { e.stopPropagation(); setDaConfermare(r); }}
+                            title={pagata && r.pagata_il ? `Incassata il ${r.pagata_il.split('-').reverse().join('/')}` : 'Cambia stato pagamento'}
                             className={`text-xs mt-0.5 inline-flex items-center gap-1.5 cursor-pointer ${pagata ? 'text-green-400' : 'text-amber-400'}`}
                           >
                             <span className={`w-1.5 h-1.5 rounded-full ${pagata ? 'bg-green-400' : 'bg-amber-400'}`} />
-                            {pagata ? 'Pagata' : 'Da pagare'}
+                            {pagata ? (r.pagata_il ? `Pagata ${r.pagata_il.slice(8, 10)}/${r.pagata_il.slice(5, 7)}` : 'Pagata') : 'Da pagare'}
                           </button>
                         </div>
                         <div className="flex items-center gap-0.5 shrink-0">
@@ -526,6 +554,31 @@ export default function FattureDashboard({
           </div>
         </div>
       </div>
+
+      {pagamentoNuova?.fattura && (
+        <ConfermaPagamento
+          descrizione={`Fattura n. ${pagamentoNuova.fattura.numero} · ${pagamentoNuova.fattura.committente.nome} · ${eur(pagamentoNuova.fattura.totaleDocumento)}. Verrà salvata come pagata.`}
+          stato={pagamentoNuova.pagataIl ? 'pagata' : 'da_pagare'}
+          pagataIl={pagamentoNuova.pagataIl}
+          dataFattura={pagamentoNuova.fattura.data}
+          onConferma={(stato, giorno) => {
+            setItems((prev) => prev.map((i) => (i.id === pagamentoNuova.id ? { ...i, pagataIl: stato === 'pagata' ? giorno : null } : i)));
+            setPagamentoNuova(null);
+          }}
+          onAnnulla={() => setPagamentoNuova(null)}
+        />
+      )}
+
+      {daConfermare && (
+        <ConfermaPagamento
+          descrizione={`Fattura n. ${daConfermare.numero} · ${daConfermare.cliente_nome} · ${eur(daConfermare.importo)}`}
+          stato={daConfermare.stato}
+          pagataIl={daConfermare.pagata_il}
+          dataFattura={daConfermare.data}
+          onConferma={(stato, giorno) => cambiaStato(daConfermare, stato, giorno)}
+          onAnnulla={() => setDaConfermare(null)}
+        />
+      )}
     </div>
   );
 }

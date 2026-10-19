@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import sql from '@/lib/db';
-import { collegaPreventivo, preparaArchivio, sincronizzaPreventivo } from '@/lib/fattura/server';
+import { collegaPreventivo, impostaStatoFattura, preparaArchivio, sincronizzaPreventivo } from '@/lib/fattura/server';
 
-// Aggiorna stato pagamento, preferenza logo e/o preventivo collegato di una fattura in archivio.
+// Aggiorna stato pagamento (con il giorno dell'incasso), preferenza logo e/o preventivo collegato di una fattura in archivio.
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,10 +16,7 @@ export async function PATCH(
   const b = await req.json().catch(() => ({}));
 
   if (b.stato !== undefined) {
-    await sql`
-      UPDATE fatture SET stato = ${b.stato === 'pagata' ? 'pagata' : 'da_pagare'}, updated_at = NOW()
-      WHERE id = ${id}
-    `;
+    await impostaStatoFattura(id, b.stato === 'pagata' ? 'pagata' : 'da_pagare', b.pagata_il);
   }
   if (b.con_logo !== undefined) {
     await sql`UPDATE fatture SET con_logo = ${b.con_logo !== false}, updated_at = NOW() WHERE id = ${id}`;

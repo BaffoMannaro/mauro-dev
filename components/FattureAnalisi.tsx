@@ -4,8 +4,9 @@ import { useMemo, useState } from 'react';
 import type { FatturaSalvata } from './FattureDashboard';
 import { calcolaAnalisi, SOGLIA_FORFETTARIO } from '@/lib/fattura/analisi';
 import { euro as fmt } from '@/lib/formato';
+import { calcolaFisco, incassatoAnno, type ImpostazioniFisco } from '@/lib/fisco';
 
-export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[] }) {
+export default function FattureAnalisi({ archivio, fisco }: { archivio: FatturaSalvata[]; fisco: ImpostazioniFisco }) {
   const anni = useMemo(
     () => [...new Set(archivio.map((f) => f.anno))].sort((a, b) => b - a),
     [archivio]
@@ -14,6 +15,8 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
   const anno = annoScelto !== null && anni.includes(annoScelto) ? annoScelto : anni[0];
 
   const s = useMemo(() => calcolaAnalisi(archivio, anno), [archivio, anno]);
+  // Netto sull'incassato dell'anno (data d'incasso), come in Statistiche.
+  const netto = useMemo(() => calcolaFisco(anno, incassatoAnno(archivio, anno), fisco), [archivio, anno, fisco]);
   const { delta } = s;
 
   return (
@@ -35,7 +38,7 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
         </div>
       </div>
 
-      <div className="kpi-griglia md:grid-cols-4">
+      <div className="kpi-griglia md:grid-cols-3 xl:grid-cols-5">
         <div className="kpi">
           <p className="kpi-etichetta">FATTURATO {anno}</p>
           <p className="kpi-valore">{fmt(s.fatturato)}</p>
@@ -44,6 +47,11 @@ export default function FattureAnalisi({ archivio }: { archivio: FatturaSalvata[
               ? <><span className={delta >= 0 ? 'text-green-400' : 'text-red-400'}>{delta >= 0 ? '+' : ''}{delta}%</span> vs {anno - 1}</>
               : `di cui ${fmt(s.contributo)} rivalsa INPS`}
           </p>
+        </div>
+        <div className="kpi">
+          <p className="kpi-etichetta">NETTO STIMATO {anno}</p>
+          <p className="kpi-valore text-green-400">{fmt(netto.netto)}</p>
+          <p className="kpi-nota">su {fmt(netto.incassato)} incassati · tasse e INPS {fmt(netto.imposta + netto.contributi)}</p>
         </div>
         <div className="kpi">
           <p className="kpi-etichetta">FATTURE EMESSE</p>

@@ -27,7 +27,8 @@ export default async function ClientePage({
   if (!cliente) notFound();
 
   const fatture = await sql`
-    SELECT id, numero, importo, data, stato, pdf_url, note, created_at
+    SELECT id, numero, importo, to_char(data, 'YYYY-MM-DD') AS data, stato,
+           to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il, pdf_url, note, created_at
     FROM fatture
     WHERE cliente_id = ${id}
     ORDER BY data DESC NULLS LAST, created_at DESC

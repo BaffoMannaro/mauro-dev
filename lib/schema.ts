@@ -108,5 +108,7 @@ export async function ensureFattureXmlSchema() {
     )
   `;
   await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS intestatario_id INTEGER`;
+  // Giorno in cui la fattura è stata segnata pagata: fa fede per l'incasso (principio di cassa).
+  await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS pagata_il DATE`;
   ensuredFattureXml = true;
 }

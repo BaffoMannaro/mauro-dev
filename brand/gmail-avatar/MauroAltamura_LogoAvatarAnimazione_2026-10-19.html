@@ -16,7 +16,7 @@
   Timeline (3,6 s in loop, 25 fps = 90 fotogrammi). Primo e ultimo fotogramma = logo fermo,
   cosi' i client che mostrano solo il primo frame vedono il logo completo.
   0,00-0,70 pausa | 0,70-1,20 il tratto si ritira | 0,75-1,15 la piega si chiude sulla cerniera
-  1,35-2,05 il tratto si ridisegna in verde accento | 1,60-2,30 la piega si riapre con leggero rimbalzo
+  1,35-2,05 il tratto si ridisegna in verde accento | 1,60-2,30 la piega si riapre e si ferma esattamente in posizione
   2,20-2,75 il tratto passa dal verde accento al grigio finale | 2,75-3,60 pausa
 -->
 <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -39,7 +39,7 @@
   const inCubic = p => p * p * p;
   const outCubic = p => 1 - Math.pow(1 - p, 3);
   const inOut = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-  const outBack = p => { const c = 1.4; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+  const outQuint = p => 1 - Math.pow(1 - p, 5);
 
   const tratto = document.getElementById('tratto');
   const piega = document.getElementById('piega');
@@ -59,10 +59,10 @@
     tratto.style.strokeDashoffset = -L * (1 - visibile);
     tratto.style.opacity = visibile < 0.01 ? 0 : 1;
 
-    // Piega: si chiude sulla cerniera sinistra, poi si riapre con un rimbalzo
+    // Piega: si chiude sulla cerniera sinistra, poi si riapre senza superare la posizione finale
     let sx;
     if (t < 1.60) sx = 1 - inOut(fase(t, 0.75, 1.15));
-    else sx = outBack(fase(t, 1.60, 2.30));
+    else sx = outQuint(fase(t, 1.60, 2.30));
     sx = Math.max(sx, 0.0001);
     piega.setAttribute('transform', `translate(147 0) scale(${sx} 1) translate(-147 0)`);
   }

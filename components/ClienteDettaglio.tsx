@@ -127,7 +127,7 @@ export default function ClienteDettaglio({
   // Fatture
   const [showFattura, setShowFattura] = useState(false);
   const [fattForm, setFattForm] = useState({
-    numero: '', importo: '', data: '', stato: 'da_pagare', pdf_url: '', note: '',
+    numero: '', importo: '', data: '', stato: 'da_pagare', pagata_il: '', pdf_url: '', note: '',
   });
   const [fattLoading, setFattLoading] = useState(false);
   const setFatt = (k: string, v: any) => setFattForm((f) => ({ ...f, [k]: v }));
@@ -162,7 +162,7 @@ export default function ClienteDettaglio({
     setFattLoading(false);
     if (res.ok) {
       setShowFattura(false);
-      setFattForm({ numero: '', importo: '', data: '', stato: 'da_pagare', pdf_url: '', note: '' });
+      setFattForm({ numero: '', importo: '', data: '', stato: 'da_pagare', pagata_il: '', pdf_url: '', note: '' });
       router.refresh();
     }
   };
@@ -523,6 +523,13 @@ export default function ClienteDettaglio({
                   </select>
                 </div>
               </div>
+              {fattForm.stato === 'pagata' && (
+                <div>
+                  <label className="text-dim text-xs font-medium block mb-1">INCASSATA IL</label>
+                  <input type="date" value={fattForm.pagata_il} onChange={(e) => setFatt('pagata_il', e.target.value)} className={inputCls} />
+                  <p className="text-dim text-xs mt-1">Fa fede per incassi e tasse. Vuoto = data della fattura.</p>
+                </div>
+              )}
               <div>
                 <label className="text-dim text-xs font-medium block mb-1">LINK AL PDF (opzionale)</label>
                 <input type="url" placeholder="https://…" value={fattForm.pdf_url} onChange={(e) => setFatt('pdf_url', e.target.value)} className={inputCls} />
@@ -721,8 +728,10 @@ export default function ClienteDettaglio({
       {daConfermare && (
         <ConfermaPagamento
           descrizione={`Fattura${daConfermare.numero ? ` n. ${daConfermare.numero}` : ''}${daConfermare.importo != null ? ` · ${fmt(Number(daConfermare.importo))}` : ''}`}
-          verso={daConfermare.stato === 'pagata' ? 'da_pagare' : 'pagata'}
-          onConferma={(giorno) => cambiaStatoFattura(daConfermare.id, daConfermare.stato === 'pagata' ? 'da_pagare' : 'pagata', giorno)}
+          stato={daConfermare.stato}
+          pagataIl={daConfermare.pagata_il}
+          dataFattura={daConfermare.data ? String(daConfermare.data).slice(0, 10) : null}
+          onConferma={(stato, giorno) => cambiaStatoFattura(daConfermare.id, stato, giorno)}
           onAnnulla={() => setDaConfermare(null)}
         />
       )}

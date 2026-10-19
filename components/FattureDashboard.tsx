@@ -38,6 +38,8 @@ interface Caricata {
   fattura: Fattura | null;
   errore: string | null;
   conLogo: boolean;
+  /** Già pagata al caricamento: giorno dell'incasso da salvare insieme alla fattura. */
+  pagataIl?: string | null;
 }
 
 type Selezione = { tipo: 'nuova'; id: string } | { tipo: 'salvata'; id: number } | null;
@@ -105,6 +107,7 @@ export default function FattureDashboard({
   const [errore, setErrore] = useState('');
   const [cerca, setCerca] = useState('');
   const [daConfermare, setDaConfermare] = useState<FatturaSalvata | null>(null);
+  const [pagamentoNuova, setPagamentoNuova] = useState<Caricata | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // ── Selezione corrente ──
@@ -216,7 +219,16 @@ export default function FattureDashboard({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? 'Salvataggio non riuscito');
-      const row = data as FatturaSalvata;
+      let row = data as FatturaSalvata;
+      if (item.pagataIl) {
+        const pag = await fetch(`/api/fatture/${row.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stato: 'pagata', pagata_il: item.pagataIl }),
+        });
+        if (!pag.ok) throw new Error('Fattura salvata, ma non sono riuscito a segnarla pagata');
+        row = { ...row, stato: 'pagata', pagata_il: item.pagataIl };
+      }
       setArchivio((prev) =>
         [row, ...prev.filter((r) => r.id !== row.id)].sort((a, b) => b.data.localeCompare(a.data) || b.id - a.id)
       );
@@ -265,8 +277,7 @@ export default function FattureDashboard({
   };
 
   // Il cambio di stato passa sempre dalla conferma (con il giorno dell'incasso).
-  const cambiaStato = async (r: FatturaSalvata, pagataIl: string | null) => {
-    const stato = r.stato === 'pagata' ? 'da_pagare' : 'pagata';
+  const cambiaStato = async (r: FatturaSalvata, stato: 'pagata' | 'da_pagare', pagataIl: string | null) => {
     setDaConfermare(null);
     setErrore('');
     const res = await fetch(`/api/fatture/${r.id}`, {
@@ -399,6 +410,13 @@ export default function FattureDashboard({
                           <p className="text-text font-semibold text-sm truncate mt-0.5">{f.committente.nome}</p>
                           <p className="text-sm font-bold mt-1">{eur(f.totaleDocumento)}</p>
                           {esistente && <p className="text-amber-400 text-xs mt-1">Già in archivio: salvando la aggiorni</p>}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setPagamentoNuova(item); }}
+                            className={`text-xs mt-1.5 inline-flex items-center gap-1.5 cursor-pointer ${item.pagataIl ? 'text-green-400' : 'text-dim hover:text-text'}`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${item.pagataIl ? 'bg-green-400' : 'bg-dim'}`} />
+                            {item.pagataIl ? `Pagata il ${item.pagataIl.split('-').reverse().join('/')} · cambia` : 'Già pagata? Indica quando'}
+                          </button>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
                           <button
@@ -537,11 +555,27 @@ export default function FattureDashboard({
         </div>
       </div>
 
+      {pagamentoNuova?.fattura && (
+        <ConfermaPagamento
+          descrizione={`Fattura n. ${pagamentoNuova.fattura.numero} · ${pagamentoNuova.fattura.committente.nome} · ${eur(pagamentoNuova.fattura.totaleDocumento)}. Verrà salvata come pagata.`}
+          stato={pagamentoNuova.pagataIl ? 'pagata' : 'da_pagare'}
+          pagataIl={pagamentoNuova.pagataIl}
+          dataFattura={pagamentoNuova.fattura.data}
+          onConferma={(stato, giorno) => {
+            setItems((prev) => prev.map((i) => (i.id === pagamentoNuova.id ? { ...i, pagataIl: stato === 'pagata' ? giorno : null } : i)));
+            setPagamentoNuova(null);
+          }}
+          onAnnulla={() => setPagamentoNuova(null)}
+        />
+      )}
+
       {daConfermare && (
         <ConfermaPagamento
           descrizione={`Fattura n. ${daConfermare.numero} · ${daConfermare.cliente_nome} · ${eur(daConfermare.importo)}`}
-          verso={daConfermare.stato === 'pagata' ? 'da_pagare' : 'pagata'}
-          onConferma={(giorno) => cambiaStato(daConfermare, giorno)}
+          stato={daConfermare.stato}
+          pagataIl={daConfermare.pagata_il}
+          dataFattura={daConfermare.data}
+          onConferma={(stato, giorno) => cambiaStato(daConfermare, stato, giorno)}
           onAnnulla={() => setDaConfermare(null)}
         />
       )}

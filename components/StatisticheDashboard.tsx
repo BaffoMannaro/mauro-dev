@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react';
 import { euro as fmt } from '@/lib/formato';
 import { accettato, calcolaIncassi, type FatturaIncasso } from '@/lib/incassi';
+import type { ImpostazioniFisco } from '@/lib/fisco';
+import FiscoPannello from './FiscoPannello';
 
 interface Tranche {
   descrizione: string;
@@ -54,10 +56,12 @@ export default function StatisticheDashboard({
   preventivi,
   abbonamenti,
   fatture,
+  fisco,
 }: {
   preventivi: Preventivo[];
   abbonamenti: Abbonamento[];
   fatture: FatturaIncasso[];
+  fisco: ImpostazioniFisco;
 }) {
   const [includiDaIncassare, setIncludiDaIncassare] = useState(false);
 
@@ -193,6 +197,8 @@ export default function StatisticheDashboard({
             </div>
           ))}
         </div>
+
+        <FiscoPannello fatture={fatture} impostazioni={fisco} />
 
         {/* Grafico */}
         <div className="scheda">

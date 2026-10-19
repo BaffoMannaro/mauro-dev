@@ -1,6 +1,6 @@
 // Incassi: da dove arrivano i soldi entrati, per le statistiche.
-// - Fatture segnate "pagata": valgono per il loro importo, nel mese della data fattura
-//   (collegate a un preventivo o no).
+// - Fatture segnate "pagata": valgono per il loro importo, nel mese dell'incasso (pagata_il,
+//   altrimenti la data fattura), collegate a un preventivo o no.
 // - Tranche spuntate dei preventivi accettati: nel mese di data_pagamento.
 // Per un preventivo con fatture collegate e tranche spuntate si prende la fonte che vale
 // di più, mai la somma: è lo stesso denaro registrato in due modi.
@@ -24,6 +24,7 @@ export interface FatturaIncasso {
   preventivo_id: number | null;
   importo: number | string | null;
   data: string | null; // YYYY-MM-DD
+  pagata_il?: string | null; // giorno dell'incasso
   stato: string;
 }
 
@@ -39,7 +40,7 @@ export const accettato = (p: { stato: string }) => p.stato === 'accettato' || p.
 
 export function calcolaIncassi(preventivi: PreventivoIncasso[], fatture: FatturaIncasso[]) {
   const pagate = fatture.filter((f) => f.stato === 'pagata' && f.data && Number(f.importo) > 0);
-  const daFatture = (f: FatturaIncasso): Incasso => ({ data: giorno(f.data), importo: Number(f.importo), preventivo_id: f.preventivo_id });
+  const daFatture = (f: FatturaIncasso): Incasso => ({ data: giorno(f.pagata_il) || giorno(f.data), importo: Number(f.importo), preventivo_id: f.preventivo_id });
 
   const incassi: Incasso[] = pagate.filter((f) => f.preventivo_id == null).map(daFatture);
   const perPreventivo = new Map<number, number>();

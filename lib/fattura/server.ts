@@ -10,6 +10,7 @@ export { normalizzaId };
 export const archivioSelect = () => sql`
   SELECT id, numero, to_char(data, 'YYYY-MM-DD') AS data, anno, importo::float8 AS importo,
          imponibile::float8 AS imponibile, contributo::float8 AS contributo, stato,
+         to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il,
          cliente_id, cliente_nome, cliente_piva, con_logo, xml, preventivo_id, intestatario_id,
          (SELECT oggetto FROM preventivi p WHERE p.id = fatture.preventivo_id) AS preventivo_oggetto
   FROM fatture
@@ -67,6 +68,22 @@ export async function upsertIntestatario(f: Fattura): Promise<{ id: number; clie
   `;
   const [row] = await sql`SELECT id, cliente_id FROM intestatari WHERE chiave = ${chiave}`;
   return row as { id: number; cliente_id: number | null };
+}
+
+/**
+ * Segna una fattura pagata o da pagare. Da pagata salva il giorno dell'incasso
+ * (quello indicato, altrimenti oggi); tornando a "da pagare" la data si cancella.
+ */
+export async function impostaStatoFattura(id: number | string, stato: 'pagata' | 'da_pagare', pagataIl?: string | null) {
+  const giorno = pagataIl && /^\d{4}-\d{2}-\d{2}$/.test(pagataIl) ? pagataIl : null;
+  return sql`
+    UPDATE fatture
+    SET stato = ${stato},
+        pagata_il = ${stato === 'pagata' ? sql`COALESCE(${giorno}::date, CURRENT_DATE)` : null},
+        updated_at = NOW()
+    WHERE id = ${id}
+    RETURNING id
+  `;
 }
 
 let backfillFatto = false;

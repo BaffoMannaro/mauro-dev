@@ -6,12 +6,15 @@ import {
   archivioSelect,
   collegaPreventivo,
   fattureDelPreventivo,
+  impostaStatoFattura,
   preparaArchivio,
   preventiviCollegabili,
   salvaFattura,
 } from '@/lib/fattura/server';
 import { suggerisciPreventivi } from '@/lib/fattura/collegamenti';
 import { calcolaAnalisi, SOGLIA_FORFETTARIO, type RigaAnalisi } from '@/lib/fattura/analisi';
+import { calcolaFisco, incassatoAnno, leggiImpostazioniFisco, type FatturaFisco } from '@/lib/fisco';
+import { ensureClientiSchema } from '@/lib/schema';
 import {
   applicaModello,
   controllaPreventivo,
@@ -533,14 +536,20 @@ export function registraStrumenti(server: McpServer) {
     'aggiorna_stato_fattura',
     {
       title: 'Segna fattura pagata / da pagare',
-      description: 'Imposta lo stato di pagamento di una fattura in archivio.',
-      inputSchema: z.object({ id: z.number().int(), stato: z.enum(['pagata', 'da_pagare']) }),
+      description:
+        'Imposta lo stato di pagamento di una fattura in archivio. Da "pagata" salva il giorno dell’incasso ' +
+        '(pagata_il, default oggi), che fa fede per il calcolo di incassi e tasse. Chiedi conferma all’utente.',
+      inputSchema: z.object({
+        id: z.number().int(),
+        stato: z.enum(['pagata', 'da_pagare']),
+        pagata_il: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe('Giorno dell’incasso, YYYY-MM-DD. Default: oggi'),
+      }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
-    async ({ id, stato }) => {
+    async ({ id, stato, pagata_il }) => {
       await preparaArchivio();
-      const rows = await sql`UPDATE fatture SET stato = ${stato}, updated_at = NOW() WHERE id = ${id} RETURNING id`;
-      return rows.length ? testo({ id, stato }) : errore(`Fattura ${id} non trovata`);
+      const rows = await impostaStatoFattura(id, stato, pagata_il);
+      return rows.length ? testo({ id, stato, pagata_il: stato === 'pagata' ? pagata_il ?? 'oggi' : null }) : errore(`Fattura ${id} non trovata`);
     }
   );
 
@@ -651,7 +660,8 @@ export function registraStrumenti(server: McpServer) {
       title: 'Statistiche e analisi',
       description:
         'Analisi di un anno: fatturato (vs anno precedente), incassato/da incassare, soglia forfettario 85.000 €, ' +
-        'andamento mensile, clienti principali, pipeline dei preventivi e costo abbonamenti.',
+        'andamento mensile, clienti principali, pipeline dei preventivi e costo abbonamenti. Include il netto ' +
+        'del regime forfettario (contributi Gestione Separata, imposta sostitutiva, da accantonare, prossime scadenze).',
       inputSchema: z.object({ anno: z.number().int().optional().describe('Default: anno corrente') }),
       annotations: sola,
     },
@@ -675,6 +685,14 @@ export function registraStrumenti(server: McpServer) {
         WHERE p.stato IN ('accettato', 'archiviato') AND extract(year FROM p.created_at) = ${a}
         GROUP BY c.fonte ORDER BY valore DESC
       `;
+
+      await ensureClientiSchema(); // tabella impostazioni
+      const [impFisco] = await sql`SELECT valore FROM impostazioni WHERE chiave = 'fisco'`;
+      const pagamenti = (await sql`
+        SELECT importo::float8 AS importo, stato, to_char(data, 'YYYY-MM-DD') AS data, to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il
+        FROM fatture
+      `) as FatturaFisco[];
+      const fisco = calcolaFisco(a, incassatoAnno(pagamenti, a), leggiImpostazioniFisco(impFisco?.valore));
 
       const [abb] = await sql`
         SELECT coalesce(sum(CASE WHEN cadenza = 'mensile' THEN cifra WHEN cadenza = 'annuale' THEN cifra / 12 ELSE 0 END), 0)::float8 AS mensile
@@ -709,6 +727,19 @@ export function registraStrumenti(server: McpServer) {
           tasso_accettazione_percentuale: decisi ? Math.round(((per.accettato?.n ?? 0) / decisi) * 100) : null,
           valore_in_attesa: per.inviato?.totale ?? 0,
           lavori_acquisiti_per_fonte: perFonte.map((r) => ({ fonte: fonteLabel(r.fonte), lavori: r.lavori, valore: r.valore })),
+        },
+        netto_forfettario: {
+          incassato: fisco.incassato,
+          reddito_imponibile: fisco.reddito,
+          contributi_inps: fisco.contributi,
+          imposta_sostitutiva: fisco.imposta,
+          netto: fisco.netto,
+          quota_netta_percentuale: Math.round(fisco.quotaNetta * 1000) / 10,
+          da_accantonare: fisco.daAccantonare,
+          prossime_scadenze: fisco.scadenze,
+          nota: fisco.datiMancanti
+            ? `Mancano i dati della dichiarazione ${a - 1} (Statistiche → Dati fiscali): acconti stimati.`
+            : 'Incassi alla data di pagamento; stima, i numeri finali sono quelli della dichiarazione.',
         },
         abbonamenti_costo_mensile: abb.mensile,
         gestionale: `${baseApp()}/statistiche`,

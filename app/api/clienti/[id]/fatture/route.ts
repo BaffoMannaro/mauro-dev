@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import sql from '@/lib/db';
-import { ensurePortaleSchema } from '@/lib/schema';
+import { impostaStatoFattura } from '@/lib/fattura/server';
+import { ensureFattureXmlSchema } from '@/lib/schema';
 
 // Gestione fatture di un cliente (lato admin).
 export async function POST(
@@ -11,12 +12,12 @@ export async function POST(
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
 
-  await ensurePortaleSchema();
+  await ensureFattureXmlSchema();
   const { id } = await params;
   const b = await req.json().catch(() => ({}));
 
   await sql`
-    INSERT INTO fatture (cliente_id, preventivo_id, numero, importo, data, stato, pdf_url, note)
+    INSERT INTO fatture (cliente_id, preventivo_id, numero, importo, data, stato, pagata_il, pdf_url, note)
     VALUES (
       ${id},
       ${b.preventivo_id || null},
@@ -24,6 +25,7 @@ export async function POST(
       ${b.importo != null && b.importo !== '' ? b.importo : null},
       ${b.data || null},
       ${b.stato === 'pagata' ? 'pagata' : 'da_pagare'},
+      ${b.stato === 'pagata' ? b.pagata_il || b.data || null : null},
       ${b.pdf_url || null},
       ${b.note || null}
     )
@@ -38,18 +40,16 @@ export async function PATCH(
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
 
-  await ensurePortaleSchema();
+  await ensureFattureXmlSchema();
   const { id } = await params;
   const b = await req.json().catch(() => ({}));
   if (!b.fattura_id) {
     return NextResponse.json({ error: 'fattura_id mancante' }, { status: 400 });
   }
-  // Per ora l'unico update utile dal gestionale è lo stato pagamento.
-  await sql`
-    UPDATE fatture
-    SET stato = ${b.stato === 'pagata' ? 'pagata' : 'da_pagare'}, updated_at = NOW()
-    WHERE id = ${b.fattura_id} AND cliente_id = ${id}
-  `;
+  // Per ora l'unico update utile dal gestionale è lo stato pagamento (con il giorno dell'incasso).
+  const [propria] = await sql`SELECT id FROM fatture WHERE id = ${b.fattura_id} AND cliente_id = ${id}`;
+  if (!propria) return NextResponse.json({ error: 'Fattura non trovata' }, { status: 404 });
+  await impostaStatoFattura(b.fattura_id, b.stato === 'pagata' ? 'pagata' : 'da_pagare', b.pagata_il);
   return NextResponse.json({ ok: true });
 }
 
@@ -60,7 +60,7 @@ export async function DELETE(
   const session = await auth();
   if (!session) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
 
-  await ensurePortaleSchema();
+  await ensureFattureXmlSchema();
   const { id } = await params;
   const b = await req.json().catch(() => ({}));
   if (!b.fattura_id) {

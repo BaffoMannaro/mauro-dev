@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
 import { FONTI } from '@/lib/fonti';
 import { euro, euroCent } from '@/lib/formato';
+import ConfermaPagamento from './ConfermaPagamento';
 
 interface Cliente {
   id: number;
@@ -32,6 +33,7 @@ interface Fattura {
   importo: number | string | null;
   data: string | null;
   stato: string;
+  pagata_il?: string | null;
   pdf_url: string | null;
   note: string | null;
   created_at: string;
@@ -165,12 +167,14 @@ export default function ClienteDettaglio({
     }
   };
 
-  const cambiaStatoFattura = async (fatturaId: number, stato: string) => {
+  const [daConfermare, setDaConfermare] = useState<Fattura | null>(null);
+  const cambiaStatoFattura = async (fatturaId: number, stato: string, pagataIl: string | null) => {
+    setDaConfermare(null);
     setBusyId(fatturaId);
     const res = await fetch(`/api/clienti/${cliente.id}/fatture`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fattura_id: fatturaId, stato }),
+      body: JSON.stringify({ fattura_id: fatturaId, stato, pagata_il: pagataIl }),
     });
     setBusyId(null);
     if (res.ok) router.refresh();
@@ -547,16 +551,16 @@ export default function ClienteDettaglio({
                       <a href={f.pdf_url} target="_blank" rel="noreferrer" className="text-xs px-3 py-1.5 bg-surface hover:bg-slate text-muted hover:text-text rounded-lg transition-colors border border-edge">PDF</a>
                     )}
                     <button
-                      onClick={() => cambiaStatoFattura(f.id, f.stato === 'pagata' ? 'da_pagare' : 'pagata')}
+                      onClick={() => setDaConfermare(f)}
                       disabled={busyId === f.id}
                       className={`text-xs px-3 py-1.5 rounded-full border transition-colors disabled:opacity-40 ${
                         f.stato === 'pagata'
                           ? 'text-green-400 border-green-800/60 bg-green-950/30'
                           : 'text-amber-400 border-amber-800/60 bg-amber-950/30'
                       }`}
-                      title="Cambia stato pagamento"
+                      title={f.stato === 'pagata' && f.pagata_il ? `Incassata il ${fmtData(f.pagata_il)}` : 'Cambia stato pagamento'}
                     >
-                      {f.stato === 'pagata' ? 'Pagata' : 'Da pagare'}
+                      {f.stato === 'pagata' ? (f.pagata_il ? `Pagata ${f.pagata_il.slice(8, 10)}/${f.pagata_il.slice(5, 7)}` : 'Pagata') : 'Da pagare'}
                     </button>
                     <button onClick={() => eliminaFattura(f.id)} disabled={busyId === f.id} className="text-xs px-2 py-1.5 text-dim hover:text-red-400 transition-colors disabled:opacity-30" title="Elimina">✕</button>
                   </div>
@@ -712,6 +716,15 @@ export default function ClienteDettaglio({
             <button onClick={() => setShowMerge(false)} className="w-full mt-5 py-2.5 text-sm bg-surface2 hover:bg-slate text-muted hover:text-text rounded-xl transition-colors">Chiudi</button>
           </div>
         </div>
+      )}
+
+      {daConfermare && (
+        <ConfermaPagamento
+          descrizione={`Fattura${daConfermare.numero ? ` n. ${daConfermare.numero}` : ''}${daConfermare.importo != null ? ` · ${fmt(Number(daConfermare.importo))}` : ''}`}
+          verso={daConfermare.stato === 'pagata' ? 'da_pagare' : 'pagata'}
+          onConferma={(giorno) => cambiaStatoFattura(daConfermare.id, daConfermare.stato === 'pagata' ? 'da_pagare' : 'pagata', giorno)}
+          onAnnulla={() => setDaConfermare(null)}
+        />
       )}
     </div>
   );

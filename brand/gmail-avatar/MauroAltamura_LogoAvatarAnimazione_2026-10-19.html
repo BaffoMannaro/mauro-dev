@@ -16,8 +16,8 @@
   Timeline (3,6 s in loop, 25 fps = 90 fotogrammi). Primo e ultimo fotogramma = logo fermo,
   cosi' i client che mostrano solo il primo frame vedono il logo completo.
   0,00-0,70 pausa | 0,70-1,20 il tratto si ritira | 0,75-1,15 la piega si chiude sulla cerniera
-  1,10-1,60 resta la cerniera in verde accento | 1,55-2,25 il tratto si ridisegna
-  1,75-2,45 la piega si riapre con leggero rimbalzo | 2,45-3,60 pausa
+  1,35-2,05 il tratto si ridisegna in verde accento | 1,60-2,30 la piega si riapre con leggero rimbalzo
+  2,20-2,75 il tratto passa dal verde accento al grigio finale | 2,75-3,60 pausa
 -->
 <svg id="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
@@ -28,8 +28,6 @@
   <rect width="512" height="512" fill="#4C5760"/>
   <path id="tratto" d="M240 279 L355 126 L355 384" fill="none" stroke="#CBD2D0"
         stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-  <line id="cerniera" x1="153" y1="122" x2="153" y2="390" stroke="#DCF23C"
-        stroke-width="14" stroke-linecap="round" opacity="0"/>
   <g filter="url(#ombra)">
     <path id="piega" d="M147 126 Q147 112 160 120 L258 248 Q264 256 258 264 L160 392 Q147 400 147 386 Z" fill="#FFFFFF"/>
   </g>
@@ -45,31 +43,28 @@
 
   const tratto = document.getElementById('tratto');
   const piega = document.getElementById('piega');
-  const cerniera = document.getElementById('cerniera');
+  const ACCENTO = [0xDC, 0xF2, 0x3C], GRIGIO = [0xCB, 0xD2, 0xD0];
+  const mix = (a, b, p) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * p)).join(',')})`;
   const L = tratto.getTotalLength();
   tratto.style.strokeDasharray = `${L} ${L}`;
 
   function render(t) {
     t = ((t % DURATA) + DURATA) % DURATA;
-    // Tratto: si ritira verso il basso a destra, poi si ridisegna da li'
+    // Tratto: si ritira verso il basso a destra, poi si ridisegna da li' in verde accento
     const via = inCubic(fase(t, 0.70, 1.20));
-    const torna = outCubic(fase(t, 1.55, 2.25));
-    const visibile = t < 1.55 ? 1 - via : torna;
+    const torna = outCubic(fase(t, 1.35, 2.05));
+    const visibile = t < 1.35 ? 1 - via : torna;
+    const grigio = t < 1.35 ? 1 : inOut(fase(t, 2.20, 2.75));
+    tratto.setAttribute('stroke', mix(ACCENTO, GRIGIO, grigio));
     tratto.style.strokeDashoffset = -L * (1 - visibile);
     tratto.style.opacity = visibile < 0.01 ? 0 : 1;
 
     // Piega: si chiude sulla cerniera sinistra, poi si riapre con un rimbalzo
     let sx;
-    if (t < 1.75) sx = 1 - inOut(fase(t, 0.75, 1.15));
-    else sx = outBack(fase(t, 1.75, 2.45));
+    if (t < 1.60) sx = 1 - inOut(fase(t, 0.75, 1.15));
+    else sx = outBack(fase(t, 1.60, 2.30));
     sx = Math.max(sx, 0.0001);
     piega.setAttribute('transform', `translate(147 0) scale(${sx} 1) translate(-147 0)`);
-
-    // Cerniera in verde accento: compare a piega chiusa, sparisce mentre si riapre
-    const accesa = fase(t, 1.00, 1.15) * (1 - fase(t, 1.80, 2.05));
-    const pulsa = 1 + 0.05 * Math.sin(Math.PI * fase(t, 1.15, 1.70));
-    cerniera.setAttribute('opacity', accesa.toFixed(3));
-    cerniera.setAttribute('transform', `translate(0 256) scale(1 ${pulsa}) translate(0 -256)`);
   }
   window.render = render;
   window.DURATA = DURATA;

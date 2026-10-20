@@ -7,7 +7,7 @@
 // - Netto = incassato − tasse e INPS − abbonamenti.
 // - Anno in corso: medie sui mesi e sui giorni lavorativi già trascorsi.
 
-import { accettato, calcolaIncassi, type FatturaIncasso, type PreventivoIncasso } from './incassi';
+import { accettato, calcolaIncassi, giorno, type FatturaIncasso, type PreventivoIncasso } from './incassi';
 import { calcolaFisco, incassatoAnno, type Fisco, type ImpostazioniFisco } from './fisco';
 
 export interface AbbonamentoStat {
@@ -48,7 +48,10 @@ function giorniLavorativi(anno: number, oggi: Date) {
   return n;
 }
 
-const annoDi = (iso: string | null | undefined) => (iso ? Number(String(iso).slice(0, 4)) : NaN);
+const annoDi = (d: string | Date | null | undefined) => {
+  const g = giorno(d);
+  return g ? Number(g.slice(0, 4)) : NaN;
+};
 const dataAccettazione = (p: PreventivoIncasso) => p.accettato_at || p.created_at;
 
 export interface Barra {
@@ -147,7 +150,7 @@ export function calcolaPeriodo(periodo: number | 'totale', d: DatiStatistiche, o
   const giorni = somma('giorni');
 
   // Preventivi del periodo.
-  const nelPeriodo = (iso: string | null) => anni.includes(annoDi(iso));
+  const nelPeriodo = (d: string | Date | null) => anni.includes(annoDi(d));
   const accettati = d.preventivi.filter((p) => accettato(p) && nelPeriodo(dataAccettazione(p)));
   const creati = d.preventivi.filter((p) => nelPeriodo(p.created_at));
 

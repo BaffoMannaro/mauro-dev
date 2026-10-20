@@ -2,7 +2,8 @@ import { cookies } from 'next/headers';
 import { isScaduto } from '@/lib/scadenza';
 import { redirect } from 'next/navigation';
 import sql from '@/lib/db';
-import { ensurePortaleSchema } from '@/lib/schema';
+import { ordineFatture } from '@/lib/fattura/server';
+import { ensureFattureXmlSchema } from '@/lib/schema';
 import { verifyClientToken, CLIENT_COOKIE } from '@/lib/client-auth';
 import PortaleDashboard from '@/components/PortaleDashboard';
 
@@ -10,7 +11,7 @@ export const metadata = { title: 'La tua area' };
 export const dynamic = 'force-dynamic';
 
 export default async function PortalePage() {
-  await ensurePortaleSchema();
+  await ensureFattureXmlSchema(); // portale + colonne delle fatture (anno, per l'ordine)
 
   const store = await cookies();
   const token = store.get(CLIENT_COOKIE)?.value;
@@ -31,7 +32,7 @@ export default async function PortalePage() {
     SELECT id, numero, importo, data, stato, pdf_url, note
     FROM fatture
     WHERE cliente_id = ${session.cid}
-    ORDER BY data DESC NULLS LAST, created_at DESC
+    ORDER BY ${ordineFatture()}
   `;
 
   return (

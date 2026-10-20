@@ -7,6 +7,7 @@ import {
   collegaPreventivo,
   fattureDelPreventivo,
   impostaStatoFattura,
+  ordineFatture,
   preparaArchivio,
   preventiviCollegabili,
   salvaFattura,
@@ -500,7 +501,7 @@ export function registraStrumenti(server: McpServer) {
           AND (${anno ?? null}::int IS NULL OR anno = ${anno ?? null})
           AND (${stato ?? null}::text IS NULL OR stato = ${stato ?? null})
           AND (${q}::text IS NULL OR cliente_nome ILIKE ${q} OR numero ILIKE ${q})
-        ORDER BY data DESC, id DESC
+        ORDER BY ${ordineFatture()}
       `;
       return testo(
         rows.map((r) => ({

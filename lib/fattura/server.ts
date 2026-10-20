@@ -16,6 +16,13 @@ export const archivioSelect = () => sql`
   FROM fatture
 `;
 
+/** Ordine delle fatture per anno e numero, più recente prima (come piuRecentePrima in ordine.ts). */
+export const ordineFatture = () => sql`
+  COALESCE(anno, extract(year FROM data)::int) DESC NULLS LAST,
+  substring(numero FROM '[0-9]+')::int DESC NULLS LAST,
+  id DESC
+`;
+
 /** Genera il PDF brandizzato con PDFShift e lo restituisce come download. */
 export async function rispostaPdf(f: Fattura, logo: boolean): Promise<Response> {
   const pdfRes = await fetch('https://api.pdfshift.io/v3/convert/pdf', {

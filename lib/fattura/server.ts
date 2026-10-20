@@ -3,6 +3,7 @@ import { ensureFattureXmlSchema } from '@/lib/schema';
 import { parseFattura, type Fattura } from './parse';
 import { renderFatturaHtml, nomeFilePdf } from './html';
 import { normalizzaId, type PreventivoCollegabile } from './collegamenti';
+import { trancheDaFatture, type IncassoFattura, type TrancheStato } from './tranche';
 
 export { normalizzaId };
 
@@ -83,14 +84,17 @@ export async function upsertIntestatario(f: Fattura): Promise<{ id: number; clie
  */
 export async function impostaStatoFattura(id: number | string, stato: 'pagata' | 'da_pagare', pagataIl?: string | null) {
   const giorno = pagataIl && /^\d{4}-\d{2}-\d{2}$/.test(pagataIl) ? pagataIl : null;
-  return sql`
+  const righe = await sql`
     UPDATE fatture
     SET stato = ${stato},
         pagata_il = ${stato === 'pagata' ? sql`COALESCE(${giorno}::date, CURRENT_DATE)` : null},
         updated_at = NOW()
     WHERE id = ${id}
-    RETURNING id
+    RETURNING id, preventivo_id
   `;
+  // Le tranche del preventivo collegato seguono lo stato della fattura.
+  if (righe[0]?.preventivo_id) await sincronizzaTranche(righe[0].preventivo_id);
+  return righe;
 }
 
 let backfillFatto = false;
@@ -113,6 +117,15 @@ export async function preparaArchivio() {
       `;
     } catch (e) {
       console.error(`Backfill intestatario fattura ${r.id}:`, e);
+    }
+  }
+  // Tranche dei preventivi con fatture pagate collegate prima della spunta automatica.
+  const conFatture = await sql`SELECT DISTINCT preventivo_id FROM fatture WHERE preventivo_id IS NOT NULL AND stato = 'pagata'`;
+  for (const r of conFatture) {
+    try {
+      await sincronizzaTranche(r.preventivo_id);
+    } catch (e) {
+      console.error(`Spunta tranche preventivo ${r.preventivo_id}:`, e);
     }
   }
   backfillFatto = true;
@@ -219,6 +232,7 @@ export async function collegaPreventivo(fatturaId: number, preventivoId: number 
 
 /** Aggiorna società e P.IVA del preventivo con quelle delle fatture collegate. */
 export async function sincronizzaPreventivo(preventivoId: number) {
+  await sincronizzaTranche(preventivoId);
   const intestatari = await sql`
     SELECT i.id, i.denominazione, i.piva, i.codice_fiscale, i.indirizzo, i.localita,
            i.codice_destinatario, i.pec, min(f.data) AS prima, sum(f.importo)::float8 AS fatturato
@@ -256,6 +270,39 @@ export async function sincronizzaPreventivo(preventivoId: number) {
     UPDATE preventivi SET cliente_azienda = ${azienda}, meta = ${JSON.stringify(meta)}, updated_at = NOW()
     WHERE id = ${preventivoId}
   `;
+}
+
+/**
+ * Spunta le tranche del preventivo coperte dalle fatture collegate e pagate, in ordine:
+ * una tranche è pagata quando gli incassi delle fatture arrivano al suo totale cumulato,
+ * con la data d'incasso della fattura che la completa. Le spunte messe così hanno
+ * da_fattura: se la fattura torna "da pagare" o viene scollegata si tolgono; quelle
+ * messe a mano non vengono mai toccate.
+ */
+export async function sincronizzaTranche(preventivoId: number) {
+  const [p] = await sql`SELECT totale, tranches_stato, meta FROM preventivi WHERE id = ${preventivoId}`;
+  if (!p) return;
+  const totale = Number(p.totale) || 0;
+  const prima = (p.tranches_stato ?? []) as TrancheStato[];
+  const piano = (p.meta?.sezioni?.tranches ?? []) as { descrizione: string; percentuale: number }[];
+  const base: TrancheStato[] = prima.length
+    ? prima
+    : piano.length
+      ? piano.map((t) => ({ descrizione: t.descrizione, percentuale: Number(t.percentuale), pagato: false }))
+      : [{ descrizione: 'Pagamento unico', percentuale: 100, pagato: false }];
+
+  const pagate = await sql`
+    SELECT importo::float8 AS importo, to_char(COALESCE(pagata_il, data), 'YYYY-MM-DD') AS giorno
+    FROM fatture
+    WHERE preventivo_id = ${preventivoId} AND stato = 'pagata'
+    ORDER BY COALESCE(pagata_il, data), id
+  `;
+
+  const tranche = trancheDaFatture(base, totale, pagate as IncassoFattura[]);
+
+  const cambiato = JSON.stringify(tranche) !== JSON.stringify(prima.length ? prima : base);
+  if (!cambiato || (!prima.length && !tranche.some((t) => t.pagato))) return;
+  await sql`UPDATE preventivi SET tranches_stato = ${JSON.stringify(tranche)}::jsonb, updated_at = NOW() WHERE id = ${preventivoId}`;
 }
 
 /** Fatture collegate a un preventivo con il riepilogo fatturato / incassato. */

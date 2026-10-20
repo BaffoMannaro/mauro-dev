@@ -9,6 +9,7 @@ import FatturaCollegamento from './FatturaCollegamento';
 import ConfermaPagamento from './ConfermaPagamento';
 import type { ImpostazioniFisco } from '@/lib/fisco';
 import type { PreventivoCollegabile } from '@/lib/fattura/collegamenti';
+import { piuRecentePrima } from '@/lib/fattura/ordine';
 
 /** Riga dell'archivio (tabella fatture, solo quelle importate da XML). */
 export interface FatturaSalvata {
@@ -230,7 +231,7 @@ export default function FattureDashboard({
         row = { ...row, stato: 'pagata', pagata_il: item.pagataIl };
       }
       setArchivio((prev) =>
-        [row, ...prev.filter((r) => r.id !== row.id)].sort((a, b) => b.data.localeCompare(a.data) || b.id - a.id)
+        [row, ...prev.filter((r) => r.id !== row.id)].sort(piuRecentePrima)
       );
       setItems((prev) => prev.filter((i) => i.id !== item.id));
       setSel((s) => (s?.tipo === 'nuova' && s.id === item.id ? { tipo: 'salvata', id: row.id } : s));

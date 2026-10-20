@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import sql from '@/lib/db';
 import { ensureClientiSchema } from '@/lib/schema';
-import { preparaArchivio } from '@/lib/fattura/server';
+import { ordineFatture, preparaArchivio } from '@/lib/fattura/server';
 import ClienteDettaglio from '@/components/ClienteDettaglio';
 
 export async function generateMetadata({
@@ -31,7 +31,7 @@ export default async function ClientePage({
            to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il, pdf_url, note, created_at
     FROM fatture
     WHERE cliente_id = ${id}
-    ORDER BY data DESC NULLS LAST, created_at DESC
+    ORDER BY ${ordineFatture()}
   `;
 
   const preventivi = await sql`

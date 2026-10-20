@@ -9,7 +9,8 @@ export const metadata = { title: 'Statistiche' };
 
 export default async function StatistichePage() {
   const preventivi = await sql`SELECT * FROM preventivi ORDER BY created_at ASC`;
-  const abbonamenti = await sql`SELECT * FROM abbonamenti WHERE attivo = true`;
+  // Anche gli abbonamenti chiusi con una data di fine: contano negli anni in cui erano attivi.
+  const abbonamenti = await sql`SELECT * FROM abbonamenti WHERE attivo = true OR data_fine IS NOT NULL`;
   await preparaArchivio();
   await ensureClientiSchema(); // tabella impostazioni
   const fatture = await sql`

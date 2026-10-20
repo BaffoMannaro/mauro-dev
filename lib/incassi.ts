@@ -32,6 +32,7 @@ export interface Incasso {
   data: string; // YYYY-MM-DD
   importo: number;
   preventivo_id: number | null;
+  fonte: 'fattura' | 'tranche';
 }
 
 const giorno = (d: string | null | undefined) => (d ? String(d).slice(0, 10) : '');
@@ -40,7 +41,9 @@ export const accettato = (p: { stato: string }) => p.stato === 'accettato' || p.
 
 export function calcolaIncassi(preventivi: PreventivoIncasso[], fatture: FatturaIncasso[]) {
   const pagate = fatture.filter((f) => f.stato === 'pagata' && f.data && Number(f.importo) > 0);
-  const daFatture = (f: FatturaIncasso): Incasso => ({ data: giorno(f.pagata_il) || giorno(f.data), importo: Number(f.importo), preventivo_id: f.preventivo_id });
+  const daFatture = (f: FatturaIncasso): Incasso => ({
+    data: giorno(f.pagata_il) || giorno(f.data), importo: Number(f.importo), preventivo_id: f.preventivo_id, fonte: 'fattura',
+  });
 
   const incassi: Incasso[] = pagate.filter((f) => f.preventivo_id == null).map(daFatture);
   const perPreventivo = new Map<number, number>();
@@ -60,6 +63,7 @@ export function calcolaIncassi(preventivi: PreventivoIncasso[], fatture: Fattura
         data: giorno(t.data_pagamento) || giorno(p.accettato_at) || giorno(p.created_at),
         importo: (totale * Number(t.percentuale)) / 100,
         preventivo_id: p.id,
+        fonte: 'tranche' as const,
       }));
     const somma = (xs: Incasso[]) => xs.reduce((s, x) => s + x.importo, 0);
     const scelti = somma(fatt) >= somma(tranche) ? fatt : tranche;

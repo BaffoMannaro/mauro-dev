@@ -2,55 +2,19 @@
 
 import { useMemo, useState } from 'react';
 import { euro as fmt } from '@/lib/formato';
-import { accettato, calcolaIncassi, type FatturaIncasso } from '@/lib/incassi';
+import type { FatturaIncasso } from '@/lib/incassi';
 import type { ImpostazioniFisco } from '@/lib/fisco';
+import { anniDisponibili, calcolaPeriodo, type AbbonamentoStat, type PreventivoStat } from '@/lib/statistiche';
 import FiscoPannello from './FiscoPannello';
 
-interface Tranche {
-  descrizione: string;
-  percentuale: number;
-  pagato: boolean;
-  data_pagamento?: string | null;
-}
+type Tab = number | 'totale';
 
-interface Preventivo {
-  id: number;
-  oggetto: string;
-  cliente_nome: string;
-  totale: number;
-  stato: string;
-  created_at: string;
-  accettato_at: string | null;
-  lavoro_inizio: string | null;
-  lavoro_fine: string | null;
-  tranches_stato: Tranche[] | null;
-  meta?: any;
-}
-
-interface Abbonamento {
-  id: number;
-  nome: string;
-  cifra: number;
-  cadenza: string;
-  data_inizio: string;
-  data_fine: string | null;
-  attivo: boolean;
-}
-
-function costoMensileAbbonamento(ab: Abbonamento, anno: number, mese: number): number {
-  const inizio = new Date(ab.data_inizio);
-  const fine = ab.data_fine ? new Date(ab.data_fine) : null;
-  const dataCorrente = new Date(anno, mese, 1);
-  const dataFineCorrente = new Date(anno, mese + 1, 0);
-  if (inizio > dataFineCorrente) return 0;
-  if (fine && fine < dataCorrente) return 0;
-  if (ab.cadenza === 'mensile') return Number(ab.cifra);
-  if (ab.cadenza === 'annuale') return Number(ab.cifra) / 12;
-  if (ab.cadenza === 'una tantum') {
-    if (inizio.getFullYear() === anno && inizio.getMonth() === mese) return Number(ab.cifra);
-  }
-  return 0;
-}
+const LEGENDA = [
+  { color: 'bg-green-400', label: 'Incassato' },
+  { color: 'bg-amber-400', label: 'Tasse e INPS' },
+  { color: 'bg-accent', label: 'Abbonamenti' },
+  { color: 'bg-muted', label: 'Netto' },
+];
 
 export default function StatisticheDashboard({
   preventivi,
@@ -58,227 +22,159 @@ export default function StatisticheDashboard({
   fatture,
   fisco,
 }: {
-  preventivi: Preventivo[];
-  abbonamenti: Abbonamento[];
+  preventivi: PreventivoStat[];
+  abbonamenti: AbbonamentoStat[];
   fatture: FatturaIncasso[];
   fisco: ImpostazioniFisco;
 }) {
-  const [includiDaIncassare, setIncludiDaIncassare] = useState(false);
+  const dati = useMemo(() => ({ preventivi, fatture, abbonamenti, impostazioni: fisco }), [preventivi, fatture, abbonamenti, fisco]);
+  const anni = useMemo(() => anniDisponibili(dati), [dati]);
+  const corrente = new Date().getFullYear();
+  const [tab, setTab] = useState<Tab>(corrente);
+  const s = useMemo(() => calcolaPeriodo(tab, dati), [tab, dati]);
 
-  const stats = useMemo(() => {
-    const accettati = preventivi.filter(accettato);
-    const totaleContrattualizzato = accettati.reduce((acc, p) => acc + Number(p.totale), 0);
-    const inviati = preventivi.filter((p) => p.stato === 'inviato').length;
-    const rifiutati = preventivi.filter((p) => p.stato === 'rifiutato').length;
-    const tassoAccettazione = preventivi.length > 0
-      ? Math.round((accettati.length / preventivi.length) * 100) : 0;
-
-    // Incassato: fatture pagate e tranche spuntate (vedi lib/incassi.ts).
-    const { incassi, perPreventivo } = calcolaIncassi(preventivi, fatture);
-    const totalePagato = incassi.reduce((s, x) => s + x.importo, 0);
-    const residuo = (p: Preventivo) => Math.max(0, Number(p.totale) - (perPreventivo.get(p.id) ?? 0));
-    const totaleNonPagato = accettati.reduce((s, p) => s + residuo(p), 0);
-
-    // Ultimi 12 mesi, dal mese di un anno fa a quello in corso.
-    const oggi = new Date();
-    const mesi = Array.from({ length: 12 }, (_, i) => {
-      const d = new Date(oggi.getFullYear(), oggi.getMonth() - 11 + i, 1);
-      return {
-        label: d.toLocaleDateString('it-IT', { month: 'short' }),
-        anno: d.getFullYear(),
-        mese: d.getMonth(),
-        incassato: 0,
-        costoAbbonamenti: 0,
-        netto: 0,
-      };
-    });
-    const meseDi = (iso: string) => {
-      const [a, m] = iso.slice(0, 7).split('-').map(Number);
-      return mesi.find((x) => x.anno === a && x.mese === m - 1);
-    };
-
-    incassi.forEach((x) => {
-      const m = meseDi(x.data);
-      if (m) m.incassato += x.importo;
-    });
-    if (includiDaIncassare) {
-      // Quello che resta da incassare va nel mese di accettazione del preventivo.
-      accettati.forEach((p) => {
-        const m = meseDi(new Date(p.accettato_at || p.created_at).toISOString());
-        if (m) m.incassato += residuo(p);
-      });
-    }
-
-    mesi.forEach((m) => {
-      m.costoAbbonamenti = abbonamenti.reduce((s, ab) => s + costoMensileAbbonamento(ab, m.anno, m.mese), 0);
-      m.netto = m.incassato - m.costoAbbonamenti;
-    });
-
-    // Tariffe: incassato degli ultimi 12 mesi diviso i giorni lavorativi dello stesso periodo.
-    const incassatoPeriodo = mesi.reduce((s, m) => s + m.incassato, 0);
-    let giorniLavorativiAnno = 0;
-    const cursore = new Date(mesi[0].anno, mesi[0].mese, 1);
-    while (cursore <= oggi) {
-      const giorno = cursore.getDay();
-      if (giorno !== 0 && giorno !== 6) giorniLavorativiAnno++;
-      cursore.setDate(cursore.getDate() + 1);
-    }
-    const guadagnoAlGiorno = giorniLavorativiAnno > 0 ? incassatoPeriodo / giorniLavorativiAnno : 0;
-    const guadagnoAllOra = guadagnoAlGiorno / 8;
-    const totaleIncassatoEffettivo = includiDaIncassare ? totalePagato + totaleNonPagato : totalePagato;
-
-    const maxValore = Math.max(...mesi.map((m) => Math.max(m.incassato, m.costoAbbonamenti, Math.abs(m.netto))), 1);
-    const mesiConDati = mesi.filter((m) => m.incassato > 0);
-    const mediaIncassatoMensile = mesiConDati.length > 0
-      ? mesiConDati.reduce((s, m) => s + m.incassato, 0) / mesiConDati.length : 0;
-    const mediaNettoMensile = mesi.reduce((s, m) => s + m.netto, 0) / mesi.length;
-
-    const costoAbbMensileCorrente = abbonamenti.reduce(
-      (s, ab) => s + costoMensileAbbonamento(ab, oggi.getFullYear(), oggi.getMonth()), 0
-    );
-
-    return {
-      accettati, totaleContrattualizzato, inviati, rifiutati,
-      tassoAccettazione, totalePagato, totaleNonPagato, totaleIncassatoEffettivo,
-      guadagnoAlGiorno, guadagnoAllOra, giorniLavorativiAnno, perPreventivo,
-      mesi, maxValore, mediaIncassatoMensile, mediaNettoMensile,
-      costoAbbMensileCorrente,
-    };
-  }, [preventivi, abbonamenti, fatture, includiDaIncassare]);
+  const titolo = tab === 'totale' ? 'TOTALE' : String(tab);
+  const quota = (n: number) => (s.incassato > 0 ? `${((n / s.incassato) * 100).toLocaleString('it-IT', { maximumFractionDigits: 1 })}%` : '—');
+  const maxBarra = Math.max(...s.barre.map((b) => Math.max(b.incassato, b.tasse, b.abbonamenti, Math.abs(b.netto))), 1);
+  const altezza = (v: number) => Math.max(v > 0 ? (v / maxBarra) * 120 : 2, v > 0 ? 3 : 2);
+  const annoInCorso = tab === corrente;
 
   return (
     <div className="min-h-screen text-text">
-
-      {/* Header */}
       <header className="testata">
         <h1 className="titolo-pagina">Statistiche</h1>
-        <button
-          onClick={() => setIncludiDaIncassare((v) => !v)}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-            includiDaIncassare
-              ? 'bg-accent/10 border-accent text-accent'
-              : 'bg-surface2 border-edge text-muted hover:text-text hover:border-slate'
-          }`}
-        >
-          <span className={`w-1.5 h-1.5 rounded-full ${includiDaIncassare ? 'bg-accent' : 'bg-dim'}`} />
-          {includiDaIncassare ? 'Incluso da incassare' : 'Includi da incassare'}
-        </button>
+        <div role="tablist" aria-label="Periodo" className="flex gap-1 overflow-x-auto scrollbar-nascosta max-sm:w-full">
+          {(['totale', ...anni] as Tab[]).map((t) => (
+            <button
+              key={String(t)}
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => setTab(t)}
+              className={`shrink-0 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                tab === t ? 'bg-accent text-on-accent' : 'text-muted hover:text-text hover:bg-surface2'
+              }`}
+            >
+              {t === 'totale' ? 'Totale' : t}
+            </button>
+          ))}
+        </div>
       </header>
 
       <div className="corpo max-w-6xl">
-
-        {/* KPI riga 1 — numeri grandi stile Crextio */}
+        {/* Dal lordo al netto */}
         <div className="kpi-griglia md:grid-cols-4">
-          {[
-            { label: 'CONTRATTUALIZZATO', value: fmt(stats.totaleContrattualizzato), sub: `${stats.accettati.length} progetti`, color: 'text-text' },
-            { label: 'INCASSATO',         value: fmt(stats.totaleIncassatoEffettivo), sub: includiDaIncassare ? 'pagato + da incassare' : 'fatture pagate e tranche', color: 'text-green-400' },
-            { label: 'DA INCASSARE',      value: includiDaIncassare ? '—' : fmt(stats.totaleNonPagato), sub: includiDaIncassare ? 'incluso nel calcolo' : 'residuo dei lavori accettati', color: includiDaIncassare ? 'text-dim' : 'text-accent' },
-            { label: 'TASSO ACCETTAZIONE',value: `${stats.tassoAccettazione}%`,      sub: `${stats.rifiutati} rifiutati · ${stats.inviati} in attesa`, color: 'text-text' },
-          ].map((k) => (
-            <div key={k.label} className="kpi">
-              <p className="kpi-etichetta">{k.label}</p>
-              <p className={`kpi-valore ${k.color}`}>{k.value}</p>
-              <p className="kpi-nota">{k.sub}</p>
-            </div>
-          ))}
+          <div className="kpi">
+            <p className="kpi-etichetta">INCASSATO {titolo}</p>
+            <p className="kpi-valore text-green-400">{fmt(s.incassato)}</p>
+            <p className="kpi-nota">{s.senzaFattura > 0 ? `di cui ${fmt(s.senzaFattura)} senza fattura` : 'fatture pagate e tranche'}</p>
+          </div>
+          <div className="kpi">
+            <p className="kpi-etichetta">TASSE E INPS</p>
+            <p className="kpi-valore text-amber-400">{fmt(s.tasse)}</p>
+            <p className="kpi-nota">imposta {fmt(s.imposta)} · INPS {fmt(s.contributi)}</p>
+          </div>
+          <div className="kpi">
+            <p className="kpi-etichetta">ABBONAMENTI</p>
+            <p className="kpi-valore">{fmt(s.abbonamenti)}</p>
+            <p className="kpi-nota">{s.mesi} {s.mesi === 1 ? 'mese' : 'mesi'}{annoInCorso ? ' finora' : ''}</p>
+          </div>
+          <div className="kpi">
+            <p className="kpi-etichetta">NETTO {titolo}</p>
+            <p className={`kpi-valore ${s.netto >= 0 ? 'text-green-400' : 'text-red-400'}`}>{fmt(s.netto)}</p>
+            <p className="kpi-nota">{quota(s.netto)} dell’incassato, dopo tasse e abbonamenti</p>
+          </div>
         </div>
 
-        {/* KPI riga 2 */}
+        {/* Medie sul netto */}
         <div className="kpi-griglia sm:grid-cols-3">
-          {[
-            { label: 'MEDIA NETTO/MESE',   value: fmt(stats.mediaNettoMensile),  sub: 'incassato − abbonamenti', color: stats.mediaNettoMensile >= 0 ? 'text-text' : 'text-red-400' },
-            { label: 'TARIFFA GIORNALIERA',value: stats.guadagnoAlGiorno > 0 ? fmt(stats.guadagnoAlGiorno) : '—', sub: `${stats.giorniLavorativiAnno} giorni lav. in 12 mesi`, color: 'text-accent' },
-            { label: 'TARIFFA ORARIA',     value: stats.guadagnoAllOra > 0 ? fmt(stats.guadagnoAllOra) : '—', sub: '8h/giorno', color: 'text-accent' },
-          ].map((k) => (
-            <div key={k.label} className="kpi">
-              <p className="kpi-etichetta">{k.label}</p>
-              <p className={`kpi-valore ${k.color}`}>{k.value}</p>
-              <p className="kpi-nota">{k.sub}</p>
-            </div>
-          ))}
+          <div className="kpi">
+            <p className="kpi-etichetta">MEDIA NETTO/MESE</p>
+            <p className={`kpi-valore ${s.mediaNettoMese >= 0 ? '' : 'text-red-400'}`}>{fmt(s.mediaNettoMese)}</p>
+            <p className="kpi-nota">su {s.mesi} {s.mesi === 1 ? 'mese' : 'mesi'}{annoInCorso ? ' trascorsi' : ''}</p>
+          </div>
+          <div className="kpi">
+            <p className="kpi-etichetta">NETTO AL GIORNO</p>
+            <p className="kpi-valore text-accent">{s.giorni ? fmt(s.nettoGiorno) : '—'}</p>
+            <p className="kpi-nota">lordo {fmt(s.lordoGiorno)} · {s.giorni} giorni lav.</p>
+          </div>
+          <div className="kpi">
+            <p className="kpi-etichetta">NETTO ALL’ORA</p>
+            <p className="kpi-valore text-accent">{s.giorni ? fmt(s.nettoGiorno / 8) : '—'}</p>
+            <p className="kpi-nota">lordo {fmt(s.lordoGiorno / 8)} · 8h al giorno</p>
+          </div>
         </div>
 
-        <FiscoPannello fatture={fatture} impostazioni={fisco} />
+        {/* Lavori del periodo */}
+        <div className="kpi-griglia sm:grid-cols-3">
+          <div className="kpi">
+            <p className="kpi-etichetta">CONTRATTUALIZZATO</p>
+            <p className="kpi-valore">{fmt(s.contrattualizzato)}</p>
+            <p className="kpi-nota">{s.accettati.length} {s.accettati.length === 1 ? 'progetto accettato' : 'progetti accettati'}</p>
+          </div>
+          <div className="kpi">
+            <p className="kpi-etichetta">DA INCASSARE</p>
+            <p className="kpi-valore text-accent">{fmt(s.daIncassare)}</p>
+            <p className="kpi-nota">residuo dei progetti accettati</p>
+          </div>
+          <div className="kpi">
+            <p className="kpi-etichetta">TASSO ACCETTAZIONE</p>
+            <p className="kpi-valore">{s.tassoAccettazione === null ? '—' : `${s.tassoAccettazione}%`}</p>
+            <p className="kpi-nota">{s.rifiutati} rifiutati · {s.inAttesa} in attesa</p>
+          </div>
+        </div>
+
+        {s.fisco && annoInCorso && <FiscoPannello fisco={s.fisco} impostazioni={fisco} />}
 
         {/* Grafico */}
         <div className="scheda">
-          <p className="text-dim text-xs font-medium mb-4">INCASSATO VS ABBONAMENTI · ULTIMI 12 MESI</p>
-          <div className="flex gap-4 mb-5 flex-wrap">
-            {[
-              { color: 'bg-green-400', label: 'Incassato' },
-              { color: 'bg-accent', label: 'Abbonamenti' },
-              { color: 'bg-muted', label: 'Netto' },
-            ].map((l) => (
+          <p className="text-dim text-xs font-medium mb-4">{tab === 'totale' ? 'ANNO PER ANNO' : `MESE PER MESE · ${tab}`}</p>
+          <div className="flex gap-x-4 gap-y-2 mb-5 flex-wrap">
+            {LEGENDA.map((l) => (
               <div key={l.label} className="flex items-center gap-2">
                 <div className={`w-2.5 h-2.5 rounded-sm ${l.color}`} />
                 <span className="text-muted text-xs">{l.label}</span>
               </div>
             ))}
           </div>
-
           <div className="flex items-end gap-1 sm:gap-1.5">
-            {stats.mesi.map((m, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
-                {(m.incassato > 0 || m.costoAbbonamenti > 0) && (
-                  <div className={`absolute bottom-full mb-2 ${i < 3 ? 'left-0' : i > 8 ? 'right-0' : 'left-1/2 -translate-x-1/2'} bg-surface2 border border-edge rounded-lg p-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none`}>
-                    {m.incassato > 0 && <p className="text-green-400">{fmt(m.incassato)} incassato</p>}
-                    <p className="text-accent">{fmt(m.costoAbbonamenti)} abbonamenti</p>
-                    <p className={m.netto >= 0 ? 'text-text font-medium' : 'text-red-400 font-medium'}>
-                      {fmt(m.netto)} netto
-                    </p>
+            {s.barre.map((b, i) => (
+              <div key={b.label} className={`flex-1 flex flex-col items-center gap-1 group relative ${b.futuro ? 'opacity-30' : ''}`}>
+                {!b.futuro && (b.incassato > 0 || b.abbonamenti > 0) && (
+                  <div className={`absolute bottom-full mb-2 ${i < 3 ? 'left-0' : i > s.barre.length - 4 ? 'right-0' : 'left-1/2 -translate-x-1/2'} bg-surface2 border border-edge rounded-lg p-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none`}>
+                    <p className="text-green-400">{fmt(b.incassato)} incassato</p>
+                    <p className="text-amber-400">{fmt(b.tasse)} tasse e INPS</p>
+                    <p className="text-accent">{fmt(b.abbonamenti)} abbonamenti</p>
+                    <p className={b.netto >= 0 ? 'text-text font-medium' : 'text-red-400 font-medium'}>{fmt(b.netto)} netto</p>
                   </div>
                 )}
-                <div className="w-full flex items-end gap-px sm:gap-0.5" style={{ height: '120px' }}>
-                  <div className="flex-1 flex flex-col justify-end">
-                    <div className="w-full rounded-t-sm bg-green-400 transition-all"
-                      style={{ height: `${Math.max(m.incassato > 0 ? (m.incassato / stats.maxValore) * 120 : 2, m.incassato > 0 ? 4 : 2)}px` }} />
-                  </div>
-                  <div className="flex-1 flex flex-col justify-end">
-                    <div className="w-full rounded-t-sm bg-accent transition-all"
-                      style={{ height: `${Math.max(m.costoAbbonamenti > 0 ? (m.costoAbbonamenti / stats.maxValore) * 120 : 2, 4)}px` }} />
-                  </div>
-                  <div className="flex-1 flex flex-col justify-end">
-                    <div className={`w-full rounded-t-sm transition-all ${m.netto >= 0 ? 'bg-muted' : 'bg-red-600'}`}
-                      style={{ height: `${Math.max(Math.abs(m.netto) > 0 ? (Math.abs(m.netto) / stats.maxValore) * 120 : 2, 4)}px` }} />
-                  </div>
+                <div className="w-full flex items-end gap-px" style={{ height: 120 }}>
+                  <div className="flex-1 rounded-t-sm bg-green-400" style={{ height: altezza(b.incassato) }} />
+                  <div className="flex-1 rounded-t-sm bg-amber-400" style={{ height: altezza(b.tasse) }} />
+                  <div className="flex-1 rounded-t-sm bg-accent" style={{ height: altezza(b.abbonamenti) }} />
+                  <div className={`flex-1 rounded-t-sm ${b.netto >= 0 ? 'bg-muted' : 'bg-red-600'}`} style={{ height: altezza(Math.abs(b.netto)) }} />
                 </div>
-                <p className="text-dim text-[10px] sm:text-xs whitespace-nowrap">{m.label}<span className="hidden sm:inline"> {String(m.anno).slice(2)}</span></p>
+                <p className="text-dim text-[10px] sm:text-xs whitespace-nowrap">{b.label}</p>
               </div>
             ))}
           </div>
-
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-5 pt-4 sm:mt-6 sm:pt-5 border-t border-edge">
-            <div className="text-center">
-              <p className="text-dim text-[11px] sm:text-xs leading-snug mb-1">MEDIA INCASSATO</p>
-              <p className="text-green-400 font-bold text-base sm:text-lg tabular-nums">{fmt(stats.mediaIncassatoMensile)}</p>
-              <p className="text-dim text-xs mt-0.5">mesi con progetti</p>
-            </div>
-            <div className="text-center">
-              <p className="text-dim text-[11px] sm:text-xs leading-snug mb-1">ABBONAMENTI CORRENTI</p>
-              <p className="text-accent font-bold text-base sm:text-lg tabular-nums">{fmt(stats.costoAbbMensileCorrente)}</p>
-              <p className="text-dim text-xs mt-0.5">questo mese</p>
-            </div>
-            <div className="text-center">
-              <p className="text-dim text-[11px] sm:text-xs leading-snug mb-1">MEDIA NETTO</p>
-              <p className={`font-bold text-base sm:text-lg tabular-nums ${stats.mediaNettoMensile >= 0 ? 'text-text' : 'text-red-400'}`}>
-                {fmt(stats.mediaNettoMensile)}
-              </p>
-              <p className="text-dim text-xs mt-0.5">ultimi 12 mesi</p>
-            </div>
-          </div>
+          {s.senzaFattura > 0 && (
+            <p className="text-dim text-xs mt-4">
+              Tasse e INPS sono calcolati sulle fatture pagate: i {fmt(s.senzaFattura)} incassati senza fattura non sono tassati.
+            </p>
+          )}
         </div>
 
-        {/* Lista progetti */}
+        {/* Progetti accettati nel periodo */}
         <div className="bg-surface border border-edge rounded-xl overflow-hidden">
           <div className="px-4 sm:px-5 py-4 border-b border-edge">
-            <p className="text-dim text-xs font-medium">DETTAGLIO PROGETTI ACCETTATI</p>
+            <p className="text-dim text-xs font-medium">PROGETTI ACCETTATI · {titolo}</p>
           </div>
-          {stats.accettati.length === 0 ? (
-            <div className="px-4 sm:px-5 py-10 text-center text-dim text-sm">Nessun progetto accettato</div>
+          {s.accettati.length === 0 ? (
+            <div className="px-4 sm:px-5 py-10 text-center text-dim text-sm">Nessun progetto accettato nel periodo</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2">
-              {stats.accettati.map((p) => {
-                const pagato = stats.perPreventivo.get(p.id) ?? 0;
+              {s.accettati.map((p) => {
+                const pagato = s.perPreventivo.get(p.id) ?? 0;
                 const nonPagato = Math.max(0, Number(p.totale) - pagato);
                 const durata = p.lavoro_inizio && p.lavoro_fine
                   ? Math.round((new Date(p.lavoro_fine).getTime() - new Date(p.lavoro_inizio).getTime()) / (1000 * 60 * 60 * 24)) + 1 // inizio e fine inclusi
@@ -299,8 +195,8 @@ export default function StatisticheDashboard({
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-text text-sm font-bold">{fmt(Number(p.totale))}</p>
-                        {pagato > 0 && <p className="text-green-400 text-xs">{`${fmt(pagato)} incassati`}</p>}
+                        <p className="text-text text-sm font-bold tabular-nums">{fmt(Number(p.totale))}</p>
+                        {pagato > 0 && <p className="text-green-400 text-xs tabular-nums">{`${fmt(pagato)} incassati`}</p>}
                       </div>
                     </div>
                     {pagato > 0 && (

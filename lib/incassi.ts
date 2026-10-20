@@ -15,8 +15,8 @@ export interface PreventivoIncasso {
   id: number;
   totale: number | string;
   stato: string;
-  created_at: string;
-  accettato_at: string | null;
+  created_at: string | Date;
+  accettato_at: string | Date | null;
   tranches_stato: TrancheIncasso[] | null;
 }
 
@@ -35,7 +35,21 @@ export interface Incasso {
   fonte: 'fattura' | 'tranche';
 }
 
-const giorno = (d: string | null | undefined) => (d ? String(d).slice(0, 10) : '');
+/**
+ * Giorno YYYY-MM-DD da una data del database: testo ("2026-10-20", "2026-10-20T…")
+ * oppure oggetto Date (le colonne timestamp arrivano così), letto nel fuso locale.
+ */
+export function giorno(d: string | Date | null | undefined): string {
+  if (!d) return '';
+  if (d instanceof Date) {
+    if (Number.isNaN(d.getTime())) return '';
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  const s = String(d);
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  const t = new Date(s);
+  return Number.isNaN(t.getTime()) ? '' : giorno(t);
+}
 
 export const accettato = (p: { stato: string }) => p.stato === 'accettato' || p.stato === 'archiviato';
 

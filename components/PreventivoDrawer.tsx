@@ -60,7 +60,7 @@ export default function PreventivoDrawer({
   const totale = Number(preventivo.totale);
   const metaTranches = preventivo.meta?.sezioni?.tranches || [];
 
-  const tranches: { descrizione: string; percentuale: number; pagato: boolean; data_pagamento?: string }[] =
+  const tranches: { descrizione: string; percentuale: number; pagato: boolean; data_pagamento?: string; da_fattura?: boolean }[] =
     preventivo.tranches_stato && preventivo.tranches_stato.length > 0
       ? preventivo.tranches_stato
       : metaTranches.length > 0
@@ -342,7 +342,11 @@ export default function PreventivoDrawer({
                           </p>
                         </div>
                       </div>
-                      {t.pagato && <span className="text-green-400 text-xs font-mono">✓ Pagato</span>}
+                      {t.pagato && (
+                        <span className="text-green-400 text-xs font-mono text-right" title={t.da_fattura ? 'Spuntata dalla fattura pagata collegata' : undefined}>
+                          ✓ Pagato{t.da_fattura ? ' · da fattura' : ''}
+                        </span>
+                      )}
                     </div>
                     {t.pagato && (
                       <div className="mt-3 flex items-center gap-2">

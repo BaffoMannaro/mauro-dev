@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { euro, euroCent } from '@/lib/formato';
-import { calcolaFisco, incassatoAnno, type FatturaFisco, type ImpostazioniFisco } from '@/lib/fisco';
+import type { Fisco, ImpostazioniFisco } from '@/lib/fisco';
 
 const dataLunga = (iso: string) =>
   new Date(`${iso}T12:00:00`).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -11,16 +11,15 @@ const dataLunga = (iso: string) =>
 const inputCls =
   'w-full bg-bg border border-edge rounded-lg px-3 py-2 text-sm text-text placeholder-dim focus:outline-none focus:border-slate tabular-nums';
 
-/** Netto, tasse e scadenze del regime forfettario per l'anno in corso (vedi lib/fisco.ts). */
-export default function FiscoPannello({ fatture, impostazioni }: { fatture: FatturaFisco[]; impostazioni: ImpostazioniFisco }) {
-  const anno = new Date().getFullYear();
-  const f = useMemo(() => calcolaFisco(anno, incassatoAnno(fatture, anno), impostazioni), [anno, fatture, impostazioni]);
+/** Da accantonare, scadenze e dati fiscali dell'anno in corso (vedi lib/fisco.ts). */
+export default function FiscoPannello({ fisco: f, impostazioni }: { fisco: Fisco; impostazioni: ImpostazioniFisco }) {
+  const anno = f.anno;
   const [aperto, setAperto] = useState(false);
 
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-dim text-xs font-medium">NETTO E TASSE {anno} · FORFETTARIO</p>
+        <p className="text-dim text-xs font-medium">TASSE {anno} · FORFETTARIO</p>
         <button onClick={() => setAperto((v) => !v)} className="text-xs text-muted hover:text-text cursor-pointer">
           {aperto ? 'Chiudi dati fiscali' : 'Dati fiscali'}
         </button>
@@ -31,29 +30,6 @@ export default function FiscoPannello({ fatture, impostazioni }: { fatture: Fatt
           Mancano i dati della dichiarazione {anno - 1}: acconti e scadenze non sono ancora esatti. Inseriscili in “Dati fiscali”.
         </p>
       )}
-
-      <div className="kpi-griglia md:grid-cols-4">
-        <div className="kpi">
-          <p className="kpi-etichetta">INCASSATO {anno}</p>
-          <p className="kpi-valore">{euro(f.incassato)}</p>
-          <p className="kpi-nota">fatture pagate, alla data d’incasso</p>
-        </div>
-        <div className="kpi">
-          <p className="kpi-etichetta">CONTRIBUTI INPS</p>
-          <p className="kpi-valore text-amber-400">{euro(f.contributi)}</p>
-          <p className="kpi-nota">{(impostazioni.aliquotaContributi * 100).toLocaleString('it-IT')}% del reddito</p>
-        </div>
-        <div className="kpi">
-          <p className="kpi-etichetta">IMPOSTA SOSTITUTIVA</p>
-          <p className="kpi-valore text-amber-400">{euro(f.imposta)}</p>
-          <p className="kpi-nota">{(impostazioni.aliquotaImposta * 100).toLocaleString('it-IT')}% del reddito netto</p>
-        </div>
-        <div className="kpi">
-          <p className="kpi-etichetta">NETTO {anno}</p>
-          <p className="kpi-valore text-green-400">{euro(f.netto)}</p>
-          <p className="kpi-nota">{(f.quotaNetta * 100).toLocaleString('it-IT', { maximumFractionDigits: 1 })}% dell’incassato</p>
-        </div>
-      </div>
 
       <div className="scheda flex flex-col gap-4">
         <div className="flex items-baseline justify-between gap-3">

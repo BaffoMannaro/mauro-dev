@@ -56,6 +56,7 @@ FATTURE: l'utente carica in chat l'XML FatturaPA dell'Agenzia delle Entrate; pas
 FONTE DEL CLIENTE (diretto / Astrolancer / Cream): è una divisione INTERNA. Non scriverla mai nei testi del preventivo né in nulla che vede il cliente.
 LISTINO: le voci dei lavori (preventivi e fatture) sono raggruppate in "azioni". Se voci_lavori mostra voci da classificare, raggruppale per tipo di lavoro con classifica_voci (nomi brevi e riutilizzabili, es. "Landing page", "Intervento urgente", "Manutenzione ordinaria") e mostra all'utente la proposta prima di applicarla.
 SCADENZA: ogni preventivo vale al massimo ${VALIDITA_MAX_GIORNI} giorni (predefinito ${VALIDITA_MAX_GIORNI}). Se è scaduto il cliente può chiedere un'accettazione tardiva dalla pagina: la trovi come richiesta_accettazione_tardiva e la gestisci con gestisci_accettazione_tardiva, sempre dopo la conferma dell'utente.
+FISCO (forfettario, Gestione Separata): statistiche restituisce netto_forfettario (tasse, da accantonare, scadenze). Gli incassi contano alla data d'incasso (pagata_il di aggiorna_stato_fattura). Se l'utente carica un Modello Redditi, salva i dati dell'anno con imposta_dati_fiscali dopo la sua conferma.
 CLIENTE vs SOCIETÀ: il cliente è la persona/il rapporto; le società (lista_societa) sono i soggetti fiscali che ricevono le fatture. Un cliente può avere più società.
 
 Importi in euro, date YYYY-MM-DD. Rispondi in italiano. Il PDF delle fatture si scarica dal link restituito (valido 24 ore).`;
@@ -745,6 +746,41 @@ export function registraStrumenti(server: McpServer) {
         abbonamenti_costo_mensile: abb.mensile,
         gestionale: `${baseApp()}/statistiche`,
       });
+    }
+  );
+
+  server.registerTool(
+    'imposta_dati_fiscali',
+    {
+      title: 'Dati fiscali (dichiarazione di un anno)',
+      description:
+        'Salva i dati della dichiarazione dei redditi di un anno chiuso (Modello Redditi: imposta sostitutiva del ' +
+        'quadro LM, contributi Gestione Separata del quadro RR, acconti versati per quell’anno). Servono a calcolare ' +
+        'saldo e acconti dell’anno dopo (Statistiche → Dati fiscali). Importi in euro; 0 se l’anno è stato dichiarato a zero. ' +
+        'Chiedi conferma all’utente prima di salvare.',
+      inputSchema: z.object({
+        anno: z.number().int().min(2000),
+        imposta: z.number().min(0).describe('Imposta sostitutiva dovuta per l’anno'),
+        acconti_imposta: z.number().min(0).describe('Acconti d’imposta versati per l’anno'),
+        contributi: z.number().min(0).describe('Contributi Gestione Separata dovuti per l’anno'),
+        acconti_contributi: z.number().min(0).describe('Acconti di contributi versati per l’anno'),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    async ({ anno, imposta, acconti_imposta, contributi, acconti_contributi }) => {
+      await ensureClientiSchema(); // tabella impostazioni
+      const [riga] = await sql`SELECT valore FROM impostazioni WHERE chiave = 'fisco'`;
+      const imp = leggiImpostazioniFisco(riga?.valore);
+      imp.anni = {
+        ...imp.anni,
+        [String(anno)]: { imposta, accontiImposta: acconti_imposta, contributi, accontiContributi: acconti_contributi },
+      };
+      await sql`
+        INSERT INTO impostazioni (chiave, valore, updated_at)
+        VALUES ('fisco', ${JSON.stringify(imp)}::jsonb, NOW())
+        ON CONFLICT (chiave) DO UPDATE SET valore = EXCLUDED.valore, updated_at = NOW()
+      `;
+      return testo({ salvato: true, anno, dati: imp.anni[String(anno)], gestionale: `${baseApp()}/statistiche` });
     }
   );
 

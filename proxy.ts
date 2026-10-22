@@ -22,6 +22,19 @@ function isClientOnly(path: string) {
   return path === '/portale' || path === '/entra' || path === '/accedi';
 }
 
+// URL assoluta forzata sull'host indicato. Serve perché il wrapper auth()
+// normalizza nextUrl su AUTH_URL (app.maurodev.it): senza forzare l'host, i
+// redirect del portale finirebbero sull'host admin invece che su area.
+function onHost(nextUrl: URL, hostname: string, pathname: string) {
+  const url = new URL(nextUrl);
+  url.protocol = 'https:';
+  url.host = hostname;
+  url.port = '';
+  url.pathname = pathname;
+  url.search = '';
+  return url;
+}
+
 export default auth(async (req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
@@ -41,14 +54,14 @@ export default auth(async (req) => {
     const token = req.cookies.get(CLIENT_COOKIE)?.value;
     const session = token ? await verifyClientToken(token) : null;
     if (!session || session.scope !== 'session') {
-      return NextResponse.redirect(new URL('/accedi', nextUrl));
+      return NextResponse.redirect(onHost(nextUrl, CLIENT_HOST, '/accedi'));
     }
     // La dashboard vive alla URL reale /portale (nessun rewrite): tutto il
     // resto viene canonicalizzato lì con un redirect sullo stesso host.
     if (path === '/portale') {
       return NextResponse.next();
     }
-    return NextResponse.redirect(new URL('/portale', nextUrl));
+    return NextResponse.redirect(onHost(nextUrl, CLIENT_HOST, '/portale'));
   }
 
   // --- Dominio pubblico (maurodev.it) -------------------------------------

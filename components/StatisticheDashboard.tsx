@@ -66,7 +66,7 @@ export default function StatisticheDashboard({
           <div className="kpi">
             <p className="kpi-etichetta">INCASSATO {titolo}</p>
             <p className="kpi-valore text-green-400">{fmt(s.incassato)}</p>
-            <p className="kpi-nota">{s.senzaFattura > 0 ? `di cui ${fmt(s.senzaFattura)} senza fattura` : 'fatture pagate e tranche'}</p>
+            <p className="kpi-nota">{s.senzaFattura > 0 ? `di cui ${fmt(s.senzaFattura)} senza fattura` : 'pagamenti delle fatture e tranche'}</p>
           </div>
           <div className="kpi">
             <p className="kpi-etichetta">TASSE E INPS</p>
@@ -159,7 +159,7 @@ export default function StatisticheDashboard({
           </div>
           {s.senzaFattura > 0 && (
             <p className="text-dim text-xs mt-4">
-              Tasse e INPS sono calcolati sulle fatture pagate: i {fmt(s.senzaFattura)} incassati senza fattura non sono tassati.
+              Tasse e INPS sono calcolati sui pagamenti delle fatture, alla data di ciascun pagamento: i {fmt(s.senzaFattura)} incassati senza fattura non sono tassati.
             </p>
           )}
         </div>

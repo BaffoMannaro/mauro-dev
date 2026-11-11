@@ -4,8 +4,30 @@ import { parseFattura, type Fattura } from './parse';
 import { renderFatturaHtml, nomeFilePdf } from './html';
 import { normalizzaId, type PreventivoCollegabile } from './collegamenti';
 import { trancheDaFatture, type IncassoFattura, type TrancheStato } from './tranche';
+import {
+  dataValida, inCentesimi, inEuro, oggiRoma, riepilogoPagamenti, validaPagamento, type Pagamento,
+} from '@/lib/pagamenti';
 
 export { normalizzaId };
+
+/**
+ * Pagamenti della fattura come JSON ([{ id, data, importo_cent, metodo, nota }], per data).
+ * Va usato in query FROM fatture senza alias.
+ */
+export const pagamentiJson = () => sql`
+  COALESCE((
+    SELECT json_agg(json_build_object(
+      'id', pf.id, 'data', to_char(pf.data, 'YYYY-MM-DD'), 'importo_cent', pf.importo,
+      'metodo', pf.metodo, 'nota', pf.nota
+    ) ORDER BY pf.data, pf.id)
+    FROM pagamenti_fattura pf WHERE pf.fattura_id = fatture.id
+  ), '[]'::json)
+`;
+
+/** Incassato della fattura in euro (somma dei pagamenti). Query FROM fatture senza alias. */
+const incassatoSql = () => sql`
+  (COALESCE((SELECT sum(pf.importo) FROM pagamenti_fattura pf WHERE pf.fattura_id = fatture.id), 0) / 100.0)::float8
+`;
 
 /** Colonne dell'archivio che servono alla pagina Fatture (senza JOIN: i WHERE dei chiamanti restano non qualificati). */
 export const archivioSelect = () => sql`
@@ -13,7 +35,10 @@ export const archivioSelect = () => sql`
          imponibile::float8 AS imponibile, contributo::float8 AS contributo, stato,
          to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il,
          cliente_id, cliente_nome, cliente_piva, con_logo, xml, preventivo_id, intestatario_id,
-         (SELECT oggetto FROM preventivi p WHERE p.id = fatture.preventivo_id) AS preventivo_oggetto
+         (SELECT oggetto FROM preventivi p WHERE p.id = fatture.preventivo_id) AS preventivo_oggetto,
+         ${incassatoSql()} AS incassato,
+         GREATEST(0, COALESCE(importo, 0)::float8 - ${incassatoSql()}) AS residuo,
+         ${pagamentiJson()} AS pagamenti
   FROM fatture
 `;
 
@@ -78,23 +103,125 @@ export async function upsertIntestatario(f: Fattura): Promise<{ id: number; clie
   return row as { id: number; cliente_id: number | null };
 }
 
+// ─── Pagamenti ────────────────────────────────────────────────
+
+export class ErrorePagamento extends Error {}
+
+export interface StatoPagamenti {
+  fattura: { id: number; numero: string | null; cliente: string | null; data: string | null; preventivo_id: number | null };
+  pagamenti: { id: number; data: string; importo: number; metodo: string | null; nota: string | null }[];
+  totale: number;
+  incassato: number;
+  residuo: number;
+  stato: 'da_pagare' | 'parziale' | 'pagata';
+  pagata_il: string | null;
+}
+
+async function leggiFatturaPagamenti(fatturaId: number | string) {
+  const [f] = await sql`
+    SELECT id, numero, cliente_nome, to_char(data, 'YYYY-MM-DD') AS data, preventivo_id,
+           importo::float8 AS importo, stato, to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il,
+           ${pagamentiJson()} AS pagamenti
+    FROM fatture WHERE id = ${fatturaId}
+  `;
+  return f as
+    | { id: number; numero: string | null; cliente_nome: string | null; data: string | null; preventivo_id: number | null;
+        importo: number | null; stato: string; pagata_il: string | null; pagamenti: Required<Pagamento>[] }
+    | undefined;
+}
+
+/** Pagamenti della fattura con incassato, residuo e stato (importi in euro). null se non esiste. */
+export async function statoPagamenti(fatturaId: number | string): Promise<StatoPagamenti | null> {
+  const f = await leggiFatturaPagamenti(fatturaId);
+  if (!f) return null;
+  const r = riepilogoPagamenti(f.importo, f.pagamenti);
+  return {
+    fattura: { id: f.id, numero: f.numero, cliente: f.cliente_nome, data: f.data, preventivo_id: f.preventivo_id },
+    pagamenti: f.pagamenti.map((p) => ({ id: p.id, data: p.data, importo: inEuro(p.importo_cent), metodo: p.metodo, nota: p.nota })),
+    ...r,
+  };
+}
+
 /**
- * Segna una fattura pagata o da pagare. Da pagata salva il giorno dell'incasso
- * (quello indicato, altrimenti oggi); tornando a "da pagare" la data si cancella.
+ * Riallinea stato e pagata_il della fattura ai suoi pagamenti (da_pagare / parziale / pagata)
+ * e, se è collegata a un preventivo, le sue tranche.
+ */
+export async function ricalcolaStatoFattura(fatturaId: number | string) {
+  const f = await leggiFatturaPagamenti(fatturaId);
+  if (!f) return null;
+  const r = riepilogoPagamenti(f.importo, f.pagamenti);
+  if (r.stato !== f.stato || r.pagata_il !== f.pagata_il) {
+    await sql`UPDATE fatture SET stato = ${r.stato}, pagata_il = ${r.pagata_il}::date, updated_at = NOW() WHERE id = ${f.id}`;
+  }
+  if (f.preventivo_id) await sincronizzaTranche(f.preventivo_id);
+  return statoPagamenti(f.id);
+}
+
+/**
+ * Registra un pagamento (importo in euro, data default oggi). Errore chiaro se l'importo
+ * non è positivo, la data non è valida o la somma supera il totale della fattura.
+ */
+export async function registraPagamento(
+  fatturaId: number | string,
+  p: { importo: number; data?: string | null; metodo?: string | null; nota?: string | null }
+): Promise<StatoPagamenti> {
+  const f = await leggiFatturaPagamenti(fatturaId);
+  if (!f) throw new ErrorePagamento(`Fattura ${fatturaId} non trovata`);
+  const data = p.data || oggiRoma();
+  const importoCent = inCentesimi(p.importo);
+  const totaleCent = inCentesimi(f.importo);
+  const incassatoCent = f.pagamenti.reduce((s, x) => s + x.importo_cent, 0);
+  const err = Number(p.importo) > 0 && importoCent === 0
+    ? 'L’importo del pagamento deve essere almeno 0,01 €.'
+    : validaPagamento({ totaleCent, incassatoCent, importoCent, data });
+  if (err) throw new ErrorePagamento(err);
+
+  // Il controllo sulla somma si ripete nella INSERT, contro pagamenti arrivati nel frattempo.
+  const righe = await sql`
+    INSERT INTO pagamenti_fattura (fattura_id, data, importo, metodo, nota)
+    SELECT ${f.id}, ${data}::date, ${importoCent}, ${p.metodo?.trim() || null}, ${p.nota?.trim() || null}
+    WHERE ${importoCent} + COALESCE((SELECT sum(importo) FROM pagamenti_fattura WHERE fattura_id = ${f.id}), 0)
+          <= round(${f.importo ?? 0}::numeric * 100)
+    RETURNING id
+  `;
+  if (!righe.length) throw new ErrorePagamento('Il pagamento supera il residuo della fattura: ricarica i pagamenti e riprova.');
+  return (await ricalcolaStatoFattura(f.id))!;
+}
+
+/** Elimina un pagamento e riallinea la fattura. null se il pagamento non esiste. */
+export async function eliminaPagamento(pagamentoId: number | string, fatturaId?: number | string) {
+  const [r] = fatturaId === undefined
+    ? await sql`DELETE FROM pagamenti_fattura WHERE id = ${pagamentoId} RETURNING fattura_id`
+    : await sql`DELETE FROM pagamenti_fattura WHERE id = ${pagamentoId} AND fattura_id = ${fatturaId} RETURNING fattura_id`;
+  if (!r) return null;
+  return ricalcolaStatoFattura(r.fattura_id);
+}
+
+/**
+ * Compatibilità col vecchio "segna pagata / da pagare" (UI, aggiorna_stato_fattura):
+ * - "pagata": registra un pagamento pari al residuo alla data indicata (default oggi). Se è già
+ *   saldata con un solo pagamento e la data è diversa, corregge la data di quel pagamento.
+ * - "da_pagare": elimina tutti i pagamenti della fattura.
+ * null se la fattura non esiste.
  */
 export async function impostaStatoFattura(id: number | string, stato: 'pagata' | 'da_pagare', pagataIl?: string | null) {
-  const giorno = pagataIl && /^\d{4}-\d{2}-\d{2}$/.test(pagataIl) ? pagataIl : null;
-  const righe = await sql`
-    UPDATE fatture
-    SET stato = ${stato},
-        pagata_il = ${stato === 'pagata' ? sql`COALESCE(${giorno}::date, CURRENT_DATE)` : null},
-        updated_at = NOW()
-    WHERE id = ${id}
-    RETURNING id, preventivo_id
-  `;
-  // Le tranche del preventivo collegato seguono lo stato della fattura.
-  if (righe[0]?.preventivo_id) await sincronizzaTranche(righe[0].preventivo_id);
-  return righe;
+  const f = await leggiFatturaPagamenti(id);
+  if (!f) return null;
+  if (pagataIl && !dataValida(pagataIl)) throw new ErrorePagamento('Data del pagamento non valida: usa il formato YYYY-MM-DD.');
+
+  if (stato === 'da_pagare') {
+    await sql`DELETE FROM pagamenti_fattura WHERE fattura_id = ${f.id}`;
+    return ricalcolaStatoFattura(f.id);
+  }
+
+  const giorno = pagataIl || oggiRoma();
+  const r = riepilogoPagamenti(f.importo, f.pagamenti);
+  if (r.residuo > 0) return registraPagamento(f.id, { importo: r.residuo, data: giorno, nota: 'Saldo' });
+  if (r.totale <= 0) throw new ErrorePagamento('La fattura non ha un totale: impossibile registrare il saldo.');
+  if (pagataIl && f.pagamenti.length === 1 && f.pagamenti[0].data !== pagataIl) {
+    await sql`UPDATE pagamenti_fattura SET data = ${pagataIl}::date WHERE id = ${f.pagamenti[0].id}`;
+  }
+  return ricalcolaStatoFattura(f.id);
 }
 
 let backfillFatto = false;
@@ -120,7 +247,9 @@ export async function preparaArchivio() {
     }
   }
   // Tranche dei preventivi con fatture pagate collegate prima della spunta automatica.
-  const conFatture = await sql`SELECT DISTINCT preventivo_id FROM fatture WHERE preventivo_id IS NOT NULL AND stato = 'pagata'`;
+  const conFatture = await sql`
+    SELECT DISTINCT preventivo_id FROM fatture WHERE preventivo_id IS NOT NULL AND stato IN ('pagata', 'parziale')
+  `;
   for (const r of conFatture) {
     try {
       await sincronizzaTranche(r.preventivo_id);
@@ -179,6 +308,8 @@ export async function salvaFattura(f: Fattura, xml: string, conLogo: boolean, pr
   `;
   // Il PDF è sempre rigenerato dall'XML: il link vale per admin e portale cliente.
   await sql`UPDATE fatture SET pdf_url = ${`/api/fatture/${row.id}/pdf`} WHERE id = ${row.id}`;
+  // Riletta con un totale diverso: lo stato dipende dai pagamenti già registrati.
+  await ricalcolaStatoFattura(row.id);
 
   if (preventivoId !== undefined) {
     await collegaPreventivo(row.id, preventivoId);
@@ -273,9 +404,9 @@ export async function sincronizzaPreventivo(preventivoId: number) {
 }
 
 /**
- * Spunta le tranche del preventivo coperte dalle fatture collegate e pagate, in ordine:
- * una tranche è pagata quando gli incassi delle fatture arrivano al suo totale cumulato,
- * con la data d'incasso della fattura che la completa. Le spunte messe così hanno
+ * Spunta le tranche del preventivo coperte dai pagamenti delle fatture collegate, in ordine:
+ * una tranche è pagata quando i pagamenti (anche parziali) arrivano al suo totale cumulato,
+ * con la data del pagamento che la completa. Le spunte messe così hanno
  * da_fattura: se la fattura torna "da pagare" o viene scollegata si tolgono; quelle
  * messe a mano non vengono mai toccate.
  */
@@ -291,11 +422,12 @@ export async function sincronizzaTranche(preventivoId: number) {
       ? piano.map((t) => ({ descrizione: t.descrizione, percentuale: Number(t.percentuale), pagato: false }))
       : [{ descrizione: 'Pagamento unico', percentuale: 100, pagato: false }];
 
+  // Ogni pagamento (anche parziale) delle fatture collegate, alla sua data.
   const pagate = await sql`
-    SELECT importo::float8 AS importo, to_char(COALESCE(pagata_il, data), 'YYYY-MM-DD') AS giorno
-    FROM fatture
-    WHERE preventivo_id = ${preventivoId} AND stato = 'pagata'
-    ORDER BY COALESCE(pagata_il, data), id
+    SELECT (pf.importo / 100.0)::float8 AS importo, to_char(pf.data, 'YYYY-MM-DD') AS giorno
+    FROM pagamenti_fattura pf JOIN fatture f ON f.id = pf.fattura_id
+    WHERE f.preventivo_id = ${preventivoId}
+    ORDER BY pf.data, pf.id
   `;
 
   const tranche = trancheDaFatture(base, totale, pagate as IncassoFattura[]);
@@ -312,14 +444,18 @@ export async function fattureDelPreventivo(preventivoId: number) {
 
   const fatture = await sql`
     SELECT f.id, f.numero, to_char(f.data, 'YYYY-MM-DD') AS data, f.importo::float8 AS importo, f.stato,
+           (COALESCE((SELECT sum(pf.importo) FROM pagamenti_fattura pf WHERE pf.fattura_id = f.id), 0) / 100.0)::float8 AS incassato,
            f.xml IS NOT NULL AS da_xml, i.id AS intestatario_id,
            COALESCE(i.denominazione, f.cliente_nome) AS intestatario, i.piva
     FROM fatture f LEFT JOIN intestatari i ON i.id = f.intestatario_id
     WHERE f.preventivo_id = ${preventivoId}
     ORDER BY f.data NULLS LAST, f.id
   `;
-  const fatturato = fatture.reduce((s, f) => s + (f.importo ?? 0), 0);
-  const incassato = fatture.filter((f) => f.stato === 'pagata').reduce((s, f) => s + (f.importo ?? 0), 0);
+  const cent = (n: number) => Math.round(n * 100) / 100;
+  for (const f of fatture) f.residuo = cent(Math.max(0, (f.importo ?? 0) - f.incassato));
+  const fatturato = cent(fatture.reduce((s, f) => s + (f.importo ?? 0), 0));
+  // Incassato = pagamenti registrati sulle fatture (anche parziali).
+  const incassato = cent(fatture.reduce((s, f) => s + f.incassato, 0));
 
   return {
     fatture,
@@ -327,8 +463,8 @@ export async function fattureDelPreventivo(preventivoId: number) {
       totale_preventivo: p.totale,
       fatturato,
       incassato,
-      da_fatturare: Math.max(0, p.totale - fatturato),
-      da_incassare: fatturato - incassato,
+      da_fatturare: Math.max(0, cent(p.totale - fatturato)),
+      da_incassare: Math.max(0, cent(fatturato - incassato)),
       societa: [...new Set(fatture.map((f) => f.intestatario).filter(Boolean))],
     },
   };

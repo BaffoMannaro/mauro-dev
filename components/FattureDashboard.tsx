@@ -7,7 +7,9 @@ import { euroCent as eur } from '@/lib/formato';
 import FattureAnalisi from './FattureAnalisi';
 import FatturaCollegamento from './FatturaCollegamento';
 import ConfermaPagamento from './ConfermaPagamento';
+import PagamentiFattura from './PagamentiFattura';
 import type { ImpostazioniFisco } from '@/lib/fisco';
+import type { StatoPagamenti } from '@/lib/fattura/server';
 import type { PreventivoCollegabile } from '@/lib/fattura/collegamenti';
 import { piuRecentePrima } from '@/lib/fattura/ordine';
 
@@ -20,8 +22,14 @@ export interface FatturaSalvata {
   importo: number;
   imponibile: number | null;
   contributo: number | null;
-  stato: 'pagata' | 'da_pagare';
+  /** Derivato dai pagamenti. */
+  stato: 'pagata' | 'parziale' | 'da_pagare';
+  /** Giorno del pagamento che chiude il saldo. */
   pagata_il: string | null;
+  /** Somma dei pagamenti registrati e totale meno pagamenti, in euro. */
+  incassato: number;
+  residuo: number;
+  pagamenti: { id: number; data: string; importo_cent: number; metodo: string | null; nota: string | null }[];
   cliente_id: number | null;
   cliente_nome: string;
   cliente_piva: string | null;
@@ -107,7 +115,6 @@ export default function FattureDashboard({
   const [busy, setBusy] = useState<string | null>(null);
   const [errore, setErrore] = useState('');
   const [cerca, setCerca] = useState('');
-  const [daConfermare, setDaConfermare] = useState<FatturaSalvata | null>(null);
   const [pagamentoNuova, setPagamentoNuova] = useState<Caricata | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -228,7 +235,7 @@ export default function FattureDashboard({
           body: JSON.stringify({ stato: 'pagata', pagata_il: item.pagataIl }),
         });
         if (!pag.ok) throw new Error('Fattura salvata, ma non sono riuscito a segnarla pagata');
-        row = { ...row, stato: 'pagata', pagata_il: item.pagataIl };
+        row = { ...row, stato: 'pagata', pagata_il: item.pagataIl, incassato: row.importo, residuo: 0 };
       }
       setArchivio((prev) =>
         [row, ...prev.filter((r) => r.id !== row.id)].sort(piuRecentePrima)
@@ -277,18 +284,18 @@ export default function FattureDashboard({
     );
   };
 
-  // Il cambio di stato passa sempre dalla conferma (con il giorno dell'incasso).
-  const cambiaStato = async (r: FatturaSalvata, stato: 'pagata' | 'da_pagare', pagataIl: string | null) => {
-    setDaConfermare(null);
-    setErrore('');
-    const res = await fetch(`/api/fatture/${r.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stato, pagata_il: pagataIl }),
-    });
-    if (!res.ok) return setErrore('Aggiornamento dello stato non riuscito');
-    setArchivio((prev) => prev.map((x) => (x.id === r.id ? { ...x, stato, pagata_il: pagataIl } : x)));
-  };
+  // Pagamenti registrati o eliminati nel dettaglio: stato, incassato e residuo seguono.
+  const aggiornaPagamenti = (id: number, s: StatoPagamenti) =>
+    setArchivio((prev) =>
+      prev.map((x) =>
+        x.id === id
+          ? {
+              ...x, stato: s.stato, pagata_il: s.pagata_il, incassato: s.incassato, residuo: s.residuo,
+              pagamenti: s.pagamenti.map((p) => ({ id: p.id, data: p.data, importo_cent: Math.round(p.importo * 100), metodo: p.metodo, nota: p.nota })),
+            }
+          : x
+      )
+    );
 
   const eliminaSalvata = async (r: FatturaSalvata) => {
     if (!confirm(`Eliminare dall'archivio la fattura n. ${r.numero} di ${r.cliente_nome}?`)) return;
@@ -465,6 +472,7 @@ export default function FattureDashboard({
                   {archivioFiltrato.map((r, i) => {
                     const active = sel?.tipo === 'salvata' && sel.id === r.id;
                     const pagata = r.stato === 'pagata';
+                    const parziale = r.stato === 'parziale';
                     return (
                       <div
                         key={r.id}
@@ -484,12 +492,18 @@ export default function FattureDashboard({
                         <div className="text-right shrink-0">
                           <p className="text-sm font-semibold">{eur(r.importo)}</p>
                           <button
-                            onClick={(e) => { e.stopPropagation(); setDaConfermare(r); }}
-                            title={pagata && r.pagata_il ? `Incassata il ${r.pagata_il.split('-').reverse().join('/')}` : 'Cambia stato pagamento'}
-                            className={`text-xs mt-0.5 inline-flex items-center gap-1.5 cursor-pointer ${pagata ? 'text-green-400' : 'text-amber-400'}`}
+                            onClick={(e) => { e.stopPropagation(); setSel({ tipo: 'salvata', id: r.id }); }}
+                            title={
+                              pagata && r.pagata_il ? `Saldata il ${r.pagata_il.split('-').reverse().join('/')} · pagamenti`
+                                : parziale ? `Incassati ${eur(r.incassato)} su ${eur(r.importo)} · pagamenti`
+                                : 'Registra un pagamento'
+                            }
+                            className={`text-xs mt-0.5 inline-flex items-center gap-1.5 cursor-pointer ${pagata ? 'text-green-400' : parziale ? 'text-sky-400' : 'text-amber-400'}`}
                           >
-                            <span className={`w-1.5 h-1.5 rounded-full ${pagata ? 'bg-green-400' : 'bg-amber-400'}`} />
-                            {pagata ? (r.pagata_il ? `Pagata ${r.pagata_il.slice(8, 10)}/${r.pagata_il.slice(5, 7)}` : 'Pagata') : 'Da pagare'}
+                            <span className={`w-1.5 h-1.5 rounded-full ${pagata ? 'bg-green-400' : parziale ? 'bg-sky-400' : 'bg-amber-400'}`} />
+                            {pagata
+                              ? (r.pagata_il ? `Pagata ${r.pagata_il.slice(8, 10)}/${r.pagata_il.slice(5, 7)}` : 'Pagata')
+                              : parziale ? `Parziale · restano ${eur(r.residuo)}` : 'Da pagare'}
                           </button>
                         </div>
                         <div className="flex items-center gap-0.5 shrink-0">
@@ -536,6 +550,9 @@ export default function FattureDashboard({
               </div>
             )}
             <div className="max-lg:p-4">
+            {salvataSel && (
+              <PagamentiFattura key={salvataSel.id} fatturaId={salvataSel.id} onCambio={(s) => aggiornaPagamenti(salvataSel.id, s)} />
+            )}
             {salvataSel && fatturaSel && (
               <FatturaCollegamento
                 riga={salvataSel}
@@ -570,16 +587,6 @@ export default function FattureDashboard({
         />
       )}
 
-      {daConfermare && (
-        <ConfermaPagamento
-          descrizione={`Fattura n. ${daConfermare.numero} · ${daConfermare.cliente_nome} · ${eur(daConfermare.importo)}`}
-          stato={daConfermare.stato}
-          pagataIl={daConfermare.pagata_il}
-          dataFattura={daConfermare.data}
-          onConferma={(stato, giorno) => cambiaStato(daConfermare, stato, giorno)}
-          onAnnulla={() => setDaConfermare(null)}
-        />
-      )}
     </div>
   );
 }

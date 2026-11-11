@@ -1,5 +1,5 @@
 import sql from '@/lib/db';
-import { preparaArchivio } from '@/lib/fattura/server';
+import { pagamentiJson, preparaArchivio } from '@/lib/fattura/server';
 import type { FatturaIncasso } from '@/lib/incassi';
 import { leggiImpostazioniFisco } from '@/lib/fisco';
 import { ensureClientiSchema } from '@/lib/schema';
@@ -15,7 +15,7 @@ export default async function StatistichePage() {
   await ensureClientiSchema(); // tabella impostazioni
   const fatture = await sql`
     SELECT preventivo_id, importo::float8 AS importo, to_char(data, 'YYYY-MM-DD') AS data,
-           to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il, stato
+           to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il, stato, ${pagamentiJson()} AS pagamenti
     FROM fatture
   `;
   const [fisco] = await sql`SELECT valore FROM impostazioni WHERE chiave = 'fisco'`;

@@ -61,7 +61,11 @@ export default function FattureAnalisi({ archivio, fisco }: { archivio: FatturaS
         <div className="kpi">
           <p className="kpi-etichetta">DA INCASSARE</p>
           <p className={`kpi-valore ${s.daIncassare > 0 ? '' : 'text-accent'}`}>{fmt(s.daIncassare)}</p>
-          <p className="kpi-nota">{s.aperte ? `${s.aperte} ${s.aperte === 1 ? 'fattura aperta' : 'fatture aperte'}` : 'tutto incassato'}</p>
+          <p className="kpi-nota">
+            {s.aperte
+              ? `${s.aperte} ${s.aperte === 1 ? 'fattura aperta' : 'fatture aperte'}${s.parziali ? `, ${s.parziali} ${s.parziali === 1 ? 'parziale' : 'parziali'}` : ''}`
+              : 'tutto incassato'}
+          </p>
         </div>
         <div className="kpi">
           <p className="kpi-etichetta">SOGLIA FORFETTARIO</p>
@@ -82,7 +86,9 @@ export default function FattureAnalisi({ archivio, fisco }: { archivio: FatturaS
         {/* Andamento mensile */}
         <div className="scheda">
           <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-            <p className="text-dim text-xs font-medium">FATTURATO MENSILE {anno}</p>
+            <p className="text-dim text-xs font-medium" title="Incassato alla data di ciascun pagamento; da incassare sulle fatture emesse nel mese">
+              INCASSI MENSILI {anno}
+            </p>
             <div className="flex gap-4">
               {[
                 { color: 'bg-accent', label: 'Incassato' },
@@ -102,8 +108,9 @@ export default function FattureAnalisi({ archivio, fisco }: { archivio: FatturaS
                 <div key={m.label} className="flex-1 flex flex-col items-center gap-1 group relative">
                   {tot > 0 && (
                     <div className={`absolute bottom-full mb-2 ${i < 3 ? 'left-0' : i > 8 ? 'right-0' : 'left-1/2 -translate-x-1/2'} bg-surface2 border border-edge rounded-lg p-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none`}>
-                      <p className="text-text font-medium">{fmt(tot)} · {m.n} {m.n === 1 ? 'fattura' : 'fatture'}</p>
+                      <p className="text-text font-medium">{fmt(m.pagato)} incassati</p>
                       {m.aperto > 0 && <p className="text-muted">{fmt(m.aperto)} da incassare</p>}
+                      <p className="text-dim">{m.n} {m.n === 1 ? 'fattura emessa' : 'fatture emesse'}</p>
                     </div>
                   )}
                   <div className="w-full flex flex-col justify-end" style={{ height: 120 }}>

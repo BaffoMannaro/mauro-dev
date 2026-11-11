@@ -29,7 +29,10 @@ export default async function PortalePage() {
     ORDER BY created_at DESC
   `;
   const fatture = await sql`
-    SELECT id, numero, importo, data, stato, pdf_url, note
+    SELECT id, numero, importo, data, stato, pdf_url, note,
+           GREATEST(0, COALESCE(importo, 0) - COALESCE((
+             SELECT sum(pf.importo) FROM pagamenti_fattura pf WHERE pf.fattura_id = fatture.id
+           ), 0) / 100.0)::float8 AS residuo
     FROM fatture
     WHERE cliente_id = ${session.cid}
     ORDER BY ${ordineFatture()}

@@ -5,13 +5,19 @@ import { parseFattura, extractXml } from '@/lib/fattura/parse';
 import {
   archivioSelect,
   collegaPreventivo,
+  eliminaPagamento,
+  ErrorePagamento,
   fattureDelPreventivo,
   impostaStatoFattura,
   ordineFatture,
+  pagamentiJson,
   preparaArchivio,
   preventiviCollegabili,
+  registraPagamento,
   salvaFattura,
+  type StatoPagamenti,
 } from '@/lib/fattura/server';
+import { inEuro } from '@/lib/pagamenti';
 import { suggerisciPreventivi } from '@/lib/fattura/collegamenti';
 import { calcolaAnalisi, SOGLIA_FORFETTARIO, type RigaAnalisi } from '@/lib/fattura/analisi';
 import { calcolaFisco, incassatoAnno, leggiImpostazioniFisco, type FatturaFisco } from '@/lib/fisco';
@@ -53,10 +59,11 @@ NUOVO PREVENTIVO: intervista, non inventare.
 5. Mostra il link pubblico e il link PDF restituiti.
 
 FATTURE: l'utente carica in chat l'XML FatturaPA dell'Agenzia delle Entrate; passa il testo XML integrale a importa_fattura. Se la risposta contiene preventivi_suggeriti, proponi il collegamento e chiedi conferma prima di chiamare collega_fattura_preventivo. Un preventivo può avere più fatture, anche di società diverse. I dati fiscali (ragione sociale, P.IVA, indirizzo) vengono dalle fatture, che sono la fonte di verità: il preventivo collegato si aggiorna da solo.
+PAGAMENTI: una fattura si può saldare a rate. Ogni incasso si registra con registra_pagamento (importo in euro, data del pagamento, metodo e nota facoltativi), dopo la conferma dell'utente; un pagamento sbagliato si toglie con elimina_pagamento. Il riferimento è il totale documento (rivalsa INPS inclusa) e la somma dei pagamenti non può superarlo. Lo stato è derivato e non si imposta a mano: da_pagare (nessun pagamento), parziale (incassato una parte), pagata (saldo); pagata_il è il giorno del pagamento che chiude il saldo. lista_fatture mostra incassato, residuo e i pagamenti (con il loro id). aggiorna_stato_fattura resta per compatibilità: "pagata" registra un pagamento pari al residuo, "da_pagare" elimina TUTTI i pagamenti della fattura; per un acconto usa sempre registra_pagamento.
 FONTE DEL CLIENTE (diretto / Astrolancer / Cream): è una divisione INTERNA. Non scriverla mai nei testi del preventivo né in nulla che vede il cliente.
 LISTINO: le voci dei lavori (preventivi e fatture) sono raggruppate in "azioni". Se voci_lavori mostra voci da classificare, raggruppale per tipo di lavoro con classifica_voci (nomi brevi e riutilizzabili, es. "Landing page", "Intervento urgente", "Manutenzione ordinaria") e mostra all'utente la proposta prima di applicarla.
 SCADENZA: ogni preventivo vale al massimo ${VALIDITA_MAX_GIORNI} giorni (predefinito ${VALIDITA_MAX_GIORNI}). Se è scaduto il cliente può chiedere un'accettazione tardiva dalla pagina: la trovi come richiesta_accettazione_tardiva e la gestisci con gestisci_accettazione_tardiva, sempre dopo la conferma dell'utente.
-FISCO (forfettario, Gestione Separata): statistiche restituisce netto_forfettario (tasse, da accantonare, scadenze). Gli incassi contano alla data d'incasso (pagata_il di aggiorna_stato_fattura). Se l'utente carica un Modello Redditi, salva i dati dell'anno con imposta_dati_fiscali dopo la sua conferma.
+FISCO (forfettario, Gestione Separata): statistiche restituisce netto_forfettario (tasse, da accantonare, scadenze). Gli incassi contano alla data di ciascun pagamento (principio di cassa), non alla data fattura né a pagata_il: una fattura di dicembre saldata a rate l'anno dopo divide l'incassato tra i due anni, e così contributi e imposta. Da incassare = totale fatture − pagamenti registrati. Se l'utente carica un Modello Redditi, salva i dati dell'anno con imposta_dati_fiscali dopo la sua conferma.
 CLIENTE vs SOCIETÀ: il cliente è la persona/il rapporto; le società (lista_societa) sono i soggetti fiscali che ricevono le fatture. Un cliente può avere più società.
 
 Importi in euro, date YYYY-MM-DD. Rispondi in italiano. Il PDF delle fatture si scarica dal link restituito (valido 24 ore).`;
@@ -68,6 +75,16 @@ const testo = (data: unknown) => ({
 });
 
 const errore = (msg: string) => ({ content: [{ type: 'text' as const, text: msg }], isError: true });
+
+/** Risposta dei tool sui pagamenti di una fattura (importi in euro). */
+const esitoPagamenti = (s: StatoPagamenti) => ({
+  fattura: { id: s.fattura.id, numero: s.fattura.numero, cliente: s.fattura.cliente, data: s.fattura.data, totale: s.totale },
+  pagamenti: s.pagamenti,
+  incassato: s.incassato,
+  residuo: s.residuo,
+  stato: s.stato,
+  pagata_il: s.pagata_il,
+});
 
 const iso = (d: unknown) => (d instanceof Date ? d.toISOString().slice(0, 10) : d ? String(d).slice(0, 10) : null);
 
@@ -199,7 +216,10 @@ export function registraStrumenti(server: McpServer) {
         ...riepilogoPreventivo(p),
         dati: p.meta,
         tranches_stato: p.tranches_stato,
-        fatture: fatture.map((f) => ({ id: f.id, numero: f.numero, data: f.data, societa: f.intestatario, piva: f.piva, importo: f.importo, stato: f.stato })),
+        fatture: fatture.map((f) => ({
+          id: f.id, numero: f.numero, data: f.data, societa: f.intestatario, piva: f.piva,
+          importo: f.importo, incassato: f.incassato, residuo: f.residuo, stato: f.stato,
+        })),
         fatturazione: riepilogo,
         aperture_link: await visiteDelPreventivo(id, 10),
       });
@@ -485,10 +505,12 @@ export function registraStrumenti(server: McpServer) {
     'lista_fatture',
     {
       title: 'Elenca fatture',
-      description: 'Elenca le fatture in archivio, dalla più recente. Filtri per anno, stato e cliente.',
+      description:
+        'Elenca le fatture in archivio, dalla più recente, con incassato, residuo, stato (da_pagare, parziale, pagata) ' +
+        'e pagamenti registrati (id, data, importo). Filtri per anno, stato e cliente.',
       inputSchema: z.object({
         anno: z.number().int().optional(),
-        stato: z.enum(['pagata', 'da_pagare']).optional(),
+        stato: z.enum(['pagata', 'parziale', 'da_pagare']).optional(),
         cerca: z.string().optional().describe('Nome cliente o numero'),
       }),
       annotations: sola,
@@ -507,8 +529,14 @@ export function registraStrumenti(server: McpServer) {
       return testo(
         rows.map((r) => ({
           id: r.id, numero: r.numero, data: r.data, cliente: r.cliente_nome,
-          importo: r.importo, stato: r.stato, cliente_collegato: r.cliente_id != null,
+          importo: r.importo, incassato: r.incassato, residuo: Math.round(r.residuo * 100) / 100,
+          stato: r.stato, pagata_il: r.pagata_il, cliente_collegato: r.cliente_id != null,
           preventivo: r.preventivo_id ? { id: r.preventivo_id, oggetto: r.preventivo_oggetto } : null,
+          ...(r.pagamenti.length > 0 && {
+            pagamenti: (r.pagamenti as { id: number; data: string; importo_cent: number; metodo: string | null }[]).map((p) => ({
+              id: p.id, data: p.data, importo: inEuro(p.importo_cent), ...(p.metodo && { metodo: p.metodo }),
+            })),
+          }),
         }))
       );
     }
@@ -539,19 +567,72 @@ export function registraStrumenti(server: McpServer) {
     {
       title: 'Segna fattura pagata / da pagare',
       description:
-        'Imposta lo stato di pagamento di una fattura in archivio. Da "pagata" salva il giorno dell’incasso ' +
-        '(pagata_il, default oggi), che fa fede per il calcolo di incassi e tasse. Chiedi conferma all’utente.',
+        'Compatibilità: per gli acconti usa registra_pagamento. "pagata" registra UN pagamento pari al residuo ' +
+        '(tutto il totale se non ci sono pagamenti) alla data pagata_il (default oggi), che fa fede per incassi e tasse. ' +
+        '"da_pagare" ELIMINA TUTTI i pagamenti registrati sulla fattura (anche i parziali): dillo all’utente. ' +
+        'Chiedi sempre conferma all’utente prima di chiamarlo.',
       inputSchema: z.object({
         id: z.number().int(),
         stato: z.enum(['pagata', 'da_pagare']),
         pagata_il: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe('Giorno dell’incasso, YYYY-MM-DD. Default: oggi'),
       }),
-      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
     },
     async ({ id, stato, pagata_il }) => {
       await preparaArchivio();
-      const rows = await impostaStatoFattura(id, stato, pagata_il);
-      return rows.length ? testo({ id, stato, pagata_il: stato === 'pagata' ? pagata_il ?? 'oggi' : null }) : errore(`Fattura ${id} non trovata`);
+      try {
+        const s = await impostaStatoFattura(id, stato, pagata_il);
+        return s ? testo(esitoPagamenti(s)) : errore(`Fattura ${id} non trovata`);
+      } catch (e) {
+        if (e instanceof ErrorePagamento) return errore(e.message);
+        throw e;
+      }
+    }
+  );
+
+  server.registerTool(
+    'registra_pagamento',
+    {
+      title: 'Registra pagamento fattura',
+      description:
+        'Registra un pagamento (anche parziale, es. una rata) su una fattura in archivio. Importo in euro; la somma dei ' +
+        'pagamenti non può superare il totale documento (errore con il residuo). Ogni pagamento conta per incassi e tasse ' +
+        'alla sua data. Restituisce pagamenti, incassato, residuo e stato (da_pagare, parziale, pagata). ' +
+        'Prima di chiamarlo mostra all’utente fattura, importo e data e chiedi conferma.',
+      inputSchema: z.object({
+        fattura_id: z.number().int(),
+        importo: z.number().positive().describe('Euro, es. 500 o 1250.50'),
+        data: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe('Giorno del pagamento, YYYY-MM-DD. Default: oggi'),
+        metodo: z.string().max(60).optional().describe('Es. bonifico, contanti, carta'),
+        nota: z.string().max(300).optional(),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    },
+    async ({ fattura_id, importo, data, metodo, nota }) => {
+      await preparaArchivio();
+      try {
+        return testo(esitoPagamenti(await registraPagamento(fattura_id, { importo, data, metodo, nota })));
+      } catch (e) {
+        if (e instanceof ErrorePagamento) return errore(e.message);
+        throw e;
+      }
+    }
+  );
+
+  server.registerTool(
+    'elimina_pagamento',
+    {
+      title: 'Elimina pagamento fattura',
+      description:
+        'Elimina un pagamento registrato su una fattura (id da lista_fatture o registra_pagamento); stato, incassato e tasse ' +
+        'si ricalcolano. Operazione irreversibile: chiedi conferma all’utente mostrando data e importo del pagamento.',
+      inputSchema: z.object({ pagamento_id: z.number().int() }),
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
+    },
+    async ({ pagamento_id }) => {
+      await preparaArchivio();
+      const s = await eliminaPagamento(pagamento_id);
+      return s ? testo({ eliminato: pagamento_id, ...esitoPagamenti(s) }) : errore(`Pagamento ${pagamento_id} non trovato`);
     }
   );
 
@@ -661,7 +742,8 @@ export function registraStrumenti(server: McpServer) {
     {
       title: 'Statistiche e analisi',
       description:
-        'Analisi di un anno: fatturato (vs anno precedente), incassato/da incassare, soglia forfettario 85.000 €, ' +
+        'Analisi di un anno: fatturato (vs anno precedente), incassato (per data di ciascun pagamento) e da incassare ' +
+        '(totale fatture − pagamenti), soglia forfettario 85.000 €, ' +
         'andamento mensile, clienti principali, pipeline dei preventivi e costo abbonamenti. Include il netto ' +
         'del regime forfettario (contributi Gestione Separata, imposta sostitutiva, da accantonare, prossime scadenze).',
       inputSchema: z.object({ anno: z.number().int().optional().describe('Default: anno corrente') }),
@@ -671,7 +753,8 @@ export function registraStrumenti(server: McpServer) {
       await preparaArchivio();
       const a = anno ?? new Date().getFullYear();
 
-      const archivio = (await sql`${archivioSelect()} WHERE xml IS NOT NULL AND anno IN (${a}, ${a - 1})`) as RigaAnalisi[];
+      // Tutto l'archivio: l'incassato dell'anno comprende pagamenti di fatture emesse prima.
+      const archivio = (await sql`${archivioSelect()} WHERE xml IS NOT NULL`) as RigaAnalisi[];
       const s = calcolaAnalisi(archivio, a);
 
       const prev = await sql`
@@ -690,10 +773,8 @@ export function registraStrumenti(server: McpServer) {
 
       await ensureClientiSchema(); // tabella impostazioni
       const [impFisco] = await sql`SELECT valore FROM impostazioni WHERE chiave = 'fisco'`;
-      const pagamenti = (await sql`
-        SELECT importo::float8 AS importo, stato, to_char(data, 'YYYY-MM-DD') AS data, to_char(pagata_il, 'YYYY-MM-DD') AS pagata_il
-        FROM fatture
-      `) as FatturaFisco[];
+      // Pagamenti di tutte le fatture (anche inserite a mano), ognuno alla sua data.
+      const pagamenti = (await sql`SELECT ${pagamentiJson()} AS pagamenti FROM fatture`) as FatturaFisco[];
       const fisco = calcolaFisco(a, incassatoAnno(pagamenti, a), leggiImpostazioniFisco(impFisco?.valore));
 
       const [abb] = await sql`
@@ -709,8 +790,10 @@ export function registraStrumenti(server: McpServer) {
           variazione_percentuale: s.delta,
           numero: s.n,
           media_per_fattura: s.n ? Math.round(s.fatturato / s.n) : 0,
+          incassato_nell_anno: s.incassato,
           da_incassare: s.daIncassare,
           fatture_aperte: s.aperte,
+          fatture_parziali: s.parziali,
           rivalsa_inps: s.contributo,
           soglia_forfettario: {
             limite: SOGLIA_FORFETTARIO,
@@ -718,7 +801,8 @@ export function registraStrumenti(server: McpServer) {
             residuo: Math.max(0, SOGLIA_FORFETTARIO - s.fatturato),
             nota: 'Calcolata sulla data fattura; la norma considera gli incassi (principio di cassa).',
           },
-          mensile: s.mesi.map((m) => ({ mese: m.label, incassato: m.pagato, da_incassare: m.aperto, fatture: m.n })),
+          // incassato: pagamenti del mese (data pagamento); da_incassare e fatture: fatture emesse nel mese.
+          mensile: s.mesi.map((m) => ({ mese: m.label, incassato: m.pagato, da_incassare: m.aperto, fatture_emesse: m.n })),
           clienti: s.clienti.map((c) => ({
             cliente: c.nome, totale: c.totale, fatture: c.n,
             quota_percentuale: s.fatturato ? Math.round((c.totale / s.fatturato) * 100) : 0,

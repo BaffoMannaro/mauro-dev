@@ -7,20 +7,33 @@ export const MESI = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Se
 export interface RigaAnalisi {
   anno: number;
   data: string;
-  importo: number;
+  importo: number; // totale documento
   contributo: number | null;
   stato: string;
   cliente_nome: string;
   cliente_piva: string | null;
+  /** Pagamenti registrati (importo in centesimi). */
+  pagamenti: { data: string; importo_cent: number }[];
 }
 
+const cent = (n: number) => Math.round(n * 100) / 100;
+const incassatoFattura = (f: RigaAnalisi) => (f.pagamenti ?? []).reduce((s, p) => s + p.importo_cent, 0) / 100;
+/** Totale fattura meno pagamenti registrati. */
+export const residuoFattura = (f: RigaAnalisi) => Math.max(0, cent(f.importo - incassatoFattura(f)));
+
+/**
+ * Analisi dell'anno. Fatturato e clienti per data fattura; incassato per data del pagamento
+ * (anche di fatture di anni prima); da incassare = totale delle fatture dell'anno − pagamenti.
+ * Mensile: incassato nel mese (per data pagamento) e residuo delle fatture emesse nel mese.
+ * L'archivio va passato intero, non solo l'anno: servono i pagamenti delle fatture precedenti.
+ */
 export function calcolaAnalisi(archivio: RigaAnalisi[], anno: number) {
   const rows = archivio.filter((f) => f.anno === anno);
   const prec = archivio.filter((f) => f.anno === anno - 1);
   const fatturato = rows.reduce((t, f) => t + f.importo, 0);
   const fatturatoPrec = prec.reduce((t, f) => t + f.importo, 0);
-  const aperte = rows.filter((f) => f.stato !== 'pagata');
-  const daIncassare = aperte.reduce((t, f) => t + f.importo, 0);
+  const aperte = rows.filter((f) => residuoFattura(f) > 0);
+  const daIncassare = cent(aperte.reduce((t, f) => t + residuoFattura(f), 0));
   const contributo = rows.reduce((t, f) => t + (f.contributo ?? 0), 0);
 
   const mesi = MESI.map((label) => ({ label, pagato: 0, aperto: 0, n: 0 }));
@@ -28,8 +41,15 @@ export function calcolaAnalisi(archivio: RigaAnalisi[], anno: number) {
     const m = mesi[Number(f.data.slice(5, 7)) - 1];
     if (!m) return;
     m.n++;
-    if (f.stato === 'pagata') m.pagato += f.importo;
-    else m.aperto += f.importo;
+    m.aperto = cent(m.aperto + residuoFattura(f));
+  });
+  let incassato = 0;
+  archivio.flatMap((f) => f.pagamenti ?? []).forEach((p) => {
+    if (!p.data.startsWith(`${anno}-`)) return;
+    const m = mesi[Number(p.data.slice(5, 7)) - 1];
+    if (!m) return;
+    m.pagato = cent(m.pagato + p.importo_cent / 100);
+    incassato += p.importo_cent;
   });
   const maxMese = Math.max(1, ...mesi.map((m) => m.pagato + m.aperto));
 
@@ -45,6 +65,8 @@ export function calcolaAnalisi(archivio: RigaAnalisi[], anno: number) {
 
   return {
     n: rows.length, fatturato, fatturatoPrec, aperte: aperte.length, daIncassare, contributo,
+    incassato: incassato / 100,
+    parziali: rows.filter((f) => f.stato === 'parziale').length,
     mesi, maxMese, clienti,
     delta: fatturatoPrec > 0 ? Math.round(((fatturato - fatturatoPrec) / fatturatoPrec) * 100) : null,
     soglia: Math.min(100, (fatturato / SOGLIA_FORFETTARIO) * 100),

@@ -1,6 +1,7 @@
 // Incassi: da dove arrivano i soldi entrati, per le statistiche.
-// - Fatture segnate "pagata": valgono per il loro importo, nel mese dell'incasso (pagata_il,
-//   altrimenti la data fattura), collegate a un preventivo o no.
+// - Pagamenti delle fatture (anche parziali): ognuno vale nel giorno del pagamento, non alla
+//   data fattura né a pagata_il. Una fattura di dicembre saldata a rate l'anno dopo si divide
+//   tra i due anni. Collegate a un preventivo o no.
 // - Tranche spuntate dei preventivi accettati: nel mese di data_pagamento.
 // Per un preventivo con fatture collegate e tranche spuntate si prende la fonte che vale
 // di più, mai la somma: è lo stesso denaro registrato in due modi.
@@ -22,10 +23,12 @@ export interface PreventivoIncasso {
 
 export interface FatturaIncasso {
   preventivo_id: number | null;
-  importo: number | string | null;
+  importo: number | string | null; // totale documento
   data: string | null; // YYYY-MM-DD
-  pagata_il?: string | null; // giorno dell'incasso
+  pagata_il?: string | null; // giorno del saldo
   stato: string;
+  /** Pagamenti registrati (importo in centesimi). */
+  pagamenti: { data: string; importo_cent: number }[];
 }
 
 export interface Incasso {
@@ -54,23 +57,25 @@ export function giorno(d: string | Date | null | undefined): string {
 export const accettato = (p: { stato: string }) => p.stato === 'accettato' || p.stato === 'archiviato';
 
 export function calcolaIncassi(preventivi: PreventivoIncasso[], fatture: FatturaIncasso[]) {
-  const pagate = fatture.filter((f) => f.stato === 'pagata' && f.data && Number(f.importo) > 0);
-  const daFatture = (f: FatturaIncasso): Incasso => ({
-    data: giorno(f.pagata_il) || giorno(f.data), importo: Number(f.importo), preventivo_id: f.preventivo_id, fonte: 'fattura',
-  });
+  const pagate = fatture.filter((f) => (f.pagamenti ?? []).length > 0);
+  // Un incasso per ogni pagamento, alla sua data.
+  const daFatture = (f: FatturaIncasso): Incasso[] =>
+    (f.pagamenti ?? []).map((p) => ({
+      data: giorno(p.data), importo: p.importo_cent / 100, preventivo_id: f.preventivo_id, fonte: 'fattura' as const,
+    }));
 
-  const incassi: Incasso[] = pagate.filter((f) => f.preventivo_id == null).map(daFatture);
+  const incassi: Incasso[] = pagate.filter((f) => f.preventivo_id == null).flatMap(daFatture);
   const perPreventivo = new Map<number, number>();
 
   // Fatture collegate a preventivi non accettati: contano comunque (sono soldi entrati).
   const idAccettati = new Set(preventivi.filter(accettato).map((p) => p.id));
   for (const f of pagate) {
-    if (f.preventivo_id != null && !idAccettati.has(f.preventivo_id)) incassi.push(daFatture(f));
+    if (f.preventivo_id != null && !idAccettati.has(f.preventivo_id)) incassi.push(...daFatture(f));
   }
 
   for (const p of preventivi.filter(accettato)) {
     const totale = Number(p.totale) || 0;
-    const fatt = pagate.filter((f) => f.preventivo_id === p.id).map(daFatture);
+    const fatt = pagate.filter((f) => f.preventivo_id === p.id).flatMap(daFatture);
     const tranche: Incasso[] = (p.tranches_stato ?? [])
       .filter((t) => t.pagato)
       .map((t) => ({

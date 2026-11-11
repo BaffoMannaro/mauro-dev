@@ -52,20 +52,21 @@ export function leggiImpostazioniFisco(v: unknown): ImpostazioniFisco {
 }
 
 export interface FatturaFisco {
-  importo: number | string | null;
-  stato: string;
-  data: string | null; // data fattura YYYY-MM-DD
-  pagata_il?: string | null; // giorno dell'incasso
+  /** Pagamenti della fattura (importo in centesimi), ognuno alla sua data. */
+  pagamenti: { data: string; importo_cent: number }[];
 }
 
-/** Giorno dell'incasso: quello registrato, altrimenti la data fattura (fatture segnate pagate prima di ottobre 2026). */
-export const giornoIncasso = (f: FatturaFisco) => (f.pagata_il || f.data || '').slice(0, 10);
-
-/** Incassato di un anno: fatture pagate con incasso in quell'anno. */
+/**
+ * Incassato di un anno (principio di cassa): somma dei pagamenti con data in quell'anno,
+ * qualunque sia la data della fattura. Rivalsa INPS inclusa (il totale documento).
+ */
 export const incassatoAnno = (fatture: FatturaFisco[], anno: number) =>
-  fatture
-    .filter((f) => f.stato === 'pagata' && giornoIncasso(f).startsWith(`${anno}-`))
-    .reduce((s, f) => s + (Number(f.importo) || 0), 0);
+  Math.round(
+    fatture
+      .flatMap((f) => f.pagamenti ?? [])
+      .filter((p) => p.data.startsWith(`${anno}-`))
+      .reduce((s, p) => s + p.importo_cent, 0)
+  ) / 100;
 
 const cent = (n: number) => Math.round(n * 100) / 100;
 

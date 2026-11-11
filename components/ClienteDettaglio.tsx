@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
 import { FONTI } from '@/lib/fonti';
 import { euro, euroCent } from '@/lib/formato';
-import ConfermaPagamento from './ConfermaPagamento';
+import PagamentiFattura from './PagamentiFattura';
 
 interface Cliente {
   id: number;
@@ -32,12 +32,17 @@ interface Fattura {
   numero: string | null;
   importo: number | string | null;
   data: string | null;
+  /** Derivato dai pagamenti: da_pagare, parziale, pagata. */
   stato: string;
   pagata_il?: string | null;
+  pagamenti?: { importo_cent: number }[];
   pdf_url: string | null;
   note: string | null;
   created_at: string;
 }
+
+const residuoFattura = (f: Fattura) =>
+  Math.max(0, (Number(f.importo) || 0) - (f.pagamenti ?? []).reduce((s, p) => s + p.importo_cent, 0) / 100);
 
 interface Prev {
   id: number;
@@ -167,18 +172,8 @@ export default function ClienteDettaglio({
     }
   };
 
+  // Fattura di cui gestire i pagamenti (anche parziali) nella finestra.
   const [daConfermare, setDaConfermare] = useState<Fattura | null>(null);
-  const cambiaStatoFattura = async (fatturaId: number, stato: string, pagataIl: string | null) => {
-    setDaConfermare(null);
-    setBusyId(fatturaId);
-    const res = await fetch(`/api/clienti/${cliente.id}/fatture`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fattura_id: fatturaId, stato, pagata_il: pagataIl }),
-    });
-    setBusyId(null);
-    if (res.ok) router.refresh();
-  };
 
   const eliminaFattura = async (fatturaId: number) => {
     if (!confirm('Eliminare questa fattura?')) return;
@@ -563,11 +558,15 @@ export default function ClienteDettaglio({
                       className={`text-xs px-3 py-1.5 rounded-full border transition-colors disabled:opacity-40 ${
                         f.stato === 'pagata'
                           ? 'text-green-400 border-green-800/60 bg-green-950/30'
-                          : 'text-amber-400 border-amber-800/60 bg-amber-950/30'
+                          : f.stato === 'parziale'
+                            ? 'text-sky-400 border-sky-800/60 bg-sky-950/30'
+                            : 'text-amber-400 border-amber-800/60 bg-amber-950/30'
                       }`}
-                      title={f.stato === 'pagata' && f.pagata_il ? `Incassata il ${fmtData(f.pagata_il)}` : 'Cambia stato pagamento'}
+                      title={f.stato === 'pagata' && f.pagata_il ? `Saldata il ${fmtData(f.pagata_il)} · pagamenti` : 'Pagamenti della fattura'}
                     >
-                      {f.stato === 'pagata' ? (f.pagata_il ? `Pagata ${f.pagata_il.slice(8, 10)}/${f.pagata_il.slice(5, 7)}` : 'Pagata') : 'Da pagare'}
+                      {f.stato === 'pagata'
+                        ? (f.pagata_il ? `Pagata ${f.pagata_il.slice(8, 10)}/${f.pagata_il.slice(5, 7)}` : 'Pagata')
+                        : f.stato === 'parziale' ? `Parziale · restano ${fmt(residuoFattura(f))}` : 'Da pagare'}
                     </button>
                     <button onClick={() => eliminaFattura(f.id)} disabled={busyId === f.id} className="text-xs px-2 py-1.5 text-dim hover:text-red-400 transition-colors disabled:opacity-30" title="Elimina">✕</button>
                   </div>
@@ -726,14 +725,24 @@ export default function ClienteDettaglio({
       )}
 
       {daConfermare && (
-        <ConfermaPagamento
-          descrizione={`Fattura${daConfermare.numero ? ` n. ${daConfermare.numero}` : ''}${daConfermare.importo != null ? ` · ${fmt(Number(daConfermare.importo))}` : ''}`}
-          stato={daConfermare.stato}
-          pagataIl={daConfermare.pagata_il}
-          dataFattura={daConfermare.data ? String(daConfermare.data).slice(0, 10) : null}
-          onConferma={(stato, giorno) => cambiaStatoFattura(daConfermare.id, stato, giorno)}
-          onAnnulla={() => setDaConfermare(null)}
-        />
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-end sm:items-center justify-center px-4 pb-4 sm:pb-0" onClick={() => setDaConfermare(null)}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Pagamenti della fattura"
+            className="w-full max-w-md anima-comparsa"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 mb-2 text-sm">
+              <p className="text-text font-semibold truncate">
+                Fattura{daConfermare.numero ? ` n. ${daConfermare.numero}` : ''}
+                {daConfermare.importo != null ? ` · ${fmt(Number(daConfermare.importo))}` : ''}
+              </p>
+              <button onClick={() => setDaConfermare(null)} aria-label="Chiudi" className="text-muted hover:text-text cursor-pointer">✕</button>
+            </div>
+            <PagamentiFattura fatturaId={daConfermare.id} onCambio={() => router.refresh()} />
+          </div>
+        </div>
       )}
     </div>
   );

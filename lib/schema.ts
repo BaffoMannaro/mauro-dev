@@ -110,5 +110,43 @@ export async function ensureFattureXmlSchema() {
   await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS intestatario_id INTEGER`;
   // Giorno in cui la fattura è stata segnata pagata: fa fede per l'incasso (principio di cassa).
   await sql`ALTER TABLE fatture ADD COLUMN IF NOT EXISTS pagata_il DATE`;
+  await migraPagamentiFattura();
   ensuredFattureXml = true;
+}
+
+/**
+ * Pagamenti (anche parziali) delle fatture. Idempotente: si può rilanciare senza duplicare.
+ * - importo in centesimi interi; il riferimento è il totale documento della fattura (fatture.importo).
+ * - Fatture già "pagata" senza pagamenti: un unico pagamento pari al totale, alla data
+ *   pagata_il (o la data fattura per quelle segnate prima di ottobre 2026). Le "da_pagare" restano vuote.
+ * - Da qui in poi stato e pagata_il di fatture derivano dai pagamenti (ricalcolaStatoFattura).
+ */
+export async function migraPagamentiFattura() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS pagamenti_fattura (
+      id SERIAL PRIMARY KEY,
+      fattura_id INTEGER NOT NULL REFERENCES fatture(id) ON DELETE CASCADE,
+      data DATE NOT NULL,
+      importo INTEGER NOT NULL CHECK (importo > 0),
+      metodo TEXT,
+      nota TEXT,
+      creato_il TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS pagamenti_fattura_fattura ON pagamenti_fattura (fattura_id, data)`;
+  await sql`CREATE INDEX IF NOT EXISTS pagamenti_fattura_data ON pagamenti_fattura (data)`;
+  await sql`
+    INSERT INTO pagamenti_fattura (fattura_id, data, importo, nota)
+    SELECT f.id, COALESCE(f.pagata_il, f.data, f.created_at::date), round(f.importo * 100)::int,
+           'Saldo registrato prima dei pagamenti parziali'
+    FROM fatture f
+    WHERE f.stato = 'pagata' AND f.importo > 0
+      AND NOT EXISTS (SELECT 1 FROM pagamenti_fattura p WHERE p.fattura_id = f.id)
+  `;
+  // pagata_il coerente col pagamento appena creato (le fatture segnate senza giorno).
+  await sql`
+    UPDATE fatture f SET pagata_il = p.data
+    FROM (SELECT fattura_id, max(data) AS data FROM pagamenti_fattura GROUP BY fattura_id) p
+    WHERE p.fattura_id = f.id AND f.stato = 'pagata' AND f.pagata_il IS NULL
+  `;
 }

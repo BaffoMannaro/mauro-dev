@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import sql from '@/lib/db';
-import { collegaPreventivo, impostaStatoFattura, preparaArchivio, sincronizzaPreventivo } from '@/lib/fattura/server';
+import { collegaPreventivo, ErrorePagamento, impostaStatoFattura, preparaArchivio, sincronizzaPreventivo } from '@/lib/fattura/server';
 
 // Aggiorna stato pagamento (con il giorno dell'incasso), preferenza logo e/o preventivo collegato di una fattura in archivio.
+// Stato: "pagata" registra un pagamento pari al residuo, "da_pagare" elimina i pagamenti (vedi impostaStatoFattura).
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,7 +17,12 @@ export async function PATCH(
   const b = await req.json().catch(() => ({}));
 
   if (b.stato !== undefined) {
-    await impostaStatoFattura(id, b.stato === 'pagata' ? 'pagata' : 'da_pagare', b.pagata_il);
+    try {
+      await impostaStatoFattura(id, b.stato === 'pagata' ? 'pagata' : 'da_pagare', b.pagata_il);
+    } catch (e) {
+      if (e instanceof ErrorePagamento) return NextResponse.json({ error: e.message }, { status: 400 });
+      throw e;
+    }
   }
   if (b.con_logo !== undefined) {
     await sql`UPDATE fatture SET con_logo = ${b.con_logo !== false}, updated_at = NOW() WHERE id = ${id}`;

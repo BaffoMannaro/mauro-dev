@@ -26,6 +26,8 @@ type Fattura = {
   importo: number | string | null;
   data: string | null;
   stato: string;
+  /** Totale meno pagamenti già ricevuti. */
+  residuo?: number | null;
   pdf_url: string | null;
   note: string | null;
 };
@@ -178,7 +180,9 @@ export default function PortaleDashboard({
                         Fattura {f.numero ? `n. ${f.numero}` : ''} da saldare
                       </p>
                       <p className="text-xs text-dim">
-                        {f.importo != null ? eur(Number(f.importo)) : ''} · {dataIt(f.data)}
+                        {f.stato === 'parziale' && f.residuo != null
+                          ? `restano ${eur(Number(f.residuo))} su ${eur(Number(f.importo))}`
+                          : f.importo != null ? eur(Number(f.importo)) : ''} · {dataIt(f.data)}
                       </p>
                     </div>
                     {f.pdf_url && (
@@ -289,8 +293,9 @@ export default function PortaleDashboard({
                             ? 'bg-emerald-500/15 text-emerald-400'
                             : 'bg-amber-500/15 text-amber-400'
                         }`}
+                        title={f.stato === 'parziale' && f.residuo != null ? `Restano ${eur(Number(f.residuo))}` : undefined}
                       >
-                        {f.stato === 'pagata' ? 'Pagata' : 'Da pagare'}
+                        {f.stato === 'pagata' ? 'Pagata' : f.stato === 'parziale' ? 'Pagata in parte' : 'Da pagare'}
                       </span>
                       {f.pdf_url && (
                         <a

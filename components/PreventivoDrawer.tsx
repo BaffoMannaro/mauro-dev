@@ -34,7 +34,10 @@ interface Preventivo {
 }
 
 interface FattureCollegate {
-  fatture: { id: number; numero: string | null; data: string | null; importo: number; stato: string; intestatario: string | null; piva: string | null }[];
+  fatture: {
+    id: number; numero: string | null; data: string | null; importo: number; stato: string;
+    incassato: number; residuo: number; intestatario: string | null; piva: string | null;
+  }[];
   riepilogo: { totale_preventivo: number; fatturato: number; incassato: number; da_fatturare: number; da_incassare: number; societa: string[] };
 }
 
@@ -443,8 +446,11 @@ export default function PreventivoDrawer({
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-text text-sm font-semibold">{euro(f.importo)}</p>
-                        <p className={`text-xs ${f.stato === 'pagata' ? 'text-green-400' : 'text-amber-400'}`}>
-                          {f.stato === 'pagata' ? 'Pagata' : 'Da pagare'}
+                        <p
+                          className={`text-xs ${f.stato === 'pagata' ? 'text-green-400' : f.stato === 'parziale' ? 'text-sky-400' : 'text-amber-400'}`}
+                          title={f.stato === 'parziale' ? `Incassati ${euro(f.incassato)}` : undefined}
+                        >
+                          {f.stato === 'pagata' ? 'Pagata' : f.stato === 'parziale' ? `Parziale · restano ${euro(f.residuo)}` : 'Da pagare'}
                         </p>
                       </div>
                     </div>

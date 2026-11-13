@@ -6,6 +6,7 @@ import { ordineFatture } from '@/lib/fattura/server';
 import { ensureFattureXmlSchema } from '@/lib/schema';
 import { verifyClientToken, CLIENT_COOKIE } from '@/lib/client-auth';
 import PortaleDashboard from '@/components/PortaleDashboard';
+import { leggiCanone } from '@/lib/canone';
 
 export const metadata = { title: 'La tua area' };
 export const dynamic = 'force-dynamic';
@@ -38,8 +39,11 @@ export default async function PortalePage() {
     ORDER BY ${ordineFatture()}
   `;
 
+  const haCanone = !!(await leggiCanone(session.cid));
+
   return (
     <PortaleDashboard
+      haCanone={haCanone}
       cliente={cliente as any}
       preventivi={preventivi.map((p) => ({ ...p, scaduto: p.stato === 'inviato' && isScaduto(p) })) as any}
       fatture={fatture as any}

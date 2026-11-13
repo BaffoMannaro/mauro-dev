@@ -19,7 +19,7 @@ function stripPrefix(pathname: string) {
 
 // Percorsi che appartengono SOLO al portale cliente.
 function isClientOnly(path: string) {
-  return path === '/portale' || path === '/entra' || path === '/accedi';
+  return path === '/portale' || path === '/canone' || path === '/entra' || path === '/accedi';
 }
 
 // URL assoluta forzata sull'host indicato. Serve perché il wrapper auth()
@@ -58,7 +58,7 @@ export default auth(async (req) => {
     }
     // La dashboard vive alla URL reale /portale (nessun rewrite): tutto il
     // resto viene canonicalizzato lì con un redirect sullo stesso host.
-    if (path === '/portale') {
+    if (path === '/portale' || path === '/canone') {
       return NextResponse.next();
     }
     return NextResponse.redirect(onHost(nextUrl, CLIENT_HOST, '/portale'));

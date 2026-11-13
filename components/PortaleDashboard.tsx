@@ -56,7 +56,9 @@ export default function PortaleDashboard({
   cliente,
   preventivi,
   fatture,
+  haCanone = false,
 }: {
+  haCanone?: boolean;
   cliente: Cliente;
   preventivi: Preventivo[];
   fatture: Fattura[];
@@ -103,6 +105,11 @@ export default function PortaleDashboard({
             <span className="text-sm text-muted truncate hidden sm:block">
               {cliente.azienda || cliente.nome}
             </span>
+            {haCanone && (
+              <a href="/canone" className="text-xs text-dim hover:text-text transition-colors shrink-0">
+                Ore e lavori
+              </a>
+            )}
             <button
               onClick={esci}
               className="text-xs text-dim hover:text-text transition-colors shrink-0"

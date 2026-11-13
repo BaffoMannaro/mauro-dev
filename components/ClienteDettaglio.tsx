@@ -7,6 +7,7 @@ import { calcFinanza } from '@/lib/preventivo-finance';
 import { FONTI } from '@/lib/fonti';
 import { euro, euroCent } from '@/lib/formato';
 import PagamentiFattura from './PagamentiFattura';
+import CanoneAdmin, { type DatiCanoneAdmin } from './CanoneAdmin';
 
 interface Cliente {
   id: number;
@@ -108,7 +109,9 @@ export default function ClienteDettaglio({
   altriClienti,
   fatture,
   societa = [],
+  canone,
 }: {
+  canone?: DatiCanoneAdmin;
   cliente: Cliente;
   preventivi: Prev[];
   nonAssociati: PrevLibero[];
@@ -445,6 +448,9 @@ export default function ClienteDettaglio({
             )}
           </section>
         </div>
+
+        {/* Canone ore */}
+        {canone && <CanoneAdmin clienteId={cliente.id} dati={canone} />}
 
         {/* Portale cliente */}
         <section className="scheda">

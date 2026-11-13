@@ -3,6 +3,7 @@ import sql from '@/lib/db';
 import { ensureClientiSchema } from '@/lib/schema';
 import { ordineFatture, pagamentiJson, preparaArchivio } from '@/lib/fattura/server';
 import ClienteDettaglio from '@/components/ClienteDettaglio';
+import { datiCanone } from '@/lib/canone';
 
 export async function generateMetadata({
   params,
@@ -66,8 +67,12 @@ export default async function ClientePage({
     SELECT id, nome, azienda, email FROM clienti WHERE id != ${id} ORDER BY nome ASC
   `;
 
+  const oggi = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' });
+  const canone = await datiCanone(Number(id), oggi);
+
   return (
     <ClienteDettaglio
+      canone={canone}
       cliente={cliente as any}
       preventivi={preventivi as any}
       nonAssociati={nonAssociati as any}

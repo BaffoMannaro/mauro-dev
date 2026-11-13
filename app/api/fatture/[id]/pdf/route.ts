@@ -7,15 +7,15 @@ import { rispostaPdf } from '@/lib/fattura/server';
 import { verifica } from '@/lib/mcp/oauth';
 import { fatturaDelCliente } from '@/lib/area-cliente';
 
-// PDF di una fattura in archivio. Accessibile all'admin, al cliente a cui appartiene (dal portale,
-// anche tramite la P.IVA della sua società) e con un link firmato dal connettore Claude.
+// PDF di una fattura in archivio. Accessibile all'admin, al cliente a cui appartiene (dal portale:
+// decide la P.IVA, vedi fatturaDelCliente) e con un link firmato dal connettore Claude.
 // Sempre rigenerato dall'XML salvato.
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const [row] = await sql`SELECT xml, cliente_id, con_logo FROM fatture WHERE id = ${id}`;
+  const [row] = await sql`SELECT xml, con_logo FROM fatture WHERE id = ${id}`;
   if (!row?.xml) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   // Link firmato generato dal connettore Claude: valido senza login per 24 ore.
@@ -25,7 +25,7 @@ export async function GET(
   if (!admin) {
     const token = req.cookies.get(CLIENT_COOKIE)?.value;
     const cliente = token ? await verifyClientToken(token) : null;
-    const sua = cliente?.scope === 'session' && (cliente.cid === row.cliente_id || (await fatturaDelCliente(Number(id), cliente.cid)));
+    const sua = cliente?.scope === 'session' && (await fatturaDelCliente(Number(id), cliente.cid));
     if (!sua) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
     }

@@ -16,6 +16,8 @@ interface Props {
   lavori: Lavoro[];
   richieste: Richiesta[];
   pagamenti: Scadenza[];
+  /** Vista di Mauro dal gestionale: niente header cliente, azioni disattivate. */
+  anteprima?: { indietro: string };
 }
 
 const giorno = (d: string | null, anno = false) =>
@@ -65,6 +67,14 @@ export default function CanonePagina(p: Props) {
 
   return (
     <div className="min-h-screen bg-bg text-text">
+      {p.anteprima ? (
+        <div className="border-b border-amber-500/30 bg-amber-500/10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span className="text-amber-400">Anteprima: è la pagina che vede {p.cliente.nome}. I pulsanti sono disattivati.</span>
+            <a href={p.anteprima.indietro} className="text-muted hover:text-text">Torna alla scheda cliente</a>
+          </div>
+        </div>
+      ) : (
       <header className="border-b border-edge bg-surface">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
           <img src="/Logo.svg" alt="MAURO DEV" className="h-6 w-auto logo-adaptive" />
@@ -79,6 +89,7 @@ export default function CanonePagina(p: Props) {
           </div>
         </div>
       </header>
+      )}
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
         <h1 className="text-xl sm:text-2xl font-semibold leading-tight mb-1">Ciao {p.cliente.nome.split(' ')[0]}</h1>
@@ -97,7 +108,7 @@ export default function CanonePagina(p: Props) {
               </div>
               <div className="flex flex-col gap-2">
                 {daApprovare.map((r) => (
-                  <StimaDaApprovare key={r.id} r={r} onFatto={() => router.refresh()} />
+                  <StimaDaApprovare key={r.id} r={r} bloccato={!!p.anteprima} onFatto={() => router.refresh()} />
                 ))}
                 {attese.map((l) => (
                   <div key={l.id} className="bg-surface2 rounded-xl px-4 py-3">
@@ -132,7 +143,7 @@ export default function CanonePagina(p: Props) {
               <p className="text-xs text-dim mb-3">
                 Facoltativo: puoi continuare a scrivermi via mail o messaggio. Da qui ti rispondo con una stima in ore prima di partire.
               </p>
-              <NuovaRichiesta siti={canone.siti} onFatto={() => router.refresh()} />
+              <NuovaRichiesta siti={canone.siti} bloccato={!!p.anteprima} onFatto={() => router.refresh()} />
               {aperte.length > 0 && (
                 <ul className="flex flex-col gap-2 mt-4">
                   {aperte.map((r) => (
@@ -471,7 +482,7 @@ function Storico({ mesi }: { mesi: MeseCanone[] }) {
 
 // ── Richieste ──
 
-function NuovaRichiesta({ siti, onFatto }: { siti: string[]; onFatto: () => void }) {
+function NuovaRichiesta({ siti, bloccato, onFatto }: { siti: string[]; bloccato?: boolean; onFatto: () => void }) {
   const [testo, setTesto] = useState('');
   const [sito, setSito] = useState('');
   const [urgente, setUrgente] = useState(false);
@@ -525,7 +536,7 @@ function NuovaRichiesta({ siti, onFatto }: { siti: string[]; onFatto: () => void
       </label>
       <button
         type="submit"
-        disabled={stato === 'invio' || testo.trim().length < 3}
+        disabled={bloccato || stato === 'invio' || testo.trim().length < 3}
         className="text-sm px-3 py-2 rounded-lg bg-accent text-on-accent font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
       >
         {stato === 'invio' ? 'Invio…' : 'Invia richiesta'}
@@ -536,7 +547,7 @@ function NuovaRichiesta({ siti, onFatto }: { siti: string[]; onFatto: () => void
   );
 }
 
-function StimaDaApprovare({ r, onFatto }: { r: Richiesta; onFatto: () => void }) {
+function StimaDaApprovare({ r, bloccato, onFatto }: { r: Richiesta; bloccato?: boolean; onFatto: () => void }) {
   const [busy, setBusy] = useState(false);
   const decidi = async (azione: 'approva' | 'rifiuta') => {
     setBusy(true);
@@ -563,11 +574,11 @@ function StimaDaApprovare({ r, onFatto }: { r: Richiesta; onFatto: () => void })
         {r.risposta && <p className="text-xs text-dim mt-1 whitespace-pre-wrap">{r.risposta}</p>}
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <button disabled={busy} onClick={() => decidi('rifiuta')}
+        <button disabled={busy || bloccato} onClick={() => decidi('rifiuta')}
           className="text-xs px-3 py-1.5 rounded-lg border border-edge text-dim hover:text-text transition-colors disabled:opacity-50">
           Non ora
         </button>
-        <button disabled={busy} onClick={() => decidi('approva')}
+        <button disabled={busy || bloccato} onClick={() => decidi('approva')}
           className="text-xs px-3 py-1.5 rounded-lg bg-accent text-on-accent hover:opacity-90 transition-opacity disabled:opacity-50">
           Approva
         </button>

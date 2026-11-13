@@ -163,7 +163,7 @@ export default function ClientiDashboard({
     const q = query.trim().toLowerCase();
     const arr = clienti.filter(
       (c) =>
-        (filtroFonte === 'tutte' || (c.fonte ?? 'nessuna') === filtroFonte) &&
+        (filtroFonte === 'tutte' || (c.fonte || 'nessuna') === filtroFonte) &&
         (!q ||
           c.nome.toLowerCase().includes(q) ||
           (c.azienda || '').toLowerCase().includes(q))
@@ -180,7 +180,7 @@ export default function ClientiDashboard({
       return sortDir === 'asc' ? cmp : -cmp;
     });
     return arr;
-  }, [clienti, query, sortField, sortDir, financeById]);
+  }, [clienti, query, filtroFonte, sortField, sortDir, financeById]);
 
   // Candidati all'import: preventivi accettati non associati, raggruppati per email,
   // escludendo email già presenti tra i clienti.
@@ -400,7 +400,10 @@ export default function ClientiDashboard({
         ) : visibili.length === 0 ? (
           <div className="text-center py-20 text-dim">
             <p className="font-medium">Nessun risultato</p>
-            <p className="text-sm mt-1">Nessun cliente corrisponde a "{query}"</p>
+            <p className="text-sm mt-1">
+              {query.trim() ? `Nessun cliente corrisponde a "${query}"` : 'Nessun cliente in questo filtro'}
+              {filtroFonte !== 'tutte' && query.trim() ? ' con questo filtro' : ''}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

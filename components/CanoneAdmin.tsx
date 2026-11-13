@@ -70,9 +70,12 @@ export default function CanoneAdmin({ clienteId, dati }: { clienteId: number; da
         <h2 className="text-text font-semibold text-sm">Canone ore</h2>
         <div className="flex gap-2">
           {canone && (
-            <a href="#" onClick={(e) => { e.preventDefault(); setMostraCanone((v) => !v); }} className={btn}>
+            <a href={`/clienti/${clienteId}/anteprima`} className={btn}>Vedi come il cliente</a>
+          )}
+          {canone && (
+            <button onClick={() => setMostraCanone((v) => !v)} className={btn}>
               {mostraCanone ? 'Chiudi' : 'Condizioni'}
-            </a>
+            </button>
           )}
         </div>
       </div>

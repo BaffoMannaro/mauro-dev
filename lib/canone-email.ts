@@ -55,7 +55,7 @@ export async function notificaNuovaRichiesta(cid: number, r: Richiesta) {
 export async function notificaStima(cid: number, r: Richiesta) {
   const c = await cliente(cid);
   if (!c?.email) return;
-  const link = `${AREA_URL}/canone`;
+  const link = `${AREA_URL}/portale`;
   await invia(
     {
       to: c.email,

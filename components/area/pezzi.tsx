@@ -1,64 +1,40 @@
 'use client';
 
+// Pezzi dell'area cliente: ore del canone, timeline, interventi, richieste, storico.
+
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { euroCent } from '@/lib/formato';
 import { fmtMinuti, meseDi, meseSuccessivo, nomeMese, type MeseCanone } from '@/lib/canone-calcolo';
 import type { Canone, Intervento, Lavoro, Richiesta, Scadenza } from '@/lib/canone';
-import { pixelFont } from '@/lib/font-pixel';
 import { Icona, Omino, type NomeIcona } from '@/components/pixel/Sprite';
-
-interface Props {
-  cliente: { nome: string; azienda: string | null };
-  oggi: string;
-  canone: Canone;
-  mesi: MeseCanone[];
-  corrente: MeseCanone | null;
-  interventi: Intervento[];
-  lavori: Lavoro[];
-  richieste: Richiesta[];
-  pagamenti: Scadenza[];
-  /** Vista di Mauro dal gestionale: niente header cliente, azioni disattivate. */
-  anteprima?: { indietro: string };
-}
+import { AREA, Etichetta, Titolo, type Area } from '@/components/pixel/Bento';
 
 // ── Utilità ──
 
-const giorno = (d: string | null, anno = false) =>
+export const giorno = (d: string | null, anno = false) =>
   d
     ? new Date(`${d}T12:00:00`).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', ...(anno && { year: 'numeric' }) })
     : '';
 
-const giorniTra = (a: string, b: string) => Math.round((Date.parse(`${b}T12:00:00`) - Date.parse(`${a}T12:00:00`)) / 86400000);
+export const giorniTra = (a: string, b: string) => Math.round((Date.parse(`${b}T12:00:00`) - Date.parse(`${a}T12:00:00`)) / 86400000);
 
-const aggiungiGiorni = (d: string, n: number) => {
+export const aggiungiGiorni = (d: string, n: number) => {
   const x = new Date(`${d}T12:00:00`);
   x.setDate(x.getDate() + n);
   return x.toISOString().slice(0, 10);
 };
 
-const ore = (n: number | null) => (n == null ? '' : `${String(n).replace('.', ',')} h`);
-const soloMese = (mese: string) => nomeMese(mese).split(' ')[0];
+export const ore = (n: number | null) => (n == null ? '' : `${String(n).replace('.', ',')} h`);
+export const soloMese = (mese: string) => nomeMese(mese).split(' ')[0];
 
-// Ogni area della pagina ha un colore: aiuta a orientarsi e a ritrovare le cose.
-type Area = 'ore' | 'lavori' | 'soldi' | 'azione' | 'fatto' | 'fumo';
-const AREA: Record<Area, { testo: string; sfondo: string; tenue: string; var: string }> = {
-  ore: { testo: 'text-ore', sfondo: 'bg-ore', tenue: 'bg-ore/15', var: 'var(--color-ore)' },
-  lavori: { testo: 'text-lavori', sfondo: 'bg-lavori', tenue: 'bg-lavori/15', var: 'var(--color-lavori)' },
-  soldi: { testo: 'text-soldi', sfondo: 'bg-soldi', tenue: 'bg-soldi/15', var: 'var(--color-soldi)' },
-  azione: { testo: 'text-azione', sfondo: 'bg-azione', tenue: 'bg-azione/15', var: 'var(--color-azione)' },
-  fatto: { testo: 'text-fatto', sfondo: 'bg-fatto', tenue: 'bg-fatto/15', var: 'var(--color-fatto)' },
-  fumo: { testo: 'text-nebbia', sfondo: 'bg-fumo', tenue: 'bg-fumo/15', var: 'var(--color-ink-4)' },
-};
-
-const STATO_LAVORO: Record<string, { label: string; area: Area }> = {
+export const STATO_LAVORO: Record<string, { label: string; area: Area }> = {
   da_avviare: { label: 'Da avviare', area: 'fumo' },
   in_corso: { label: 'In corso', area: 'lavori' },
   attesa_cliente: { label: 'Aspetto voi', area: 'azione' },
   completato: { label: 'Consegnato', area: 'fatto' },
 };
 
-const STATO_RICHIESTA: Record<string, { label: string; area: Area }> = {
+export const STATO_RICHIESTA: Record<string, { label: string; area: Area }> = {
   nuova: { label: 'In valutazione', area: 'fumo' },
   stimata: { label: 'Da approvare', area: 'azione' },
   approvata: { label: 'In lavorazione', area: 'lavori' },
@@ -66,265 +42,7 @@ const STATO_RICHIESTA: Record<string, { label: string; area: Area }> = {
   completata: { label: 'Fatta', area: 'fatto' },
 };
 
-// ── Mattoncini del bento ──
-
-function Tile({ area, id, className = '', children }: { area: Area; id?: string; className?: string; children: React.ReactNode }) {
-  return (
-    <section
-      id={id}
-      className={`px-notch bg-ink-2 p-4 sm:p-5 min-w-0 scroll-mt-4 ${className}`}
-      style={{ boxShadow: `inset 0 4px 0 ${AREA[area].var}` }}
-    >
-      {children}
-    </section>
-  );
-}
-
-function Titolo({ area, icona, children, destra }: { area: Area; icona: NomeIcona; children: React.ReactNode; destra?: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-      <h2 className="flex items-center gap-2.5 font-pixel text-[15px] leading-none text-chiaro">
-        <span className={`grid place-items-center w-7 h-7 px-notch-sm ${AREA[area].tenue} ${AREA[area].testo}`}>
-          <Icona nome={icona} />
-        </span>
-        {children}
-      </h2>
-      {destra}
-    </div>
-  );
-}
-
-function Etichetta({ area, children }: { area: Area; children: React.ReactNode }) {
-  return (
-    <span className={`inline-block px-notch-sm font-pixel text-[10px] leading-none px-2 py-1 ${AREA[area].tenue} ${AREA[area].testo}`}>
-      {children}
-    </span>
-  );
-}
-
-// ── Pagina ──
-
-export default function CanonePagina(p: Props) {
-  const router = useRouter();
-  const { canone, corrente, oggi } = p;
-
-  const esci = async () => {
-    await fetch('/api/portale/esci', { method: 'POST' });
-    window.location.href = '/accedi';
-  };
-
-  const daApprovare = p.richieste.filter((r) => r.stato === 'stimata');
-  const aperte = p.richieste.filter((r) => r.stato === 'nuova' || r.stato === 'approvata');
-  const attese = p.lavori.filter((l) => l.stato === 'attesa_cliente' && l.attesa_cliente);
-  const inCorso = p.lavori.filter((l) => l.stato === 'in_corso');
-  const daFare = daApprovare.length + attese.length;
-  const attivi = p.lavori.filter((l) => l.stato !== 'completato');
-  const prossima = attivi
-    .filter((l) => l.consegna_prevista && l.consegna_prevista >= oggi)
-    .sort((a, b) => a.consegna_prevista!.localeCompare(b.consegna_prevista!))[0];
-
-  const dataLunga = new Date(`${oggi}T12:00:00`).toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
-
-  return (
-    <div className={`${pixelFont.variable} min-h-screen px-tela text-chiaro`}>
-      {p.anteprima ? (
-        <div className="bg-ink-2 border-b-2 border-azione/50">
-          <div className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <span className="flex items-center gap-2 text-chiaro">
-              <Icona nome="esclamativo" className="text-azione" />
-              Anteprima: è la pagina che vede {p.cliente.nome}. I pulsanti sono disattivati.
-            </span>
-            <a href={p.anteprima.indietro} className="text-nebbia hover:text-chiaro underline-offset-4 hover:underline">
-              Torna alla scheda cliente
-            </a>
-          </div>
-        </div>
-      ) : (
-        <header className="border-b-2 border-ink-3 bg-ink/80 backdrop-blur">
-          <div className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 h-14 flex items-center justify-between gap-3">
-            <img src="/Logo.svg" alt="MAURO DEV" className="h-6 w-auto brightness-0 invert" />
-            <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-              <span className="text-sm text-nebbia truncate hidden sm:block">{p.cliente.azienda || p.cliente.nome}</span>
-              <a href="/portale" className="text-xs text-fumo hover:text-chiaro transition-colors shrink-0">
-                Preventivi e fatture
-              </a>
-              <button onClick={esci} className="text-xs text-fumo hover:text-chiaro transition-colors shrink-0">
-                Esci
-              </button>
-            </div>
-          </div>
-        </header>
-      )}
-
-      <main className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 py-5 sm:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 gap-3 sm:gap-4">
-          {/* Benvenuto */}
-          <section className="md:col-span-4 xl:col-span-5 px-notch bg-ink-2 p-4 sm:p-6 flex flex-col justify-between gap-5 min-w-0">
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="relative shrink-0">
-                {daFare > 0 && (
-                  <span className="absolute -top-4 -right-2 px-hop text-azione">
-                    <Icona nome="esclamativo" scala={3} />
-                  </span>
-                )}
-                <div className="sm:hidden"><Omino scala={5} alLavoro={inCorso.length > 0} /></div>
-                <div className="hidden sm:block"><Omino scala={8} alLavoro={inCorso.length > 0} /></div>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-fumo capitalize mb-1.5">{dataLunga}</p>
-                <h1 className="font-pixel text-2xl sm:text-4xl leading-tight mb-3 break-words">Ciao {p.cliente.nome.split(' ')[0]}</h1>
-                <p className="inline-block bg-ink-3 px-notch-sm px-3 py-2 text-sm text-nebbia leading-snug">
-                  {daFare > 0 ? (
-                    <>
-                      Mi serve {daFare === 1 ? 'una tua risposta' : 'qualche tua risposta'}: trovi tutto nel riquadro{' '}
-                      <span className="text-azione font-medium">rosa</span>.
-                    </>
-                  ) : inCorso.length > 0 ? (
-                    <>
-                      Sto lavorando a <span className="text-lavori font-medium">{inCorso[0].titolo}</span>
-                      {inCorso.length > 1 ? ` e ad altri ${inCorso.length - 1}` : ''}
-                      <span className="px-dots" />
-                    </>
-                  ) : (
-                    <>Tutto in ordine. Se ti serve qualcosa, scrivimi da qui o come sempre.</>
-                  )}
-                </p>
-              </div>
-            </div>
-            {/* Colpo d'occhio: un numero per area */}
-            <div className="grid grid-cols-3 gap-2">
-              <Lampo area="ore" valore={corrente ? fmtMinuti(corrente.rimaste) : '-'} label="ore rimaste" />
-              <Lampo area="lavori" valore={String(attivi.length)} label={attivi.length === 1 ? 'lavoro aperto' : 'lavori aperti'} />
-              <Lampo area="lavori" valore={prossima ? giorno(prossima.consegna_prevista) : '-'} label="prossima consegna" />
-            </div>
-          </section>
-
-          {/* Serve qualcosa da voi / tutto a posto */}
-          {daFare > 0 ? (
-            <Tile area="azione" className="md:col-span-2 xl:col-span-3">
-              <Titolo area="azione" icona="esclamativo" destra={<span className="font-pixel text-azione text-lg leading-none">{daFare}</span>}>
-                Serve da voi
-              </Titolo>
-              <div className="flex flex-col gap-2">
-                {daApprovare.map((r) => (
-                  <StimaDaApprovare key={r.id} r={r} bloccato={!!p.anteprima} onFatto={() => router.refresh()} />
-                ))}
-                {attese.map((l) => (
-                  <div key={l.id} className="bg-ink-3 px-notch-sm px-3 py-2.5">
-                    <p className="text-sm font-medium">{l.titolo}{l.sito ? <span className="text-fumo font-normal"> · {l.sito}</span> : null}</p>
-                    <p className="text-sm text-nebbia mt-0.5 whitespace-pre-wrap">{l.attesa_cliente}</p>
-                  </div>
-                ))}
-              </div>
-            </Tile>
-          ) : (
-            <Tile area="fatto" className="md:col-span-2 xl:col-span-3 flex flex-col justify-center">
-              <Titolo area="fatto" icona="spunta">Tutto a posto</Titolo>
-              <p className="text-sm text-nebbia">Non aspetto niente da voi. Se serve una vostra risposta o un&apos;approvazione, compare qui.</p>
-            </Tile>
-          )}
-
-          {/* Monte ore */}
-          {corrente ? (
-            <>
-              <MonteOre mese={corrente} />
-              <div className="md:col-span-2 xl:col-span-3 grid grid-cols-2 md:grid-cols-1 gap-3 sm:gap-4 min-w-0">
-                <FineMese canone={canone} mese={corrente} oggi={oggi} />
-                <ProssimoPagamento pagamenti={p.pagamenti} />
-              </div>
-            </>
-          ) : (
-            <Tile area="ore" className="md:col-span-6 xl:col-span-12">
-              <Titolo area="ore" icona="clessidra">Monte ore</Titolo>
-              <p className="text-sm text-nebbia">Il canone parte da {nomeMese(meseDi(canone.inizio))}: da quel mese trovi qui le ore.</p>
-            </Tile>
-          )}
-
-          {/* Lavori */}
-          <Tile area="lavori" className="md:col-span-6 xl:col-span-9">
-            <Titolo area="lavori" icona="bandiera"
-              destra={<span className="text-xs text-fumo">Le consegne sono stime: se cambiano, le aggiorno qui.</span>}>
-              Lavori e consegne
-            </Titolo>
-            <Timeline lavori={p.lavori} oggi={oggi} />
-          </Tile>
-
-          {/* Interventi */}
-          <Tile area="ore" className="md:col-span-4 xl:col-span-5">
-            <RegistroInterventi interventi={p.interventi} siti={canone.siti} meseCorrente={meseDi(oggi)} />
-          </Tile>
-
-          {/* Nuova richiesta */}
-          <Tile area="azione" className="md:col-span-2 xl:col-span-3">
-            <Titolo area="azione" icona="fumetto">Chiedimi qualcosa</Titolo>
-            <p className="text-xs text-fumo mb-3 leading-relaxed">
-              Facoltativo: mail e messaggi vanno benissimo. Da qui ti rispondo con una stima in ore prima di partire.
-            </p>
-            <NuovaRichiesta siti={canone.siti} bloccato={!!p.anteprima} onFatto={() => router.refresh()} />
-            {aperte.length > 0 && (
-              <ul className="flex flex-col gap-2 mt-4">
-                {aperte.map((r) => (
-                  <li key={r.id} className="bg-ink-3 px-notch-sm px-3 py-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs text-fumo truncate">{r.sito || 'Richiesta'} · {giorno(r.creata_il?.slice(0, 10) ?? null)}</span>
-                      <Etichetta area={STATO_RICHIESTA[r.stato].area}>{STATO_RICHIESTA[r.stato].label}</Etichetta>
-                    </div>
-                    <p className="text-sm mt-1.5 line-clamp-3 whitespace-pre-wrap">{r.testo}</p>
-                    {r.ore_stimate != null && (
-                      <p className="text-xs text-fumo mt-1">Stima: {ore(r.ore_stimate)}{r.consegna_prevista ? ` · consegna ${giorno(r.consegna_prevista)}` : ''}</p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Tile>
-
-          {/* Pagamenti */}
-          <Tile area="soldi" id="pagamenti" className="md:col-span-2 xl:col-span-4">
-            <Titolo area="soldi" icona="moneta">Pagamenti</Titolo>
-            <Pagamenti pagamenti={p.pagamenti} />
-          </Tile>
-
-          {/* Storico */}
-          <Tile area="fumo" className="md:col-span-4 xl:col-span-5">
-            <Titolo area="fumo" icona="calendario">Mese per mese</Titolo>
-            {p.mesi.length > 0 ? <Storico mesi={p.mesi} /> : <p className="text-sm text-nebbia">Lo storico parte dal primo mese di canone.</p>}
-          </Tile>
-
-          {/* Come funziona */}
-          <Tile area="fumo" className="md:col-span-6 xl:col-span-7">
-            <Titolo area="fumo" icona="domanda">Come funziona</Titolo>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-2 gap-3">
-              <Regola area="ore" icona="clessidra" titolo={`${ore(canone.ore_mese)} al mese`}>
-                Canone di {euroCent(canone.prezzo_mese)} al mese, ore usabili su tutti i vostri siti.
-              </Regola>
-              <Regola area="ore" icona="calendario" titolo="Le ore avanzano">
-                Quelle non usate passano al mese dopo e valgono {canone.riporto_mesi === 1 ? 'per quel mese' : `per ${canone.riporto_mesi} mesi`}: si usano per prime.
-              </Regola>
-              <Regola area="soldi" icona="moneta" titolo="Ore extra">
-                Oltre le ore disponibili, le ore in più sono a {euroCent(canone.tariffa_extra)} l&apos;ora.
-              </Regola>
-              <Regola area="lavori" icona="bandiera" titolo="Fuori canone">
-                I lavori con un preventivo o un prezzo a parte non consumano ore.
-              </Regola>
-            </ul>
-          </Tile>
-        </div>
-      </main>
-    </div>
-  );
-}
-
-function Lampo({ area, valore, label }: { area: Area; valore: string; label: string }) {
-  return (
-    <div className="bg-ink-3 px-notch-sm px-3 py-2.5 min-w-0">
-      <p className={`font-pixel text-base sm:text-xl leading-none truncate ${AREA[area].testo}`}>{valore}</p>
-      <p className="text-[11px] text-fumo mt-1 truncate">{label}</p>
-    </div>
-  );
-}
-
-function Regola({ area, icona, titolo, children }: { area: Area; icona: NomeIcona; titolo: string; children: React.ReactNode }) {
+export function Regola({ area, icona, titolo, children }: { area: Area; icona: NomeIcona; titolo: string; children: React.ReactNode }) {
   return (
     <li className="bg-ink-3 px-notch-sm p-3.5">
       <p className={`flex items-center gap-2 font-pixel text-sm mb-1.5 ${AREA[area].testo}`}>
@@ -340,7 +58,7 @@ function Regola({ area, icona, titolo, children }: { area: Area; icona: NomeIcon
 type Cella = 'usata' | 'riporto' | 'libera' | 'extra';
 const quarti = (m: number) => Math.round(m / 15);
 
-function MonteOre({ mese }: { mese: MeseCanone }) {
+export function MonteOre({ mese, compatto = false }: { mese: MeseCanone; compatto?: boolean }) {
   const disponibili = mese.incluse + mese.riportate;
 
   const celle = useMemo(() => {
@@ -369,10 +87,8 @@ function MonteOre({ mese }: { mese: MeseCanone }) {
   const m = mese.rimaste % 60;
 
   return (
-    <Tile area="ore" className="md:col-span-4 xl:col-span-4">
-      <Titolo area="ore" icona="clessidra">Ore di {soloMese(mese.mese)}</Titolo>
-
-      <div className="flex flex-wrap items-end gap-x-4 gap-y-1 mb-5">
+    <>
+      <div className="flex flex-wrap items-end gap-x-4 gap-y-1 mb-4">
         <p className="font-pixel text-ore leading-none tabular-nums">
           <span className="text-5xl sm:text-6xl">{h}</span>
           <span className="text-2xl sm:text-3xl">h</span>
@@ -400,6 +116,7 @@ function MonteOre({ mese }: { mese: MeseCanone }) {
         ))}
       </div>
 
+      {!compatto && (<>
       <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 text-xs text-fumo">
         <Leggenda c="bg-ore">usate</Leggenda>
         {mese.riportate > 0 && <Leggenda c="bg-ore/25">dal mese prima</Leggenda>}
@@ -408,17 +125,18 @@ function MonteOre({ mese }: { mese: MeseCanone }) {
         <span>1 quadrato = 1 ora, 1 pixel = 15 minuti</span>
       </div>
 
-      <dl className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 gap-2 mt-5">
+      <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
         <Dato label="Del canone" valore={fmtMinuti(mese.incluse)} />
         <Dato label="Dal mese prima" valore={fmtMinuti(mese.riportate)} />
         <Dato label="Usate" valore={fmtMinuti(mese.usate)} />
         <Dato label="Fuori canone" valore={fmtMinuti(mese.fuori_canone)} />
       </dl>
-    </Tile>
+      </>)}
+    </>
   );
 }
 
-function Leggenda({ c, children }: { c: string; children: React.ReactNode }) {
+export function Leggenda({ c, children }: { c: string; children: React.ReactNode }) {
   return (
     <span className="flex items-center gap-1.5">
       <span className={`inline-block w-2.5 h-2.5 ${c}`} />
@@ -427,7 +145,7 @@ function Leggenda({ c, children }: { c: string; children: React.ReactNode }) {
   );
 }
 
-function Dato({ label, valore }: { label: string; valore: string }) {
+export function Dato({ label, valore }: { label: string; valore: string }) {
   return (
     <div className="bg-ink-3 px-notch-sm px-3 py-2">
       <dt className="text-fumo text-[11px]">{label}</dt>
@@ -436,52 +154,9 @@ function Dato({ label, valore }: { label: string; valore: string }) {
   );
 }
 
-function FineMese({ canone, mese, oggi }: { canone: Canone; mese: MeseCanone; oggi: string }) {
-  const d = new Date(`${oggi}T12:00:00`);
-  const giorni = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate() - d.getDate();
-  const poche = mese.rimaste > 0 && mese.rimaste < 120;
-  return (
-    <section className="px-notch bg-ink-2 p-4 min-w-0" style={{ boxShadow: `inset 0 4px 0 ${AREA.ore.var}` }}>
-      <p className="text-xs text-fumo mb-2">Alla fine di {soloMese(mese.mese)}</p>
-      <p className="font-pixel leading-none mb-2">
-        <span className="text-4xl sm:text-5xl">{giorni}</span>{' '}
-        <span className="text-base text-nebbia">{giorni === 1 ? 'giorno' : 'giorni'}</span>
-      </p>
-      <div className="flex flex-col gap-1 text-xs leading-snug">
-        {mese.riporto_prossimo > 0 && (
-          <p className="text-nebbia">Se non le usate, {fmtMinuti(mese.riporto_prossimo)} passano a {soloMese(meseSuccessivo(mese.mese))}.</p>
-        )}
-        {mese.scadono > 0 && <p className="text-azione">{fmtMinuti(mese.scadono)} del mese scorso scadono a fine mese.</p>}
-        {poche && <p className="text-soldi">Restano meno di 2 ore: oltre, {euroCent(canone.tariffa_extra)} l&apos;ora.</p>}
-      </div>
-    </section>
-  );
-}
-
-function ProssimoPagamento({ pagamenti }: { pagamenti: Scadenza[] }) {
-  const primo = pagamenti[0];
-  return (
-    <a href="#pagamenti" className="block px-notch bg-ink-2 p-4 min-w-0 hover:bg-ink-3 transition-colors"
-      style={{ boxShadow: `inset 0 4px 0 ${AREA.soldi.var}` }}>
-      <p className="text-xs text-fumo mb-2 flex items-center gap-1.5">
-        <Icona nome="moneta" className="text-soldi" /> {primo ? 'Prossimo pagamento' : 'Pagamenti'}
-      </p>
-      {primo ? (
-        <>
-          <p className="font-pixel text-2xl sm:text-3xl text-soldi leading-none mb-1.5 tabular-nums">{euroCent(primo.importo)}</p>
-          <p className="text-xs text-nebbia line-clamp-2">{primo.descrizione}</p>
-          {pagamenti.length > 1 && <p className="text-xs text-fumo mt-1">e altri {pagamenti.length - 1}</p>}
-        </>
-      ) : (
-        <p className="font-pixel text-xl text-fatto leading-none">Niente in sospeso</p>
-      )}
-    </a>
-  );
-}
-
 // ── Timeline ──
 
-function Timeline({ lavori, oggi }: { lavori: Lavoro[]; oggi: string }) {
+export function Timeline({ lavori, oggi }: { lavori: Lavoro[]; oggi: string }) {
   const [mostraFatti, setMostraFatti] = useState(false);
   const fatti = lavori.filter((l) => l.stato === 'completato');
   const visibili = lavori.filter((l) => mostraFatti || l.stato !== 'completato');
@@ -616,7 +291,7 @@ function Timeline({ lavori, oggi }: { lavori: Lavoro[]; oggi: string }) {
 
 // ── Registro interventi ──
 
-function RegistroInterventi({ interventi, siti, meseCorrente }: { interventi: Intervento[]; siti: string[]; meseCorrente: string }) {
+export function RegistroInterventi({ interventi, siti, meseCorrente }: { interventi: Intervento[]; siti: string[]; meseCorrente: string }) {
   const mesi = useMemo(() => Array.from(new Set([meseCorrente, ...interventi.map((i) => meseDi(i.data))])).sort().reverse(), [interventi, meseCorrente]);
   const tuttiSiti = useMemo(
     () => Array.from(new Set([...siti, ...(interventi.map((i) => i.sito).filter(Boolean) as string[])])),
@@ -624,8 +299,10 @@ function RegistroInterventi({ interventi, siti, meseCorrente }: { interventi: In
   );
   const [mese, setMese] = useState(meseCorrente);
   const [sito, setSito] = useState('');
+  const [tutti, setTutti] = useState(false);
 
   const righe = interventi.filter((i) => meseDi(i.data) === mese && (!sito || i.sito === sito));
+  const visibili = tutti ? righe : righe.slice(0, 5);
   const totale = righe.filter((i) => !i.fuori_canone).reduce((s, i) => s + i.minuti, 0);
 
   const sel = 'bg-ink-3 px-notch-sm px-2.5 py-1.5 text-xs text-chiaro border-0';
@@ -656,7 +333,7 @@ function RegistroInterventi({ interventi, siti, meseCorrente }: { interventi: In
       ) : (
         <>
           <ul className="flex flex-col gap-1.5">
-            {righe.map((i) => {
+            {visibili.map((i) => {
               const [g, ms] = giorno(i.data).split(' ');
               return (
                 <li key={i.id} className="flex items-stretch gap-3 bg-ink-3/60 px-notch-sm p-2.5">
@@ -678,9 +355,12 @@ function RegistroInterventi({ interventi, siti, meseCorrente }: { interventi: In
               );
             })}
           </ul>
-          <p className="text-xs text-fumo mt-3 text-right">
+          <div className="flex items-center justify-between gap-3 mt-3">
+            {righe.length > 5 ? <VediTutti aperto={tutti} n={righe.length} onClick={() => setTutti((v) => !v)} /> : <span />}
+          <p className="text-xs text-fumo text-right">
             Totale a canone{sito ? ` su ${sito}` : ''}: <span className="font-pixel text-sm text-ore tabular-nums">{fmtMinuti(totale)}</span>
           </p>
+          </div>
         </>
       )}
     </>
@@ -689,7 +369,7 @@ function RegistroInterventi({ interventi, siti, meseCorrente }: { interventi: In
 
 // ── Pagamenti ──
 
-function Pagamenti({ pagamenti }: { pagamenti: Scadenza[] }) {
+export function Pagamenti({ pagamenti }: { pagamenti: Scadenza[] }) {
   if (pagamenti.length === 0) {
     return (
       <p className="flex items-center gap-2 text-sm text-nebbia">
@@ -720,7 +400,7 @@ function Pagamenti({ pagamenti }: { pagamenti: Scadenza[] }) {
 
 // ── Storico: colonne di tacche, 1 tacca = 1 ora ──
 
-function Storico({ mesi }: { mesi: MeseCanone[] }) {
+export function Storico({ mesi }: { mesi: MeseCanone[] }) {
   const ultimi = mesi.slice(-12);
   const maxOre = Math.max(1, ...ultimi.map((m) => Math.ceil(Math.max(m.incluse + m.riportate, m.usate) / 60)));
   const unita = maxOre > 16 ? 2 : 1; // ore per tacca
@@ -785,7 +465,7 @@ function Storico({ mesi }: { mesi: MeseCanone[] }) {
 
 // ── Richieste ──
 
-function NuovaRichiesta({ siti, bloccato, onFatto }: { siti: string[]; bloccato?: boolean; onFatto: () => void }) {
+export function NuovaRichiesta({ siti, bloccato, onFatto }: { siti: string[]; bloccato?: boolean; onFatto: () => void }) {
   const [testo, setTesto] = useState('');
   const [sito, setSito] = useState('');
   const [urgente, setUrgente] = useState(false);
@@ -850,7 +530,7 @@ function NuovaRichiesta({ siti, bloccato, onFatto }: { siti: string[]; bloccato?
   );
 }
 
-function StimaDaApprovare({ r, bloccato, onFatto }: { r: Richiesta; bloccato?: boolean; onFatto: () => void }) {
+export function StimaDaApprovare({ r, bloccato, onFatto }: { r: Richiesta; bloccato?: boolean; onFatto: () => void }) {
   const [busy, setBusy] = useState(false);
   const decidi = async (azione: 'approva' | 'rifiuta') => {
     setBusy(true);
@@ -883,5 +563,14 @@ function StimaDaApprovare({ r, bloccato, onFatto }: { r: Richiesta; bloccato?: b
         </button>
       </div>
     </div>
+  );
+}
+
+/** "Vedi tutte (12)" / "Mostra meno": le liste partono dalle ultime 5. */
+export function VediTutti({ aperto, n, onClick }: { aperto: boolean; n: number; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="font-pixel text-[11px] text-nebbia hover:text-chiaro transition-colors">
+      {aperto ? 'Mostra meno' : `Vedi tutte (${n})`}
+    </button>
   );
 }

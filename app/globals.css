@@ -249,3 +249,6 @@ html { -webkit-text-size-adjust: 100%; }
   .px-anim .px-f1, .px-anim .px-f2, .px-anim .px-blink, .px-hop, .px-pop, .px-dots::after { animation: none; }
   .px-anim .px-f2, .px-anim .px-blink { opacity: 0; }
 }
+
+/* Liste che scorrono dentro un riquadro: barra sottile nei colori della pagina */
+.px-scroll { scrollbar-width: thin; scrollbar-color: var(--color-ink-4) transparent; }

@@ -150,6 +150,14 @@ export const ICONE = {
     .ccc...
     ..c....
     .......`,
+  casa: `
+    ...c...
+    ..ccc..
+    .ccccc.
+    ccccccc
+    .c...c.
+    .c.c.c.
+    .ccccc.`,
   freccia: `
     ccccc
     .ccc.
@@ -187,7 +195,7 @@ const OMINO = `
   ..ssessssess..
   ..bssssssssb..
   ..bssbbbbssb..
-  ..bbbsSSsbbb..
+  ..bbbbbbbbbb..
   ...bbbbbbbb...
   ..tttttttttt..
   .tttttttttttt.

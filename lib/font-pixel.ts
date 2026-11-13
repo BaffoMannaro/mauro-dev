@@ -1,9 +1,10 @@
-import { Tiny5 } from 'next/font/google';
+import { Silkscreen } from 'next/font/google';
 
-// Font pixel per titoli e numeri grandi della pagina cliente (il testo resta in Noto Sans).
-// Tiny5 al posto di Pixelify Sans: in Pixelify il 5 si confonde con la S (€650 → €6S0).
-export const pixelFont = Tiny5({
+// Font pixel per titoli e numeri della pagina cliente (il testo resta in Noto Sans).
+// Silkscreen: cifre larghe e nette, le più leggibili tra i font pixel provati
+// (Pixelify Sans confondeva il 5 con la S, Tiny5 era troppo stretto).
+export const pixelFont = Silkscreen({
   subsets: ['latin'],
-  weight: '400',
+  weight: ['400', '700'],
   variable: '--font-pixelify',
 });

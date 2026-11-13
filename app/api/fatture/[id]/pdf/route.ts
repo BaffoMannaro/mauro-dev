@@ -5,9 +5,11 @@ import { verifyClientToken, CLIENT_COOKIE } from '@/lib/client-auth';
 import { parseFattura } from '@/lib/fattura/parse';
 import { rispostaPdf } from '@/lib/fattura/server';
 import { verifica } from '@/lib/mcp/oauth';
+import { fatturaDelCliente } from '@/lib/area-cliente';
 
-// PDF di una fattura in archivio. Accessibile all'admin, al cliente a cui è intestata
-// (dal portale) e con un link firmato dal connettore Claude. Sempre rigenerato dall'XML salvato.
+// PDF di una fattura in archivio. Accessibile all'admin, al cliente a cui appartiene (dal portale,
+// anche tramite la P.IVA della sua società) e con un link firmato dal connettore Claude.
+// Sempre rigenerato dall'XML salvato.
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -23,7 +25,8 @@ export async function GET(
   if (!admin) {
     const token = req.cookies.get(CLIENT_COOKIE)?.value;
     const cliente = token ? await verifyClientToken(token) : null;
-    if (!cliente || cliente.scope !== 'session' || cliente.cid !== row.cliente_id) {
+    const sua = cliente?.scope === 'session' && (cliente.cid === row.cliente_id || (await fatturaDelCliente(Number(id), cliente.cid)));
+    if (!sua) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
     }
   }

@@ -85,19 +85,22 @@ function descrizioneFattura(xml: string | null) {
 const normPiva = (v: unknown) => String(v ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^IT/, '');
 
 /**
- * Fatture (alias f) che appartengono al cliente: le sue, quelle della società collegata
- * e quelle intestate alla sua P.IVA anche se archiviate su un'altra scheda
- * (es. lavori fatti per conto di un'agenzia e fatturati all'agenzia).
+ * Fatture (alias f) che appartengono al cliente. Decide la P.IVA dell'intestatario quando
+ * è quella di un cliente in anagrafica: allora la vede solo quel cliente, anche se la fattura
+ * è archiviata su un'altra scheda (es. lavori per conto di un'agenzia, fatturati all'agenzia).
+ * Altrimenti (privati, o P.IVA non registrata su nessun cliente) vale la scheda: il cliente
+ * della fattura o della società collegata.
  */
 function condizioneFatture(clienteId: number, piva: string) {
+  const norm = (espr: ReturnType<typeof sql>) =>
+    sql`upper(regexp_replace(regexp_replace(COALESCE(${espr}, ''), '[^A-Za-z0-9]', '', 'g'), '^IT', '', 'i'))`;
+  const pivaFattura = norm(sql`COALESCE((SELECT i.piva FROM intestatari i WHERE i.id = f.intestatario_id), f.cliente_piva)`);
   return sql`(
-    f.cliente_id = ${clienteId}
-    OR f.intestatario_id IN (
-      SELECT i.id FROM intestatari i
-      WHERE i.cliente_id = ${clienteId}
-         OR (${piva} <> '' AND upper(regexp_replace(regexp_replace(COALESCE(i.piva, ''), '[^A-Za-z0-9]', '', 'g'), '^IT', '', 'i')) = ${piva})
-    )
-    OR (${piva} <> '' AND upper(regexp_replace(regexp_replace(COALESCE(f.cliente_piva, ''), '[^A-Za-z0-9]', '', 'g'), '^IT', '', 'i')) = ${piva})
+    CASE WHEN ${pivaFattura} <> '' AND EXISTS (SELECT 1 FROM clienti c WHERE ${norm(sql`c.piva`)} = ${pivaFattura})
+      THEN ${piva} <> '' AND ${pivaFattura} = ${piva}
+      ELSE f.cliente_id = ${clienteId}
+        OR f.intestatario_id IN (SELECT i.id FROM intestatari i WHERE i.cliente_id = ${clienteId})
+    END
   )`;
 }
 

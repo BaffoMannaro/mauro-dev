@@ -48,6 +48,13 @@ beforeAll(async () => {
   ids.f24 = await fatt('24', ids.ciccolella, ids.cream, ids.migrazione, null);
   ids.f19 = await fatt('19', null, ids.cream, null, xml('Assistenza tecnica Shopify'));
   ids.fAltro = await fatt('7', ids.altro, null, null, null);
+  await sql`UPDATE fatture SET cliente_piva = 'IT99999999999' WHERE id = ${ids.fAltro}`;
+  // Fattura a un privato (senza P.IVA) archiviata sulla scheda di Ciccolella.
+  ids.fPrivato = await fatt('3', ids.ciccolella, null, null, null);
+  // Cliente senza P.IVA in scheda, fattura con una P.IVA che nessun cliente ha registrato.
+  ids.concept = await ins('Concept', null);
+  ids.fConcept = await fatt('5', ids.concept, null, null, null);
+  await sql`UPDATE fatture SET cliente_piva = 'IT05555555555' WHERE id = ${ids.fConcept}`;
 });
 
 describe('area cliente', () => {
@@ -68,10 +75,17 @@ describe('area cliente', () => {
     expect(await fatturaDelCliente(ids.f19, ids.altro)).toBe(false);
   });
 
-  it('un cliente senza P.IVA vede solo le sue schede', async () => {
+  it('le fatture con P.IVA le vede solo il cliente con la stessa P.IVA', async () => {
     const d = (await caricaArea(ids.ciccolella, '2026-11-13'))!;
+    // Cream è collegata alla scheda di Ciccolella, ma le sue fatture restano di Claudio.
+    expect(d.fatture.map((f) => f.numero)).toEqual(['3']);
+    expect(await fatturaDelCliente(ids.f24, ids.ciccolella)).toBe(false);
+    expect(await fatturaDelCliente(ids.fPrivato, ids.ciccolella)).toBe(true);
+    expect(await fatturaDelCliente(ids.fPrivato, ids.claudio)).toBe(false);
+    // P.IVA non registrata su nessun cliente: vale la scheda.
+    expect(await fatturaDelCliente(ids.fConcept, ids.concept)).toBe(true);
+    expect(await fatturaDelCliente(ids.fConcept, ids.claudio)).toBe(false);
+    // il suo preventivo resta suo
     expect(d.preventivi.map((p) => p.oggetto)).toEqual(['Migrazione']);
-    // la società collegata alla sua scheda porta con sé le fatture
-    expect(d.fatture.map((f) => f.numero).sort()).toEqual(['19', '24']);
   });
 });

@@ -176,3 +176,76 @@ html { -webkit-text-size-adjust: 100%; }
     box-decoration-break: clone;
   }
 }
+
+/* ─── Pagina cliente "Ore e lavori": palette notte + colori per area, stile pixel ─── */
+@theme inline {
+  --color-ink:    #0B0F1C;
+  --color-ink-2:  #131A2C;
+  --color-ink-3:  #1B2339;
+  --color-ink-4:  #283253;
+  --color-chiaro: #EEF2FF;
+  --color-nebbia: #A9B2CE;
+  --color-fumo:   #6E7899;
+  --color-ore:    #3DD6F5;
+  --color-lavori: #B18CFF;
+  --color-soldi:  #FFC24B;
+  --color-azione: #FF5C8A;
+  --color-fatto:  #4BE3A0;
+  --font-pixel:   var(--font-pixelify), ui-monospace, monospace;
+}
+
+/* Sfondo con griglia di puntini, come una tela pixel */
+.px-tela {
+  background-color: var(--color-ink);
+  background-image: radial-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Angoli "a scalino" (due gradini da 4px) */
+.px-notch {
+  clip-path: polygon(
+    0 8px, 4px 8px, 4px 4px, 8px 4px, 8px 0,
+    calc(100% - 8px) 0, calc(100% - 8px) 4px, calc(100% - 4px) 4px, calc(100% - 4px) 8px, 100% 8px,
+    100% calc(100% - 8px), calc(100% - 4px) calc(100% - 8px), calc(100% - 4px) calc(100% - 4px), calc(100% - 8px) calc(100% - 4px), calc(100% - 8px) 100%,
+    8px 100%, 8px calc(100% - 4px), 4px calc(100% - 4px), 4px calc(100% - 8px), 0 calc(100% - 8px)
+  );
+}
+.px-notch-sm {
+  clip-path: polygon(
+    0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px,
+    100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%,
+    3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px)
+  );
+}
+
+/* Pulsante pixel: angoli a scalino e "spessore" in basso che si schiaccia al clic */
+.px-btn {
+  clip-path: polygon(
+    0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px,
+    100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%,
+    3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px)
+  );
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.3);
+  transition: transform 80ms, filter 120ms;
+}
+.px-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.px-btn:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.3); }
+.px-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Sprite animati: due fotogrammi alternati, battito di ciglia, saltello */
+@keyframes px-f1 { 0% { opacity: 1 } 50% { opacity: 0 } }
+@keyframes px-f2 { 0% { opacity: 0 } 50% { opacity: 1 } }
+@keyframes px-blink { 0%, 93% { opacity: 0 } 94%, 100% { opacity: 1 } }
+@keyframes px-hop { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+@keyframes px-pop { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes px-dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
+.px-anim .px-f1 { animation: px-f1 0.5s step-end infinite; }
+.px-anim .px-f2 { animation: px-f2 0.5s step-end infinite; }
+.px-anim .px-blink { animation: px-blink 4s step-end infinite; }
+.px-hop { animation: px-hop 0.9s steps(2, jump-none) infinite; }
+.px-pop { animation: px-pop 0.25s steps(3, jump-end) both; }
+.px-dots::after { content: '...'; animation: px-dots 1.2s step-end infinite; display: inline-block; width: 1.2em; text-align: left; }
+@media (prefers-reduced-motion: reduce) {
+  .px-anim .px-f1, .px-anim .px-f2, .px-anim .px-blink, .px-hop, .px-pop, .px-dots::after { animation: none; }
+  .px-anim .px-f2, .px-anim .px-blink { opacity: 0; }
+}

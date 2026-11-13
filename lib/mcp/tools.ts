@@ -48,6 +48,23 @@ import {
   raccogliOsservazioni,
 } from '@/lib/listino-db';
 
+import {
+  datiCanone,
+  eliminaIntervento,
+  eliminaLavoro,
+  ErroreCanone,
+  impostaCanone,
+  impostaStatoRichiesta,
+  listaLavori,
+  registraIntervento,
+  salvaLavoro,
+  STATI_LAVORO,
+  STATI_RICHIESTA,
+  stimaRichiesta,
+} from '@/lib/canone';
+import { fmtMinuti, parseOre } from '@/lib/canone-calcolo';
+import { notificaStima } from '@/lib/canone-email';
+
 export const ISTRUZIONI = `Gestionale di Mauro Altamura (Mauro Dev, sviluppatore web in regime forfettario).
 
 NUOVO PREVENTIVO: intervista, non inventare.
@@ -64,7 +81,7 @@ FONTE DEL CLIENTE (diretto / Astrolancer / Cream): è una divisione INTERNA. Non
 LISTINO: le voci dei lavori (preventivi e fatture) sono raggruppate in "azioni". Se voci_lavori mostra voci da classificare, raggruppale per tipo di lavoro con classifica_voci (nomi brevi e riutilizzabili, es. "Landing page", "Intervento urgente", "Manutenzione ordinaria") e mostra all'utente la proposta prima di applicarla.
 SCADENZA: ogni preventivo vale al massimo ${VALIDITA_MAX_GIORNI} giorni (predefinito ${VALIDITA_MAX_GIORNI}). Se è scaduto il cliente può chiedere un'accettazione tardiva dalla pagina: la trovi come richiesta_accettazione_tardiva e la gestisci con gestisci_accettazione_tardiva, sempre dopo la conferma dell'utente.
 FISCO (forfettario, Gestione Separata): statistiche restituisce netto_forfettario (tasse, da accantonare, scadenze). Gli incassi contano alla data di ciascun pagamento (principio di cassa), non alla data fattura né a pagata_il: una fattura di dicembre saldata a rate l'anno dopo divide l'incassato tra i due anni, e così contributi e imposta. Da incassare = totale fatture − pagamenti registrati. Se l'utente carica un Modello Redditi, salva i dati dell'anno con imposta_dati_fiscali dopo la sua conferma.
-CLIENTE vs SOCIETÀ: il cliente è la persona/il rapporto; le società (lista_societa) sono i soggetti fiscali che ricevono le fatture. Un cliente può avere più società.
+CANONE ORE: alcuni clienti hanno un canone mensile (leggi_canone, imposta_canone). Le ore non usate passano al mese dopo e valgono solo per quel mese; oltre il monte ore sono extra a tariffa piena. Ogni intervento si registra con registra_intervento (data, durata, descrizione, sito; fuori_canone se si fattura a parte). I lavori della timeline si gestiscono con salva_lavoro. Le richieste del cliente arrivano dalla sua pagina: rispondi con una stima usando rispondi_richiesta (parte una email al cliente) solo dopo la conferma dell'utente.\nCLIENTE vs SOCIETÀ: il cliente è la persona/il rapporto; le società (lista_societa) sono i soggetti fiscali che ricevono le fatture. Un cliente può avere più società.
 
 Importi in euro, date YYYY-MM-DD. Rispondi in italiano. Il PDF delle fatture si scarica dal link restituito (valido 24 ore).`;
 
@@ -1045,6 +1062,212 @@ export function registraStrumenti(server: McpServer) {
         return errore((e as Error).message);
       }
     }
+  );
+
+  // ── Canone ore ──
+
+  const scrive = { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false };
+  const oreSchema = z
+    .union([z.number().positive(), z.string()])
+    .describe('Durata: numero di ore (1.5) oppure testo "1:30", "90m", "2h"');
+
+  const riepilogoCanone = async (cid: number) => {
+    const dati = await datiCanone(cid);
+    const fmt = (m: number) => ({ minuti: m, testo: fmtMinuti(m) });
+    return {
+      canone: dati.canone,
+      mese_corrente: dati.corrente && {
+        mese: dati.corrente.mese,
+        incluse: fmt(dati.corrente.incluse),
+        riportate: fmt(dati.corrente.riportate),
+        usate: fmt(dati.corrente.usate),
+        rimaste: fmt(dati.corrente.rimaste),
+        extra: fmt(dati.corrente.extra),
+        costo_extra: dati.corrente.costo_extra,
+        fuori_canone: fmt(dati.corrente.fuori_canone),
+        scadono_a_fine_mese: fmt(dati.corrente.scadono),
+      },
+      mesi: dati.mesi,
+      interventi_recenti: dati.interventi.slice(0, 30),
+      lavori: dati.lavori,
+      richieste_aperte: dati.richieste.filter((r) => r.stato === 'nuova' || r.stato === 'stimata' || r.stato === 'approvata'),
+      pagamenti_in_scadenza: dati.pagamenti,
+      pagina_cliente: `${process.env.CLIENT_URL || `https://${process.env.CLIENT_HOST || 'area.maurodev.it'}`}/canone`,
+    };
+  };
+
+  const conErrore = async <T,>(fn: () => Promise<T>) => {
+    try {
+      return testo(await fn());
+    } catch (e) {
+      if (e instanceof ErroreCanone) return errore(e.message);
+      throw e;
+    }
+  };
+
+  server.registerTool(
+    'leggi_canone',
+    {
+      title: 'Leggi canone ore',
+      description:
+        'Monte ore del cliente: canone, mese corrente (incluse, riportate, usate, rimaste, extra), storico mesi, ' +
+        'interventi recenti, lavori della timeline, richieste aperte e pagamenti in scadenza.',
+      inputSchema: z.object({ cliente_id: z.number().int() }),
+      annotations: sola,
+    },
+    async ({ cliente_id }) => conErrore(() => riepilogoCanone(cliente_id))
+  );
+
+  server.registerTool(
+    'imposta_canone',
+    {
+      title: 'Imposta canone ore',
+      description:
+        'Crea o modifica il canone mensile di un cliente (uno per cliente). Le ore non usate valgono per riporto_mesi mesi (default 1). ' +
+        'siti = elenco dei siti su cui si registrano gli interventi. Chiedi conferma all’utente prima.',
+      inputSchema: z.object({
+        cliente_id: z.number().int(),
+        ore_mese: z.number().positive(),
+        prezzo_mese: z.number().describe('Euro al mese'),
+        tariffa_extra: z.number().describe('Euro all’ora oltre il monte ore'),
+        inizio: z.string().describe('YYYY-MM-DD, conta il mese'),
+        fine: z.string().nullable().optional(),
+        riporto_mesi: z.number().int().min(0).max(12).optional(),
+        siti: z.array(z.string()).optional(),
+        note: z.string().nullable().optional(),
+      }),
+      annotations: { ...scrive, idempotentHint: true },
+    },
+    async ({ cliente_id, ...c }) => conErrore(() => impostaCanone(cliente_id, c))
+  );
+
+  server.registerTool(
+    'registra_intervento',
+    {
+      title: 'Registra intervento',
+      description:
+        'Registra un intervento con la durata. Conta sul monte ore del mese della data, salvo fuori_canone (fatturato a parte). ' +
+        'Facoltativi: sito, chi l’ha chiesto, richiesta_id (la richiesta collegata), lavoro_id (il lavoro della timeline), ' +
+        'completa_richiesta per segnare la richiesta come completata. Restituisce il nuovo riepilogo del mese.',
+      inputSchema: z.object({
+        cliente_id: z.number().int(),
+        data: z.string().describe('YYYY-MM-DD'),
+        ore: oreSchema,
+        descrizione: z.string(),
+        sito: z.string().optional(),
+        richiesto_da: z.string().optional(),
+        fuori_canone: z.boolean().optional(),
+        richiesta_id: z.number().int().optional(),
+        lavoro_id: z.number().int().optional(),
+        completa_richiesta: z.boolean().optional(),
+      }),
+      annotations: scrive,
+    },
+    async ({ cliente_id, ore, completa_richiesta, ...i }) =>
+      conErrore(async () => {
+        const minuti = parseOre(ore);
+        if (!minuti) throw new ErroreCanone(`Durata non valida: ${ore}`);
+        const intervento = await registraIntervento(cliente_id, { ...i, minuti });
+        if (completa_richiesta && i.richiesta_id) await impostaStatoRichiesta(cliente_id, i.richiesta_id, 'completata');
+        const r = await riepilogoCanone(cliente_id);
+        return { intervento, mese_corrente: r.mese_corrente };
+      })
+  );
+
+  server.registerTool(
+    'elimina_intervento',
+    {
+      title: 'Elimina intervento',
+      description: 'Elimina un intervento registrato per errore. Chiedi conferma all’utente prima.',
+      inputSchema: z.object({ cliente_id: z.number().int(), id: z.number().int() }),
+      annotations: { ...scrive, destructiveHint: true },
+    },
+    async ({ cliente_id, id }) =>
+      conErrore(async () => {
+        await eliminaIntervento(cliente_id, id);
+        return { eliminato: id };
+      })
+  );
+
+  server.registerTool(
+    'salva_lavoro',
+    {
+      title: 'Crea o aggiorna lavoro (timeline)',
+      description:
+        'Lavori mostrati nella timeline della pagina cliente. Senza id crea un lavoro (serve titolo); con id aggiorna solo i campi passati. ' +
+        'stato: da_avviare, in_corso, attesa_cliente (scrivi in attesa_cliente cosa serve dal cliente), completato. ' +
+        'Facoltativi: preventivo_id, sito, inizio, consegna_prevista, ore_stimate.',
+      inputSchema: z.object({
+        cliente_id: z.number().int(),
+        id: z.number().int().optional(),
+        titolo: z.string().optional(),
+        preventivo_id: z.number().int().nullable().optional(),
+        sito: z.string().nullable().optional(),
+        stato: z.enum(STATI_LAVORO).optional(),
+        inizio: z.string().nullable().optional(),
+        consegna_prevista: z.string().nullable().optional(),
+        completato_il: z.string().nullable().optional(),
+        ore_stimate: z.number().nullable().optional(),
+        attesa_cliente: z.string().nullable().optional(),
+        note: z.string().nullable().optional(),
+      }),
+      annotations: scrive,
+    },
+    async ({ cliente_id, ...l }) =>
+      conErrore(async () => {
+        const id = await salvaLavoro(cliente_id, l);
+        return (await listaLavori(cliente_id)).find((x) => x.id === id);
+      })
+  );
+
+  server.registerTool(
+    'elimina_lavoro',
+    {
+      title: 'Elimina lavoro',
+      description: 'Toglie un lavoro dalla timeline. Chiedi conferma all’utente prima.',
+      inputSchema: z.object({ cliente_id: z.number().int(), id: z.number().int() }),
+      annotations: { ...scrive, destructiveHint: true },
+    },
+    async ({ cliente_id, id }) =>
+      conErrore(async () => {
+        await eliminaLavoro(cliente_id, id);
+        return { eliminato: id };
+      })
+  );
+
+  server.registerTool(
+    'rispondi_richiesta',
+    {
+      title: 'Rispondi a una richiesta con una stima',
+      description:
+        'Invia la stima in ore (e se vuoi una risposta e una consegna prevista) per una richiesta del cliente: ' +
+        'la richiesta passa a "stimata", al cliente arriva una email e la approva dalla sua pagina. Mostra la stima all’utente e chiedi conferma prima.',
+      inputSchema: z.object({
+        cliente_id: z.number().int(),
+        id: z.number().int(),
+        ore_stimate: z.number().positive(),
+        risposta: z.string().optional(),
+        consegna_prevista: z.string().optional(),
+      }),
+      annotations: { ...scrive, openWorldHint: true },
+    },
+    async ({ cliente_id, id, ...s }) =>
+      conErrore(async () => {
+        const r = await stimaRichiesta(cliente_id, id, s);
+        await notificaStima(cliente_id, r);
+        return r;
+      })
+  );
+
+  server.registerTool(
+    'aggiorna_richiesta',
+    {
+      title: 'Cambia stato di una richiesta',
+      description: 'Imposta lo stato di una richiesta: nuova, stimata, approvata (es. approvata a voce), rifiutata, completata.',
+      inputSchema: z.object({ cliente_id: z.number().int(), id: z.number().int(), stato: z.enum(STATI_RICHIESTA) }),
+      annotations: { ...scrive, idempotentHint: true },
+    },
+    async ({ cliente_id, id, stato }) => conErrore(() => impostaStatoRichiesta(cliente_id, id, stato))
   );
 
   // ── Prompt ──

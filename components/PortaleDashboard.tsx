@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { calcFinanza } from '@/lib/preventivo-finance';
 import { euroCent } from '@/lib/formato';
+import { Icona, Omino } from '@/components/pixel/Sprite';
+import { Etichetta, Lampo, PaginaCliente, Tile, Titolo, type Area } from '@/components/pixel/Bento';
 
 type Preventivo = {
   id: number;
@@ -44,13 +46,22 @@ type Cliente = {
 const eur = euroCent;
 
 const dataIt = (d: string | null) =>
-  d ? new Date(d).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  d ? new Date(d).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
 
-function lavoroStato(p: Preventivo) {
-  if (p.lavoro_fine) return { label: 'Completato', cls: 'bg-emerald-500/15 text-emerald-400' };
-  if (p.lavoro_inizio) return { label: 'In corso', cls: 'bg-sky-500/15 text-sky-400' };
-  return { label: 'In attesa di avvio', cls: 'bg-zinc-500/15 text-zinc-400' };
+function lavoroStato(p: Preventivo): { label: string; area: Area } {
+  if (p.lavoro_fine) return { label: 'Completato', area: 'fatto' };
+  if (p.lavoro_inizio) return { label: 'In corso', area: 'lavori' };
+  return { label: 'Da avviare', area: 'fumo' };
 }
+
+const STATO_PREVENTIVO: Record<string, { label: string; area: Area }> = {
+  inviato: { label: 'Da valutare', area: 'azione' },
+  accettato: { label: 'Accettato', area: 'fatto' },
+  archiviato: { label: 'Concluso', area: 'fumo' },
+  rifiutato: { label: 'Non accettato', area: 'fumo' },
+};
+
+const btnSecondario = 'px-btn font-pixel text-[11px] px-3 py-2 bg-ink-4 text-nebbia hover:text-chiaro';
 
 export default function PortaleDashboard({
   cliente,
@@ -67,12 +78,10 @@ export default function PortaleDashboard({
   const [busyId, setBusyId] = useState<number | null>(null);
 
   const daAccettare = useMemo(() => preventivi.filter((p) => p.stato === 'inviato'), [preventivi]);
-  const accettati = useMemo(
-    () => preventivi.filter((p) => p.stato === 'accettato' || p.stato === 'archiviato'),
-    [preventivi]
-  );
+  const accettati = useMemo(() => preventivi.filter((p) => p.stato === 'accettato' || p.stato === 'archiviato'), [preventivi]);
+  const inCorso = accettati.filter((p) => p.lavoro_inizio && !p.lavoro_fine);
   const fattureDaPagare = useMemo(() => fatture.filter((f) => f.stato !== 'pagata'), [fatture]);
-  const finanza = useMemo(() => calcFinanza(preventivi as any), [preventivi]);
+  const finanza = useMemo(() => calcFinanza(preventivi as never), [preventivi]);
 
   const rispondiPreventivo = async (id: number, azione: 'accetta' | 'rifiuta') => {
     setBusyId(id);
@@ -88,286 +97,281 @@ export default function PortaleDashboard({
     }
   };
 
-  const esci = async () => {
-    await fetch('/api/portale/esci', { method: 'POST' });
-    window.location.href = '/accedi';
-  };
-
   const nAzioni = daAccettare.length + fattureDaPagare.length;
+  const oggi = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Rome' });
 
   return (
-    <div className="min-h-screen bg-bg text-text">
-      {/* Header */}
-      <header className="border-b border-edge bg-surface">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <img src="/Logo.svg" alt="MAURO DEV" className="h-6 w-auto logo-adaptive" />
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-sm text-muted truncate hidden sm:block">
-              {cliente.azienda || cliente.nome}
-            </span>
+    <PaginaCliente cliente={cliente} attiva="portale" haCanone={haCanone}>
+      <div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 gap-3 sm:gap-4">
+        {/* Benvenuto */}
+        <section className="md:col-span-4 xl:col-span-6 px-notch bg-ink-2 p-4 sm:p-6 flex flex-col justify-between gap-5 min-w-0">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <div className="relative shrink-0">
+              {nAzioni > 0 && (
+                <span className="absolute -top-4 -right-2 px-hop text-azione">
+                  <Icona nome="esclamativo" scala={3} />
+                </span>
+              )}
+              <div className="sm:hidden"><Omino scala={5} alLavoro={inCorso.length > 0} /></div>
+              <div className="hidden sm:block"><Omino scala={8} alLavoro={inCorso.length > 0} /></div>
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-fumo capitalize mb-1.5" suppressHydrationWarning>{oggi}</p>
+              <h1 className="font-pixel text-2xl sm:text-4xl leading-tight mb-3 break-words">Ciao {cliente.nome.split(' ')[0]}</h1>
+              <p className="inline-block bg-ink-3 px-notch-sm px-3 py-2 text-sm text-nebbia leading-snug">
+                {nAzioni > 0 ? (
+                  <>
+                    C&apos;è qualcosa per te nel riquadro <span className="text-azione font-medium">rosa</span>.
+                  </>
+                ) : inCorso.length > 0 ? (
+                  <>
+                    Sto lavorando a <span className="text-lavori font-medium">{inCorso[0].oggetto}</span>
+                    {inCorso.length > 1 ? ` e ad altri ${inCorso.length - 1}` : ''}
+                    <span className="px-dots" />
+                  </>
+                ) : (
+                  <>Questa è la tua area: preventivi, lavori e fatture, tutto qui.</>
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 flex-1">
+              <Lampo area="soldi" className="col-span-2 sm:col-span-1" valore={eur(finanza.daDare)} label="ancora da versare" />
+              <Lampo area="lavori" valore={String(inCorso.length)} label={inCorso.length === 1 ? 'lavoro in corso' : 'lavori in corso'} />
+              <Lampo area="azione" valore={String(daAccettare.length)} label="preventivi da valutare" />
+            </div>
             {haCanone && (
-              <a href="/canone" className="text-xs text-dim hover:text-text transition-colors shrink-0">
+              <a href="/canone" className="px-btn font-pixel text-xs px-4 py-3 bg-ore text-ink grid place-items-center text-center">
                 Ore e lavori
               </a>
             )}
-            <button
-              onClick={esci}
-              className="text-xs text-dim hover:text-text transition-colors shrink-0"
-            >
-              Esci
-            </button>
           </div>
-        </div>
-      </header>
+        </section>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
-        <h1 className="text-xl sm:text-2xl font-semibold leading-tight mb-1">Ciao {cliente.nome} 👋</h1>
-        <p className="text-muted text-sm mb-6">Questa è la tua area riservata.</p>
-
-        {/* Bento grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-          {/* Azioni richieste — hero */}
-          <section className="md:col-span-3 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
-            <div className="flex items-center gap-2 mb-3">
-              <h2 className="font-semibold">Azioni richieste</h2>
-              {nAzioni > 0 && (
-                <span className="text-xs bg-accent text-on-accent rounded-full px-2 py-0.5">{nAzioni}</span>
-              )}
-            </div>
-            {nAzioni === 0 ? (
-              <p className="text-muted text-sm">Tutto in ordine, non serve niente da parte tua. ✓</p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {daAccettare.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex flex-wrap items-center gap-3 justify-between bg-surface2 rounded-xl px-4 py-3"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{p.oggetto}</p>
-                      <p className="text-xs text-dim">
-                        {p.scaduto ? 'Preventivo scaduto: aprilo per chiedere un’accettazione tardiva' : 'Preventivo da valutare'} · {eur(Number(p.totale))}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <a
-                        href={`/p/${p.token}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs px-3 py-1.5 rounded-lg border border-edge hover:bg-surface transition-colors"
-                      >
-                        {p.scaduto ? 'Apri' : 'Vedi'}
-                      </a>
-                      {!p.scaduto && (<>
-                      <button
-                        disabled={busyId === p.id}
-                        onClick={() => rispondiPreventivo(p.id, 'rifiuta')}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-edge text-dim hover:text-text transition-colors disabled:opacity-50"
-                      >
-                        Rifiuta
-                      </button>
-                      <button
-                        disabled={busyId === p.id}
-                        onClick={() => rispondiPreventivo(p.id, 'accetta')}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-accent text-on-accent hover:opacity-90 transition-opacity disabled:opacity-50"
-                      >
+        {/* Azioni richieste */}
+        {nAzioni > 0 ? (
+          <Tile area="azione" className="md:col-span-2 xl:col-span-3">
+            <Titolo area="azione" icona="esclamativo" destra={<span className="font-pixel text-azione text-lg leading-none">{nAzioni}</span>}>
+              Per te
+            </Titolo>
+            <div className="flex flex-col gap-2">
+              {daAccettare.map((p) => (
+                <div key={p.id} className="bg-ink-3 px-notch-sm p-3">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="font-pixel text-lg text-azione leading-none tabular-nums">{eur(Number(p.totale))}</p>
+                    <span className="text-xs text-fumo">{p.scaduto ? 'scaduto' : 'preventivo'}</span>
+                  </div>
+                  <p className="text-sm text-chiaro mt-2">{p.oggetto}</p>
+                  {p.scaduto && <p className="text-xs text-nebbia mt-1">Aprilo per chiedere un&apos;accettazione tardiva.</p>}
+                  <div className="flex items-center gap-2 mt-3">
+                    {!p.scaduto && (
+                      <button disabled={busyId === p.id} onClick={() => rispondiPreventivo(p.id, 'accetta')}
+                        className="px-btn flex-1 font-pixel text-[11px] px-3 py-2 bg-azione text-ink">
                         Accetta
                       </button>
-                      </>)}
-                    </div>
-                  </div>
-                ))}
-                {fattureDaPagare.map((f) => (
-                  <div
-                    key={f.id}
-                    className="flex flex-wrap items-center gap-3 justify-between bg-surface2 rounded-xl px-4 py-3"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        Fattura {f.numero ? `n. ${f.numero}` : ''} da saldare
-                      </p>
-                      <p className="text-xs text-dim">
-                        {f.stato === 'parziale' && f.residuo != null
-                          ? `restano ${eur(Number(f.residuo))} su ${eur(Number(f.importo))}`
-                          : f.importo != null ? eur(Number(f.importo)) : ''} · {dataIt(f.data)}
-                      </p>
-                    </div>
-                    {f.pdf_url && (
-                      <a
-                        href={f.pdf_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs px-3 py-1.5 rounded-lg border border-edge hover:bg-surface transition-colors shrink-0"
-                      >
-                        Apri PDF
-                      </a>
+                    )}
+                    <a href={`/p/${p.token}`} target="_blank" rel="noreferrer" className={btnSecondario}>
+                      {p.scaduto ? 'Apri' : 'Leggi'}
+                    </a>
+                    {!p.scaduto && (
+                      <button disabled={busyId === p.id} onClick={() => rispondiPreventivo(p.id, 'rifiuta')} className={btnSecondario}>
+                        No
+                      </button>
                     )}
                   </div>
-                ))}
-              </div>
-            )}
-          </section>
+                </div>
+              ))}
+              {fattureDaPagare.map((f) => (
+                <div key={f.id} className="bg-ink-3 px-notch-sm p-3">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="font-pixel text-lg text-soldi leading-none tabular-nums">
+                      {eur(Number(f.stato === 'parziale' && f.residuo != null ? f.residuo : f.importo ?? 0))}
+                    </p>
+                    {f.pdf_url && (
+                      <a href={f.pdf_url} target="_blank" rel="noreferrer" className="font-pixel text-[11px] text-soldi hover:underline underline-offset-4">PDF</a>
+                    )}
+                  </div>
+                  <p className="text-sm text-chiaro mt-2">Fattura {f.numero ? `n. ${f.numero}` : ''} da saldare</p>
+                  <p className="text-xs text-fumo mt-0.5">
+                    {f.stato === 'parziale' && f.residuo != null ? `su ${eur(Number(f.importo))} totali · ` : ''}del {dataIt(f.data)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Tile>
+        ) : (
+          <Tile area="fatto" className="md:col-span-2 xl:col-span-3 flex flex-col justify-center">
+            <Titolo area="fatto" icona="spunta">Tutto a posto</Titolo>
+            <p className="text-sm text-nebbia">Non serve niente da parte tua. Se arriva un preventivo o una fattura, compare qui.</p>
+          </Tile>
+        )}
 
-          {/* Riepilogo economico */}
-          <section className="bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
-            <h2 className="font-semibold mb-3">Riepilogo</h2>
-            <dl className="flex flex-col gap-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted">Totale lavori</dt>
-                <dd className="tabular-nums font-medium">{eur(finanza.totale)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted">Già versato</dt>
-                <dd className="tabular-nums font-medium text-emerald-400">{eur(finanza.ricevuto)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted">Ancora da versare</dt>
-                <dd className="tabular-nums font-medium">{eur(finanza.daDare)}</dd>
-              </div>
-            </dl>
-          </section>
+        {/* Riepilogo economico */}
+        <Tile area="soldi" className="md:col-span-2 xl:col-span-3">
+          <Titolo area="soldi" icona="moneta">Riepilogo</Titolo>
+          <Riepilogo totale={finanza.totale} ricevuto={finanza.ricevuto} daDare={finanza.daDare} />
+        </Tile>
 
-          {/* Avanzamento lavori */}
-          <section className="md:col-span-2 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
-            <h2 className="font-semibold mb-3">Avanzamento lavori</h2>
-            {accettati.length === 0 ? (
-              <p className="text-muted text-sm">Nessun lavoro attivo al momento.</p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {accettati.map((p) => {
-                  const st = lavoroStato(p);
-                  return (
-                    <div key={p.id} className="flex items-center justify-between gap-3 bg-surface2 rounded-xl px-4 py-3">
-                      <p className="text-sm font-medium truncate">{p.oggetto}</p>
-                      <span className={`text-xs rounded-full px-2.5 py-1 shrink-0 ${st.cls}`}>{st.label}</span>
-                    </div>
-                  );
-                })}
-                <p className="text-xs text-dim mt-1">
-                  Presto qui vedrai il dettaglio delle singole fasi e cosa serve da parte tua.
-                </p>
-              </div>
-            )}
-          </section>
-
-          {/* Preventivi */}
-          <section className="bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
-            <h2 className="font-semibold mb-3">Preventivi</h2>
-            {preventivi.length === 0 ? (
-              <p className="text-muted text-sm">Nessun preventivo.</p>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {preventivi.map((p) => (
-                  <li key={p.id}>
-                    <a
-                      href={`/p/${p.token}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-between gap-2 text-sm hover:text-accent transition-colors"
-                    >
-                      <span className="truncate">{p.oggetto}</span>
-                      <span className="text-xs text-dim shrink-0">{eur(Number(p.totale))}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          {/* Fatture */}
-          <section className="md:col-span-2 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
-            <h2 className="font-semibold mb-3">Fatture</h2>
-            {fatture.length === 0 ? (
-              <p className="text-muted text-sm">Nessuna fattura disponibile.</p>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {fatture.map((f) => (
-                  <li
-                    key={f.id}
-                    className="flex flex-wrap items-center justify-between gap-2 bg-surface2 rounded-xl px-4 py-2.5"
-                  >
+        {/* Avanzamento lavori */}
+        <Tile area="lavori" className="md:col-span-4 xl:col-span-7">
+          <Titolo area="lavori" icona="bandiera">Lavori</Titolo>
+          {accettati.length === 0 ? (
+            <div className="flex items-center gap-4 bg-ink-3 px-notch-sm p-4">
+              <Omino scala={3} />
+              <p className="text-sm text-nebbia">Nessun lavoro attivo al momento. Quando accetti un preventivo, qui ne segui l&apos;avanzamento.</p>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {accettati.map((p) => {
+                const st = lavoroStato(p);
+                const passi = [true, !!p.lavoro_inizio, !!p.lavoro_fine];
+                return (
+                  <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 bg-ink-3/60 px-notch-sm p-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium">
-                        {f.numero ? `Fattura n. ${f.numero}` : 'Fattura'}
-                        <span className="text-dim font-normal"> · {dataIt(f.data)}</span>
+                      <p className="text-sm font-medium text-chiaro">{p.oggetto}</p>
+                      <p className="text-xs text-fumo mt-0.5">
+                        {p.lavoro_fine
+                          ? `consegnato il ${dataIt(p.lavoro_fine)}`
+                          : p.lavoro_inizio
+                            ? `iniziato il ${dataIt(p.lavoro_inizio)}`
+                            : p.accettato_at
+                              ? `accettato il ${dataIt(p.accettato_at)}`
+                              : ''}
                       </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <span className="text-sm">{f.importo != null ? eur(Number(f.importo)) : ''}</span>
-                      <span
-                        className={`text-xs rounded-full px-2.5 py-1 ${
-                          f.stato === 'pagata'
-                            ? 'bg-emerald-500/15 text-emerald-400'
-                            : 'bg-amber-500/15 text-amber-400'
-                        }`}
-                        title={f.stato === 'parziale' && f.residuo != null ? `Restano ${eur(Number(f.residuo))}` : undefined}
-                      >
-                        {f.stato === 'pagata' ? 'Pagata' : f.stato === 'parziale' ? 'Pagata in parte' : 'Da pagare'}
+                      {/* Tre passi in pixel: accettato, in corso, consegnato */}
+                      <span className="flex gap-[3px]" aria-hidden>
+                        {passi.map((ok, i) => (
+                          <span key={i} className={`block w-4 h-2.5 ${ok ? (p.lavoro_fine ? 'bg-fatto' : 'bg-lavori') : 'bg-ink-4'}`} />
+                        ))}
                       </span>
-                      {f.pdf_url && (
-                        <a
-                          href={f.pdf_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs px-3 py-1.5 rounded-lg border border-edge hover:bg-surface transition-colors"
-                        >
-                          PDF
-                        </a>
-                      )}
+                      <Etichetta area={st.area}>{st.label}</Etichetta>
                     </div>
                   </li>
-                ))}
-              </ul>
-            )}
-          </section>
+                );
+              })}
+            </ul>
+          )}
+        </Tile>
 
-          {/* Messaggi (placeholder Fase 3) */}
-          <section className="bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
-            <h2 className="font-semibold mb-3">Messaggi</h2>
-            <p className="text-muted text-sm">
-              Presto potrai scrivermi da qui e ritrovare tutta la nostra conversazione in un unico posto.
-            </p>
-          </section>
+        {/* Preventivi */}
+        <Tile area="lavori" className="md:col-span-2 xl:col-span-5">
+          <Titolo area="lavori" icona="registro">Preventivi</Titolo>
+          {preventivi.length === 0 ? (
+            <p className="text-sm text-nebbia">Nessun preventivo.</p>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {preventivi.map((p) => {
+                const st = p.scaduto ? { label: 'Scaduto', area: 'fumo' as Area } : STATO_PREVENTIVO[p.stato] ?? { label: p.stato, area: 'fumo' as Area };
+                return (
+                  <li key={p.id}>
+                    <a href={`/p/${p.token}`} target="_blank" rel="noreferrer"
+                      className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 bg-ink-3/60 hover:bg-ink-3 px-notch-sm px-3 py-2.5 transition-colors">
+                      <span className="text-sm text-chiaro min-w-0">{p.oggetto}</span>
+                      <span className="flex items-center gap-2 shrink-0">
+                        <Etichetta area={st.area}>{st.label}</Etichetta>
+                        <span className="font-pixel text-xs text-nebbia tabular-nums">{eur(Number(p.totale))}</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </Tile>
 
-          {/* I tuoi dati */}
-          <section className="md:col-span-3 bg-surface border border-edge rounded-2xl p-4 sm:p-5 min-w-0">
-            <h2 className="font-semibold mb-3">I tuoi dati</h2>
-            <dl className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <dt className="text-dim text-xs">Nome</dt>
-                <dd className="mt-0.5">{cliente.nome}</dd>
-              </div>
-              {cliente.azienda && (
-                <div>
-                  <dt className="text-dim text-xs">Azienda</dt>
-                  <dd className="mt-0.5">{cliente.azienda}</dd>
-                </div>
-              )}
-              {cliente.email && (
-                <div className="min-w-0">
-                  <dt className="text-dim text-xs">Email</dt>
-                  <dd className="mt-0.5 truncate">{cliente.email}</dd>
-                </div>
-              )}
-              {cliente.telefono && (
-                <div>
-                  <dt className="text-dim text-xs">Telefono</dt>
-                  <dd className="mt-0.5">{cliente.telefono}</dd>
-                </div>
-              )}
-              {cliente.piva && (
-                <div>
-                  <dt className="text-dim text-xs">P. IVA</dt>
-                  <dd className="mt-0.5">{cliente.piva}</dd>
-                </div>
-              )}
-            </dl>
-            <p className="text-xs text-dim mt-3">
-              Un dato non è corretto? Scrivimi e lo sistemo.
+        {/* Fatture */}
+        <Tile area="soldi" className="md:col-span-4 xl:col-span-8">
+          <Titolo area="soldi" icona="moneta">Fatture</Titolo>
+          {fatture.length === 0 ? (
+            <p className="text-sm text-nebbia">Nessuna fattura disponibile.</p>
+          ) : (
+            <ul className="flex flex-col gap-1.5">
+              {fatture.map((f) => (
+                <li key={f.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 bg-ink-3/60 px-notch-sm px-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="text-sm text-chiaro">{f.numero ? `Fattura n. ${f.numero}` : 'Fattura'}</p>
+                    <p className="text-xs text-fumo mt-0.5">
+                      del {dataIt(f.data)}
+                      {f.stato === 'parziale' && f.residuo != null ? ` · restano ${eur(Number(f.residuo))}` : ''}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Etichetta area={f.stato === 'pagata' ? 'fatto' : 'soldi'}>
+                      {f.stato === 'pagata' ? 'Pagata' : f.stato === 'parziale' ? 'In parte' : 'Da pagare'}
+                    </Etichetta>
+                    <span className="font-pixel text-sm text-soldi tabular-nums">{f.importo != null ? eur(Number(f.importo)) : ''}</span>
+                    {f.pdf_url && (
+                      <a href={f.pdf_url} target="_blank" rel="noreferrer" className="font-pixel text-[11px] text-nebbia hover:text-chiaro">PDF</a>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Tile>
+
+        {/* Messaggi */}
+        <Tile area="fumo" className="md:col-span-2 xl:col-span-4">
+          <Titolo area="fumo" icona="fumetto">Messaggi</Titolo>
+          <p className="text-sm text-nebbia">Presto potrai scrivermi da qui e ritrovare tutta la nostra conversazione in un unico posto.</p>
+          {haCanone && (
+            <p className="text-xs text-fumo mt-3">
+              Intanto, per una richiesta con stima in ore, usa <a href="/canone" className="text-ore hover:underline underline-offset-4">Ore e lavori</a>.
             </p>
-          </section>
-        </div>
-      </main>
+          )}
+        </Tile>
+
+        {/* I tuoi dati */}
+        <Tile area="fumo" className="md:col-span-6 xl:col-span-12">
+          <Titolo area="fumo" icona="domanda">I tuoi dati</Titolo>
+          <dl className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2">
+            <Dato label="Nome" valore={cliente.nome} />
+            {cliente.azienda && <Dato label="Azienda" valore={cliente.azienda} />}
+            {cliente.email && <Dato label="Email" valore={cliente.email} />}
+            {cliente.telefono && <Dato label="Telefono" valore={cliente.telefono} />}
+            {cliente.piva && <Dato label="P. IVA" valore={cliente.piva} />}
+          </dl>
+          <p className="text-xs text-fumo mt-3">Un dato non è corretto? Scrivimi e lo sistemo.</p>
+        </Tile>
+      </div>
+    </PaginaCliente>
+  );
+}
+
+function Dato({ label, valore }: { label: string; valore: string }) {
+  return (
+    <div className="bg-ink-3 px-notch-sm px-3 py-2 min-w-0">
+      <dt className="text-fumo text-[11px]">{label}</dt>
+      <dd className="mt-0.5 text-sm text-chiaro truncate">{valore}</dd>
     </div>
+  );
+}
+
+// Totale dei lavori come barra di 20 pixel: verdi i versati.
+function Riepilogo({ totale, ricevuto, daDare }: { totale: number; ricevuto: number; daDare: number }) {
+  const pieni = totale > 0 ? Math.round((ricevuto / totale) * 20) : 0;
+  return (
+    <>
+      <p className="text-xs text-fumo mb-1.5">Ancora da versare</p>
+      <p className="font-pixel text-3xl sm:text-4xl text-soldi leading-none tabular-nums mb-4">{eur(daDare)}</p>
+      <div className="grid grid-cols-10 gap-[3px] mb-2" role="img" aria-label={`Versati ${eur(ricevuto)} su ${eur(totale)}`}>
+        {Array.from({ length: 20 }, (_, i) => (
+          <span key={i} className={`block h-3 px-pop ${i < pieni ? 'bg-fatto' : 'bg-ink-4'}`} style={{ animationDelay: `${i * 30}ms` }} />
+        ))}
+      </div>
+      <dl className="flex flex-col gap-1.5 text-sm mt-3">
+        <div className="flex justify-between gap-2">
+          <dt className="text-nebbia flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 bg-fatto" /> Già versato</dt>
+          <dd className="font-pixel text-xs text-fatto tabular-nums">{eur(ricevuto)}</dd>
+        </div>
+        <div className="flex justify-between gap-2">
+          <dt className="text-nebbia flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 bg-ink-4" /> Totale lavori</dt>
+          <dd className="font-pixel text-xs text-chiaro tabular-nums">{eur(totale)}</dd>
+        </div>
+      </dl>
+    </>
   );
 }

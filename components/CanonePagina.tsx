@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { euroCent } from '@/lib/formato';
 import { fmtMinuti, meseDi, meseSuccessivo, nomeMese, type MeseCanone } from '@/lib/canone-calcolo';
 import type { Canone, Intervento, Lavoro, Richiesta, Scadenza } from '@/lib/canone';
-import { pixelFont } from '@/lib/font-pixel';
 import { Icona, Omino, type NomeIcona } from '@/components/pixel/Sprite';
+import { AREA, Etichetta, Lampo, PaginaCliente, Tile, Titolo, type Area } from '@/components/pixel/Bento';
 
 interface Props {
   cliente: { nome: string; azienda: string | null };
@@ -40,17 +40,6 @@ const aggiungiGiorni = (d: string, n: number) => {
 const ore = (n: number | null) => (n == null ? '' : `${String(n).replace('.', ',')} h`);
 const soloMese = (mese: string) => nomeMese(mese).split(' ')[0];
 
-// Ogni area della pagina ha un colore: aiuta a orientarsi e a ritrovare le cose.
-type Area = 'ore' | 'lavori' | 'soldi' | 'azione' | 'fatto' | 'fumo';
-const AREA: Record<Area, { testo: string; sfondo: string; tenue: string; var: string }> = {
-  ore: { testo: 'text-ore', sfondo: 'bg-ore', tenue: 'bg-ore/15', var: 'var(--color-ore)' },
-  lavori: { testo: 'text-lavori', sfondo: 'bg-lavori', tenue: 'bg-lavori/15', var: 'var(--color-lavori)' },
-  soldi: { testo: 'text-soldi', sfondo: 'bg-soldi', tenue: 'bg-soldi/15', var: 'var(--color-soldi)' },
-  azione: { testo: 'text-azione', sfondo: 'bg-azione', tenue: 'bg-azione/15', var: 'var(--color-azione)' },
-  fatto: { testo: 'text-fatto', sfondo: 'bg-fatto', tenue: 'bg-fatto/15', var: 'var(--color-fatto)' },
-  fumo: { testo: 'text-nebbia', sfondo: 'bg-fumo', tenue: 'bg-fumo/15', var: 'var(--color-ink-4)' },
-};
-
 const STATO_LAVORO: Record<string, { label: string; area: Area }> = {
   da_avviare: { label: 'Da avviare', area: 'fumo' },
   in_corso: { label: 'In corso', area: 'lavori' },
@@ -66,52 +55,11 @@ const STATO_RICHIESTA: Record<string, { label: string; area: Area }> = {
   completata: { label: 'Fatta', area: 'fatto' },
 };
 
-// ── Mattoncini del bento ──
-
-function Tile({ area, id, className = '', children }: { area: Area; id?: string; className?: string; children: React.ReactNode }) {
-  return (
-    <section
-      id={id}
-      className={`px-notch bg-ink-2 p-4 sm:p-5 min-w-0 scroll-mt-4 ${className}`}
-      style={{ boxShadow: `inset 0 4px 0 ${AREA[area].var}` }}
-    >
-      {children}
-    </section>
-  );
-}
-
-function Titolo({ area, icona, children, destra }: { area: Area; icona: NomeIcona; children: React.ReactNode; destra?: React.ReactNode }) {
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-      <h2 className="flex items-center gap-2.5 font-pixel text-[15px] leading-none text-chiaro">
-        <span className={`grid place-items-center w-7 h-7 px-notch-sm ${AREA[area].tenue} ${AREA[area].testo}`}>
-          <Icona nome={icona} />
-        </span>
-        {children}
-      </h2>
-      {destra}
-    </div>
-  );
-}
-
-function Etichetta({ area, children }: { area: Area; children: React.ReactNode }) {
-  return (
-    <span className={`inline-block px-notch-sm font-pixel text-[10px] leading-none px-2 py-1 ${AREA[area].tenue} ${AREA[area].testo}`}>
-      {children}
-    </span>
-  );
-}
-
 // ── Pagina ──
 
 export default function CanonePagina(p: Props) {
   const router = useRouter();
   const { canone, corrente, oggi } = p;
-
-  const esci = async () => {
-    await fetch('/api/portale/esci', { method: 'POST' });
-    window.location.href = '/accedi';
-  };
 
   const daApprovare = p.richieste.filter((r) => r.stato === 'stimata');
   const aperte = p.richieste.filter((r) => r.stato === 'nuova' || r.stato === 'approvata');
@@ -126,37 +74,7 @@ export default function CanonePagina(p: Props) {
   const dataLunga = new Date(`${oggi}T12:00:00`).toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
-    <div className={`${pixelFont.variable} min-h-screen px-tela text-chiaro`}>
-      {p.anteprima ? (
-        <div className="bg-ink-2 border-b-2 border-azione/50">
-          <div className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <span className="flex items-center gap-2 text-chiaro">
-              <Icona nome="esclamativo" className="text-azione" />
-              Anteprima: è la pagina che vede {p.cliente.nome}. I pulsanti sono disattivati.
-            </span>
-            <a href={p.anteprima.indietro} className="text-nebbia hover:text-chiaro underline-offset-4 hover:underline">
-              Torna alla scheda cliente
-            </a>
-          </div>
-        </div>
-      ) : (
-        <header className="border-b-2 border-ink-3 bg-ink/80 backdrop-blur">
-          <div className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 h-14 flex items-center justify-between gap-3">
-            <img src="/Logo.svg" alt="MAURO DEV" className="h-6 w-auto brightness-0 invert" />
-            <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-              <span className="text-sm text-nebbia truncate hidden sm:block">{p.cliente.azienda || p.cliente.nome}</span>
-              <a href="/portale" className="text-xs text-fumo hover:text-chiaro transition-colors shrink-0">
-                Preventivi e fatture
-              </a>
-              <button onClick={esci} className="text-xs text-fumo hover:text-chiaro transition-colors shrink-0">
-                Esci
-              </button>
-            </div>
-          </div>
-        </header>
-      )}
-
-      <main className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 py-5 sm:py-8">
+    <PaginaCliente cliente={p.cliente} attiva="canone" haCanone anteprima={p.anteprima}>
         <div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 gap-3 sm:gap-4">
           {/* Benvenuto */}
           <section className="md:col-span-4 xl:col-span-5 px-notch bg-ink-2 p-4 sm:p-6 flex flex-col justify-between gap-5 min-w-0">
@@ -192,8 +110,8 @@ export default function CanonePagina(p: Props) {
               </div>
             </div>
             {/* Colpo d'occhio: un numero per area */}
-            <div className="grid grid-cols-3 gap-2">
-              <Lampo area="ore" valore={corrente ? fmtMinuti(corrente.rimaste) : '-'} label="ore rimaste" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <Lampo area="ore" className="col-span-2 sm:col-span-1" valore={corrente ? fmtMinuti(corrente.rimaste) : '-'} label="ore rimaste" />
               <Lampo area="lavori" valore={String(attivi.length)} label={attivi.length === 1 ? 'lavoro aperto' : 'lavori aperti'} />
               <Lampo area="lavori" valore={prossima ? giorno(prossima.consegna_prevista) : '-'} label="prossima consegna" />
             </div>
@@ -310,17 +228,7 @@ export default function CanonePagina(p: Props) {
             </ul>
           </Tile>
         </div>
-      </main>
-    </div>
-  );
-}
-
-function Lampo({ area, valore, label }: { area: Area; valore: string; label: string }) {
-  return (
-    <div className="bg-ink-3 px-notch-sm px-3 py-2.5 min-w-0">
-      <p className={`font-pixel text-base sm:text-xl leading-none truncate ${AREA[area].testo}`}>{valore}</p>
-      <p className="text-[11px] text-fumo mt-1 truncate">{label}</p>
-    </div>
+    </PaginaCliente>
   );
 }
 

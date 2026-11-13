@@ -187,7 +187,7 @@ const OMINO = `
   ..ssessssess..
   ..bssssssssb..
   ..bssbbbbssb..
-  ..bbbsSSsbbb..
+  ..bbbbbbbbbb..
   ...bbbbbbbb...
   ..tttttttttt..
   .tttttttttttt.

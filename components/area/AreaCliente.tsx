@@ -210,7 +210,7 @@ export default function AreaCliente({
         )}
 
         {tab === 'lavori' && (
-          <div className={`grid gap-3 sm:gap-4 lg:h-full grid-cols-1 ${lavoriCanone.length && progetti.length ? 'lg:grid-rows-[auto_minmax(0,1fr)]' : ''}`}>
+          <div className={`grid gap-3 sm:gap-4 lg:h-full grid-cols-1 ${lavoriCanone.length && (progetti.length || fatture.length) ? 'lg:grid-rows-[auto_minmax(0,1fr)]' : ''}`}>
             {lavoriCanone.length > 0 && (
               <Tile area="lavori">
                 <Titolo area="lavori" icona="bandiera" destra={<span className="text-xs text-fumo">Le consegne sono stime: se cambiano, le aggiorno qui.</span>}>
@@ -219,10 +219,10 @@ export default function AreaCliente({
                 <div className={corpo}><Timeline lavori={lavoriCanone} oggi={oggi} /></div>
               </Tile>
             )}
-            {(progetti.length > 0 || lavoriCanone.length === 0) && (
+            {(progetti.length > 0 || fatture.length > 0 || lavoriCanone.length === 0) && (
               <Tile area="lavori">
-                <Titolo area="lavori" icona="registro">Progetti</Titolo>
-                <div className={corpo}><Progetti progetti={progetti} /></div>
+                <Titolo area="lavori" icona="registro">Lavori fatti</Titolo>
+                <div className={corpo}><LavoriFatti progetti={progetti} fatture={fatture} /></div>
               </Tile>
             )}
           </div>
@@ -463,45 +463,96 @@ function PerTe({ stime, preventivi, attese, fatture, bloccato, onFatto }: {
 
 // ── Lavori ──
 
-function Progetti({ progetti }: { progetti: Preventivo[] }) {
+type Fattura = DatiArea['fatture'][number];
+
+/** Lavori fatti: i progetti da preventivo e le fatture senza preventivo, con le fatture da riscaricare. */
+function LavoriFatti({ progetti, fatture }: { progetti: Preventivo[]; fatture: Fattura[] }) {
   const [tutti, setTutti] = useState(false);
-  if (progetti.length === 0) {
+  const idProgetti = new Set(progetti.map((p) => p.id));
+  const voci = [
+    ...progetti.map((p) => ({
+      chiave: `p${p.id}`,
+      nome: p.oggetto,
+      data: p.lavoro_fine ?? p.lavoro_inizio ?? p.accettato_at,
+      sotto: p.lavoro_fine ? `consegnato il ${dataIt(p.lavoro_fine)}` : p.lavoro_inizio ? `iniziato il ${dataIt(p.lavoro_inizio)}` : p.accettato_at ? `accettato il ${dataIt(p.accettato_at)}` : '',
+      progetto: p,
+      fatture: fatture.filter((f) => f.preventivo_id === p.id),
+    })),
+    ...fatture
+      .filter((f) => !f.preventivo_id || !idProgetti.has(f.preventivo_id))
+      .map((f) => ({
+        chiave: `f${f.id}`,
+        nome: f.descrizione || (f.numero ? `Fattura n. ${f.numero}` : 'Lavoro'),
+        data: f.data,
+        sotto: f.data ? `fatturato il ${dataIt(f.data)}` : '',
+        progetto: null,
+        fatture: [f],
+      })),
+  ].sort((a, b) => (b.data ?? '').localeCompare(a.data ?? ''));
+
+  if (voci.length === 0) {
     return (
       <div className="flex items-center gap-4 bg-ink-3 px-notch-sm p-4">
         <Omino scala={3} />
-        <p className="text-sm text-nebbia">Nessun progetto attivo. Quando accetti un preventivo, qui ne segui l&apos;avanzamento.</p>
+        <p className="text-sm text-nebbia">Nessun lavoro ancora. Quando accetti un preventivo, qui ne segui l&apos;avanzamento e trovi le fatture.</p>
       </div>
     );
   }
-  const visibili = tutti ? progetti : progetti.slice(0, 5);
+  const visibili = tutti ? voci : voci.slice(0, 5);
   return (
     <>
       <ul className="flex flex-col gap-1.5">
-        {visibili.map((p) => {
-          const st = statoProgetto(p);
-          const passi = [true, !!p.lavoro_inizio, !!p.lavoro_fine];
+        {visibili.map((v) => {
+          const st = v.progetto ? statoProgetto(v.progetto) : null;
+          const passi = v.progetto ? [true, !!v.progetto.lavoro_inizio, !!v.progetto.lavoro_fine] : null;
           return (
-            <li key={p.id} className="flex flex-wrap items-center justify-between gap-3 bg-ink-3/60 px-notch-sm p-3">
-              <div className="min-w-0">
-                <p className="text-sm sm:text-base text-chiaro">{p.oggetto}</p>
-                <p className="text-xs text-fumo mt-0.5">
-                  {p.lavoro_fine ? `consegnato il ${dataIt(p.lavoro_fine)}` : p.lavoro_inizio ? `iniziato il ${dataIt(p.lavoro_inizio)}` : p.accettato_at ? `accettato il ${dataIt(p.accettato_at)}` : ''}
-                </p>
+            <li key={v.chiave} className="bg-ink-3/60 px-notch-sm p-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm sm:text-base text-chiaro">{v.nome}</p>
+                  {v.sotto && <p className="text-xs text-fumo mt-0.5">{v.sotto}</p>}
+                </div>
+                {st && passi && (
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="flex gap-[3px]" title="accettato, in corso, consegnato">
+                      {passi.map((ok, i) => (
+                        <span key={i} className={`block w-5 h-3 ${ok ? (v.progetto!.lavoro_fine ? 'bg-fatto' : 'bg-lavori') : 'bg-ink-4'}`} />
+                      ))}
+                    </span>
+                    <Etichetta area={st.area}>{st.label}</Etichetta>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="flex gap-[3px]" title="accettato, in corso, consegnato">
-                  {passi.map((ok, i) => (
-                    <span key={i} className={`block w-5 h-3 ${ok ? (p.lavoro_fine ? 'bg-fatto' : 'bg-lavori') : 'bg-ink-4'}`} />
-                  ))}
-                </span>
-                <Etichetta area={st.area}>{st.label}</Etichetta>
-              </div>
+              {v.fatture.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2.5">
+                  {v.fatture.map((f) => <FatturaChip key={f.id} f={f} />)}
+                </div>
+              )}
             </li>
           );
         })}
       </ul>
-      {progetti.length > 5 && <div className="mt-3"><VediTutti aperto={tutti} n={progetti.length} onClick={() => setTutti((v) => !v)} /></div>}
+      {voci.length > 5 && <div className="mt-3"><VediTutti aperto={tutti} n={voci.length} onClick={() => setTutti((v) => !v)} /></div>}
     </>
+  );
+}
+
+/** Fattura in breve, da scaricare: numero, importo, stato. */
+function FatturaChip({ f }: { f: Fattura }) {
+  const pagata = f.stato === 'pagata';
+  const testo = (
+    <>
+      <span className="text-fumo">Fattura</span> {f.numero ? `n. ${f.numero}` : ''}
+      <span className="font-pixel text-[11px] text-soldi tabular-nums">{f.importo != null ? eur(f.importo) : ''}</span>
+      <span className={pagata ? 'text-fatto' : 'text-soldi'}>{pagata ? 'pagata' : f.stato === 'parziale' ? 'in parte' : 'da pagare'}</span>
+      {f.pdf_url && <span className="font-pixel text-[11px] text-chiaro">PDF</span>}
+    </>
+  );
+  const cls = 'px-notch-sm bg-ink-2 flex items-center gap-2 text-xs px-2.5 py-1.5';
+  return f.pdf_url ? (
+    <a href={f.pdf_url} target="_blank" rel="noreferrer" className={`${cls} hover:bg-ink-4 transition-colors`} title="Scarica il PDF">{testo}</a>
+  ) : (
+    <span className={cls}>{testo}</span>
   );
 }
 

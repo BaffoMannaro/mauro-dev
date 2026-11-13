@@ -83,7 +83,7 @@ function Tile({ area, id, className = '', children }: { area: Area; id?: string;
 function Titolo({ area, icona, children, destra }: { area: Area; icona: NomeIcona; children: React.ReactNode; destra?: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-      <h2 className="flex items-center gap-2.5 font-pixel text-[17px] leading-none tracking-wide text-chiaro">
+      <h2 className="flex items-center gap-2.5 font-pixel text-[15px] leading-none text-chiaro">
         <span className={`grid place-items-center w-7 h-7 px-notch-sm ${AREA[area].tenue} ${AREA[area].testo}`}>
           <Icona nome={icona} />
         </span>
@@ -96,7 +96,7 @@ function Titolo({ area, icona, children, destra }: { area: Area; icona: NomeIcon
 
 function Etichetta({ area, children }: { area: Area; children: React.ReactNode }) {
   return (
-    <span className={`inline-block px-notch-sm font-pixel text-[11px] leading-none px-2 py-1 ${AREA[area].tenue} ${AREA[area].testo}`}>
+    <span className={`inline-block px-notch-sm font-pixel text-[10px] leading-none px-2 py-1 ${AREA[area].tenue} ${AREA[area].testo}`}>
       {children}
     </span>
   );
@@ -129,7 +129,7 @@ export default function CanonePagina(p: Props) {
     <div className={`${pixelFont.variable} min-h-screen px-tela text-chiaro`}>
       {p.anteprima ? (
         <div className="bg-ink-2 border-b-2 border-azione/50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
             <span className="flex items-center gap-2 text-chiaro">
               <Icona nome="esclamativo" className="text-azione" />
               Anteprima: è la pagina che vede {p.cliente.nome}. I pulsanti sono disattivati.
@@ -141,7 +141,7 @@ export default function CanonePagina(p: Props) {
         </div>
       ) : (
         <header className="border-b-2 border-ink-3 bg-ink/80 backdrop-blur">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
+          <div className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 h-14 flex items-center justify-between gap-3">
             <img src="/Logo.svg" alt="MAURO DEV" className="h-6 w-auto brightness-0 invert" />
             <div className="flex items-center gap-3 sm:gap-5 min-w-0">
               <span className="text-sm text-nebbia truncate hidden sm:block">{p.cliente.azienda || p.cliente.nome}</span>
@@ -156,10 +156,10 @@ export default function CanonePagina(p: Props) {
         </header>
       )}
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-5 sm:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-3 sm:gap-4">
+      <main className="max-w-[1760px] mx-auto px-4 sm:px-6 xl:px-10 py-5 sm:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-6 xl:grid-cols-12 gap-3 sm:gap-4">
           {/* Benvenuto */}
-          <section className="md:col-span-4 px-notch bg-ink-2 p-4 sm:p-6 flex flex-col justify-between gap-5 min-w-0">
+          <section className="md:col-span-4 xl:col-span-5 px-notch bg-ink-2 p-4 sm:p-6 flex flex-col justify-between gap-5 min-w-0">
             <div className="flex items-center gap-4 sm:gap-6">
               <div className="relative shrink-0">
                 {daFare > 0 && (
@@ -172,7 +172,7 @@ export default function CanonePagina(p: Props) {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-fumo capitalize mb-1.5">{dataLunga}</p>
-                <h1 className="font-pixel text-3xl sm:text-5xl leading-none mb-3">Ciao {p.cliente.nome.split(' ')[0]}</h1>
+                <h1 className="font-pixel text-2xl sm:text-4xl leading-tight mb-3 break-words">Ciao {p.cliente.nome.split(' ')[0]}</h1>
                 <p className="inline-block bg-ink-3 px-notch-sm px-3 py-2 text-sm text-nebbia leading-snug">
                   {daFare > 0 ? (
                     <>
@@ -201,7 +201,7 @@ export default function CanonePagina(p: Props) {
 
           {/* Serve qualcosa da voi / tutto a posto */}
           {daFare > 0 ? (
-            <Tile area="azione" className="md:col-span-2">
+            <Tile area="azione" className="md:col-span-2 xl:col-span-3">
               <Titolo area="azione" icona="esclamativo" destra={<span className="font-pixel text-azione text-lg leading-none">{daFare}</span>}>
                 Serve da voi
               </Titolo>
@@ -218,7 +218,7 @@ export default function CanonePagina(p: Props) {
               </div>
             </Tile>
           ) : (
-            <Tile area="fatto" className="md:col-span-2 flex flex-col justify-center">
+            <Tile area="fatto" className="md:col-span-2 xl:col-span-3 flex flex-col justify-center">
               <Titolo area="fatto" icona="spunta">Tutto a posto</Titolo>
               <p className="text-sm text-nebbia">Non aspetto niente da voi. Se serve una vostra risposta o un&apos;approvazione, compare qui.</p>
             </Tile>
@@ -228,20 +228,20 @@ export default function CanonePagina(p: Props) {
           {corrente ? (
             <>
               <MonteOre mese={corrente} />
-              <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-1 gap-3 sm:gap-4 min-w-0">
+              <div className="md:col-span-2 xl:col-span-3 grid grid-cols-2 md:grid-cols-1 gap-3 sm:gap-4 min-w-0">
                 <FineMese canone={canone} mese={corrente} oggi={oggi} />
                 <ProssimoPagamento pagamenti={p.pagamenti} />
               </div>
             </>
           ) : (
-            <Tile area="ore" className="md:col-span-6">
+            <Tile area="ore" className="md:col-span-6 xl:col-span-12">
               <Titolo area="ore" icona="clessidra">Monte ore</Titolo>
               <p className="text-sm text-nebbia">Il canone parte da {nomeMese(meseDi(canone.inizio))}: da quel mese trovi qui le ore.</p>
             </Tile>
           )}
 
           {/* Lavori */}
-          <Tile area="lavori" className="md:col-span-6">
+          <Tile area="lavori" className="md:col-span-6 xl:col-span-9">
             <Titolo area="lavori" icona="bandiera"
               destra={<span className="text-xs text-fumo">Le consegne sono stime: se cambiano, le aggiorno qui.</span>}>
               Lavori e consegne
@@ -250,12 +250,12 @@ export default function CanonePagina(p: Props) {
           </Tile>
 
           {/* Interventi */}
-          <Tile area="ore" className="md:col-span-4">
+          <Tile area="ore" className="md:col-span-4 xl:col-span-5">
             <RegistroInterventi interventi={p.interventi} siti={canone.siti} meseCorrente={meseDi(oggi)} />
           </Tile>
 
           {/* Nuova richiesta */}
-          <Tile area="azione" className="md:col-span-2">
+          <Tile area="azione" className="md:col-span-2 xl:col-span-3">
             <Titolo area="azione" icona="fumetto">Chiedimi qualcosa</Titolo>
             <p className="text-xs text-fumo mb-3 leading-relaxed">
               Facoltativo: mail e messaggi vanno benissimo. Da qui ti rispondo con una stima in ore prima di partire.
@@ -280,21 +280,21 @@ export default function CanonePagina(p: Props) {
           </Tile>
 
           {/* Pagamenti */}
-          <Tile area="soldi" id="pagamenti" className="md:col-span-2">
+          <Tile area="soldi" id="pagamenti" className="md:col-span-2 xl:col-span-4">
             <Titolo area="soldi" icona="moneta">Pagamenti</Titolo>
             <Pagamenti pagamenti={p.pagamenti} />
           </Tile>
 
           {/* Storico */}
-          <Tile area="fumo" className="md:col-span-4">
+          <Tile area="fumo" className="md:col-span-4 xl:col-span-5">
             <Titolo area="fumo" icona="calendario">Mese per mese</Titolo>
             {p.mesi.length > 0 ? <Storico mesi={p.mesi} /> : <p className="text-sm text-nebbia">Lo storico parte dal primo mese di canone.</p>}
           </Tile>
 
           {/* Come funziona */}
-          <Tile area="fumo" className="md:col-span-6">
+          <Tile area="fumo" className="md:col-span-6 xl:col-span-7">
             <Titolo area="fumo" icona="domanda">Come funziona</Titolo>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-2 gap-3">
               <Regola area="ore" icona="clessidra" titolo={`${ore(canone.ore_mese)} al mese`}>
                 Canone di {euroCent(canone.prezzo_mese)} al mese, ore usabili su tutti i vostri siti.
               </Regola>
@@ -318,7 +318,7 @@ export default function CanonePagina(p: Props) {
 function Lampo({ area, valore, label }: { area: Area; valore: string; label: string }) {
   return (
     <div className="bg-ink-3 px-notch-sm px-3 py-2.5 min-w-0">
-      <p className={`font-pixel text-lg sm:text-2xl leading-none truncate ${AREA[area].testo}`}>{valore}</p>
+      <p className={`font-pixel text-base sm:text-xl leading-none truncate ${AREA[area].testo}`}>{valore}</p>
       <p className="text-[11px] text-fumo mt-1 truncate">{label}</p>
     </div>
   );
@@ -369,17 +369,17 @@ function MonteOre({ mese }: { mese: MeseCanone }) {
   const m = mese.rimaste % 60;
 
   return (
-    <Tile area="ore" className="md:col-span-4">
+    <Tile area="ore" className="md:col-span-4 xl:col-span-4">
       <Titolo area="ore" icona="clessidra">Ore di {soloMese(mese.mese)}</Titolo>
 
       <div className="flex flex-wrap items-end gap-x-4 gap-y-1 mb-5">
         <p className="font-pixel text-ore leading-none tabular-nums">
-          <span className="text-6xl sm:text-7xl">{h}</span>
-          <span className="text-3xl sm:text-4xl">h</span>
+          <span className="text-5xl sm:text-6xl">{h}</span>
+          <span className="text-2xl sm:text-3xl">h</span>
           {m > 0 && (
             <>
-              <span className="text-4xl sm:text-5xl ml-1">{m}</span>
-              <span className="text-2xl sm:text-3xl">m</span>
+              <span className="text-4xl sm:text-5xl ml-2">{m}</span>
+              <span className="text-xl sm:text-2xl">m</span>
             </>
           )}
         </p>
@@ -408,7 +408,7 @@ function MonteOre({ mese }: { mese: MeseCanone }) {
         <span>1 quadrato = 1 ora, 1 pixel = 15 minuti</span>
       </div>
 
-      <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5">
+      <dl className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 gap-2 mt-5">
         <Dato label="Del canone" valore={fmtMinuti(mese.incluse)} />
         <Dato label="Dal mese prima" valore={fmtMinuti(mese.riportate)} />
         <Dato label="Usate" valore={fmtMinuti(mese.usate)} />
@@ -727,7 +727,7 @@ function Storico({ mesi }: { mesi: MeseCanone[] }) {
   const breve = (min: number) => fmtMinuti(min).replace(' h ', 'h').replace(' min', 'm').replace(' h', 'h');
   return (
     <>
-      <div className="flex items-end gap-3 sm:gap-4 overflow-x-auto pb-1">
+      <div className="flex items-end gap-2 sm:gap-3 overflow-x-auto pb-1">
         {ultimi.map((m) => {
           const usate = Math.round((m.da_riporto + m.da_incluse) / 60 / unita);
           const extra = Math.round(m.extra / 60 / unita);
@@ -736,12 +736,12 @@ function Storico({ mesi }: { mesi: MeseCanone[] }) {
           // Dal basso: usate, extra, libere.
           const tacche = [...Array(usate).fill('bg-ore'), ...Array(extra).fill('bg-soldi'), ...Array(libere).fill('bg-ink-4')];
           return (
-            <div key={m.mese} className="flex flex-col items-center gap-1.5 shrink-0"
+            <div key={m.mese} className="flex flex-col items-center gap-1.5 flex-1 min-w-9 max-w-20"
               title={`${nomeMese(m.mese)}: usate ${fmtMinuti(m.usate)}${m.extra ? `, extra ${fmtMinuti(m.extra)}` : ''}, al mese dopo ${fmtMinuti(m.riporto_prossimo)}`}>
               <span className="font-pixel text-[11px] text-ore tabular-nums">{breve(m.usate)}</span>
-              <div className="flex flex-col-reverse gap-[2px]">
+              <div className="flex flex-col-reverse gap-[2px] w-full">
                 {tacche.map((c, i) => (
-                  <span key={i} className={`block w-5 h-2 sm:w-6 ${c}`} />
+                  <span key={i} className={`block w-full h-2 ${c}`} />
                 ))}
               </div>
               <span className="font-pixel text-[11px] text-fumo uppercase">{soloMese(m.mese).slice(0, 3)}</span>

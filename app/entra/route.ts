@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
 import { ensurePortaleSchema } from '@/lib/schema';
-import { leggiCanone } from '@/lib/canone';
 import {
   verifyClientToken,
   createSessionToken,
@@ -31,8 +30,7 @@ export async function GET(req: NextRequest) {
   const host = req.headers.get('host') || req.nextUrl.host;
   const dest = new URL(req.nextUrl.toString());
   dest.host = host;
-  // Chi ha un canone ore atterra sulla sua pagina dedicata.
-  dest.pathname = (await leggiCanone(payload.cid)) ? '/canone' : '/portale';
+  dest.pathname = '/portale';
   dest.search = '';
   const res = NextResponse.redirect(dest);
   res.cookies.set(CLIENT_COOKIE, session, {

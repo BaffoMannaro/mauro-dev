@@ -6,13 +6,13 @@ import { Chess } from 'chess.js';
 import Scacchiera, { type Freccia } from './Scacchiera';
 import { BarraValutazione, GraficoValutazione, ListaMosse, Navigazione } from './Pannelli';
 import { Motore } from '@/lib/scacchi/motore';
-import { costruisciReview, leggiPgn, type AnalisiPosizione, type Review } from '@/lib/scacchi/partita';
+import { leggiPgn, type AnalisiPosizione, type Review } from '@/lib/scacchi/partita';
+import { analizzaESalva, PROFONDITA_REVIEW as PROFONDITA } from '@/lib/scacchi/review-client';
 import { COLORI, ETICHETTE, SIMBOLI, formattaValutazione, type Classificazione, type Valutazione } from '@/lib/scacchi/classifica';
 import type { PartitaCompleta } from '@/lib/scacchi/db';
 import { suonoMossa } from './suoni';
 
 const ORDINE: Classificazione[] = ['brillante', 'ottima', 'migliore', 'eccellente', 'buona', 'libro', 'imprecisione', 'errore', 'grave'];
-const PROFONDITA = 14;
 
 function frase(c: Classificazione, san: string) {
   switch (c) {
@@ -48,23 +48,10 @@ export default function ReviewPartita({ partita }: { partita: PartitaCompleta })
 
   // Avvio automatico della Game Review se manca.
   const avvia = useCallback(async () => {
-    const m = getMotore();
-    const fens = [letta.fenIniziale, ...letta.mosse.map((x) => x.fenDopo)];
-    const analisi: AnalisiPosizione[] = [];
-    setAvanzamento(0);
-    for (let i = 0; i < fens.length; i++) {
-      analisi.push(await m.analizza(fens[i], PROFONDITA));
-      setAvanzamento((i + 1) / fens.length);
-    }
-    const r = costruisciReview(letta, analisi);
+    const r = await analizzaESalva(getMotore(), partita.id, partita.pgn, setAvanzamento);
     setReview(r);
     setAvanzamento(null);
-    await fetch(`/api/scacchi/partite/${partita.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ review: r }),
-    });
-  }, [letta, partita.id]);
+  }, [partita.id, partita.pgn]);
 
   const avviata = useRef(false);
   useEffect(() => {

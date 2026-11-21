@@ -6,13 +6,15 @@ import { Chess } from 'chess.js';
 import Scacchiera, { type Freccia } from './Scacchiera';
 import { BarraValutazione, GraficoValutazione, ListaMosse, Navigazione } from './Pannelli';
 import { Motore } from '@/lib/scacchi/motore';
-import { costruisciReview, leggiPgn, type AnalisiPosizione, type Review } from '@/lib/scacchi/partita';
+import { leggiPgn, type AnalisiPosizione, type Review } from '@/lib/scacchi/partita';
+import { analizzaESalva, PROFONDITA_REVIEW as PROFONDITA } from '@/lib/scacchi/review-client';
 import { COLORI, ETICHETTE, SIMBOLI, formattaValutazione, type Classificazione, type Valutazione } from '@/lib/scacchi/classifica';
 import type { PartitaCompleta } from '@/lib/scacchi/db';
 import { suonoMossa } from './suoni';
+import { useSetPezzi } from './TemaScacchi';
+import { CREDITI_PEZZI } from '@/lib/scacchi/pezzi';
 
 const ORDINE: Classificazione[] = ['brillante', 'ottima', 'migliore', 'eccellente', 'buona', 'libro', 'imprecisione', 'errore', 'grave'];
-const PROFONDITA = 14;
 
 function frase(c: Classificazione, san: string) {
   switch (c) {
@@ -30,6 +32,7 @@ function frase(c: Classificazione, san: string) {
 
 export default function ReviewPartita({ partita }: { partita: PartitaCompleta }) {
   const letta = useMemo(() => leggiPgn(partita.pgn), [partita.pgn]);
+  const setPezzi = useSetPezzi();
   const [review, setReview] = useState<Review | null>(partita.review);
   const [avanzamento, setAvanzamento] = useState<number | null>(null);
   const [ply, setPly] = useState(0);
@@ -48,23 +51,10 @@ export default function ReviewPartita({ partita }: { partita: PartitaCompleta })
 
   // Avvio automatico della Game Review se manca.
   const avvia = useCallback(async () => {
-    const m = getMotore();
-    const fens = [letta.fenIniziale, ...letta.mosse.map((x) => x.fenDopo)];
-    const analisi: AnalisiPosizione[] = [];
-    setAvanzamento(0);
-    for (let i = 0; i < fens.length; i++) {
-      analisi.push(await m.analizza(fens[i], PROFONDITA));
-      setAvanzamento((i + 1) / fens.length);
-    }
-    const r = costruisciReview(letta, analisi);
+    const r = await analizzaESalva(getMotore(), partita.id, partita.pgn, setAvanzamento);
     setReview(r);
     setAvanzamento(null);
-    await fetch(`/api/scacchi/partite/${partita.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ review: r }),
-    });
-  }, [letta, partita.id]);
+  }, [partita.id, partita.pgn]);
 
   const avviata = useRef(false);
   useEffect(() => {
@@ -300,7 +290,7 @@ export default function ReviewPartita({ partita }: { partita: PartitaCompleta })
           {partita.url && <a href={partita.url} target="_blank" rel="noreferrer" className="text-[#c3c2c1] underline">Originale</a>}
         </div>
         <p className="text-[10px] text-[#6f6d6b]">
-          Motore Stockfish 19 (GPLv3, <a className="underline" href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noreferrer">sorgente</a>), profondità {PROFONDITA}. Muovi un pezzo sulla scacchiera per esplorare una variante.
+          Motore Stockfish 19 (GPLv3, <a className="underline" href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noreferrer">sorgente</a>), profondità {PROFONDITA}. {CREDITI_PEZZI[setPezzi]}. Muovi un pezzo sulla scacchiera per esplorare una variante.
         </p>
       </aside>
     </div>

@@ -4,15 +4,24 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { RigaPartita } from '@/lib/scacchi/db';
+import { SET_PEZZI, type SetPezzi } from '@/lib/scacchi/pezzi';
+import { useSetPezzi } from './TemaScacchi';
 
 const CADENZE: Record<string, string> = { bullet: 'Bullet', blitz: 'Blitz', rapid: 'Rapid', daily: 'Giornaliera', bot: 'Bot' };
 
-export default function ScacchiHome({ partite, username }: { partite: RigaPartita[]; username: string | null }) {
+type MissioneBreve = { titolo: string; giocate: number; totale: number; inRegola: number } | null;
+
+export default function ScacchiHome({ partite, username, missione }: { partite: RigaPartita[]; username: string | null; missione: MissioneBreve }) {
   const router = useRouter();
   const [utente, setUtente] = useState(username ?? '');
   const [msg, setMsg] = useState<string | null>(null);
   const [occupato, setOccupato] = useState(false);
   const [pgn, setPgn] = useState('');
+  const setPezzi = useSetPezzi();
+  async function cambiaPezzi(v: SetPezzi) {
+    await fetch('/api/scacchi/impostazioni', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pezzi: v }) });
+    router.refresh();
+  }
   const [filtro, setFiltro] = useState<'tutte' | 'vinta' | 'persa' | 'patta'>('tutte');
 
   async function importa() {
@@ -97,6 +106,23 @@ export default function ScacchiHome({ partite, username }: { partite: RigaPartit
         </div>
       </div>
 
+      <Link href="/scacchi/coach" className="flex items-center gap-4 rounded-lg border border-[#3c3a37] bg-[#262421] p-4 text-sm text-[#c3c2c1] hover:bg-[#2f2d2a]">
+        <span className="text-3xl">♛</span>
+        {missione ? (
+          <span className="min-w-0 flex-1">
+            <span className="block text-xs uppercase tracking-wide text-[#81b64c]">Missione del coach</span>
+            <span className="block truncate font-bold text-white">{missione.titolo}</span>
+            <span>{missione.giocate} / {missione.totale} partite · {missione.inRegola} nel repertorio</span>
+          </span>
+        ) : (
+          <span className="flex-1">
+            <span className="block font-bold text-white">Coach: inizia il programma</span>
+            <span>Missioni di partite con regole precise, poi analisi e correzioni.</span>
+          </span>
+        )}
+        <span className="text-[#81b64c]">→</span>
+      </Link>
+
       {msg && <p className="rounded bg-[#262421] px-3 py-2 text-sm text-[#c3c2c1]">{msg}</p>}
 
       <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
@@ -109,6 +135,12 @@ export default function ScacchiHome({ partite, username }: { partite: RigaPartit
       <div className="rounded-lg bg-[#262421]">
         <div className="flex flex-wrap items-center gap-2 border-b border-[#3c3a37] p-3">
           <h2 className="mr-auto font-bold text-white">Le mie partite</h2>
+          <label className="flex items-center gap-1 text-xs text-[#8b8987]">
+            Pezzi
+            <select value={setPezzi} onChange={(e) => cambiaPezzi(e.target.value as SetPezzi)} className="rounded bg-[#3c3a37] px-1.5 py-1 text-[#c3c2c1]">
+              {Object.entries(SET_PEZZI).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+          </label>
           {(['tutte', 'vinta', 'persa', 'patta'] as const).map((f) => (
             <button key={f} onClick={() => setFiltro(f)} className={`rounded px-2 py-1 text-xs ${filtro === f ? 'bg-[#81b64c] text-white' : 'bg-[#3c3a37] text-[#c3c2c1]'}`}>
               {f === 'tutte' ? 'Tutte' : f === 'vinta' ? 'Vinte' : f === 'persa' ? 'Perse' : 'Patte'}

@@ -9,12 +9,16 @@ import { leggiPgn } from '@/lib/scacchi/partita';
 import { formattaValutazione } from '@/lib/scacchi/classifica';
 import { htmlWidget, WIDGET_URI } from '@/lib/scacchi/widget';
 import { baseApp } from './oauth';
+import { REPERTORIO } from '@/lib/scacchi/repertorio';
+import { PROGRAMMA } from '@/lib/scacchi/coach';
+import { attivaProssima, avanzamento, chiudiMissione, creaMissione, listaMissioni, missioneAttiva, salvaFeedback, statoDrill } from '@/lib/scacchi/missioni';
 
 export const ISTRUZIONI_SCACCHI = `SCACCHI (passione di Mauro, non lavoro): Mauro gioca soprattutto su chess.com e vuole migliorare aperture, mediogioco e finali.
 - Le partite arrivano da chess.com (scacchi_importa_chesscom), da PGN incollati o da partite contro il bot sul sito. La Game Review del motore (Stockfish nel browser) classifica ogni mossa: libro, brillante, ottima, migliore, eccellente, buona, imprecisione, errore, grave.
 - Per analizzare insieme una partita: scacchi_leggi_partita, poi scacchi_mostra_partita per aprire la scacchiera interattiva in chat sulla mossa di cui parli. Spiega in italiano semplice il PERCHÉ (idea, minaccia, piano, struttura di pedoni), non solo la mossa del motore. Verifica le varianti che proponi con scacchi_analizza_posizione prima di affermarle: non inventare valutazioni.
 - Salva le spiegazioni utili con scacchi_commenta (una per mossa, con la linea alternativa in SAN dalla posizione prima della mossa): compaiono sulla scacchiera del sito e del widget.
 - Se la partita non è ancora analizzata (analizzata: false), chiedi a Mauro di aprirla sul sito per avviare la review, oppure lavora con scacchi_analizza_posizione sulle posizioni chiave.
+- COACH: Mauro ti ha chiesto di fargli da coach. Repertorio: Bianco 1.e4 e Italiana (3.Bc4), Nero 1...e5 e Giuoco Piano (3...Bc5) più le linee contro Philidor, Scandinava, Caro-Kann, Scozzese, Spagnola, Apertura di Alfiere ed Evans (scacchi_repertorio). Il programma è a missioni: blocchi di partite rapid con regole (scacchi_coach_stato). Quando chiede come va: leggi lo stato, guarda le partite della missione (soprattutto deviazioni dal repertorio, perse per tempo, errori gravi), dagli un feedback concreto e salvalo con scacchi_feedback_missione. Se gli obiettivi sono raggiunti, chiudi la missione e attiva la successiva (dopo la sua conferma). Puoi creare missioni su misura con scacchi_crea_missione. Sii diretto: dì cosa sbaglia e cosa deve fare nelle prossime partite.
 - Il ply è il numero di semimossa: 1 = prima mossa del Bianco, 2 = risposta del Nero, ecc.`;
 
 const sola = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
@@ -276,6 +280,156 @@ export function registraScacchi(server: McpServer) {
     async ({ username }) => {
       try {
         return testo(await importaChesscom({ username }));
+      } catch (e) {
+        return errore((e as Error).message);
+      }
+    }
+  );
+
+  // ── Coach: repertorio, drill e missioni ──
+
+  server.registerTool(
+    'scacchi_repertorio',
+    {
+      title: 'Repertorio di aperture',
+      description: 'Le linee del repertorio di Mauro con mosse, spiegazioni e piani, più lo stato dei drill (livello, prossimo ripasso).',
+      inputSchema: z.object({ id: z.string().optional().describe('Una sola linea; senza id restituisce l’elenco') }),
+      annotations: sola,
+    },
+    async ({ id }) => {
+      const drill = await statoDrill();
+      if (id) {
+        const l = REPERTORIO.find((x) => x.id === id);
+        return l ? testo({ ...l, drill: drill[id] ?? null, link: `${baseApp()}/scacchi/aperture/${id}` }) : errore('Linea non trovata');
+      }
+      return testo(
+        REPERTORIO.map((l) => ({
+          id: l.id,
+          titolo: l.titolo,
+          colore_mauro: l.colore === 'w' ? 'bianco' : 'nero',
+          gruppo: l.gruppo,
+          mosse: l.mosse.map(([m]) => m).join(' '),
+          drill: drill[l.id] ? { livello: drill[l.id].livello, ripassi: drill[l.id].ripassi, errori: drill[l.id].errori, prossimo: drill[l.id].prossimo } : 'mai fatto',
+        }))
+      );
+    }
+  );
+
+  server.registerTool(
+    'scacchi_coach_stato',
+    {
+      title: 'Stato del coach: missione e progressi',
+      description:
+        'Missione attiva con regole, obiettivi e avanzamento: partite giocate, quante nel repertorio, deviazioni (mossa giocata vs attesa), perse per tempo, accuratezza ed errori gravi. Più il programma e lo storico delle missioni.',
+      inputSchema: z.object({}),
+      annotations: sola,
+    },
+    async () => {
+      const m = await missioneAttiva();
+      const av = m ? await avanzamento(m) : null;
+      const storico = await listaMissioni();
+      return testo({
+        missione_attiva: av
+          ? {
+              id: av.missione.id,
+              titolo: av.missione.titolo,
+              descrizione: av.missione.descrizione,
+              regole: av.missione.regole,
+              inizio: av.missione.inizio,
+              feedback_salvato: av.missione.feedback,
+              giocate: av.giocate,
+              nel_repertorio: av.inRegola,
+              vinte: av.vinte,
+              perse: av.perse,
+              patte: av.patte,
+              perse_per_tempo: av.persePerTempo,
+              analizzate: av.analizzate,
+              accuratezza_media: av.accuratezzaMedia,
+              errori_gravi_medi: av.graviMedi,
+              deviazioni: av.deviazioni,
+              obiettivi: av.obiettivi,
+              completa: av.completa,
+              partite: av.partite.map((p) => ({
+                id: p.id,
+                colore: p.colore_mio,
+                esito: p.esito_mio,
+                apertura: p.apertura,
+                nel_repertorio: p.aderenza.inRegola,
+                deviazione: p.aderenza.deviazione,
+                persa_per_tempo: p.persaPerTempo,
+                accuratezza: p.accuratezza_mia,
+                errori_gravi: p.gravi,
+              })),
+            }
+          : null,
+        programma: PROGRAMMA.map((p) => ({ codice: p.codice, titolo: p.titolo, completata: storico.some((s) => s.codice === p.codice && s.stato === 'completata') })),
+        storico: storico.map((s) => ({ id: s.id, titolo: s.titolo, stato: s.stato, inizio: s.inizio, fine: s.fine, feedback: s.feedback })),
+        pagina: `${baseApp()}/scacchi/coach`,
+      });
+    }
+  );
+
+  server.registerTool(
+    'scacchi_feedback_missione',
+    {
+      title: 'Feedback del coach sulla missione',
+      description:
+        'Salva il feedback del coach sulla missione (lo vede nella pagina Coach). Con chiudi: "completata" o "annullata" chiude la missione; con attiva_prossima avvia la successiva del programma. Chiudi solo dopo la conferma di Mauro.',
+      inputSchema: z.object({
+        id: z.number().int(),
+        feedback: z.string().min(1),
+        chiudi: z.enum(['completata', 'annullata']).optional(),
+        attiva_prossima: z.boolean().optional(),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    },
+    async ({ id, feedback, chiudi, attiva_prossima }) => {
+      try {
+        await salvaFeedback(id, feedback);
+        if (chiudi) await chiudiMissione(id, chiudi);
+        const nuova = attiva_prossima ? await attivaProssima() : null;
+        return testo({ ok: true, nuova_missione: nuova, pagina: `${baseApp()}/scacchi/coach` });
+      } catch (e) {
+        return errore((e as Error).message);
+      }
+    }
+  );
+
+  server.registerTool(
+    'scacchi_crea_missione',
+    {
+      title: 'Crea una missione su misura',
+      description:
+        'Crea e attiva una missione del coach (annulla quella attiva). linee: id del repertorio da rispettare (vedi scacchi_repertorio); cadenze: time_class chess.com (rapid, blitz, bullet, daily); obiettivi facoltativi. Chiedi conferma a Mauro prima.',
+      inputSchema: z.object({
+        titolo: z.string().min(3),
+        descrizione: z.string().min(10).describe('Istruzioni chiare: quante partite, a che cadenza, cosa giocare, su cosa concentrarsi'),
+        linee: z.array(z.string()).min(1),
+        cadenze: z.array(z.string()).default(['rapid']),
+        partite: z.number().int().min(1).max(50),
+        min_in_regola: z.number().int().min(0).optional(),
+        max_perse_per_tempo: z.number().int().min(0).optional(),
+        max_gravi_medi: z.number().min(0).optional(),
+        drill: z.array(z.string()).optional(),
+      }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    },
+    async (a) => {
+      try {
+        const id = await creaMissione({
+          titolo: a.titolo,
+          descrizione: a.descrizione,
+          regole: {
+            linee: a.linee,
+            cadenze: a.cadenze,
+            partite: a.partite,
+            minInRegola: a.min_in_regola,
+            maxPersePerTempo: a.max_perse_per_tempo,
+            maxGraviMedi: a.max_gravi_medi,
+            drill: a.drill,
+          },
+        });
+        return testo({ id, pagina: `${baseApp()}/scacchi/coach` });
       } catch (e) {
         return errore((e as Error).message);
       }

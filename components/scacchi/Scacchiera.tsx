@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Chessboard } from 'react-chessboard';
+import { Chessboard, defaultPieces, type PieceRenderObject } from 'react-chessboard';
+import { srcPezzo, useSetPezzi } from './TemaScacchi';
 import { Chess, type Square } from 'chess.js';
 import { COLORI, SIMBOLI, type Classificazione } from '@/lib/scacchi/classifica';
 
@@ -31,6 +32,17 @@ export default function Scacchiera({ fen, orientamento = 'white', ultima, frecce
   const [selezionata, setSelezionata] = useState<string | null>(null);
   const [promozione, setPromozione] = useState<{ da: string; a: string } | null>(null);
 
+  const setPezzi = useSetPezzi();
+  const pezzi = useMemo<PieceRenderObject>(() => {
+    if (setPezzi === 'classico') return defaultPieces;
+    const out: PieceRenderObject = {};
+    for (const k of Object.keys(defaultPieces)) {
+      const src = srcPezzo(setPezzi, k)!;
+      // eslint-disable-next-line @next/next/no-img-element
+      out[k] = () => <img src={src} alt={k} draggable={false} style={{ width: '100%', height: '100%', display: 'block' }} />;
+    }
+    return out;
+  }, [setPezzi]);
   const gioco = useMemo(() => new Chess(fen), [fen]);
   const turno = gioco.turn();
   const puoMuovere = !!onMossa && (muove === undefined ? true : muove === turno);
@@ -79,8 +91,12 @@ export default function Scacchiera({ fen, orientamento = 'white', ultima, frecce
           boardOrientation: orientamento,
           lightSquareStyle: { backgroundColor: CASA_CHIARA },
           darkSquareStyle: { backgroundColor: CASA_SCURA },
+          pieces: pezzi,
+          // Coordinate come sulla scacchiera verde di chess.com: grassetto, colore della casa opposta.
           lightSquareNotationStyle: { color: CASA_SCURA, fontWeight: 700 },
           darkSquareNotationStyle: { color: CASA_CHIARA, fontWeight: 700 },
+          alphaNotationStyle: { fontSize: 'clamp(9px, 1.5vw, 15px)', position: 'absolute', bottom: '2%', right: '4%' },
+          numericNotationStyle: { fontSize: 'clamp(9px, 1.5vw, 15px)', position: 'absolute', top: '2%', left: '4%' },
           boardStyle: { borderRadius: 4, overflow: 'hidden' },
           dropSquareStyle: { boxShadow: 'inset 0 0 0 4px rgba(255,255,255,.65)' },
           animationDurationInMs: 160,
@@ -135,7 +151,7 @@ export default function Scacchiera({ fen, orientamento = 'white', ultima, frecce
             {(['q', 'r', 'b', 'n'] as const).map((p) => (
               <button
                 key={p}
-                className="h-14 w-14 rounded bg-[#3c3a37] text-3xl text-white hover:bg-[#81b64c]"
+                className="h-14 w-14 rounded bg-[#3c3a37] p-1 hover:bg-[#81b64c]"
                 onClick={() => {
                   const { da, a } = promozione;
                   setPromozione(null);
@@ -143,7 +159,7 @@ export default function Scacchiera({ fen, orientamento = 'white', ultima, frecce
                   onMossa?.(da + a + p);
                 }}
               >
-                {turno === 'w' ? { q: '♕', r: '♖', b: '♗', n: '♘' }[p] : { q: '♛', r: '♜', b: '♝', n: '♞' }[p]}
+                {pezzi[`${turno}${p.toUpperCase()}`]?.()}
               </button>
             ))}
           </div>

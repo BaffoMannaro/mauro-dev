@@ -86,3 +86,18 @@ describe('tool MCP scacchi', () => {
     expect(html).not.toMatch(/^export\s/m);
   });
 });
+
+describe('tool MCP coach', () => {
+  it('repertorio, missione e feedback', async () => {
+    const rep = JSON.parse((await chiama('scacchi_repertorio', {})).content[0].text);
+    expect(rep.length).toBeGreaterThan(5);
+    const crea = await chiama('scacchi_crea_missione', { titolo: 'Prova', descrizione: 'Dieci partite rapid di prova', linee: ['b-italiana-piano'], partite: 3 });
+    const { id: mid } = JSON.parse(crea.content[0].text);
+    const stato = JSON.parse((await chiama('scacchi_coach_stato', {})).content[0].text);
+    expect(stato.missione_attiva).toMatchObject({ id: mid, giocate: 0 });
+    const fb = await chiama('scacchi_feedback_missione', { id: mid, feedback: 'Bene così', chiudi: 'annullata' });
+    expect(fb.isError).toBeFalsy();
+    const ko = await chiama('scacchi_crea_missione', { titolo: 'Prova', descrizione: 'Dieci partite rapid di prova', linee: ['nope'], partite: 3 });
+    expect(ko.isError).toBe(true);
+  });
+});

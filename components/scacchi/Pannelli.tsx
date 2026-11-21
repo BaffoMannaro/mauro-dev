@@ -109,8 +109,22 @@ export function ListaMosse({ mosse, corrente, onSalta }: { mosse: VoceMossa[]; c
 }
 
 /** Pulsanti di navigazione e frecce da tastiera. */
-export function Navigazione({ corrente, totale, onSalta, onGira }: { corrente: number; totale: number; onSalta: (ply: number) => void; onGira?: () => void }) {
+export function Navigazione({
+  corrente,
+  totale,
+  onSalta,
+  onGira,
+  tastiera = true,
+}: {
+  corrente: number;
+  totale: number;
+  onSalta: (ply: number) => void;
+  onGira?: () => void;
+  /** false per una seconda copia dei pulsanti (es. su mobile): niente doppio ascolto delle frecce. */
+  tastiera?: boolean;
+}) {
   useEffect(() => {
+    if (!tastiera) return;
     const h = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.tagName === 'INPUT' || (e.target as HTMLElement)?.tagName === 'TEXTAREA') return;
       if (e.key === 'ArrowLeft') onSalta(Math.max(0, corrente - 1));
@@ -122,7 +136,7 @@ export function Navigazione({ corrente, totale, onSalta, onGira }: { corrente: n
     };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, [corrente, totale, onSalta]);
+  }, [corrente, totale, onSalta, tastiera]);
   const b = 'flex-1 rounded bg-[#3c3a37] py-2 text-lg text-[#c3c2c1] hover:bg-[#484644] disabled:opacity-40';
   return (
     <div className="flex gap-1">

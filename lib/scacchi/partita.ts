@@ -75,6 +75,8 @@ export type AnalisiPosizione = {
 
 export type MossaReview = Ply & {
   evalPrima: Valutazione;
+  /** Seconda miglior linea della posizione prima (serve a riconoscere le mosse uniche). */
+  secondaPrima?: Valutazione | null;
   evalDopo: Valutazione;
   migliore: string | null;
   migliorSan: string | null;
@@ -155,6 +157,7 @@ export function costruisciReview(p: PartitaLetta, analisi: AnalisiPosizione[]): 
     mosse.push({
       ...m,
       evalPrima: a.eval,
+      secondaPrima: a.seconda ?? null,
       evalDopo: d.eval,
       migliore: a.migliore,
       migliorSan: a.migliore ? uciToSan(m.fenPrima, [a.migliore], 1)[0] ?? null : null,

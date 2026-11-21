@@ -10,6 +10,8 @@ import { formattaValutazione } from '@/lib/scacchi/classifica';
 import { htmlWidget, WIDGET_URI } from '@/lib/scacchi/widget';
 import { baseApp } from './oauth';
 import { REPERTORIO } from '@/lib/scacchi/repertorio';
+import { statistiche } from '@/lib/scacchi/statistiche';
+import { riepilogoPuzzle, sincronizzaPuzzle } from '@/lib/scacchi/puzzle';
 import { PROGRAMMA } from '@/lib/scacchi/coach';
 import { attivaProssima, avanzamento, chiudiMissione, creaMissione, listaMissioni, missioneAttiva, salvaFeedback, statoDrill } from '@/lib/scacchi/missioni';
 
@@ -19,6 +21,7 @@ export const ISTRUZIONI_SCACCHI = `SCACCHI (passione di Mauro, non lavoro): Maur
 - Salva le spiegazioni utili con scacchi_commenta (una per mossa, con la linea alternativa in SAN dalla posizione prima della mossa): compaiono sulla scacchiera del sito e del widget.
 - Se la partita non è ancora analizzata (analizzata: false), chiedi a Mauro di aprirla sul sito per avviare la review, oppure lavora con scacchi_analizza_posizione sulle posizioni chiave.
 - COACH: Mauro ti ha chiesto di fargli da coach. Repertorio: Bianco 1.e4 e Italiana (3.Bc4), Nero 1...e5 e Giuoco Piano (3...Bc5) più le linee contro Philidor, Scandinava, Caro-Kann, Scozzese, Spagnola, Apertura di Alfiere ed Evans (scacchi_repertorio). Il programma è a missioni: blocchi di partite rapid con regole (scacchi_coach_stato). Quando chiede come va: leggi lo stato, guarda le partite della missione (soprattutto deviazioni dal repertorio, perse per tempo, errori gravi), dagli un feedback concreto e salvalo con scacchi_feedback_missione. Se gli obiettivi sono raggiunti, chiudi la missione e attiva la successiva (dopo la sua conferma). Puoi creare missioni su misura con scacchi_crea_missione. Sii diretto: dì cosa sbaglia e cosa deve fare nelle prossime partite.
+- STATISTICHE E PUZZLE: scacchi_statistiche riassume risultati, aperture forti e deboli, come perde, rating mensile, errori per fase (dalle partite analizzate) e lo stato dei puzzle nati dai suoi errori. Usale per decidere su cosa lavorare e per le missioni su misura; cita i numeri, non inventarli.
 - Il ply è il numero di semimossa: 1 = prima mossa del Bianco, 2 = risposta del Nero, ecc.`;
 
 const sola = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
@@ -433,6 +436,37 @@ export function registraScacchi(server: McpServer) {
       } catch (e) {
         return errore((e as Error).message);
       }
+    }
+  );
+
+  server.registerTool(
+    'scacchi_statistiche',
+    {
+      title: 'Statistiche del gioco di Mauro',
+      description:
+        'Riepilogo: risultati totali, per colore, cadenza e fascia oraria; aperture per colore con % vittorie; come perde; rating medio per mese; errori per fase ogni 100 mosse, matti mancati e vantaggi buttati (dalle partite analizzate); stato dei puzzle.',
+      inputSchema: z.object({}),
+      annotations: sola,
+    },
+    async () => {
+      const s = await statistiche();
+      await sincronizzaPuzzle();
+      const pz = await riepilogoPuzzle();
+      const p = (x: number, n: number) => (n ? Math.round((x / n) * 100) : null);
+      return testo({
+        partite: s.totale.n,
+        analizzate: s.analizzate,
+        vittorie_pct: p(s.totale.v, s.totale.n),
+        per_colore: { bianco: s.perColore.w, nero: s.perColore.b },
+        per_cadenza: s.perCadenza,
+        per_fascia_oraria: s.perFascia,
+        aperture: s.aperture.filter((a) => a.esiti.n >= 5).map((a) => ({ colore: a.colore === 'w' ? 'bianco' : 'nero', famiglia: a.famiglia, partite: a.esiti.n, vittorie_pct: p(a.esiti.v, a.esiti.n), sconfitte_pct: p(a.esiti.p, a.esiti.n) })),
+        come_perde: s.comePerdo,
+        rating_ultimi_12_mesi: s.ratingMensile.slice(-24),
+        errori: s.errori,
+        puzzle: pz,
+        pagina: `${baseApp()}/scacchi/statistiche`,
+      });
     }
   );
 

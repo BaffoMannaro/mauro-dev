@@ -125,6 +125,19 @@ export default function Lezione({ linea, livello }: { linea: Linea; livello: num
 
   const corrente = passo > 0 ? linea.mosse[passo - 1] : null;
   const numero = (i: number) => `${Math.floor(i / 2) + 1}${i % 2 === 0 ? '.' : '...'}`;
+  const vai = (p: number) => setPasso(Math.max(0, Math.min(totale, p)));
+  const spiegazione = (
+    <div className="min-h-24 rounded bg-[#3c3a37] p-3 text-sm text-[#c3c2c1]">
+      {corrente ? (
+        <>
+          <p className="font-bold text-white">{numero(passo - 1)} {corrente[0]}</p>
+          <p className="mt-1">{corrente[1] || (turnoMio(passo - 1) ? '' : 'Mossa dell\'avversario.')}</p>
+        </>
+      ) : (
+        <p>Segui la linea con ▶. La freccia bianca indica la tua prossima mossa; dopo ogni mossa vedi frecce e case colorate che illustrano la spiegazione. Poi passa al Drill.</p>
+      )}
+    </div>
+  );
 
   return (
     <div className="mx-auto grid max-w-6xl gap-4 p-3 md:p-5 lg:grid-cols-[minmax(0,1fr)_400px]">
@@ -139,6 +152,13 @@ export default function Lezione({ linea, livello }: { linea: Linea; livello: num
           muove={modo === 'drill' && !esito && passo < totale && turnoMio(passo) ? linea.colore : null}
           id="lezione"
         />
+        {/* Mobile: pulsanti e spiegazione subito sotto la scacchiera, senza scorrere. */}
+        {modo === 'lezione' && (
+          <div className="flex flex-col gap-2 lg:hidden">
+            <Navigazione corrente={passo} totale={totale} onSalta={vai} tastiera={false} />
+            {spiegazione}
+          </div>
+        )}
         {nome && <p className="text-center text-xs text-[#8b8987]">{nome}</p>}
         {coloriUsati.length > 0 && (
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-[#c3c2c1]">
@@ -173,16 +193,7 @@ export default function Lezione({ linea, livello }: { linea: Linea; livello: num
 
         {modo === 'lezione' ? (
           <>
-            <div className="min-h-24 rounded bg-[#3c3a37] p-3">
-              {corrente ? (
-                <>
-                  <p className="font-bold text-white">{numero(passo - 1)} {corrente[0]}</p>
-                  <p className="mt-1">{corrente[1] || (turnoMio(passo - 1) ? '' : 'Mossa dell\'avversario.')}</p>
-                </>
-              ) : (
-                <p>Segui la linea con ▶. La freccia bianca indica la tua prossima mossa; dopo ogni mossa vedi frecce e case colorate che illustrano la spiegazione. Poi passa al Drill.</p>
-              )}
-            </div>
+            <div className="hidden lg:block">{spiegazione}</div>
             <div className="max-h-64 overflow-y-auto">
               {linea.mosse.map(([san, perche], i) => (
                 <button
@@ -195,7 +206,9 @@ export default function Lezione({ linea, livello }: { linea: Linea; livello: num
                 </button>
               ))}
             </div>
-            <Navigazione corrente={passo} totale={totale} onSalta={(p) => setPasso(Math.max(0, Math.min(totale, p)))} />
+            <div className="hidden lg:block">
+              <Navigazione corrente={passo} totale={totale} onSalta={vai} />
+            </div>
             {passo === totale && (
               <div className="rounded border-l-4 border-[#81b64c] bg-[#2f3a2a] p-3">
                 <p className="mb-1 font-bold text-white">Piani per il mediogioco</p>

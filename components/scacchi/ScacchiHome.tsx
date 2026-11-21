@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { RigaPartita } from '@/lib/scacchi/db';
+import { SET_PEZZI, type SetPezzi } from '@/lib/scacchi/pezzi';
+import { useSetPezzi } from './TemaScacchi';
 
 const CADENZE: Record<string, string> = { bullet: 'Bullet', blitz: 'Blitz', rapid: 'Rapid', daily: 'Giornaliera', bot: 'Bot' };
 
@@ -15,6 +17,11 @@ export default function ScacchiHome({ partite, username, missione }: { partite: 
   const [msg, setMsg] = useState<string | null>(null);
   const [occupato, setOccupato] = useState(false);
   const [pgn, setPgn] = useState('');
+  const setPezzi = useSetPezzi();
+  async function cambiaPezzi(v: SetPezzi) {
+    await fetch('/api/scacchi/impostazioni', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pezzi: v }) });
+    router.refresh();
+  }
   const [filtro, setFiltro] = useState<'tutte' | 'vinta' | 'persa' | 'patta'>('tutte');
 
   async function importa() {
@@ -128,6 +135,12 @@ export default function ScacchiHome({ partite, username, missione }: { partite: 
       <div className="rounded-lg bg-[#262421]">
         <div className="flex flex-wrap items-center gap-2 border-b border-[#3c3a37] p-3">
           <h2 className="mr-auto font-bold text-white">Le mie partite</h2>
+          <label className="flex items-center gap-1 text-xs text-[#8b8987]">
+            Pezzi
+            <select value={setPezzi} onChange={(e) => cambiaPezzi(e.target.value as SetPezzi)} className="rounded bg-[#3c3a37] px-1.5 py-1 text-[#c3c2c1]">
+              {Object.entries(SET_PEZZI).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+          </label>
           {(['tutte', 'vinta', 'persa', 'patta'] as const).map((f) => (
             <button key={f} onClick={() => setFiltro(f)} className={`rounded px-2 py-1 text-xs ${filtro === f ? 'bg-[#81b64c] text-white' : 'bg-[#3c3a37] text-[#c3c2c1]'}`}>
               {f === 'tutte' ? 'Tutte' : f === 'vinta' ? 'Vinte' : f === 'persa' ? 'Perse' : 'Patte'}

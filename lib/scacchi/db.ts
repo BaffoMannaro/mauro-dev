@@ -1,4 +1,5 @@
 import sql from '@/lib/db';
+import { SET_PREDEFINITO, setValido, type SetPezzi } from './pezzi';
 import { aperturaPartita, leggiPgn, type Review } from './partita';
 
 // Tab Scacchi: partite (chess.com, PGN incollati, partite contro il bot), review del motore e commenti di Claude.
@@ -59,14 +60,14 @@ export async function ensureScacchiSchema() {
 
 // ── Impostazioni ─────────────────────────────────────────────────────────
 
-export type ImpostazioniScacchi = { username: string | null; ultimoArchivio: string | null };
+export type ImpostazioniScacchi = { username: string | null; ultimoArchivio: string | null; pezzi: SetPezzi };
 const CHIAVE = 'scacchi';
 
 export async function leggiImpostazioni(): Promise<ImpostazioniScacchi> {
   await ensureScacchiSchema();
   const [r] = await sql`SELECT valore FROM impostazioni WHERE chiave = ${CHIAVE}`;
   const v = (r?.valore ?? {}) as Partial<ImpostazioniScacchi>;
-  return { username: v.username ?? null, ultimoArchivio: v.ultimoArchivio ?? null };
+  return { username: v.username ?? null, ultimoArchivio: v.ultimoArchivio ?? null, pezzi: setValido(v.pezzi) ? v.pezzi : SET_PREDEFINITO };
 }
 
 export async function salvaImpostazioni(p: Partial<ImpostazioniScacchi>) {

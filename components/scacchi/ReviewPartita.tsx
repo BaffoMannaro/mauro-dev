@@ -11,6 +11,8 @@ import { analizzaESalva, PROFONDITA_REVIEW as PROFONDITA } from '@/lib/scacchi/r
 import { COLORI, ETICHETTE, SIMBOLI, formattaValutazione, type Classificazione, type Valutazione } from '@/lib/scacchi/classifica';
 import type { PartitaCompleta } from '@/lib/scacchi/db';
 import { suonoMossa } from './suoni';
+import { useSetPezzi } from './TemaScacchi';
+import { CREDITI_PEZZI } from '@/lib/scacchi/pezzi';
 
 const ORDINE: Classificazione[] = ['brillante', 'ottima', 'migliore', 'eccellente', 'buona', 'libro', 'imprecisione', 'errore', 'grave'];
 
@@ -30,6 +32,7 @@ function frase(c: Classificazione, san: string) {
 
 export default function ReviewPartita({ partita }: { partita: PartitaCompleta }) {
   const letta = useMemo(() => leggiPgn(partita.pgn), [partita.pgn]);
+  const setPezzi = useSetPezzi();
   const [review, setReview] = useState<Review | null>(partita.review);
   const [avanzamento, setAvanzamento] = useState<number | null>(null);
   const [ply, setPly] = useState(0);
@@ -287,7 +290,7 @@ export default function ReviewPartita({ partita }: { partita: PartitaCompleta })
           {partita.url && <a href={partita.url} target="_blank" rel="noreferrer" className="text-[#c3c2c1] underline">Originale</a>}
         </div>
         <p className="text-[10px] text-[#6f6d6b]">
-          Motore Stockfish 19 (GPLv3, <a className="underline" href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noreferrer">sorgente</a>), profondità {PROFONDITA}. Muovi un pezzo sulla scacchiera per esplorare una variante.
+          Motore Stockfish 19 (GPLv3, <a className="underline" href="https://github.com/nmrugg/stockfish.js" target="_blank" rel="noreferrer">sorgente</a>), profondità {PROFONDITA}. {CREDITI_PEZZI[setPezzi]}. Muovi un pezzo sulla scacchiera per esplorare una variante.
         </p>
       </aside>
     </div>

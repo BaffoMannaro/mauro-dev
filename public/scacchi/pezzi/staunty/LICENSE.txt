@@ -1,0 +1,2 @@
+Set "staunty" di sadsnake1, da lichess-org/lila (public/piece/staunty).
+Licenza: CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/

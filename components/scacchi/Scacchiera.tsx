@@ -19,6 +19,8 @@ type Props = {
   /** Ultima mossa giocata (uci), evidenziata. */
   ultima?: string | null;
   frecce?: Freccia[];
+  /** Case colorate (spiegazioni del repertorio): casa -> colore CSS. */
+  evidenzia?: Record<string, string>;
   /** Badge di classificazione sulla casa d'arrivo dell'ultima mossa. */
   badge?: Classificazione | null;
   /** Se presente, la scacchiera è giocabile: riceve la mossa in uci e restituisce true se accettata. */
@@ -28,7 +30,7 @@ type Props = {
   id?: string;
 };
 
-export default function Scacchiera({ fen, orientamento = 'white', ultima, frecce = [], badge, onMossa, muove, id = 'scacchiera' }: Props) {
+export default function Scacchiera({ fen, orientamento = 'white', ultima, frecce = [], evidenzia, badge, onMossa, muove, id = 'scacchiera' }: Props) {
   const [selezionata, setSelezionata] = useState<string | null>(null);
   const [promozione, setPromozione] = useState<{ da: string; a: string } | null>(null);
 
@@ -76,6 +78,9 @@ export default function Scacchiera({ fen, orientamento = 'white', ultima, frecce
   if (ultima) {
     stili[ultima.slice(0, 2)] = { background: EVIDENZA };
     stili[ultima.slice(2, 4)] = { background: EVIDENZA };
+  }
+  for (const [casa, colore] of Object.entries(evidenzia ?? {})) {
+    stili[casa] = { ...stili[casa], boxShadow: `inset 0 0 0 4px ${colore}`, background: `${colore.replace(/[\d.]+\)$/, '0.28)')}` };
   }
   if (selezionata) stili[selezionata] = { background: EVIDENZA };
   if (scacco) stili[scacco] = { ...stili[scacco], background: 'radial-gradient(circle, rgba(255,0,0,.85) 0%, rgba(231,0,0,.5) 40%, transparent 75%)' };

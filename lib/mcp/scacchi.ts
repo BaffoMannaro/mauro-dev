@@ -12,6 +12,8 @@ import { baseApp } from './oauth';
 import { REPERTORIO } from '@/lib/scacchi/repertorio';
 import { statistiche } from '@/lib/scacchi/statistiche';
 import { riepilogoPuzzle, sincronizzaPuzzle } from '@/lib/scacchi/puzzle';
+import { FINALI } from '@/lib/scacchi/finali';
+import { progressiFinali } from '@/lib/scacchi/finali-db';
 import { PROGRAMMA } from '@/lib/scacchi/coach';
 import { attivaProssima, avanzamento, chiudiMissione, creaMissione, listaMissioni, missioneAttiva, salvaFeedback, statoDrill } from '@/lib/scacchi/missioni';
 
@@ -444,7 +446,7 @@ export function registraScacchi(server: McpServer) {
     {
       title: 'Statistiche del gioco di Mauro',
       description:
-        'Riepilogo: risultati totali, per colore, cadenza e fascia oraria; aperture per colore con % vittorie; come perde; rating medio per mese; errori per fase ogni 100 mosse, matti mancati e vantaggi buttati (dalle partite analizzate); stato dei puzzle.',
+        'Riepilogo: risultati totali, per colore, cadenza e fascia oraria; aperture per colore con % vittorie; come perde; rating medio per mese; errori per fase ogni 100 mosse, matti mancati e vantaggi buttati (dalle partite analizzate); stato dei puzzle e dei finali.',
       inputSchema: z.object({}),
       annotations: sola,
     },
@@ -465,6 +467,7 @@ export function registraScacchi(server: McpServer) {
         rating_ultimi_12_mesi: s.ratingMensile.slice(-24),
         errori: s.errori,
         puzzle: pz,
+        finali: await progressiFinali().then((pr) => FINALI.map((f) => ({ id: f.id, titolo: f.titolo, completato: !!pr[f.id]?.completato, record_mosse: pr[f.id]?.migliori ?? null, tentativi: pr[f.id]?.tentativi ?? 0 }))),
         pagina: `${baseApp()}/scacchi/statistiche`,
       });
     }

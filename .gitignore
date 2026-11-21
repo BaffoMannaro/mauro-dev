@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.local
+
+# Scacchi: copiati da node_modules da scripts/copia-scacchi.mjs
+/public/scacchi/engine/
+/public/scacchi/vendor/

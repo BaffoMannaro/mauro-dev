@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Scacchi: file di terze parti copiati da node_modules (scripts/copia-scacchi.mjs).
+    "public/scacchi/**",
   ]),
 ]);
 

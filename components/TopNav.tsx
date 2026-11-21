@@ -13,6 +13,7 @@ const NAV = [
   { href: '/abbonamenti', label: 'Abbonamenti' },
   { href: '/fatture', label: 'Fatture' },
   { href: '/listino', label: 'Listino' },
+  { href: '/scacchi', label: 'Scacchi' },
 ];
 
 type ThemeMode = 'auto' | 'dark' | 'light';

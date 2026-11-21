@@ -7,7 +7,10 @@ import Scacchiera, { type Freccia } from './Scacchiera';
 import { Navigazione } from './Pannelli';
 import { suonoMossa } from './suoni';
 import { apertura } from '@/lib/scacchi/partita';
-import type { Linea } from '@/lib/scacchi/repertorio';
+import { leggiSegni, type ColoreSegno, type Linea } from '@/lib/scacchi/repertorio';
+
+const COLORE_SEGNO: Record<ColoreSegno, string> = { g: 'rgba(129,182,76,0.9)', r: 'rgba(250,65,45,0.85)', b: 'rgba(80,140,220,0.9)' };
+const NOME_SEGNO: Record<ColoreSegno, string> = { g: 'la tua mossa e cosa fa', r: 'l\'avversario: minacce e attacchi', b: 'il piano: dove andranno i pezzi' };
 
 type Modo = 'lezione' | 'drill';
 
@@ -106,14 +109,18 @@ export default function Lezione({ linea, livello }: { linea: Linea; livello: num
     return false;
   }
 
-  const frecce: Freccia[] = [];
+  // Segni della mossa appena giocata (lezione e drill): frecce e case colorate.
+  const segni = passo > 0 && !(modo === 'drill' && sbaglio) ? leggiSegni(linea.mosse[passo - 1][2]) : [];
+  const frecce: Freccia[] = segni.flatMap((sg) => ('da' in sg ? [{ da: sg.da, a: sg.a, colore: COLORE_SEGNO[sg.c] }] : []));
+  const evidenzia: Record<string, string> = Object.fromEntries(segni.flatMap((sg) => ('casa' in sg ? [[sg.casa, COLORE_SEGNO[sg.c]]] : [])));
+  const coloriUsati = [...new Set(segni.map((sg) => sg.c))];
   if (modo === 'drill' && suggerisci && passo < totale) {
     const u = pos[passo + 1].uci!;
-    frecce.push({ da: u.slice(0, 2), a: u.slice(2, 4), colore: 'rgba(150,190,70,.85)' });
+    frecce.push({ da: u.slice(0, 2), a: u.slice(2, 4), colore: COLORE_SEGNO.g });
   }
   if (modo === 'lezione' && passo < totale && turnoMio(passo)) {
     const u = pos[passo + 1].uci!;
-    frecce.push({ da: u.slice(0, 2), a: u.slice(2, 4), colore: 'rgba(80,140,220,.6)' });
+    frecce.push({ da: u.slice(0, 2), a: u.slice(2, 4), colore: 'rgba(255,255,255,0.6)' });
   }
 
   const corrente = passo > 0 ? linea.mosse[passo - 1] : null;
@@ -127,11 +134,22 @@ export default function Lezione({ linea, livello }: { linea: Linea; livello: num
           orientamento={orient}
           ultima={pos[passo].uci}
           frecce={frecce}
+          evidenzia={evidenzia}
           onMossa={modo === 'drill' ? onMossaDrill : undefined}
           muove={modo === 'drill' && !esito && passo < totale && turnoMio(passo) ? linea.colore : null}
           id="lezione"
         />
         {nome && <p className="text-center text-xs text-[#8b8987]">{nome}</p>}
+        {coloriUsati.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-[#c3c2c1]">
+            {coloriUsati.map((c) => (
+              <span key={c} className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-5 rounded-sm" style={{ background: COLORE_SEGNO[c] }} />
+                {NOME_SEGNO[c]}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <aside className="flex flex-col gap-3 rounded-lg bg-[#262421] p-3 text-sm text-[#c3c2c1]">
@@ -162,7 +180,7 @@ export default function Lezione({ linea, livello }: { linea: Linea; livello: num
                   <p className="mt-1">{corrente[1] || (turnoMio(passo - 1) ? '' : 'Mossa dell\'avversario.')}</p>
                 </>
               ) : (
-                <p>Segui la linea con ▶. La freccia blu indica la tua prossima mossa. Poi passa al Drill.</p>
+                <p>Segui la linea con ▶. La freccia bianca indica la tua prossima mossa; dopo ogni mossa vedi frecce e case colorate che illustrano la spiegazione. Poi passa al Drill.</p>
               )}
             </div>
             <div className="max-h-64 overflow-y-auto">

@@ -1,10 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { Chess } from 'chess.js';
-import { REPERTORIO } from './repertorio';
+import { leggiSegni, REPERTORIO } from './repertorio';
 import { analizzaPosizioni } from './motore-node';
 import { probPer } from './classifica';
 
 describe('repertorio', () => {
+  it('segni validi: frecce verdi e rosse partono da un pezzo (prima o dopo la mossa)', () => {
+    const problemi: string[] = [];
+    for (const l of REPERTORIO) {
+      const c = new Chess();
+      for (const [san, , segni] of l.mosse) {
+        const prima = new Chess(c.fen());
+        c.move(san);
+        for (const sg of leggiSegni(segni)) {
+          if ('da' in sg && sg.c !== 'b' && !prima.get(sg.da as never) && !c.get(sg.da as never)) problemi.push(`${l.id} ${san}: ${sg.da} vuota`);
+        }
+      }
+    }
+    expect(problemi).toEqual([]);
+    expect(() => leggiSegni('x:a1a2')).toThrow();
+  });
+
   it('id unici', () => {
     expect(new Set(REPERTORIO.map((l) => l.id)).size).toBe(REPERTORIO.length);
   });

@@ -39,8 +39,27 @@ export async function importaChesscom(opts: { username?: string; mesiIniziali?: 
   let daLeggere = ultimo ? archives.filter((a) => a >= ultimo) : archives.slice(-(opts.mesiIniziali ?? 6));
   if (daLeggere.length === 0 && archives.length) daLeggere = archives.slice(-1);
 
+  const esito = await importaArchivi(username, daLeggere);
+  if (archives.length) await salvaImpostazioni({ username, ultimoArchivio: archives[archives.length - 1] });
+  return esito;
+}
+
+/** Elenco degli archivi mensili del giocatore (URL), dal più vecchio al più recente. */
+export async function elencoArchivi(username?: string): Promise<{ username: string; archivi: string[] }> {
+  const imp = await leggiImpostazioni();
+  const u = (username ?? imp.username ?? '').trim().toLowerCase();
+  if (!u) throw new Error('Imposta prima lo username chess.com');
+  if (u !== imp.username) await salvaImpostazioni({ username: u });
+  const { archives } = await getJson<{ archives: string[] }>(`${BASE}/${encodeURIComponent(u)}/games/archives`);
+  return { username: u, archivi: archives };
+}
+
+/** Importa gli archivi indicati (blocchi piccoli: ogni chiamata deve restare sotto il limite di tempo delle funzioni). */
+export async function importaArchivi(username: string, archivi: string[]): Promise<EsitoImport> {
+  const valido = `${BASE}/${encodeURIComponent(username)}/games/`;
+  if (archivi.some((a) => !a.startsWith(valido))) throw new Error('Archivio non valido');
   const esito: EsitoImport = { importate: 0, gia_presenti: 0, scartate: 0, mesi: [] };
-  for (const a of daLeggere) {
+  for (const a of archivi) {
     const { games } = await getJson<{ games: GiocoChesscom[] }>(a);
     esito.mesi.push(a.split('/games/')[1] ?? a);
     for (const g of games) {
@@ -65,6 +84,10 @@ export async function importaChesscom(opts: { username?: string; mesiIniziali?: 
       }
     }
   }
-  if (archives.length) await salvaImpostazioni({ username, ultimoArchivio: archives[archives.length - 1] });
   return esito;
+}
+
+/** Segna come sincronizzato fino all'ultimo archivio (dopo l'import completo). */
+export async function segnaSincronizzato(username: string, ultimo: string) {
+  await salvaImpostazioni({ username, ultimoArchivio: ultimo });
 }

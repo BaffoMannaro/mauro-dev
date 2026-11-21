@@ -7,6 +7,8 @@ const VOCI = [
   { href: '/scacchi', label: 'Partite' },
   { href: '/scacchi/gioca', label: 'Gioca' },
   { href: '/scacchi/aperture', label: 'Repertorio' },
+  { href: '/scacchi/puzzle', label: 'Puzzle' },
+  { href: '/scacchi/statistiche', label: 'Statistiche' },
   { href: '/scacchi/coach', label: 'Coach' },
 ];
 

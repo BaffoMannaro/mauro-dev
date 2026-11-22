@@ -65,6 +65,7 @@ import {
 import { fmtMinuti, parseOre } from '@/lib/canone-calcolo';
 import { notificaStima } from '@/lib/canone-email';
 import { ISTRUZIONI_SCACCHI, registraScacchi } from './scacchi';
+import { ISTRUZIONI_CONOSCENZA, registraConoscenza } from './conoscenza';
 
 export const ISTRUZIONI = `Gestionale di Mauro Altamura (Mauro Dev, sviluppatore web in regime forfettario).
 
@@ -85,6 +86,8 @@ FISCO (forfettario, Gestione Separata): statistiche restituisce netto_forfettari
 CANONE ORE: alcuni clienti hanno un canone mensile (leggi_canone, imposta_canone). Le ore non usate passano al mese dopo e valgono solo per quel mese; oltre il monte ore sono extra a tariffa piena. Ogni intervento si registra con registra_intervento (data, durata, descrizione, sito; fuori_canone se si fattura a parte). I lavori della timeline si gestiscono con salva_lavoro. Le richieste del cliente arrivano dalla sua pagina: rispondi con una stima usando rispondi_richiesta (parte una email al cliente) solo dopo la conferma dell'utente.\nCLIENTE vs SOCIETÀ: il cliente è la persona/il rapporto; le società (lista_societa) sono i soggetti fiscali che ricevono le fatture. Un cliente può avere più società.
 
 Importi in euro, date YYYY-MM-DD. Rispondi in italiano. Il PDF delle fatture si scarica dal link restituito (valido 24 ore).
+
+${ISTRUZIONI_CONOSCENZA}
 
 ${ISTRUZIONI_SCACCHI}`;
 
@@ -1303,6 +1306,9 @@ export function registraStrumenti(server: McpServer) {
       ],
     })
   );
+
+  // ── Conoscenza ──
+  registraConoscenza(server);
 
   // ── Scacchi ──
   registraScacchi(server);

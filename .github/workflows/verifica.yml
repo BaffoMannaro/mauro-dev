@@ -1,0 +1,17 @@
+# Nei repo di livello auto: test sulle PR, senza segreti e senza eseguire script di installazione.
+name: Verifica
+on: { pull_request: {} }
+permissions: { contents: read }
+jobs:
+  verifica:
+    name: Verifica   # e' il nome che l'unione cerca
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci --ignore-scripts
+      - run: npm test -- --no-file-parallelism   # in parallelo i test con database superano il tempo massimo
+      # La build la verifica l'anteprima Vercel, che l'unione richiede verde.

@@ -1,0 +1,18 @@
+# In prova: dice solo cosa farebbe. Per unire davvero serve UNISCI=si, dopo l'ok di Mauro.
+# Gira dal ramo principale e non scarica mai il codice della PR.
+name: Unione dei fix di sicurezza
+on:
+  schedule: [{ cron: '20 6-18/3 * * 1-5' }]
+  workflow_dispatch: {}
+permissions: { contents: read, pull-requests: read, checks: read, statuses: read }
+concurrency: unione
+jobs:
+  unione:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: '${{ github.event.repository.default_branch }}', persist-credentials: false }
+      - shell: bash   # con pipefail: un errore non si perde nel tee
+        run: node .github/unione/unisci.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+        env: { GH_TOKEN: '${{ github.token }}', RICHIESTI: 'Verifica,Vercel', GIORNI: '3', UNISCI: 'no' }

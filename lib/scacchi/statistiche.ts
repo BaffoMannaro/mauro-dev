@@ -2,6 +2,7 @@ import sql from '@/lib/db';
 import { ensureScacchiSchema } from './db';
 import type { Review } from './partita';
 import { probPer } from './classifica';
+import { calcolaConfronto, type Confronto } from './confronto';
 
 // Statistiche del gioco di Mauro: risultati, aperture, rating, come perde ed errori per fase (dalle partite analizzate).
 
@@ -47,6 +48,8 @@ type Riga = {
 };
 
 export type Statistiche = {
+  /** Tu contro gli avversari del tuo Elo (partite analizzate, differenza di Elo ≤ 150). */
+  confronto: Confronto[];
   totale: Esiti;
   analizzate: number;
   perColore: { w: Esiti; b: Esiti };
@@ -80,6 +83,7 @@ function oraRoma(iso: string) {
 
 export function calcolaStatistiche(righe: Riga[]): Statistiche {
   const s: Statistiche = {
+    confronto: calcolaConfronto(righe),
     totale: vuoto(),
     analizzate: 0,
     perColore: { w: vuoto(), b: vuoto() },

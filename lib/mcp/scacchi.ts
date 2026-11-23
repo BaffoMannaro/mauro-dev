@@ -469,7 +469,7 @@ export function registraScacchi(server: McpServer) {
     {
       title: 'Statistiche del gioco di Mauro',
       description:
-        'Riepilogo: risultati totali, per colore, cadenza e fascia oraria; aperture per colore con % vittorie; come perde; rating medio per mese; errori per fase ogni 100 mosse, matti mancati e vantaggi buttati (dalle partite analizzate); stato dei puzzle e dei finali.',
+        'Riepilogo: risultati totali, per colore, cadenza e fascia oraria; aperture per colore con % vittorie; come perde; rating medio per mese; errori per fase ogni 100 mosse, confronto con gli avversari del suo Elo (stesse metriche, differenza di Elo ≤ 150), matti mancati e vantaggi buttati (dalle partite analizzate); stato dei puzzle e dei finali.',
       inputSchema: z.object({}),
       annotations: sola,
     },
@@ -487,6 +487,7 @@ export function registraScacchi(server: McpServer) {
         per_fascia_oraria: s.perFascia,
         aperture: s.aperture.filter((a) => a.esiti.n >= 5).map((a) => ({ colore: a.colore === 'w' ? 'bianco' : 'nero', famiglia: a.famiglia, partite: a.esiti.n, vittorie_pct: p(a.esiti.v, a.esiti.n), sconfitte_pct: p(a.esiti.p, a.esiti.n) })),
         come_perde: s.comePerdo,
+        confronto_con_avversari_del_suo_elo: s.confronto,
         rating_ultimi_12_mesi: s.ratingMensile.slice(-24),
         errori: s.errori,
         puzzle: pz,

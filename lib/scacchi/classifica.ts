@@ -13,7 +13,9 @@ export type Classificazione =
   | 'buona'
   | 'imprecisione'
   | 'errore'
-  | 'grave';
+  | 'grave'
+  /** Occasione mancata: c'era un matto o un guadagno netto di materiale e non l'hai giocato. */
+  | 'mancata';
 
 export const ETICHETTE: Record<Classificazione, string> = {
   libro: 'Libro',
@@ -25,6 +27,7 @@ export const ETICHETTE: Record<Classificazione, string> = {
   imprecisione: 'Imprecisione',
   errore: 'Errore',
   grave: 'Errore grave',
+  mancata: 'Mancata',
 };
 
 export const SIMBOLI: Record<Classificazione, string> = {
@@ -37,6 +40,7 @@ export const SIMBOLI: Record<Classificazione, string> = {
   imprecisione: '?!',
   errore: '?',
   grave: '??',
+  mancata: '✕',
 };
 
 export const COLORI: Record<Classificazione, string> = {
@@ -49,6 +53,7 @@ export const COLORI: Record<Classificazione, string> = {
   imprecisione: '#f7c631',
   errore: '#ffa459',
   grave: '#fa412d',
+  mancata: '#ee6b55',
 };
 
 /** Centipedoni equivalenti: il matto vale come una valutazione enorme, più vicino = più grande. */
@@ -110,6 +115,10 @@ export type InputMossa = {
   sacrificio?: number;
   /** Matto dato con questa mossa. */
   matto?: boolean;
+  /** Chi muove aveva un matto forzato e dopo la mossa non ce l'ha più. */
+  mattoPerso?: boolean;
+  /** Punti di materiale che la linea migliore guadagnava in più rispetto alla mossa giocata. */
+  materialeMancato?: number;
 };
 
 export type EsitoMossa = {
@@ -145,6 +154,11 @@ export function classificaMossa(m: InputMossa): EsitoMossa {
     if (prima - seconda >= 0.15 && dopo >= 0.35 && prima < 0.97) {
       return { classificazione: 'ottima', perdita, accuratezza };
     }
+  }
+
+  // Posizioni già decise: la probabilità non si muove, ma un matto o un pezzo lasciati per strada contano.
+  if (!eMigliore && perdita <= 0.1 && (m.mattoPerso || (m.materialeMancato ?? 0) >= 3)) {
+    return { classificazione: 'mancata', perdita, accuratezza };
   }
 
   if (eMigliore || perdita < 0.005) return { classificazione: 'migliore', perdita, accuratezza };

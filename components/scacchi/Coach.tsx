@@ -8,6 +8,8 @@ import type { MissioneProgramma } from '@/lib/scacchi/coach';
 import { REPERTORIO } from '@/lib/scacchi/repertorio';
 import { Motore } from '@/lib/scacchi/motore';
 import { analizzaESalva } from '@/lib/scacchi/review-client';
+import type { Bilancio } from '@/lib/scacchi/bilancio';
+import BilancioCard from './BilancioCard';
 
 type Props = {
   av: Avanzamento | null;
@@ -15,9 +17,10 @@ type Props = {
   storico: Missione[];
   drill: Record<string, StatoDrill>;
   username: string | null;
+  bilancio: Bilancio | null;
 };
 
-export default function Coach({ av, programma, storico, drill, username }: Props) {
+export default function Coach({ av, programma, storico, drill, username, bilancio }: Props) {
   const router = useRouter();
   const [occupato, setOccupato] = useState<string | null>(null);
   const motore = useRef<Motore | null>(null);
@@ -40,7 +43,7 @@ export default function Coach({ av, programma, storico, drill, username }: Props
 
   async function analizzaTutte() {
     if (!av) return;
-    const da = av.partite.filter((p) => !p.analizzata);
+    const da = av.partite.filter((p) => !p.analizzata || !p.aggiornata);
     motore.current ??= new Motore();
     for (let i = 0; i < da.length; i++) {
       const p = await fetch(`/api/scacchi/partite/${da[i].id}`).then((r) => r.json());
@@ -60,12 +63,33 @@ export default function Coach({ av, programma, storico, drill, username }: Props
       {!av ? (
         <div className="rounded-lg bg-[#262421] p-5">
           <h1 className="text-xl font-bold text-white">Coach</h1>
-          <p className="mt-2">
-            Il programma ha 3 missioni. Ognuna è un blocco di partite con regole precise: io controllo se le rispetti, analizzo le partite e ti correggo.
-          </p>
-          <button onClick={() => azione({ azione: 'attiva_prossima' })} className="mt-4 rounded-lg bg-[#81b64c] px-5 py-3 text-lg font-bold text-white shadow-[0_4px_0_#45753c]">
-            Inizia la prossima missione
-          </button>
+          {bilancio ? (
+            <>
+              <p className="mt-2">Ho guardato le partite della missione precedente: la prossima è costruita sui tuoi errori.</p>
+              <div className="mt-3 rounded border-l-4 border-[#81b64c] bg-[#2f3a2a] p-4">
+                <p className="text-xs uppercase tracking-wide text-[#81b64c]">Missione proposta</p>
+                <p className="mt-1 text-lg font-bold text-white">{bilancio.proposta.titolo}</p>
+                <p className="mt-1 whitespace-pre-line">{bilancio.proposta.descrizione}</p>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button onClick={() => azione({ azione: 'accetta_proposta' })} className="rounded-lg bg-[#81b64c] px-5 py-3 text-lg font-bold text-white shadow-[0_4px_0_#45753c]">
+                  Accetta questa missione
+                </button>
+                <button onClick={() => azione({ azione: 'attiva_prossima' })} className="rounded-lg bg-[#3c3a37] px-4 py-3 font-semibold text-white hover:bg-[#484644]">
+                  Missione standard del programma
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mt-2">
+                Il programma ha 3 missioni. Ognuna è un blocco di partite con regole precise: io controllo se le rispetti, analizzo le partite e ti correggo.
+              </p>
+              <button onClick={() => azione({ azione: 'attiva_prossima' })} className="mt-4 rounded-lg bg-[#81b64c] px-5 py-3 text-lg font-bold text-white shadow-[0_4px_0_#45753c]">
+                Inizia la prossima missione
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <>
@@ -101,9 +125,9 @@ export default function Coach({ av, programma, storico, drill, username }: Props
             </ul>
             <div className="mt-4 flex flex-wrap gap-2">
               <button onClick={aggiorna} disabled={!!occupato || !username} className="rounded bg-[#3c3a37] px-3 py-2 font-semibold text-white hover:bg-[#484644] disabled:opacity-50">Importa nuove partite</button>
-              {av.partite.some((p) => !p.analizzata) && (
+              {av.partite.some((p) => !p.analizzata || !p.aggiornata) && (
                 <button onClick={analizzaTutte} disabled={!!occupato} className="rounded bg-[#3c3a37] px-3 py-2 font-semibold text-white hover:bg-[#484644] disabled:opacity-50">
-                  Analizza le partite ({av.partite.filter((p) => !p.analizzata).length})
+                  Analizza le partite ({av.partite.filter((p) => !p.analizzata || !p.aggiornata).length})
                 </button>
               )}
               {av.completa && (
@@ -120,6 +144,8 @@ export default function Coach({ av, programma, storico, drill, username }: Props
             <Kpi e="Accuratezza media" v={av.accuratezzaMedia ?? '–'} />
             <Kpi e="Errori gravi / partita" v={av.graviMedi ?? '–'} />
           </div>
+
+          {bilancio && <BilancioCard b={bilancio} inCorso />}
 
           {av.missione.feedback && (
             <div className="rounded-lg border-l-4 border-[#5c8bb0] bg-[#2f3a44] p-4">
@@ -170,6 +196,30 @@ export default function Coach({ av, programma, storico, drill, username }: Props
             )}
           </div>
         </>
+      )}
+
+      {!av && bilancio && <BilancioCard b={bilancio} inCorso={false} />}
+
+      {storico.filter((m) => m.stato !== 'attiva').length > 0 && (
+        <div className="rounded-lg bg-[#262421] p-4">
+          <p className="mb-2 font-bold text-white">Missioni passate</p>
+          {storico.filter((m) => m.stato !== 'attiva').map((m) => (
+            <details key={m.id} className="border-t border-[#3c3a37] py-2">
+              <summary className="cursor-pointer">
+                <span className="font-semibold text-white">{m.titolo}</span>
+                <span className="ml-2 text-xs text-[#8b8987]">{m.stato} · {new Date(m.inizio).toLocaleDateString('it-IT')}{m.fine ? ` → ${new Date(m.fine).toLocaleDateString('it-IT')}` : ''}</span>
+              </summary>
+              {m.feedback ? (
+                <div className="mt-2 rounded border-l-4 border-[#5c8bb0] bg-[#2f3a44] p-3">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-wide text-[#8fb3d1]">Feedback del coach</p>
+                  <p className="whitespace-pre-line text-[#e8e6e3]">{m.feedback}</p>
+                </div>
+              ) : (
+                <p className="mt-2 text-xs text-[#8b8987]">Nessun feedback salvato: chiedimelo in chat.</p>
+              )}
+            </details>
+          ))}
+        </div>
       )}
 
       <div className="rounded-lg bg-[#262421] p-4">

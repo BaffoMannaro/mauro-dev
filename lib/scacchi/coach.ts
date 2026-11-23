@@ -72,6 +72,10 @@ export type RegoleMissione = {
   maxGraviMedi?: number;
   /** Linee da completare nei drill prima di iniziare. */
   drill?: string[];
+  /** Puzzle da risolvere durante la missione. */
+  puzzle?: number;
+  /** Finali da completare durante la missione (id di lib/scacchi/finali.ts). */
+  finali?: string[];
 };
 
 export type MissioneProgramma = { codice: string; titolo: string; descrizione: string; regole: RegoleMissione };

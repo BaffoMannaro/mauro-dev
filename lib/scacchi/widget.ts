@@ -97,9 +97,9 @@ b { color: #fff; }
 // Script del widget (JS puro, eseguito nell'iframe dell'host).
 const JS = String.raw`
 const { Chess } = window.__chess;
-const COLORI = { libro:'#a88865', brillante:'#26c2a3', ottima:'#5c8bb0', migliore:'#81b64c', eccellente:'#81b64c', buona:'#95b776', imprecisione:'#f7c631', errore:'#ffa459', grave:'#fa412d' };
-const SIMBOLI = { libro:'▤', brillante:'!!', ottima:'!', migliore:'★', eccellente:'✓', buona:'✓', imprecisione:'?!', errore:'?', grave:'??' };
-const ETICHETTE = { libro:'di teoria', brillante:'brillante', ottima:'ottima', migliore:'la migliore', eccellente:'eccellente', buona:'buona', imprecisione:"un'imprecisione", errore:'un errore', grave:'un errore grave' };
+const COLORI = { libro:'#a88865', brillante:'#26c2a3', ottima:'#5c8bb0', migliore:'#81b64c', eccellente:'#81b64c', buona:'#95b776', imprecisione:'#f7c631', errore:'#ffa459', grave:'#fa412d', mancata:'#ee6b55' };
+const SIMBOLI = { libro:'▤', brillante:'!!', ottima:'!', migliore:'★', eccellente:'✓', buona:'✓', imprecisione:'?!', errore:'?', grave:'??', mancata:'✕' };
+const ETICHETTE = { libro:'di teoria', brillante:'brillante', ottima:'ottima', migliore:'la migliore', eccellente:'eccellente', buona:'buona', imprecisione:"un'imprecisione", errore:'un errore', grave:'un errore grave', mancata:'un\'occasione mancata' };
 
 let D = null;      // dati partita
 let ply = 0;
@@ -221,7 +221,7 @@ function render() {
   let lista = '';
   for (let i = 0; i < D.mosse.length; i += 2) {
     const a = D.mosse[i], b = D.mosse[i + 1];
-    const cella = (x) => x ? '<button data-ply="' + x.ply + '" class="' + (x.ply === ply && !prova ? 'on' : '') + '">' + (x.cls && ['brillante','ottima','imprecisione','errore','grave'].includes(x.cls) ? '<span style="color:' + COLORI[x.cls] + '">' + SIMBOLI[x.cls] + '</span> ' : '') + x.san + (D.commenti.some((c) => c.ply === x.ply) ? ' <span style="color:#5c8bb0">●</span>' : '') + '</button>' : '<span></span>';
+    const cella = (x) => x ? '<button data-ply="' + x.ply + '" class="' + (x.ply === ply && !prova ? 'on' : '') + '">' + (x.cls && ['brillante','ottima','imprecisione','errore','grave','mancata'].includes(x.cls) ? '<span style="color:' + COLORI[x.cls] + '">' + SIMBOLI[x.cls] + '</span> ' : '') + x.san + (D.commenti.some((c) => c.ply === x.ply) ? ' <span style="color:#5c8bb0">●</span>' : '') + '</button>' : '<span></span>';
     lista += '<div class="m"><span class="n">' + (i / 2 + 1) + '.</span>' + cella(a) + cella(b) + '</div>';
   }
 

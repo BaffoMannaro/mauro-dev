@@ -1,6 +1,7 @@
 import sql from '@/lib/db';
 import { ensureScacchiSchema } from './db';
 import { FINALI } from './finali';
+import { registraAllenamento } from './allenamento';
 
 // Progressi sui finali: completato, minimo di mosse, tentativi.
 
@@ -42,4 +43,5 @@ export async function registraFinale(id: string, riuscito: boolean, mosse: numbe
                       ELSE LEAST(COALESCE(scacchi_finali.migliori, EXCLUDED.migliori), EXCLUDED.migliori) END,
       tentativi = scacchi_finali.tentativi + 1, ultimo = NOW()
   `;
+  await registraAllenamento('finale', id, riuscito);
 }

@@ -56,7 +56,7 @@ export function GraficoValutazione({
       <polygon points={`0,${H} ${punti} ${W},${H}`} fill="#fff" />
       <line x1="0" x2={W} y1={H / 2} y2={H / 2} stroke="#888" strokeWidth="0.5" />
       {classi?.map((c, i) =>
-        c === 'grave' || c === 'errore' || c === 'brillante' || c === 'ottima' || c === 'imprecisione' ? (
+        c === 'grave' || c === 'mancata' || c === 'errore' || c === 'brillante' || c === 'ottima' || c === 'imprecisione' ? (
           <circle key={i} cx={(i / n) * W} cy={y(valori[i])} r="3.5" fill={COLORI[c]} stroke="#262421" strokeWidth="1" />
         ) : null
       )}

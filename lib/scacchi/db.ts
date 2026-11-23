@@ -156,6 +156,8 @@ export type RigaPartita = {
   accuratezza_mia: number | null;
   accuratezza_avv: number | null;
   analizzata: boolean;
+  /** 2 = review con "mancata" e tempi; le precedenti vanno rianalizzate. */
+  versione_review?: number;
   commenti: number;
 };
 
@@ -177,6 +179,7 @@ export async function listaPartite(f: FiltriPartite = {}): Promise<RigaPartita[]
            p.esito_mio, p.cadenza, p.eco, p.apertura, p.mosse, p.giocata_il,
            p.accuratezza_mia::float AS accuratezza_mia, p.accuratezza_avv::float AS accuratezza_avv,
            (p.review IS NOT NULL) AS analizzata,
+           COALESCE((p.review->>'versione')::int, 1) AS versione_review,
            (SELECT COUNT(*)::int FROM scacchi_commenti c WHERE c.partita_id = p.id) AS commenti
     FROM scacchi_partite p
     WHERE (${f.esito ?? null}::text IS NULL OR p.esito_mio = ${f.esito ?? null})

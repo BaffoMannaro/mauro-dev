@@ -6,6 +6,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { Esiti, Statistiche } from '@/lib/scacchi/statistiche';
 import { Motore } from '@/lib/scacchi/motore';
 import { analizzaESalva } from '@/lib/scacchi/review-client';
+import ConfrontoElo from './ConfrontoElo';
 
 const pct = (x: number, n: number) => (n ? Math.round((x / n) * 100) : 0);
 const FINALI: Record<string, string> = {
@@ -91,6 +92,14 @@ export default function StatisticheScacchi({ s, username }: { s: Statistiche; us
         <Kpi e={`Rating ${CADENZE[cadenzaPrincipale] ?? cadenzaPrincipale} (ultimo mese)`} v={serie.at(-1)?.rating ?? '–'} />
         <Kpi e="Accuratezza media" v={s.errori.accuratezzaMedia ?? '–'} />
       </div>
+
+      <ConfrontoElo
+        confronto={s.confronto}
+        ratingAttuale={Object.fromEntries(Object.keys(s.perCadenza).flatMap((c) => {
+          const r = s.ratingMensile.filter((m) => m.cadenza === c).at(-1)?.rating;
+          return r ? [[c, r]] : [];
+        }))}
+      />
 
       <div className="rounded-lg bg-[#262421] p-4">
         <div className="mb-2 flex flex-wrap items-center gap-2">

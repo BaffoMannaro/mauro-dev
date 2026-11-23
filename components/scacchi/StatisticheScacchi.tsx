@@ -41,7 +41,7 @@ export default function StatisticheScacchi({ s, username }: { s: Statistiche; us
   async function analizzaUltime() {
     stop.current = false;
     const { partite } = await fetch('/api/scacchi/partite?limite=100').then((x) => x.json());
-    const da = (partite as { id: number; analizzata: boolean; colore_mio: string | null }[]).filter((p) => !p.analizzata && p.colore_mio);
+    const da = (partite as { id: number; analizzata: boolean; versione_review?: number; colore_mio: string | null }[]).filter((p) => p.colore_mio && (!p.analizzata || (p.versione_review ?? 1) < 2));
     motore.current ??= new Motore();
     for (let i = 0; i < da.length && !stop.current; i++) {
       const p = await fetch(`/api/scacchi/partite/${da[i].id}`).then((x) => x.json());

@@ -14,7 +14,7 @@ import { suonoMossa } from './suoni';
 import { useSetPezzi } from './TemaScacchi';
 import { CREDITI_PEZZI } from '@/lib/scacchi/pezzi';
 
-const ORDINE: Classificazione[] = ['brillante', 'ottima', 'migliore', 'eccellente', 'buona', 'libro', 'imprecisione', 'errore', 'grave'];
+const ORDINE: Classificazione[] = ['brillante', 'ottima', 'migliore', 'eccellente', 'buona', 'libro', 'imprecisione', 'errore', 'grave', 'mancata'];
 
 function frase(c: Classificazione, san: string) {
   switch (c) {
@@ -27,6 +27,7 @@ function frase(c: Classificazione, san: string) {
     case 'imprecisione': return `${san} è un'imprecisione`;
     case 'errore': return `${san} è un errore`;
     case 'grave': return `${san} è un errore grave`;
+    case 'mancata': return `${san}: occasione mancata`;
   }
 }
 

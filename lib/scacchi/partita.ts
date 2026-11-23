@@ -16,10 +16,14 @@ export type Ply = {
   uci: string;
   fenPrima: string;
   fenDopo: string;
+  /** Secondi rimasti sull'orologio dopo la mossa (dal commento [%clk] di chess.com), se presente. */
+  clk?: number | null;
 };
 
 export type PartitaLetta = {
   intestazioni: Record<string, string>;
+  /** Tempo base in secondi (TimeControl "600" o "600+5"), se noto. */
+  tempoBase?: number | null;
   fenIniziale: string;
   mosse: Ply[];
 };
@@ -41,6 +45,12 @@ export function leggiPgn(pgn: string): PartitaLetta {
   const intestazioni = c.getHeaders() as Record<string, string>;
   const storia = c.history({ verbose: true });
   const fenIniziale = storia.length ? storia[0].before : c.fen();
+  // Orologio: chess.com scrive {[%clk 0:09:58.5]} dopo ogni mossa; la FEN completa identifica la posizione.
+  const orologio = new Map<string, number>();
+  for (const { fen, comment } of c.getComments()) {
+    const t = /\[%clk (\d+):(\d+):(\d+(?:\.\d+)?)\]/.exec(comment ?? '');
+    if (t) orologio.set(fen, Number(t[1]) * 3600 + Number(t[2]) * 60 + Number(t[3]));
+  }
   const mosse: Ply[] = storia.map((m, i) => ({
     ply: i + 1,
     colore: m.color,
@@ -48,8 +58,10 @@ export function leggiPgn(pgn: string): PartitaLetta {
     uci: m.from + m.to + (m.promotion ?? ''),
     fenPrima: m.before,
     fenDopo: m.after,
+    clk: orologio.get(m.after) ?? null,
   }));
-  return { intestazioni, fenIniziale, mosse };
+  const base = /^(\d+)/.exec(intestazioni.TimeControl ?? '');
+  return { intestazioni, fenIniziale, mosse, tempoBase: base ? Number(base[1]) : null };
 }
 
 /** Apertura più profonda raggiunta nella partita (dal catalogo ECO). */
@@ -87,6 +99,8 @@ export type MossaReview = Ply & {
 };
 
 export type Review = {
+  /** 2 = con la classe "mancata" e i tempi. */
+  versione?: number;
   mosse: MossaReview[];
   accuratezza: { w: number | null; b: number | null };
   conteggi: { w: Record<Classificazione, number>; b: Record<Classificazione, number> };
@@ -120,8 +134,21 @@ function sacrificio(m: Ply, dopo: AnalisiPosizione): number {
   return prima - bilancioMateriale(c.fen(), m.colore);
 }
 
+/** Bilancio di materiale per `colore` dopo aver giocato fino a `n` mosse (uci) da `fen`. */
+function materialeDopo(fen: string, linea: string[], n: number, colore: 'w' | 'b'): number {
+  const c = new Chess(fen);
+  for (const u of linea.slice(0, n)) {
+    try {
+      c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] });
+    } catch {
+      break;
+    }
+  }
+  return bilancioMateriale(c.fen(), colore);
+}
+
 function contatori(): Record<Classificazione, number> {
-  return { libro: 0, brillante: 0, ottima: 0, migliore: 0, eccellente: 0, buona: 0, imprecisione: 0, errore: 0, grave: 0 };
+  return { libro: 0, brillante: 0, ottima: 0, migliore: 0, eccellente: 0, buona: 0, imprecisione: 0, errore: 0, grave: 0, mancata: 0 };
 }
 
 /**
@@ -151,6 +178,15 @@ export function costruisciReview(p: PartitaLetta, analisi: AnalisiPosizione[]): 
       libro,
       sacrificio: sacrificio(m, d),
       matto,
+      mattoPerso:
+        !matto &&
+        a.eval.mate !== null &&
+        (m.colore === 'w' ? a.eval.mate > 0 : a.eval.mate < 0) &&
+        !(d.eval.mate !== null && (m.colore === 'w' ? d.eval.mate > 0 : d.eval.mate < 0)),
+      materialeMancato:
+        a.migliore && a.migliore !== m.uci
+          ? materialeDopo(m.fenPrima, a.pv, 3, m.colore) - materialeDopo(m.fenPrima, [m.uci, ...d.pv], 3, m.colore)
+          : 0,
     });
     acc[m.colore].push(esito.accuratezza);
     conteggi[m.colore][esito.classificazione]++;
@@ -167,6 +203,7 @@ export function costruisciReview(p: PartitaLetta, analisi: AnalisiPosizione[]): 
   });
 
   return {
+    versione: 2,
     mosse,
     accuratezza: { w: accuratezzaPartita(acc.w), b: accuratezzaPartita(acc.b) },
     conteggi,

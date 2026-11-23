@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { attivaProssima, chiudiMissione } from '@/lib/scacchi/missioni';
+import { accettaProposta } from '@/lib/scacchi/bilancio';
 
 // { azione: 'attiva_prossima' } oppure { azione: 'chiudi', id, stato: 'completata' | 'annullata' }
 export async function POST(req: NextRequest) {
@@ -8,6 +9,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   try {
     if (body.azione === 'attiva_prossima') return NextResponse.json({ id: await attivaProssima() });
+    if (body.azione === 'accetta_proposta') return NextResponse.json({ id: await accettaProposta() });
     if (body.azione === 'chiudi' && Number.isInteger(body.id) && (body.stato === 'completata' || body.stato === 'annullata')) {
       await chiudiMissione(body.id, body.stato);
       return NextResponse.json({ ok: true });

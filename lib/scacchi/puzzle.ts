@@ -2,6 +2,7 @@ import sql from '@/lib/db';
 import { ensureScacchiSchema } from './db';
 import type { Review } from './partita';
 import { probPer } from './classifica';
+import { registraAllenamento } from './allenamento';
 
 // Puzzle dai propri errori: posizioni dove Mauro ha sbagliato (errore o grave) e la mossa giusta era l'unica buona.
 // Ripetizione spaziata come i drill del repertorio.
@@ -54,7 +55,7 @@ export const MARGINE_UNICA = 0.15;
 export function candidatiPuzzle(review: Review, colore: 'w' | 'b'): CandidatoPuzzle[] {
   const out: CandidatoPuzzle[] = [];
   for (const m of review.mosse) {
-    if (m.colore !== colore || (m.classificazione !== 'errore' && m.classificazione !== 'grave')) continue;
+    if (m.colore !== colore || !['errore', 'grave', 'mancata'].includes(m.classificazione)) continue;
     if (!m.migliore || !m.migliorSan || m.migliore === m.uci) continue;
     const mattoMio = m.evalPrima.mate !== null && (colore === 'w' ? m.evalPrima.mate > 0 : m.evalPrima.mate < 0);
     let unica = mattoMio;
@@ -145,5 +146,6 @@ export async function registraTentativo(id: number, risolto: boolean) {
       prossimo = NOW() + make_interval(days => ${giorni})
     WHERE id = ${id}
   `;
+  await registraAllenamento('puzzle', String(id), risolto);
   return { livello, prossimo_tra_giorni: giorni };
 }

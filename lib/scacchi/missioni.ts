@@ -3,6 +3,8 @@ import { ensureScacchiSchema, type RigaPartita } from './db';
 import { aderenza, persaPerTempo, PROGRAMMA, type Aderenza, type RegoleMissione } from './coach';
 import type { Review } from './partita';
 import { REPERTORIO } from './repertorio';
+import { allenamentiDal } from './allenamento';
+import { FINALI } from './finali';
 
 // Missioni del coach e avanzamento dei drill sul repertorio.
 
@@ -102,6 +104,8 @@ export async function creaMissione(m: { codice?: string | null; titolo: string; 
   await ensureMissioniSchema();
   const sconosciute = m.regole.linee.filter((id) => !REPERTORIO.some((l) => l.id === id));
   if (sconosciute.length) throw new Error(`Linee sconosciute: ${sconosciute.join(', ')}`);
+  const finaliIgnoti = (m.regole.finali ?? []).filter((id) => !FINALI.some((f) => f.id === id));
+  if (finaliIgnoti.length) throw new Error(`Finali sconosciuti: ${finaliIgnoti.join(', ')}`);
   // Una sola missione attiva alla volta.
   await sql`UPDATE scacchi_missioni SET stato = 'annullata', fine = NOW() WHERE stato = 'attiva'`;
   const [r] = await sql`
@@ -136,7 +140,7 @@ export async function salvaFeedback(id: number, feedback: string) {
 export type PartitaMissione = Pick<
   RigaPartita,
   'id' | 'bianco' | 'nero' | 'colore_mio' | 'esito_mio' | 'apertura' | 'eco' | 'giocata_il' | 'accuratezza_mia' | 'cadenza'
-> & { aderenza: Aderenza; persaPerTempo: boolean; gravi: number | null; analizzata: boolean };
+> & { aderenza: Aderenza; persaPerTempo: boolean; gravi: number | null; analizzata: boolean; aggiornata: boolean };
 
 export type Avanzamento = {
   missione: Missione;
@@ -186,6 +190,7 @@ export async function avanzamento(m: Missione): Promise<Avanzamento> {
       persaPerTempo: persaPerTempo(r.pgn, colore),
       gravi: review ? review.conteggi[colore].grave : null,
       analizzata: !!review,
+      aggiornata: (review?.versione ?? 1) >= 2,
     };
   });
   const n = partite.length;
@@ -210,6 +215,12 @@ export async function avanzamento(m: Missione): Promise<Avanzamento> {
   if (r.minInRegola !== undefined) obiettivi.push({ testo: `Almeno ${r.minInRegola} partite nel repertorio`, ok: finita ? inRegola >= r.minInRegola : null });
   if (r.maxPersePerTempo !== undefined)
     obiettivi.push({ testo: r.maxPersePerTempo === 0 ? 'Nessuna partita persa per tempo' : `Al massimo ${r.maxPersePerTempo} perse per tempo`, ok: persePerTempo > r.maxPersePerTempo ? false : finita ? true : null });
+  const fatti = await allenamentiDal(m.inizio, m.fine);
+  if (r.puzzle) obiettivi.push({ testo: `Risolvi ${r.puzzle} puzzle (fatti: ${Math.min(fatti.puzzleRisolti, r.puzzle)})`, ok: fatti.puzzleRisolti >= r.puzzle ? true : null });
+  for (const f of r.finali ?? []) {
+    const nome = FINALI.find((x) => x.id === f)?.titolo ?? f;
+    obiettivi.push({ testo: `Completa il finale: ${nome}`, ok: fatti.finaliCompletati.includes(f) ? true : null });
+  }
   if (r.maxGraviMedi !== undefined)
     obiettivi.push({ testo: `Al massimo ${r.maxGraviMedi} errore grave per partita (media)`, ok: finita && gr.length === n ? (graviMedi ?? 0) <= r.maxGraviMedi : null });
   return {
@@ -226,6 +237,6 @@ export async function avanzamento(m: Missione): Promise<Avanzamento> {
     graviMedi,
     deviazioni: [...dev.values()].sort((a, b) => b.volte - a.volte),
     obiettivi,
-    completa: finita && obiettivi.every((o) => o.ok !== false),
+    completa: finita && obiettivi.every((o) => o.ok !== false) && (!r.puzzle || fatti.puzzleRisolti >= r.puzzle) && (r.finali ?? []).every((f) => fatti.finaliCompletati.includes(f)),
   };
 }

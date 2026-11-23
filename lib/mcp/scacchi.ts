@@ -11,6 +11,7 @@ import { htmlWidget, WIDGET_URI } from '@/lib/scacchi/widget';
 import { baseApp } from './oauth';
 import { REPERTORIO } from '@/lib/scacchi/repertorio';
 import { statistiche } from '@/lib/scacchi/statistiche';
+import { bilancioMissione } from '@/lib/scacchi/bilancio';
 import { riepilogoPuzzle, sincronizzaPuzzle } from '@/lib/scacchi/puzzle';
 import { FINALI } from '@/lib/scacchi/finali';
 import { progressiFinali } from '@/lib/scacchi/finali-db';
@@ -23,7 +24,7 @@ export const ISTRUZIONI_SCACCHI = `SCACCHI (passione di Mauro, non lavoro): Maur
 - Salva le spiegazioni utili con scacchi_commenta (una per mossa, con la linea alternativa in SAN dalla posizione prima della mossa): compaiono sulla scacchiera del sito e del widget.
 - Se la partita non è ancora analizzata (analizzata: false), chiedi a Mauro di aprirla sul sito per avviare la review, oppure lavora con scacchi_analizza_posizione sulle posizioni chiave.
 - COACH: Mauro ti ha chiesto di fargli da coach. Repertorio: Bianco 1.e4 e Italiana (3.Bc4), Nero 1...e5 e Giuoco Piano (3...Bc5) più le linee contro Philidor, Scandinava, Caro-Kann, Scozzese, Spagnola, Apertura di Alfiere ed Evans (scacchi_repertorio). Il programma è a missioni: blocchi di partite rapid con regole (scacchi_coach_stato). Quando chiede come va: leggi lo stato, guarda le partite della missione (soprattutto deviazioni dal repertorio, perse per tempo, errori gravi), dagli un feedback concreto e salvalo con scacchi_feedback_missione. Se gli obiettivi sono raggiunti, chiudi la missione e attiva la successiva (dopo la sua conferma). Puoi creare missioni su misura con scacchi_crea_missione. Sii diretto: dì cosa sbaglia e cosa deve fare nelle prossime partite.
-- STATISTICHE E PUZZLE: scacchi_statistiche riassume risultati, aperture forti e deboli, come perde, rating mensile, errori per fase (dalle partite analizzate) e lo stato dei puzzle nati dai suoi errori. Usale per decidere su cosa lavorare e per le missioni su misura; cita i numeri, non inventarli.
+- STATISTICHE E PUZZLE: scacchi_statistiche riassume risultati, aperture forti e deboli, come perde, rating mensile, errori per fase (dalle partite analizzate) e lo stato dei puzzle nati dai suoi errori. Per il bilancio di una missione usa scacchi_bilancio_missione: errori per tipo e fase già calcolati, vittorie non convertite e missione proposta. Usale per decidere su cosa lavorare e per le missioni su misura; cita i numeri, non inventarli.
 - Il ply è il numero di semimossa: 1 = prima mossa del Bianco, 2 = risposta del Nero, ecc.`;
 
 const sola = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
@@ -59,7 +60,7 @@ function vistaPartita(p: PartitaCompleta) {
   });
   const erroriMiei = r
     ? r.mosse
-        .filter((m) => m.colore === p.colore_mio && ['imprecisione', 'errore', 'grave'].includes(m.classificazione))
+        .filter((m) => m.colore === p.colore_mio && ['imprecisione', 'errore', 'grave', 'mancata'].includes(m.classificazione))
         .map((m) => ({ ply: m.ply, mossa: m.san, classificazione: m.classificazione, migliore: m.migliorSan, perdita_pct: Math.round(m.perdita * 100) }))
     : [];
   return {
@@ -375,6 +376,24 @@ export function registraScacchi(server: McpServer) {
   );
 
   server.registerTool(
+    'scacchi_bilancio_missione',
+    {
+      title: 'Bilancio di una missione',
+      description:
+        'Analisi automatica delle partite di una missione (default: quella attiva o l\'ultima chiusa): errori per fase e per tipo (pezzo in presa, Re in pericolo, occasione mancata, finale, zeitnot) con esempi (partita e ply), vittorie non convertite, stalli, deviazioni dal repertorio e la missione successiva proposta. Usalo prima di scrivere il feedback.',
+      inputSchema: z.object({ id: z.number().int().optional() }),
+      annotations: sola,
+    },
+    async ({ id }) => {
+      const tutte = await listaMissioni();
+      const m = id ? tutte.find((x) => x.id === id) : tutte.find((x) => x.stato === 'attiva') ?? tutte[0];
+      if (!m) return errore('Nessuna missione');
+      const fatti = Object.values(await progressiFinali()).filter((p) => p.completato).map((p) => p.finale_id);
+      return testo({ missione: { id: m.id, titolo: m.titolo, stato: m.stato }, ...(await bilancioMissione(m, fatti)) });
+    }
+  );
+
+  server.registerTool(
     'scacchi_feedback_missione',
     {
       title: 'Feedback del coach sulla missione',
@@ -416,6 +435,8 @@ export function registraScacchi(server: McpServer) {
         max_perse_per_tempo: z.number().int().min(0).optional(),
         max_gravi_medi: z.number().min(0).optional(),
         drill: z.array(z.string()).optional(),
+        puzzle: z.number().int().min(1).max(100).optional().describe('Puzzle da risolvere durante la missione'),
+        finali: z.array(z.string()).optional().describe('Id dei finali da completare (donna-re, torre-re, due-torri, pedone-opposizione, quadrato, lucena, philidor, pedone-difesa)'),
       }),
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
     },
@@ -432,6 +453,8 @@ export function registraScacchi(server: McpServer) {
             maxPersePerTempo: a.max_perse_per_tempo,
             maxGraviMedi: a.max_gravi_medi,
             drill: a.drill,
+            puzzle: a.puzzle,
+            finali: a.finali,
           },
         });
         return testo({ id, pagina: `${baseApp()}/scacchi/coach` });

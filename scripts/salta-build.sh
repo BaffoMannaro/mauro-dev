@@ -11,8 +11,9 @@ ramo="$VERCEL_GIT_COMMIT_REF"
 if [ "$VERCEL_ENV" != production ]; then
   case "$ramo" in
     dependabot/*) echo "Anteprima di Dependabot: si costruisce (serve alle unioni automatiche)." ;;
-    *) if ! printf %s "$VERCEL_GIT_COMMIT_MESSAGE" | grep -q '\[anteprima\]'; then
-         echo "Anteprima saltata: scrivi [anteprima] nel commit per averla."
+    *) # Il segnale vale solo nella prima riga: nel resto del messaggio se ne può parlare.
+       if ! printf '%s\n' "$VERCEL_GIT_COMMIT_MESSAGE" | head -n 1 | grep -qF '[anteprima]'; then
+         echo "Anteprima saltata: metti [anteprima] nella prima riga del commit per averla."
          exit 0
        fi ;;
   esac
